@@ -193,8 +193,8 @@ const char* Log::logFileName() {
   return g_logFileNameBuffer;
 }
 
-void Log::init(LogLevel level, const char* logFileName, int32 logFileLimit,
-               int64 logDiskSpaceLimit) {
+void Log::init(LogLevel level, const char* logFileName, int32_t logFileLimit,
+               int64_t logDiskSpaceLimit) {
   if (g_log != NULL) {
     throw IllegalStateException(
         "The Log has already been initialized. "
@@ -244,7 +244,7 @@ void Log::init(LogLevel level, const char* logFileName, int32 logFileLimit,
     // Appending a ".log" at the end if it does not exist or file has some other
     // extension.
     std::string filebasename = ACE::basename(g_logFile->c_str());
-    int32 len = static_cast<int32>(filebasename.length());
+    int32_t len = static_cast<int32_t>(filebasename.length());
     size_t fileExtPos = filebasename.find_last_of('.', len);
     // if no extension then add .log extension
     if (fileExtPos == std::string::npos) {
@@ -363,8 +363,8 @@ void Log::init(LogLevel level, const char* logFileName, int32 logFileLimit,
       std::string extName;
       std::string newfilestr;
 
-      int32 len = static_cast<int32>(g_logFileWithExt->length());
-      int32 lastPosOfSep = static_cast<int32>(
+      int32_t len = static_cast<int32_t>(g_logFileWithExt->length());
+      int32_t lastPosOfSep = static_cast<int32_t>(
           g_logFileWithExt->find_last_of(ACE_DIRECTORY_SEPARATOR_CHAR, len));
       if (lastPosOfSep == -1) {
         logsdirname = ".";
@@ -373,8 +373,8 @@ void Log::init(LogLevel level, const char* logFileName, int32 logFileLimit,
       }
       logsbasename = g_logFileWithExt->substr(lastPosOfSep + 1, len);
       char logFileExtAfter = '.';
-      int32 baselen = static_cast<int32>(logsbasename.length());
-      int32 posOfExt = static_cast<int32>(
+      int32_t baselen = static_cast<int32_t>(logsbasename.length());
+      int32_t posOfExt = static_cast<int32_t>(
           logsbasename.find_last_of(logFileExtAfter, baselen));
       if (posOfExt == -1) {
         // throw IllegalArgument;
@@ -672,8 +672,8 @@ void Log::put(LogLevel level, const char* msg) {
       std::string extName;
       std::string newfilestr;
 
-      int32 len = static_cast<int32>(g_logFileWithExt->length());
-      int32 lastPosOfSep = static_cast<int32>(
+      int32_t len = static_cast<int32_t>(g_logFileWithExt->length());
+      int32_t lastPosOfSep = static_cast<int32_t>(
           g_logFileWithExt->find_last_of(ACE_DIRECTORY_SEPARATOR_CHAR, len));
       if (lastPosOfSep == -1) {
         logsdirname = ".";
@@ -682,8 +682,8 @@ void Log::put(LogLevel level, const char* msg) {
       }
       logsbasename = g_logFileWithExt->substr(lastPosOfSep + 1, len);
       char logFileExtAfter = '.';
-      int32 baselen = static_cast<int32>(logsbasename.length());
-      int32 posOfExt = static_cast<int32>(
+      int32_t baselen = static_cast<int32_t>(logsbasename.length());
+      int32_t posOfExt = static_cast<int32_t>(
           logsbasename.find_last_of(logFileExtAfter, baselen));
       if (posOfExt == -1) {
         // throw IllegalArgument;
@@ -732,7 +732,7 @@ void Log::put(LogLevel level, const char* msg) {
       // struct dirent **resultArray;
       // int entries_count = ACE_OS::scandir(dirname.c_str(), &resultArray,
       // selector, comparator);
-      // int64 spaceUsed = 0;
+      // int64_t spaceUsed = 0;
       g_spaceUsed = 0;
       ACE_stat statBuf = {0};
       /*for(int i = 1; i < entries_count; i++) {
@@ -769,7 +769,7 @@ void Log::put(LogLevel level, const char* msg) {
       int fileIndex = 0;
 
       while ((g_spaceUsed > (g_diskSpaceLimit /*- g_fileSizeLimit*/))) {
-        int64 fileSize = fileInfo[fileIndex].second;
+        int64_t fileSize = fileInfo[fileIndex].second;
         if (ACE_OS::unlink(fileInfo[fileIndex].first.c_str()) == 0) {
           g_spaceUsed -= fileSize;
         } else {

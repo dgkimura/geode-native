@@ -183,9 +183,9 @@ void PdxHelper::serializePdx(DataOutput& output,
 
     nType->InitializeType();
 
-    // int32 nTypeId =(int32)
+    // int32_t nTypeId =(int32_t)
     // SerializationRegistry::GetPDXIdForType(output.getPoolName(), nType);
-    int32 nTypeId = PdxTypeRegistry::getPDXIdForType(
+    int32_t nTypeId = PdxTypeRegistry::getPDXIdForType(
         pdxType, output.getPoolName(), nType, true);
     nType->setTypeId(nTypeId);
 
@@ -243,7 +243,7 @@ void PdxHelper::serializePdx(DataOutput& output,
 
 PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
                                              bool forceDeserialize,
-                                             int32 typeId, int32 length) {
+                                             int32_t typeId, int32_t length) {
   char* pdxClassname = NULL;
   // char* pdxDomainClassname = NULL;
   PdxSerializablePtr pdxObjectptr = NULLPTR;
@@ -393,8 +393,8 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
       cacheImpl->m_cacheStats->incPdxDeSerialization(len +
                                                      9);  // pdxLen + 1 + 2*4
     }
-    return PdxHelper::deserializePdx(dataInput, forceDeserialize, (int32)typeId,
-                                     (int32)len);
+    return PdxHelper::deserializePdx(dataInput, forceDeserialize, (int32_t)typeId,
+                                     (int32_t)len);
 
   } else {
     // PdxSerializablePtr pdxObject = NULLPTR;
@@ -512,8 +512,8 @@ void PdxHelper::createMergedType(PdxTypePtr localType, PdxTypePtr remoteType,
   }
 }
 
-int32 PdxHelper::readInt32(uint8_t* offsetPosition) {
-  int32 data = offsetPosition[0];
+int32_t PdxHelper::readInt32(uint8_t* offsetPosition) {
+  int32_t data = offsetPosition[0];
   data = (data << 8) | offsetPosition[1];
   data = (data << 8) | offsetPosition[2];
   data = (data << 8) | offsetPosition[3];
@@ -521,40 +521,40 @@ int32 PdxHelper::readInt32(uint8_t* offsetPosition) {
   return data;
 }
 
-void PdxHelper::writeInt32(uint8_t* offsetPosition, int32 value) {
+void PdxHelper::writeInt32(uint8_t* offsetPosition, int32_t value) {
   offsetPosition[0] = static_cast<uint8_t>(value >> 24);
   offsetPosition[1] = static_cast<uint8_t>(value >> 16);
   offsetPosition[2] = static_cast<uint8_t>(value >> 8);
   offsetPosition[3] = static_cast<uint8_t>(value);
 }
 
-int32 PdxHelper::readInt16(uint8_t* offsetPosition) {
+int32_t PdxHelper::readInt16(uint8_t* offsetPosition) {
   int16_t data = offsetPosition[0];
   data = (data << 8) | offsetPosition[1];
-  return static_cast<int32>(data);
+  return static_cast<int32_t>(data);
 }
 
-int32 PdxHelper::readUInt16(uint8_t* offsetPosition) {
-  uint16 data = offsetPosition[0];
+int32_t PdxHelper::readUInt16(uint8_t* offsetPosition) {
+  uint16_t data = offsetPosition[0];
   data = (data << 8) | offsetPosition[1];
-  return static_cast<int32>(data);
+  return static_cast<int32_t>(data);
 }
 
-int32 PdxHelper::readByte(uint8_t* offsetPosition) {
-  return static_cast<int32>(offsetPosition[0]);
+int32_t PdxHelper::readByte(uint8_t* offsetPosition) {
+  return static_cast<int32_t>(offsetPosition[0]);
 }
 
-void PdxHelper::writeInt16(uint8_t* offsetPosition, int32 value) {
-  int16 val = static_cast<int16>(value);
+void PdxHelper::writeInt16(uint8_t* offsetPosition, int32_t value) {
+  int16_t val = static_cast<int16_t>(value);
   offsetPosition[0] = static_cast<uint8_t>(val >> 8);
   offsetPosition[1] = static_cast<uint8_t>(val);
 }
 
-void PdxHelper::writeByte(uint8_t* offsetPosition, int32 value) {
+void PdxHelper::writeByte(uint8_t* offsetPosition, int32_t value) {
   offsetPosition[0] = static_cast<uint8_t>(value);
 }
 
-int32 PdxHelper::readInt(uint8_t* offsetPosition, int size) {
+int32_t PdxHelper::readInt(uint8_t* offsetPosition, int size) {
   switch (size) {
     case 1:
       return readByte(offsetPosition);
@@ -566,7 +566,7 @@ int32 PdxHelper::readInt(uint8_t* offsetPosition, int size) {
   throw;
 }
 
-int32 PdxHelper::getEnumValue(const char* enumClassName, const char* enumName,
+int32_t PdxHelper::getEnumValue(const char* enumClassName, const char* enumName,
                               int hashcode) {
   EnumInfoPtr ei(new EnumInfo(enumClassName, enumName, hashcode));
   return PdxTypeRegistry::getEnumValue(ei);
