@@ -46,7 +46,7 @@ ExecutionPtr FunctionService::onRegion(RegionPtr region) {
       // it is in multiuser mode
       proxyCache = pr->m_proxyCache;
       PoolPtr userAttachedPool = proxyCache->m_userAttributes->getPool();
-      PoolPtr pool = PoolManager::find(userAttachedPool->getName());
+      PoolPtr pool = getPoolManager()->find(userAttachedPool->getName());
       if (!(pool != nullptr && pool.get() == userAttachedPool.get() &&
             !pool->isDestroyed())) {
         throw IllegalStateException(
@@ -55,9 +55,8 @@ ExecutionPtr FunctionService::onRegion(RegionPtr region) {
       RegionPtr tmpRegion;
       tmpRegion = nullptr;
       // getting real region to execute function on region
-      if (!CacheFactory::getAnyInstance()->isClosed()) {
-        CacheRegionHelper::getCacheImpl(CacheFactory::getAnyInstance().get())
-            ->getRegion(region->getName(), tmpRegion);
+      if (!pr->getRealRegion()->getCacheImpl()->isClosed()) {
+        pr->getRealRegion()->getCacheImpl()->getRegion(region->getName(), tmpRegion);
       } else {
         throw IllegalStateException("Cache has been closed");
       }
@@ -110,7 +109,7 @@ ExecutionPtr FunctionService::onServerWithCache(const RegionServicePtr& cache) {
   LOGDEBUG("FunctionService::onServer:");
   if (pc != NULL) {
     PoolPtr userAttachedPool = pc->m_userAttributes->getPool();
-    PoolPtr pool = PoolManager::find(userAttachedPool->getName());
+    PoolPtr pool = getPoolManager()->find(userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
       return std::make_shared<ExecutionImpl>(pool, false, pc);
@@ -134,7 +133,7 @@ ExecutionPtr FunctionService::onServersWithCache(
   LOGDEBUG("FunctionService::onServers:");
   if (pc != NULL && !cache->isClosed()) {
     PoolPtr userAttachedPool = pc->m_userAttributes->getPool();
-    PoolPtr pool = PoolManager::find(userAttachedPool->getName());
+    PoolPtr pool = getPoolManager()->find(userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
       return std::make_shared<ExecutionImpl>(pool, true, pc);

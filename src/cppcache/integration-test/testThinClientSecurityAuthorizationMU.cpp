@@ -680,7 +680,7 @@ DUNIT_TASK_DEFINITION(WRITER_CLIENT, StepTwo)
     }
     HANDLE_NOT_AUTHORIZED_EXCEPTION
 
-    // PoolPtr pool = PoolManager::find(regionNamesAuth[0]);
+    // PoolPtr pool = getPoolManager()->find(regionNamesAuth[0]);
 
     try {
       RegionServicePtr virtualCache;
@@ -1010,7 +1010,7 @@ DUNIT_TASK_DEFINITION(READER_CLIENT, StepThree)
     }
     HANDLE_NOT_AUTHORIZED_EXCEPTION
 
-    // PoolPtr pool = PoolManager::find(regionNamesAuth[0]);
+    // PoolPtr pool = getPoolManager()->find(regionNamesAuth[0]);
 
     try {
       /*QueryServicePtr qs;

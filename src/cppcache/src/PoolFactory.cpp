@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <CacheRegionHelper.hpp>
 #include <CacheImpl.hpp>
 #include <geode/PoolFactory.hpp>
 #include <geode/Pool.hpp>
@@ -31,10 +32,27 @@ const char* PoolFactory::DEFAULT_SERVER_GROUP = "";
 extern HashMapOfPools* connectionPools;
 extern ACE_Recursive_Thread_Mutex connectionPoolsLock;
 
-PoolFactory::PoolFactory()
+namespace apache {
+namespace geode {
+namespace client {
+static PoolFactoryPtr g_poolFactory = nullptr;
+PoolFactoryPtr getPoolFactory(CachePtr cachePtr)
+{
+  if (g_poolFactory == nullptr) {
+    g_poolFactory = PoolFactoryPtr(new PoolFactory(cachePtr));
+  }
+  return g_poolFactory;
+}
+}  // namespace client
+}  // namespace geode
+}  // namespace apache
+
+
+PoolFactory::PoolFactory(CachePtr cachePtr)
     : m_attrs(new PoolAttributes),
       m_isSubscriptionRedundancy(false),
-      m_addedServerOrLocator(false) {}
+      m_addedServerOrLocator(false),
+      m_cachePtr(cachePtr) {}
 
 PoolFactory::~PoolFactory() {}
 
@@ -116,27 +134,13 @@ PoolPtr PoolFactory::create(const char* name) {
   {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
 
-    if (PoolManager::find(name) != nullptr) {
+    
+    if (getPoolManager()->find(name) != nullptr) {
       throw IllegalStateException("Pool with the same name already exists");
     }
     // Create a clone of Attr;
     PoolAttributesPtr copyAttrs = m_attrs->clone();
 
-    if (CacheImpl::getInstance() == NULL) {
-      throw IllegalStateException("Cache has not been created.");
-    }
-
-    if (CacheImpl::getInstance()->isClosed()) {
-      throw CacheClosedException("Cache is closed");
-    }
-    if (CacheImpl::getInstance()->getCacheMode() &&
-        m_isSubscriptionRedundancy) {
-      LOGWARN(
-          "At least one pool has been created so ignoring cache level "
-          "redundancy setting");
-    }
-    TcrConnectionManager& tccm =
-        CacheImpl::getInstance()->tcrConnectionManager();
     LOGDEBUG("PoolFactory::create mulitusermode = %d ",
              copyAttrs->getMultiuserSecureModeEnabled());
     if (copyAttrs->getMultiuserSecureModeEnabled()) {
@@ -150,6 +154,9 @@ PoolPtr PoolFactory::create(const char* name) {
             "connections are not supported.");
       }
     }
+
+    CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(m_cachePtr.get());
+      TcrConnectionManager& tccm =   cacheImpl->tcrConnectionManager();
     if (!copyAttrs->getSubscriptionEnabled() &&
         copyAttrs->getSubscriptionRedundancy() == 0 && !tccm.isDurable()) {
       if (copyAttrs

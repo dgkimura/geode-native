@@ -20,7 +20,6 @@
 #include "RegionXmlCreation.hpp"
 #include "CacheImpl.hpp"
 using namespace apache::geode::client;
-extern bool Cache_CreatedFromCacheFactory;
 
 void RegionXmlCreation::addSubregion(RegionXmlCreation* regionPtr) {
   subRegions.push_back(regionPtr);
@@ -45,19 +44,16 @@ void RegionXmlCreation::createRoot(Cache* cache) {
   GF_D_ASSERT(this->isRoot);
   RegionPtr rootRegPtr = nullptr;
 
-  if (Cache_CreatedFromCacheFactory) {
-    //  if(cache->m_cacheImpl->getDefaultPool() == nullptr)
-    {
-      // we may need to initialize default pool
-      if (regAttrs->getEndpoints() == NULL) {
-        if (regAttrs->getPoolName() == NULL) {
-          PoolPtr pool = CacheFactory::createOrGetDefaultPool();
+  {
+    // we may need to initialize default pool
+    if (regAttrs->getEndpoints() == NULL) {
+      if (regAttrs->getPoolName() == NULL) {
+        PoolPtr pool = CacheFactory::createOrGetDefaultPool(*cache->m_cacheImpl);
 
-          if (pool == nullptr) {
-            throw IllegalStateException("Pool is not defined create region.");
-          }
-          regAttrs->setPoolName(pool->getName());
+        if (pool == nullptr) {
+          throw IllegalStateException("Pool is not defined create region.");
         }
+        regAttrs->setPoolName(pool->getName());
       }
     }
   }

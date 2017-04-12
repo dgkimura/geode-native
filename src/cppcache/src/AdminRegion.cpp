@@ -25,15 +25,15 @@ namespace apache {
 namespace geode {
 namespace client {
 
-AdminRegionPtr AdminRegion::create(CacheImpl* cache,
+AdminRegionPtr AdminRegion::create(CacheImpl* cacheImpl,
                                    ThinClientBaseDM* distMan) {
   auto adminRegion = std::make_shared<AdminRegion>();
 
   SystemProperties* props =
-      cache->getCache()->getDistributedSystem()->getSystemProperties();
+      cacheImpl->getCache()->getDistributedSystem()->getSystemProperties();
   if (props && props->statisticsEnabled()) {
     // no need to create a region .. just create a cacheDistribution Manager
-    adminRegion->m_connectionMgr = &(cache->tcrConnectionManager());
+    adminRegion->m_connectionMgr = &(cacheImpl->tcrConnectionManager());
     if (!distMan) {
       adminRegion->m_distMngr =
           new ThinClientCacheDistributionManager(*adminRegion->m_connectionMgr);

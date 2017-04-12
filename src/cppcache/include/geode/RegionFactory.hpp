@@ -255,11 +255,13 @@ class CPPCACHE_EXPORT RegionFactory
   RegionFactoryPtr setTombstoneTimeout(uint32_t tombstoneTimeoutInMSec);
 
  private:
-  RegionFactory(apache::geode::client::RegionShortcut preDefinedRegion);
+  RegionFactory(apache::geode::client::RegionShortcut preDefinedRegion, CacheImpl& cacheimpl);
 
   RegionShortcut m_preDefinedRegion;
 
   AttributesFactoryPtr m_attributeFactory;
+
+  CacheImpl& m_cacheimpl;
 
   void setRegionShortcut();
 

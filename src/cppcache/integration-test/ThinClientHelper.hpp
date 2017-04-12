@@ -79,6 +79,7 @@ void initClientWithPool(const bool isthinClient, const char* poolName,
                         int loadConditioningInterval = -1,
                         bool prSingleHop = false, bool threadLocal = false) {
   if (cacheHelper == NULL) {
+    LOGERROR("Allocating a new cachehelper");
     cacheHelper = new CacheHelper(
         isthinClient, poolName, locators, serverGroup, configPtr, redundancy,
         clientNotification, subscriptionAckInterval, connections,
@@ -431,7 +432,7 @@ RegionPtr createPooledRegion(const char* name, bool ackMode,
 
 PoolPtr findPool(const char* poolName) {
   LOG("findPool() entered.");
-  PoolPtr poolPtr = PoolManager::find(poolName);
+  PoolPtr poolPtr = getPoolManager()->find(poolName);
   ASSERT(poolPtr != nullptr, "Failed to find pool.");
   return poolPtr;
 }

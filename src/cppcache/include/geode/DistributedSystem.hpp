@@ -70,7 +70,7 @@ class CPPCACHE_EXPORT DistributedSystem : public SharedBase {
    *@brief disconnect from the distributed system
    *@throws IllegalStateException if not connected
    */
-  static void disconnect();
+  static void disconnect(CachePtr cachePtr);
 
   /** Returns the SystemProperties that were used to create this instance of the
    *  DistributedSystem

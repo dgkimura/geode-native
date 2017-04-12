@@ -105,29 +105,9 @@ void AttributesFactory::setConcurrencyLevel(uint8_t concurrencyLevel) {
   m_regionAttributes.m_concurrencyLevel = concurrencyLevel;
 }
 
-/*
-void AttributesFactory::setStatisticsEnabled( bool statisticsEnabled)
-{
-   m_regionAttributes.m_statisticsEnabled = statisticsEnabled;
-}
-*/
-
 std::unique_ptr<RegionAttributes> AttributesFactory::createRegionAttributes() {
   RegionAttributesPtr res;
-  /*
-  if( m_regionAttributes.m_poolName != NULL )
-  {
-          PoolPtr pool= PoolManager::find( m_regionAttributes.m_poolName );
-    if (pool == nullptr) {
-      throw IllegalStateException("Pool not found while creating region
-  attributes");
-    }
-          setClientNotificationEnabled(pool->getSubscriptionEnabled());
-          if( pool->getSubscriptionRedundancy() >0 )
-  setClientNotificationEnabled(true);
-  }
-  */
-  validateAttributes(m_regionAttributes);
+   validateAttributes(m_regionAttributes);
   return std::unique_ptr<RegionAttributes>(
       new RegionAttributes(m_regionAttributes));
 }

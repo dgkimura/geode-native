@@ -31,6 +31,8 @@ namespace client {
 
 typedef HashMapT<CacheableStringPtr, PoolPtr> HashMapOfPools;
 
+CPPCACHE_EXPORT PoolManagerPtr getPoolManager();
+
 /**
  * Manages creation and access to {@link Pool connection pools} for clients.
  * <p>
@@ -42,14 +44,14 @@ typedef HashMapT<CacheableStringPtr, PoolPtr> HashMapOfPools;
  *
  *
  */
-class CPPCACHE_EXPORT PoolManager {
+class CPPCACHE_EXPORT PoolManager : public SharedBase {
  public:
   /**
    * Creates a new {@link PoolFactory pool factory},
    * which is used to configure and create new {@link Pool}s.
    * @return the new pool factory
    */
-  static PoolFactoryPtr createFactory();
+   PoolFactoryPtr createFactory(CachePtr cachePtr);
 
   /**
    * Returns a map containing all the pools in this manager.
@@ -61,7 +63,7 @@ class CPPCACHE_EXPORT PoolManager {
    * @return a Map that is a snapshot of all the pools currently known to this
    * manager.
    */
-  static const HashMapOfPools& getAll();
+   const HashMapOfPools& getAll();
 
   /**
    * Find by name an existing connection pool returning
@@ -70,7 +72,7 @@ class CPPCACHE_EXPORT PoolManager {
    * @return the existing connection pool or <code>nullptr</code> if it does not
    * exist.
    */
-  static PoolPtr find(const char* name);
+   PoolPtr find(const char* name);
 
   /**
    * Find the pool used by the given region.
@@ -79,7 +81,7 @@ class CPPCACHE_EXPORT PoolManager {
    * region does
    * not have a pool.
    */
-  static PoolPtr find(RegionPtr region);
+   PoolPtr find(RegionPtr region);
 
   /**
    * Unconditionally destroys all created pools that are in this manager.
@@ -88,9 +90,8 @@ class CPPCACHE_EXPORT PoolManager {
    * @see DistributedSystem#connect for a description of
    * <code>durable-client-timeout</code>.
    */
-  static void close(bool keepAlive = false);
+   void close(bool keepAlive = false);
 
- private:
   PoolManager();
 };
 }  // namespace client

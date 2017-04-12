@@ -490,7 +490,7 @@ int32_t SerializationRegistry::GetPDXIdForType(const char* poolName,
   PoolPtr pool = nullptr;
 
   if (poolName == NULL) {
-    const HashMapOfPools& pools = PoolManager::getAll();
+    const HashMapOfPools& pools = getPoolManager()->getAll();
     if (pools.size() > 0) {
       for (HashMapOfPools::Iterator iter = pools.begin(); iter != pools.end();
            ++iter) {
@@ -500,7 +500,7 @@ int32_t SerializationRegistry::GetPDXIdForType(const char* poolName,
       }
     }
   } else {
-    pool = PoolManager::find(poolName);
+    pool = getPoolManager()->find(poolName);
   }
 
   if (pool == nullptr) {
@@ -515,14 +515,14 @@ SerializablePtr SerializationRegistry::GetPDXTypeById(const char* poolName,
   PoolPtr pool = nullptr;
 
   if (poolName == NULL) {
-    const HashMapOfPools& pools = PoolManager::getAll();
+    const HashMapOfPools& pools = getPoolManager()->getAll();
     if (pools.size() > 0) {
       HashMapOfPools::Iterator iter = pools.begin();
       PoolPtr currPool(iter.second());
       pool = currPool;
     }
   } else {
-    pool = PoolManager::find(poolName);
+    pool = getPoolManager()->find(poolName);
   }
 
   if (pool == nullptr) {
@@ -551,7 +551,7 @@ SerializablePtr SerializationRegistry::GetEnum(int32_t val) {
 
 PoolPtr SerializationRegistry::getPool() {
   PoolPtr pool = nullptr;
-  const HashMapOfPools& pools = PoolManager::getAll();
+  const HashMapOfPools& pools = getPoolManager()->getAll();
   if (pools.size() > 0) {
     for (HashMapOfPools::Iterator iter = pools.begin(); iter != pools.end();
          ++iter) {

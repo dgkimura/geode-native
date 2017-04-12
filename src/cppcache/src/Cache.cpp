@@ -31,7 +31,6 @@
 
 using namespace apache::geode::client;
 
-extern bool Cache_CreatedFromCacheFactory;
 extern ACE_Recursive_Thread_Mutex* g_disconnectLock;
 
 /** Returns the name of this cache.
@@ -78,10 +77,7 @@ void Cache::close(bool keepalive) {
   m_cacheImpl->close(keepalive);
 
   try {
-    if (Cache_CreatedFromCacheFactory) {
-      Cache_CreatedFromCacheFactory = false;
-      DistributedSystem::disconnect();
-    }
+    DistributedSystem::disconnect(shared_from_this());
   } catch (const apache::geode::client::NotConnectedException&) {
   } catch (const apache::geode::client::Exception&) {
   } catch (...) {
@@ -187,7 +183,7 @@ bool Cache::isPoolInMultiuserMode(RegionPtr regionPtr) {
   const char* poolName = regionPtr->getAttributes()->getPoolName();
 
   if (poolName != NULL) {
-    PoolPtr poolPtr = PoolManager::find(poolName);
+    PoolPtr poolPtr = getPoolManager()->find(poolName);
     if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
       return poolPtr->getMultiuserAuthentication();
     }
@@ -212,7 +208,7 @@ RegionServicePtr Cache::createAuthenticatedView(
   if (poolName == NULL) {
     if (!this->isClosed() && m_cacheImpl->getDefaultPool() != nullptr) {
       return m_cacheImpl->getDefaultPool()->createSecureUserCache(
-          userSecurityProperties);
+          userSecurityProperties, shared_from_this());
     }
 
     throw IllegalStateException(
@@ -221,9 +217,9 @@ RegionServicePtr Cache::createAuthenticatedView(
   } else {
     if (!this->isClosed()) {
       if (poolName != NULL) {
-        PoolPtr poolPtr = PoolManager::find(poolName);
+        PoolPtr poolPtr = getPoolManager()->find(poolName);
         if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
-          return poolPtr->createSecureUserCache(userSecurityProperties);
+          return poolPtr->createSecureUserCache(userSecurityProperties, shared_from_this());
         }
         throw IllegalStateException(
             "Either pool not found or it has been destroyed");
@@ -235,3 +231,4 @@ RegionServicePtr Cache::createAuthenticatedView(
   }
   return nullptr;
 }
+

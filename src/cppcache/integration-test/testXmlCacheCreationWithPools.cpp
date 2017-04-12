@@ -352,9 +352,9 @@ int testXmlCacheCreationWithPools() {
     return -1;
   }
 
-  PoolPtr poolOfReg1 = PoolManager::find(poolNameReg1);
-  PoolPtr poolOfSubReg = PoolManager::find(poolNameSubReg);
-  PoolPtr poolOfReg2 = PoolManager::find(poolNameReg2);
+  PoolPtr poolOfReg1 = getPoolManager()->find(poolNameReg1);
+  PoolPtr poolOfSubReg = getPoolManager()->find(poolNameSubReg);
+  PoolPtr poolOfReg2 = getPoolManager()->find(poolNameReg2);
   SLIST locators;
   SLIST servers;
   SLIST emptylist;

@@ -23,7 +23,6 @@ target_link_libraries(security
   PRIVATE
     ACE
   PUBLIC
-    fwk
     testobject
     crypto
     ssl

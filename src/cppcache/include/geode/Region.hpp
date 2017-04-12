@@ -103,6 +103,9 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region>,
   */
   virtual RegionPtr getParentRegion() const = 0;
 
+  /** Returns the cache implementation of the parent cache, or NULLPTR if not set.
+  */
+  virtual CacheImpl* getCacheImpl() const = 0;
   /** Return the RegionAttributes for this region.
   */
   virtual RegionAttributesPtr getAttributes() const = 0;
@@ -116,6 +119,7 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region>,
   // virtual void updateAccessOrModifiedTime() = 0;
 
   virtual CacheStatisticsPtr getStatistics() const = 0;
+
 
   /** Invalidates this region. The invalidation will cascade to
   * all the subregions and cached entries. After

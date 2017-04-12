@@ -43,18 +43,18 @@ uint8_t PdxHelper::PdxHeader = 8;
 PdxHelper::PdxHelper() {}
 
 PdxHelper::~PdxHelper() {}
-
-CacheImpl* PdxHelper::getCacheImpl() {
-  CachePtr cache = CacheFactory::getAnyInstance();
-  if (cache == nullptr) {
-    throw IllegalStateException("cache has not been created yet.");
-    ;
-  }
-  if (cache->isClosed()) {
-    throw IllegalStateException("cache has been closed. ");
-  }
-  return CacheRegionHelper::getCacheImpl(cache.get());
-}
+//    TODO: WWSD
+//CacheImpl* PdxHelper::getCacheImpl() {
+//  CachePtr cache = CacheFactory::getAnyInstance();
+//  if (cache == NULLPTR) {
+//    throw IllegalStateException("cache has not been created yet.");
+//    ;
+//  }
+//  if (cache->isClosed()) {
+//    throw IllegalStateException("cache has been closed. ");
+//  }
+//  return CacheRegionHelper::getCacheImpl(cache.ptr());
+//}
 
 void PdxHelper::serializePdx(DataOutput& output,
                              const PdxSerializable& pdxObject) {
@@ -114,15 +114,16 @@ void PdxHelper::serializePdx(DataOutput& output,
     PdxTypeRegistry::addLocalPdxType(pdxType, nType);
     PdxTypeRegistry::addPdxType(nTypeId, nType);
 
-    //[ToDo] need to write bytes for stats
-    CacheImpl* cacheImpl = PdxHelper::getCacheImpl();
-    if (cacheImpl != NULL) {
-      uint8_t* stPos = const_cast<uint8_t*>(output.getBuffer()) +
-                       ptc->getStartPositionOffset();
-      int pdxLen = PdxHelper::readInt32(stPos);
-      cacheImpl->m_cacheStats->incPdxSerialization(
-          pdxLen + 1 + 2 * 4);  // pdxLen + 93 DSID + len + typeID
-    }
+//    TODO: WWSD
+//    //[ToDo] need to write bytes for stats
+//    CacheImpl* cacheImpl = PdxHelper::getCacheImpl();
+//    if (cacheImpl != NULL) {
+//      uint8_t* stPos = const_cast<uint8_t*>(output.getBuffer()) +
+//                       ptc->getStartPositionOffset();
+//      int pdxLen = PdxHelper::readInt32(stPos);
+//      cacheImpl->m_cacheStats->incPdxSerialization(
+//          pdxLen + 1 + 2 * 4);  // pdxLen + 93 DSID + len + typeID
+//    }
 
   } else  // we know locasl type, need to see preerved data
   {
@@ -146,15 +147,16 @@ void PdxHelper::serializePdx(DataOutput& output,
     pdxObject->toData(std::dynamic_pointer_cast<PdxWriter>(prw));
     prw->endObjectWriting();
 
-    //[ToDo] need to write bytes for stats
-    CacheImpl* cacheImpl = PdxHelper::getCacheImpl();
-    if (cacheImpl != NULL) {
-      uint8_t* stPos = const_cast<uint8_t*>(output.getBuffer()) +
-                       prw->getStartPositionOffset();
-      int pdxLen = PdxHelper::readInt32(stPos);
-      cacheImpl->m_cacheStats->incPdxSerialization(
-          pdxLen + 1 + 2 * 4);  // pdxLen + 93 DSID + len + typeID
-    }
+//    TODO: WWSD
+//    //[ToDo] need to write bytes for stats
+//    CacheImpl* cacheImpl = PdxHelper::getCacheImpl();
+//    if (cacheImpl != NULL) {
+//      uint8_t* stPos = const_cast<uint8_t*>(output.getBuffer()) +
+//                       prw->getStartPositionOffset();
+//      int pdxLen = PdxHelper::readInt32(stPos);
+//      cacheImpl->m_cacheStats->incPdxSerialization(
+//          pdxLen + 1 + 2 * 4);  // pdxLen + 93 DSID + len + typeID
+//    }
   }
 }
 
@@ -295,14 +297,14 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
     int32_t typeId;
     // read typeId
     dataInput.readInt(&typeId);
-
-    CacheImpl* cacheImpl = PdxHelper::getCacheImpl();
-    if (cacheImpl != NULL) {
-      cacheImpl->m_cacheStats->incPdxDeSerialization(len +
-                                                     9);  // pdxLen + 1 + 2*4
-    }
-    return PdxHelper::deserializePdx(dataInput, forceDeserialize,
-                                     (int32_t)typeId, (int32_t)len);
+//    TODO: WWSD
+//    CacheImpl* cacheImpl = PdxHelper::getCacheImpl();
+//    if (cacheImpl != NULL) {
+//      cacheImpl->m_cacheStats->incPdxDeSerialization(len +
+//                                                     9);  // pdxLen + 1 + 2*4
+//    }
+    return PdxHelper::deserializePdx(dataInput, forceDeserialize, (int32_t)typeId,
+                                     (int32_t)len);
 
   } else {
     // Read Length
@@ -329,11 +331,11 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
         const_cast<uint8_t*>(dataInput.currentBufferPosition()), len, typeId);
 
     dataInput.advanceCursor(len);
-
-    CacheImpl* cacheImpl = PdxHelper::getCacheImpl();
-    if (cacheImpl != NULL) {
-      cacheImpl->m_cacheStats->incPdxInstanceCreations();
-    }
+//  TODO: WWSD
+//    CacheImpl* cacheImpl = PdxHelper::getCacheImpl();
+//    if (cacheImpl != NULL) {
+//      cacheImpl->m_cacheStats->incPdxInstanceCreations();
+//    }
     return pdxObject;
   }
 }

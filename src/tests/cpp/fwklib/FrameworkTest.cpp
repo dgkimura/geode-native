@@ -22,7 +22,6 @@
 //#include <geode/RegionAttributes.hpp>
 #include <geode/PoolFactory.hpp>
 #include "PoolAttributes.hpp"
-
 using namespace apache::geode::client;
 using namespace apache::geode::client::testframework;
 
@@ -341,7 +340,9 @@ void FrameworkTest::localDestroyRegion(RegionPtr& region) {
 void FrameworkTest::parseEndPoints(int32_t ep, std::string label,
                                    bool isServer) {
   std::string poolName = "_Test_Pool";
-  PoolFactoryPtr pfPtr = PoolManager::createFactory();
+  CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
+  CachePtr cachePtr = cacheFactoryPtr->create();
+  PoolFactoryPtr pfPtr = getPoolManager()->createFactory(cachePtr);
   std::string tag = getStringValue("TAG");
   std::string bb("GFE_BB");
 
@@ -405,14 +406,14 @@ void FrameworkTest::parseEndPoints(int32_t ep, std::string label,
   if (!tag.empty()) {
     poolName.append(tag);
     // check if pool already exists
-    pptr = PoolManager::find(poolName.c_str());
+    pptr = getPoolManager()->find(poolName.c_str());
     if (pptr == nullptr) {
       pptr = pfPtr->create(poolName.c_str());
     }
   }
   // create default pool
   else {
-    pptr = PoolManager::find(poolName.c_str());
+    pptr = getPoolManager()->find(poolName.c_str());
     if (pptr == nullptr) {
       pptr = pfPtr->create(poolName.c_str());
     }
@@ -447,12 +448,12 @@ void FrameworkTest::createPool() {
 }
 
 QueryServicePtr FrameworkTest::checkQueryService() {
-  PoolFactoryPtr pfPtr = PoolManager::createFactory();
+  PoolFactoryPtr pfPtr = getPoolManager()->createFactory(m_cache);
   std::string bb("GFE_BB");
   std::string keys("testScheme");
   std::string mode = bbGetString(bb, keys);
   if (mode == "poolwithendpoints" || mode == "poolwithlocator") {
-    PoolPtr pool = PoolManager::find("_Test_Pool");
+    PoolPtr pool = getPoolManager()->find("_Test_Pool");
     return pool->getQueryService();
   } else {
     return m_cache->getQueryService();

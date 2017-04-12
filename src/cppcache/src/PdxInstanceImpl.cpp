@@ -1444,22 +1444,25 @@ PdxSerializablePtr PdxInstanceImpl::getObject() {
   //[ToDo] do we have to call incPdxDeSerialization here?
   PdxSerializablePtr ret =
       PdxHelper::deserializePdx(dataInput, true, m_typeId, m_bufferLength);
-  CachePtr cache = CacheFactory::getAnyInstance();
-  if (cache == nullptr) {
-    throw IllegalStateException("cache has not been created yet.");
-    ;
-  }
-  if (cache->isClosed()) {
-    throw IllegalStateException("cache has been closed. ");
-  }
-  CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cache.get());
-  if (cacheImpl != NULL) {
-    Utils::updateStatOpTime(
-        cacheImpl->m_cacheStats->getStat(),
-        cacheImpl->m_cacheStats->getPdxInstanceDeserializationTimeId(),
-        sampleStartNanos);
-    cacheImpl->m_cacheStats->incPdxInstanceDeserializations();
-  }
+
+// TODO: WWSD
+//  CachePtr cache = CacheFactory::getAnyInstance();
+//  if (cache == NULLPTR) {
+//    throw IllegalStateException("cache has not been created yet.");
+//    ;
+//  }
+//  if (cache->isClosed()) {
+//    throw IllegalStateException("cache has been closed. ");
+//  }
+//  CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cache.ptr());
+//  if (cacheImpl != NULL) {
+//    Utils::updateStatOpTime(
+//        cacheImpl->m_cacheStats->getStat(),
+//        cacheImpl->m_cacheStats->getPdxInstanceDeserializationTimeId(),
+//        sampleStartNanos);
+//    cacheImpl->m_cacheStats->incPdxInstanceDeserializations();
+//  }
+
   return ret;
 }
 

@@ -24,19 +24,34 @@ using namespace apache::geode::client;
 HashMapOfPools* connectionPools = NULL; /*new HashMapOfPools( )*/
 ACE_Recursive_Thread_Mutex connectionPoolsLock;
 
+namespace apache {
+namespace geode {
+namespace client {
+static PoolManagerPtr g_poolManager = nullptr;
+PoolManagerPtr getPoolManager()
+{
+  if (g_poolManager == nullptr) {
+    g_poolManager = PoolManagerPtr(new PoolManager());
+  }
+  return g_poolManager;
+}
+}  // namespace client
+}  // namespace geode
+}  // namespace apache
+
 void removePool(const char* name) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
   connectionPools->erase(CacheableString::create(name));
 }
 
-PoolFactoryPtr PoolManager::createFactory() {
+PoolFactoryPtr PoolManager::createFactory(CachePtr cachePtr) {
   if (connectionPools == NULL) {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
     if (connectionPools == NULL) {
       connectionPools = new HashMapOfPools();
     }
   }
-  return PoolFactoryPtr(new PoolFactory());
+  return PoolFactoryPtr(new PoolFactory(cachePtr));
 }
 
 void PoolManager::close(bool keepAlive) {
@@ -97,4 +112,9 @@ const HashMapOfPools& PoolManager::getAll() {
     }
   }
   return *connectionPools;
+}
+
+
+PoolManager::PoolManager()
+{
 }

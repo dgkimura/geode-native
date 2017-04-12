@@ -80,7 +80,7 @@ class AdminRegion : public SharedBase,
   FRIEND_STD_SHARED_PTR(AdminRegion)
 
  public:
-  static std::shared_ptr<AdminRegion> create(CacheImpl* cache,
+  static std::shared_ptr<AdminRegion> create(CacheImpl* cacheImpl,
                                              ThinClientBaseDM* distMan = NULL);
   ACE_RW_Thread_Mutex& getRWLock();
   const bool& isDestroyed();
