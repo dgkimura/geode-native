@@ -282,6 +282,8 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
 
   static std::map<std::string, RegionAttributesPtr> getRegionShortcut();
 
+  PoolPtr createOrGetDefaultPool();
+
  private:
   static volatile bool s_networkhop;
   static volatile int s_blacklistBucketTimeout;
@@ -290,6 +292,8 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   PoolPtr m_defaultPool;
   bool m_ignorePdxUnreadFields;
   bool m_readPdxSerialized;
+
+  PoolFactoryPtr pf;
 
   enum RegionKind {
     CPP_REGION,

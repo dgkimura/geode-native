@@ -236,3 +236,4 @@ RegionServicePtr Cache::createAuthenticatedView(
   }
   return NULLPTR;
 }
+

@@ -31,6 +31,22 @@ const char* PoolFactory::DEFAULT_SERVER_GROUP = "";
 extern HashMapOfPools* connectionPools;
 extern ACE_Recursive_Thread_Mutex connectionPoolsLock;
 
+namespace apache {
+namespace geode {
+namespace client {
+PoolFactoryPtr g_poolFactory = NULLPTR;
+PoolFactoryPtr getPoolFactory()
+{
+  if (g_poolFactory == NULLPTR) {
+    g_poolFactory = PoolManager::createFactory();
+  }
+  return g_poolFactory;
+}
+}  // namespace client
+}  // namespace geode
+}  // namespace apache
+
+
 PoolFactory::PoolFactory()
     : m_attrs(new PoolAttributes),
       m_isSubscriptionRedundancy(false),

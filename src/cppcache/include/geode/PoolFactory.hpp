@@ -36,6 +36,8 @@ namespace client {
 class CacheImpl;
 class PoolAttributes;
 
+PoolFactoryPtr getPoolFactory();
+
 /**
  * This interface provides for the configuration and creation of instances of
  * {@link Pool}.
@@ -528,6 +530,7 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
   bool m_isSubscriptionRedundancy;
   bool m_addedServerOrLocator;
   friend class Cache;
+  friend class CacheImpl;
   friend class PoolManager;
   friend class CacheFactory;
   friend class CacheXmlCreation;
