@@ -286,7 +286,7 @@ CachePtr CacheFactory::create(const char* name,
 
 PoolPtr CacheFactory::determineDefaultPool(CacheImpl& cacheimpl) {
   PoolPtr pool = NULLPTR;
-  HashMapOfPools allPools = PoolManager::getAll();
+  HashMapOfPools allPools = getPoolManager()->getAll();
   size_t currPoolSize = allPools.size();
 
   // means user has not set any pool attributes

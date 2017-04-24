@@ -61,7 +61,7 @@ void createPooledRegionMine(bool callReadyForEventsAPI = false) {
   PoolFactoryPtr poolFacPtr = PoolManager::createFactory();
   poolFacPtr->setSubscriptionEnabled(true);
   getHelper()->addServerLocatorEPs(locatorsG, poolFacPtr);
-  if ((PoolManager::find("__TEST_POOL1__")) ==
+  if ((getPoolManager()->find("__TEST_POOL1__")) ==
       NULLPTR) {  // Pool does not exist with the same name.
     PoolPtr pptr = poolFacPtr->create("__TEST_POOL1__");
   }

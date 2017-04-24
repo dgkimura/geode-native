@@ -46,7 +46,7 @@ ExecutionPtr FunctionService::onRegion(RegionPtr region) {
       // it is in multiuser mode
       proxyCache = pr->m_proxyCache;
       PoolPtr userAttachedPool = proxyCache->m_userAttributes->getPool();
-      PoolPtr pool = PoolManager::find(userAttachedPool->getName());
+      PoolPtr pool = getPoolManager()->find(userAttachedPool->getName());
       if (!(pool != NULLPTR && pool.ptr() == userAttachedPool.ptr() &&
             !pool->isDestroyed())) {
         throw IllegalStateException(
@@ -113,7 +113,7 @@ ExecutionPtr FunctionService::onServerWithCache(const RegionServicePtr& cache) {
   LOGDEBUG("FunctionService::onServer:");
   if (pc != NULL) {
     PoolPtr userAttachedPool = pc->m_userAttributes->getPool();
-    PoolPtr pool = PoolManager::find(userAttachedPool->getName());
+    PoolPtr pool = getPoolManager()->find(userAttachedPool->getName());
     if (pool != NULLPTR && pool.ptr() == userAttachedPool.ptr() &&
         !pool->isDestroyed()) {
       ExecutionPtr ptr(new ExecutionImpl(pool, false, cache));
@@ -138,7 +138,7 @@ ExecutionPtr FunctionService::onServersWithCache(
   LOGDEBUG("FunctionService::onServers:");
   if (pc != NULL && !cache->isClosed()) {
     PoolPtr userAttachedPool = pc->m_userAttributes->getPool();
-    PoolPtr pool = PoolManager::find(userAttachedPool->getName());
+    PoolPtr pool = getPoolManager()->find(userAttachedPool->getName());
     if (pool != NULLPTR && pool.ptr() == userAttachedPool.ptr() &&
         !pool->isDestroyed()) {
       ExecutionPtr ptr(new ExecutionImpl(pool, true, cache));

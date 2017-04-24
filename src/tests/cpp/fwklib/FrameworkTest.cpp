@@ -405,14 +405,14 @@ void FrameworkTest::parseEndPoints(int32_t ep, std::string label,
   if (!tag.empty()) {
     poolName.append(tag);
     // check if pool already exists
-    pptr = PoolManager::find(poolName.c_str());
+    pptr = getPoolManager()->find(poolName.c_str());
     if (pptr == NULLPTR) {
       pptr = pfPtr->create(poolName.c_str());
     }
   }
   // create default pool
   else {
-    pptr = PoolManager::find(poolName.c_str());
+    pptr = getPoolManager()->find(poolName.c_str());
     if (pptr == NULLPTR) {
       pptr = pfPtr->create(poolName.c_str());
     }
@@ -452,7 +452,7 @@ QueryServicePtr FrameworkTest::checkQueryService() {
   std::string keys("testScheme");
   std::string mode = bbGetString(bb, keys);
   if (mode == "poolwithendpoints" || mode == "poolwithlocator") {
-    PoolPtr pool = PoolManager::find("_Test_Pool");
+    PoolPtr pool = getPoolManager()->find("_Test_Pool");
     return pool->getQueryService();
   } else {
     return m_cache->getQueryService();

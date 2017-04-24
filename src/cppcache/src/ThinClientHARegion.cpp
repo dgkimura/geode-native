@@ -60,7 +60,7 @@ void ThinClientHARegion::initTCR() {
       m_tcrdm->init();
     } else {
       m_tcrdm = dynamic_cast<ThinClientPoolHADM*>(
-          PoolManager::find(m_attribute->getPoolName()).ptr());
+          getPoolManager()->find(m_attribute->getPoolName()).ptr());
       if (m_tcrdm) {
         m_poolDM = true;
         // Pool DM should only be inited once and it

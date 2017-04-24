@@ -187,7 +187,7 @@ bool Cache::isPoolInMultiuserMode(RegionPtr regionPtr) {
   const char* poolName = regionPtr->getAttributes()->getPoolName();
 
   if (poolName != NULL) {
-    PoolPtr poolPtr = PoolManager::find(poolName);
+    PoolPtr poolPtr = getPoolManager()->find(poolName);
     if (poolPtr != NULLPTR && !poolPtr->isDestroyed()) {
       return poolPtr->getMultiuserAuthentication();
     }
@@ -222,7 +222,7 @@ RegionServicePtr Cache::createAuthenticatedView(
   } else {
     if (!this->isClosed()) {
       if (poolName != NULL) {
-        PoolPtr poolPtr = PoolManager::find(poolName);
+        PoolPtr poolPtr = getPoolManager()->find(poolName);
         if (poolPtr != NULLPTR && !poolPtr->isDestroyed()) {
           return poolPtr->createSecureUserCache(userSecurityProperties);
         }

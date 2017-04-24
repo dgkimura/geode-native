@@ -156,7 +156,7 @@ void CacheImpl::initServices() {
   CacheImpl::s_versionStampMemIdList =
       MemberListForVersionStampPtr(new MemberListForVersionStamp());
   if (!m_initDone && m_attributes != NULLPTR && m_attributes->getEndpoints()) {
-    if (PoolManager::getAll().size() > 0 && getCacheMode()) {
+    if (getPoolManager()->getAll().size() > 0 && getCacheMode()) {
       LOGWARN(
           "At least one pool has been created so ignoring cache level "
           "redundancy setting");
@@ -194,7 +194,7 @@ int8_t CacheImpl::getAndResetServerGroupFlag() {
 void CacheImpl::netDown() {
   m_tcrConnectionManager->netDown();
 
-  const HashMapOfPools& pools = PoolManager::getAll();
+  const HashMapOfPools& pools = getPoolManager()->getAll();
   PoolPtr currPool = NULLPTR;
   for (HashMapOfPools::Iterator itr = pools.begin(); itr != pools.end();
        itr++) {
@@ -232,7 +232,7 @@ CacheImpl::RegionKind CacheImpl::getRegionKind(
       regionKind = THINCLIENT_REGION;
     }
   } else if (rattrs->getPoolName()) {
-    PoolPtr pPtr = PoolManager::find(rattrs->getPoolName());
+    PoolPtr pPtr = getPoolManager()->find(rattrs->getPoolName());
     if ((pPtr != NULLPTR && (pPtr->getSubscriptionRedundancy() > 0 ||
                              pPtr->getSubscriptionEnabled())) ||
         m_tcrConnectionManager->isDurable()) {
@@ -278,7 +278,7 @@ QueryServicePtr CacheImpl::getQueryService(const char* poolName) {
   if (poolName == NULL || strlen(poolName) == 0) {
     throw IllegalArgumentException("PoolName is NULL or not defined..");
   }
-  PoolPtr pool = PoolManager::find(poolName);
+  PoolPtr pool = getPoolManager()->find(poolName);
 
   if (pool != NULLPTR) {
     if (pool->isDestroyed()) {
@@ -327,7 +327,7 @@ void CacheImpl::getDistributedSystem(DistributedSystemPtr& dptr) const {
 }
 
 void CacheImpl::sendNotificationCloseMsgs() {
-  HashMapOfPools pools = PoolManager::getAll();
+  HashMapOfPools pools = getPoolManager()->getAll();
   for (HashMapOfPools::Iterator iter = pools.begin(); iter != pools.end();
        ++iter) {
     ThinClientPoolHADM* pool =
@@ -550,7 +550,7 @@ void CacheImpl::createRegion(const char* name,
     if (!props->isGridClient()) {
       const char* poolName = aRegionAttributes->getPoolName();
       if (poolName != NULL) {
-        PoolPtr pool = PoolManager::find(poolName);
+        PoolPtr pool = getPoolManager()->find(poolName);
         if (pool != NULLPTR && !pool->isDestroyed() &&
             pool->getPRSingleHopEnabled()) {
           ThinClientPoolDM* poolDM =
@@ -653,7 +653,7 @@ RegionInternal* CacheImpl::createRegion_internal(
   }*/
 
   if (poolName != NULL) {
-    PoolPtr pool = PoolManager::find(poolName);
+    PoolPtr pool = getPoolManager()->find(poolName);
     if (pool != NULLPTR && !pool->isDestroyed()) {
       bool isMultiUserSecureMode = pool->getMultiuserAuthentication();
       if (isMultiUserSecureMode && (attrs->getCachingEnabled())) {
@@ -748,7 +748,7 @@ void CacheImpl::readyForEvents() {
     return;
   }
 
-  const HashMapOfPools& pools = PoolManager::getAll();
+  const HashMapOfPools& pools = getPoolManager()->getAll();
   if (pools.empty()) throw IllegalStateException("No pools found.");
   PoolPtr currPool = NULLPTR;
   for (HashMapOfPools::Iterator itr = pools.begin(); itr != pools.end();
@@ -772,7 +772,7 @@ void CacheImpl::readyForEvents() {
 }
 
 bool CacheImpl::getEndpointStatus(const std::string& endpoint) {
-  const HashMapOfPools& pools = PoolManager::getAll();
+  const HashMapOfPools& pools = getPoolManager()->getAll();
   std::string fullName;
 
   /*
@@ -837,7 +837,7 @@ void CacheImpl::processMarker() {
 }
 
 int CacheImpl::getPoolSize(const char* poolName) {
-  PoolPtr pool = PoolManager::find(poolName);
+  PoolPtr pool = getPoolManager()->find(poolName);
   if (pool == NULLPTR) {
     return -1;
   } else {

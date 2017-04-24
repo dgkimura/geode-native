@@ -120,7 +120,7 @@ RegionAttributesPtr AttributesFactory::createRegionAttributes() {
   /*
   if( m_regionAttributes.m_poolName != NULL )
   {
-          PoolPtr pool= PoolManager::find( m_regionAttributes.m_poolName );
+          PoolPtr pool= getPoolManager()->find( m_regionAttributes.m_poolName );
     if (pool == NULLPTR) {
       throw IllegalStateException("Pool not found while creating region
   attributes");
