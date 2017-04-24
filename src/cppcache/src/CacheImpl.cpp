@@ -78,6 +78,7 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_remoteQueryServicePtr(NULLPTR),
       m_destroyPending(false),
       m_initDone(false),
+      m_pm(getPoolManager()),
       m_adminRegion(NULLPTR) {
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(c));
@@ -125,6 +126,7 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_remoteQueryServicePtr(NULLPTR),
       m_destroyPending(false),
       m_initDone(false),
+      m_pm(getPoolManager()),
       m_adminRegion(NULLPTR) {
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(c));
@@ -946,7 +948,7 @@ PoolPtr CacheImpl::createOrGetDefaultPool() {
 
     // means user has not set any pool attributes
     if (this->pf == NULLPTR) {
-      this->pf = getPoolFactory();
+      this->pf = m_pm->createFactory();
       if (currPoolSize == 0) {
         if (!this->pf->m_addedServerOrLocator) {
           this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);

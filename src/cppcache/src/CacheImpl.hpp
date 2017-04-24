@@ -294,6 +294,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   bool m_readPdxSerialized;
 
   PoolFactoryPtr pf;
+  PoolManagerPtr m_pm;
 
   enum RegionKind {
     CPP_REGION,

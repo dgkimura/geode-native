@@ -31,6 +31,8 @@ namespace client {
 
 typedef HashMapT<CacheableStringPtr, PoolPtr> HashMapOfPools;
 
+PoolManagerPtr getPoolManager();
+
 /**
  * Manages creation and access to {@link Pool connection pools} for clients.
  * <p>
@@ -42,7 +44,7 @@ typedef HashMapT<CacheableStringPtr, PoolPtr> HashMapOfPools;
  *
  *
  */
-class CPPCACHE_EXPORT PoolManager {
+class CPPCACHE_EXPORT PoolManager : public SharedBase {
  public:
   /**
    * Creates a new {@link PoolFactory pool factory},
@@ -90,7 +92,6 @@ class CPPCACHE_EXPORT PoolManager {
    */
   static void close(bool keepAlive = false);
 
- private:
   PoolManager();
 };
 }  // namespace client
