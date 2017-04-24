@@ -522,8 +522,9 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
 
   ~PoolFactory();
 
- private:
   PoolFactory();
+
+ private:
   PoolFactory(const PoolFactory&);
   void addCheck(const char* host, int port);
   PoolAttributesPtr m_attrs;

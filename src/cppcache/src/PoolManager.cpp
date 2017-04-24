@@ -27,7 +27,7 @@ ACE_Recursive_Thread_Mutex connectionPoolsLock;
 namespace apache {
 namespace geode {
 namespace client {
-PoolManagerPtr g_poolManager = NULLPTR;
+static PoolManagerPtr g_poolManager = NULLPTR;
 PoolManagerPtr getPoolManager()
 {
   if (g_poolManager == NULLPTR) {
@@ -51,7 +51,7 @@ PoolFactoryPtr PoolManager::createFactory() {
       connectionPools = new HashMapOfPools();
     }
   }
-  return PoolFactoryPtr(new PoolFactory());
+  return getPoolFactory();
 }
 
 void PoolManager::close(bool keepAlive) {
