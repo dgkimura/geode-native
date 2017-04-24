@@ -43,8 +43,6 @@
 
 using namespace apache::geode::client;
 
-extern ACE_Recursive_Thread_Mutex* g_disconnectLock;
-
 ExpiryTaskManager* CacheImpl::expiryTaskManager = NULL;
 CacheImpl* CacheImpl::s_instance = NULL;
 volatile bool CacheImpl::s_networkhop = false;
@@ -54,9 +52,6 @@ volatile int8_t CacheImpl::s_serverGroupFlag = 0;
 MemberListForVersionStampPtr CacheImpl::s_versionStampMemIdList = NULLPTR;
 
 #define DEFAULT_LRU_MAXIMUM_ENTRIES 100000
-
-#define DEFAULT_SERVER_PORT 40404
-#define DEFAULT_SERVER_HOST "localhost"
 
 ExpiryTaskManager* getCacheImplExpiryTaskManager() {
   return CacheImpl::expiryTaskManager;
@@ -78,7 +73,6 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_remoteQueryServicePtr(NULLPTR),
       m_destroyPending(false),
       m_initDone(false),
-      m_pm(getPoolManager()),
       m_adminRegion(NULLPTR) {
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(c));
@@ -126,7 +120,6 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_remoteQueryServicePtr(NULLPTR),
       m_destroyPending(false),
       m_initDone(false),
-      m_pm(getPoolManager()),
       m_adminRegion(NULLPTR) {
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(c));
@@ -930,85 +923,4 @@ CacheTransactionManagerPtr CacheImpl::getCacheTransactionManager() {
 }
 MemberListForVersionStampPtr CacheImpl::getMemberListForVersionStamp() {
   return CacheImpl::s_versionStampMemIdList;
-}
-PoolPtr CacheImpl::createOrGetDefaultPool() {
-  ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
-
-  if (isClosed() == false &&
-      getDefaultPool() != NULLPTR) {
-    return getDefaultPool();
-  }
-
-  PoolPtr pool = PoolManager::find(DEFAULT_POOL_NAME);
-
-  // if default_poolFactory is null then we are not using latest API....
-  if (pool == NULLPTR) {
-    HashMapOfPools allPools = PoolManager::getAll();
-    size_t currPoolSize = allPools.size();
-
-    // means user has not set any pool attributes
-    if (this->pf == NULLPTR) {
-      this->pf = m_pm->createFactory();
-      if (currPoolSize == 0) {
-        if (!this->pf->m_addedServerOrLocator) {
-          this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
-        }
-
-        pool = this->pf->create(DEFAULT_POOL_NAME);
-        // creatubg default pool so setting this as default pool
-        LOGINFO("Set default pool with localhost:40404");
-        setDefaultPool(pool);
-        return pool;
-      } else if (currPoolSize == 1) {
-        pool = allPools.begin().second();
-        LOGINFO("Set default pool from existing pool.");
-        setDefaultPool(pool);
-        return pool;
-      } else {
-        // can't set anything as deafult pool
-        return NULLPTR;
-      }
-    } else {
-      PoolPtr defaulPool = getDefaultPool();
-
-      if (!this->pf->m_addedServerOrLocator) {
-        this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
-      }
-
-      if (defaulPool != NULLPTR) {
-        // once default pool is created, we will not create
-        //if (*(defaulPool->m_attrs) == *(this->pf->m_attrs)) {
-          return defaulPool;
-        //} else {
-        //  throw IllegalStateException(
-        //      "Existing cache's default pool was not compatible");
-        //}
-      }
-
-      pool = NULLPTR;
-
-      // return any existing pool if it matches
-      for (HashMapOfPools::Iterator iter = allPools.begin();
-           iter != allPools.end(); ++iter) {
-        PoolPtr currPool(iter.second());
-        //if (*(currPool->m_attrs) == *(this->pf->m_attrs)) {
-          return currPool;
-        //}
-      }
-
-      // defaul pool is null
-      GF_DEV_ASSERT(defaulPool == NULLPTR);
-
-      if (defaulPool == NULLPTR) {
-        pool = this->pf->create(DEFAULT_POOL_NAME);
-        LOGINFO("Created default pool");
-        // creating default so setting this as defaul pool
-        setDefaultPool(pool);
-      }
-
-      return pool;
-    }
-  }
-
-  return pool;
 }

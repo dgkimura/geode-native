@@ -51,7 +51,7 @@ PoolFactoryPtr PoolManager::createFactory() {
       connectionPools = new HashMapOfPools();
     }
   }
-  return getPoolFactory();
+  return PoolFactoryPtr(new PoolFactory());
 }
 
 void PoolManager::close(bool keepAlive) {

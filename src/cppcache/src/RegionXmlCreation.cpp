@@ -44,12 +44,13 @@ void RegionXmlCreation::createRoot(Cache* cache) {
   GF_D_ASSERT(this->isRoot);
   RegionPtr rootRegPtr = NULLPTR;
 
+//  if (Cache_CreatedFromCacheFactory) {
   //  if(cache->m_cacheImpl->getDefaultPool() == NULLPTR)
   {
     // we may need to initialize default pool
     if (regAttrs->getEndpoints() == NULL) {
       if (regAttrs->getPoolName() == NULL) {
-        PoolPtr pool = cache->m_cacheImpl->createOrGetDefaultPool();
+        PoolPtr pool = CacheFactory::createOrGetDefaultPool(*cache->m_cacheImpl);
 
         if (pool == NULLPTR) {
           throw IllegalStateException("Pool is not defined create region.");
@@ -58,6 +59,7 @@ void RegionXmlCreation::createRoot(Cache* cache) {
       }
     }
   }
+//  }
 
   CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cache);
   cacheImpl->createRegion(regionName.c_str(), regAttrs, rootRegPtr);

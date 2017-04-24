@@ -469,6 +469,8 @@ class CPPCACHE_EXPORT CacheFactory : public SharedBase {
   class CacheFactoryImpl;
   std::unique_ptr<CacheFactoryImpl> pimpl;
 
+  PoolFactoryPtr getPoolFactory();
+
   CachePtr create(const char* name, DistributedSystemPtr system = NULLPTR,
                   const char* cacheXml = 0,
                   const CacheAttributesPtr& attrs = NULLPTR);
@@ -482,12 +484,15 @@ class CPPCACHE_EXPORT CacheFactory : public SharedBase {
   CacheFactory(const PropertiesPtr dsProps);
   ~CacheFactory();
 
+  PoolPtr determineDefaultPool(CacheImpl& cachePtr);
+
   CachePtr getAnyInstance(bool throwException);
   GfErrType basicGetInstance(const DistributedSystemPtr& system,
                              bool closeOk, CachePtr& cptr);
 
   // Set very first time some creates cache
   static CacheFactoryPtr s_factory;
+  static PoolPtr createOrGetDefaultPool(CacheImpl& cache);
   std::map<std::string, CachePtr> m_cacheMap;
   void cleanup();
   friend class CppCacheLibrary;
