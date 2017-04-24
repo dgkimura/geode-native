@@ -341,7 +341,7 @@ void FrameworkTest::localDestroyRegion(RegionPtr& region) {
 void FrameworkTest::parseEndPoints(int32_t ep, std::string label,
                                    bool isServer) {
   std::string poolName = "_Test_Pool";
-  PoolFactoryPtr pfPtr = PoolManager::createFactory();
+  PoolFactoryPtr pfPtr = getPoolManager()->createFactory();
   std::string tag = getStringValue("TAG");
   std::string bb("GFE_BB");
 
@@ -447,7 +447,7 @@ void FrameworkTest::createPool() {
 }
 
 QueryServicePtr FrameworkTest::checkQueryService() {
-  PoolFactoryPtr pfPtr = PoolManager::createFactory();
+  PoolFactoryPtr pfPtr = getPoolManager()->createFactory();
   std::string bb("GFE_BB");
   std::string keys("testScheme");
   std::string mode = bbGetString(bb, keys);

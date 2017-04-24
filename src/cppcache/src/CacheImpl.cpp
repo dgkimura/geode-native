@@ -398,7 +398,7 @@ void CacheImpl::close(bool keepalive) {
     m_cacheStats->close();
   }
 
-  PoolManager::close(keepalive);
+  getPoolManager()->close(keepalive);
 
   LOGFINE("Closed pool manager with keepalive %s",
           keepalive ? "true" : "false");

@@ -600,7 +600,7 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
     throw CacheXmlException(s.c_str());
   }
 
-  PoolFactoryPtr factory = PoolManager::createFactory();
+  PoolFactoryPtr factory = getPoolManager()->createFactory();
   const char* poolName = NULL;
 
   while (atts[attrsCount] != NULL) {
