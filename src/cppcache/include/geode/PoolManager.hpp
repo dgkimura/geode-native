@@ -31,7 +31,7 @@ namespace client {
 
 typedef HashMapT<CacheableStringPtr, PoolPtr> HashMapOfPools;
 
-PoolManagerPtr getPoolManager();
+CPPCACHE_EXPORT PoolManagerPtr getPoolManager();
 
 /**
  * Manages creation and access to {@link Pool connection pools} for clients.

@@ -37,13 +37,13 @@ namespace Apache
       //generic<class TKey, class TValue>
       PoolFactory/*<TKey, TValue>*/^ PoolManager/*<TKey, TValue>*/::CreateFactory()
       {
-        return PoolFactory/*<TKey, TValue>*/::Create(apache::geode::client::PoolManager::createFactory().ptr());
+        return PoolFactory/*<TKey, TValue>*/::Create(apache::geode::client::getPoolManager()->createFactory().ptr());
       }
 
       //generic<class TKey, class TValue>
       const Dictionary<String^, Pool/*<TKey, TValue>*/^>^ PoolManager/*<TKey, TValue>*/::GetAll()
       {
-        apache::geode::client::HashMapOfPools pools = apache::geode::client::PoolManager::getAll();
+		  apache::geode::client::HashMapOfPools pools = apache::geode::client::getPoolManager()->getAll();
         Dictionary<String^, Pool/*<TKey, TValue>*/^>^ result = gcnew Dictionary<String^, Pool/*<TKey, TValue>*/^>();
         for (apache::geode::client::HashMapOfPools::Iterator iter = pools.begin(); iter != pools.end(); ++iter)
         {
@@ -58,7 +58,7 @@ namespace Apache
       Pool/*<TKey, TValue>*/^ PoolManager/*<TKey, TValue>*/::Find(String^ name)
       {
         ManagedString mg_name( name );
-        apache::geode::client::PoolPtr pool = apache::geode::client::PoolManager::find(mg_name.CharPtr);
+		apache::geode::client::PoolPtr pool = apache::geode::client::getPoolManager()->find(mg_name.CharPtr);
         return Pool/*<TKey, TValue>*/::Create(pool.ptr());
       }
 
@@ -66,19 +66,19 @@ namespace Apache
       Pool/*<TKey, TValue>*/^ PoolManager/*<TKey, TValue>*/::Find(Client::Region<Object^, Object^>^ region)
       {
         //return Pool::Create(apache::geode::client::PoolManager::find(apache::geode::client::RegionPtr(GetNativePtr<apache::geode::client::Region>(region))).ptr());
-        return Pool/*<TKey, TValue>*/::Create(apache::geode::client::PoolManager::find(apache::geode::client::RegionPtr(region->_NativePtr)).ptr());
+		  return Pool/*<TKey, TValue>*/::Create(apache::geode::client::getPoolManager()->find(apache::geode::client::RegionPtr(region->_NativePtr)).ptr());
       }
 
       //generic<class TKey, class TValue>
       void PoolManager/*<TKey, TValue>*/::Close(Boolean KeepAlive)
       {
-        apache::geode::client::PoolManager::close(KeepAlive);
+		  apache::geode::client::getPoolManager()->close(KeepAlive);
       }
 
       //generic<class TKey, class TValue>
       void PoolManager/*<TKey, TValue>*/::Close()
       {
-        apache::geode::client::PoolManager::close();
+		  apache::geode::client::getPoolManager()->close();
     }  // namespace Client
   }  // namespace Geode
 }  // namespace Apache
