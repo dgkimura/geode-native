@@ -105,7 +105,7 @@ class CPPCACHE_EXPORT ProxyCache : public RegionService {
     */
   virtual ~ProxyCache();
 
-  ProxyCache(PropertiesPtr credentials, PoolPtr pool);
+  ProxyCache(PropertiesPtr credentials, PoolPtr pool, CachePtr cachePtr);
 
   /**
    * Returns a factory that can create a {@link PdxInstance}.
@@ -123,6 +123,7 @@ class CPPCACHE_EXPORT ProxyCache : public RegionService {
 
   UserAttributesPtr m_userAttributes;
   bool m_isProxyCacheClosed;
+  CachePtr m_cachePtr;
   QueryServicePtr m_remoteQueryService;
   friend class Pool;
   friend class ProxyRegion;

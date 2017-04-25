@@ -86,10 +86,9 @@ RegionPtr ProxyCache::getRegion(const char* path) {
 
   if (!m_isProxyCacheClosed) {
     RegionPtr result;
-    CachePtr realCache = CacheFactory::getAnyInstance();
 
-    if (realCache != NULLPTR && !realCache->isClosed()) {
-      CacheRegionHelper::getCacheImpl(realCache.ptr())->getRegion(path, result);
+    if (m_cachePtr != NULLPTR && !m_cachePtr->isClosed()) {
+      CacheRegionHelper::getCacheImpl(m_cachePtr.ptr())->getRegion(path, result);
     }
 
     if (result != NULLPTR) {
@@ -134,13 +133,13 @@ void ProxyCache::rootRegions(VectorOfRegion& regions) {
 
   if (!m_isProxyCacheClosed) {
     RegionPtr result;
-    CachePtr realCache = CacheFactory::getAnyInstance();
 
-    if (realCache != NULLPTR && !realCache->isClosed()) {
+
+    if (m_cachePtr != NULLPTR && !m_cachePtr->isClosed()) {
       VectorOfRegion tmp;
       // this can cause issue when pool attached with region in multiuserSecure
       // mode
-      realCache->rootRegions(tmp);
+      m_cachePtr->rootRegions(tmp);
 
       if (tmp.size() > 0) {
         for (int32_t i = 0; i < tmp.size(); i++) {
@@ -156,12 +155,13 @@ void ProxyCache::rootRegions(VectorOfRegion& regions) {
   }
 }
 
-ProxyCache::ProxyCache(PropertiesPtr credentials, PoolPtr pool) {
+ProxyCache::ProxyCache(PropertiesPtr credentials, PoolPtr pool, CachePtr cachePtr) {
   m_remoteQueryService = NULLPTR;
   m_isProxyCacheClosed = false;
   UserAttributesPtr userAttr;
   userAttr = new UserAttributes(credentials, pool, this);
   m_userAttributes = userAttr;
+  m_cachePtr = cachePtr;
 }
 
 ProxyCache::~ProxyCache() {}

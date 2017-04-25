@@ -69,16 +69,16 @@ bool Pool::getThreadLocalConnections() const {
 bool Pool::getMultiuserAuthentication() const {
   return m_attrs->getMultiuserSecureModeEnabled();
 }
-RegionServicePtr Pool::createSecureUserCache(PropertiesPtr credentials) {
+RegionServicePtr Pool::createSecureUserCache(PropertiesPtr credentials, CachePtr cachePtr) {
   if (this->getMultiuserAuthentication()) {
-    CachePtr realCache = CacheFactory::getAnyInstance();
 
-    if (!(realCache != NULLPTR && realCache->m_cacheImpl != NULL)) {
+
+    if (!(cachePtr != NULLPTR && cachePtr->m_cacheImpl != NULL)) {
       throw IllegalStateException("cache has not been created yet.");
       ;
     }
 
-    if (realCache->isClosed()) {
+    if (cachePtr->isClosed()) {
       throw IllegalStateException("cache has been closed. ");
     }
 
@@ -89,7 +89,7 @@ RegionServicePtr Pool::createSecureUserCache(PropertiesPtr credentials) {
 
     PoolPtr tmpPool(this);
     // TODO: this will return cache with userattribtes
-    ProxyCachePtr userCache(new ProxyCache(credentials, tmpPool));
+    ProxyCachePtr userCache(new ProxyCache(credentials, tmpPool, cachePtr));
     return userCache;
   }
 

@@ -213,7 +213,7 @@ RegionServicePtr Cache::createAuthenticatedView(
   if (poolName == NULL) {
     if (!this->isClosed() && m_cacheImpl->getDefaultPool() != NULLPTR) {
       return m_cacheImpl->getDefaultPool()->createSecureUserCache(
-          userSecurityProperties);
+          userSecurityProperties, CachePtr(this));
     }
 
     throw IllegalStateException(
@@ -224,7 +224,7 @@ RegionServicePtr Cache::createAuthenticatedView(
       if (poolName != NULL) {
         PoolPtr poolPtr = getPoolManager()->find(poolName);
         if (poolPtr != NULLPTR && !poolPtr->isDestroyed()) {
-          return poolPtr->createSecureUserCache(userSecurityProperties);
+          return poolPtr->createSecureUserCache(userSecurityProperties, CachePtr(this));
         }
         throw IllegalStateException(
             "Either pool not found or it has been destroyed");

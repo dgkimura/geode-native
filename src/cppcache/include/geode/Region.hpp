@@ -116,6 +116,7 @@ class CPPCACHE_EXPORT Region : public SharedBase {
 
   virtual CacheStatisticsPtr getStatistics() const = 0;
 
+
   /** Invalidates this region. The invalidation will cascade to
   * all the subregions and cached entries. After
   * the <code>invalidateRegion</code> , the region and the entries in it still
