@@ -75,6 +75,10 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
     return m_realRegion->getParentRegion();
   }
 
+  virtual RegionPtr getRealRegion() const {
+    return m_realRegion;
+  }
+
   /** Return the RegionAttributes for this region.
   */
   virtual RegionAttributesPtr getAttributes() const {
@@ -1496,6 +1500,8 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
   virtual uint32_t size() { return m_realRegion->size(); }
 
   virtual const PoolPtr& getPool() { return m_realRegion->getPool(); }
+
+  virtual CacheImpl * getCacheImpl() {return m_realRegion->getCacheImpl(); }
 
   ProxyRegion(ProxyCache* proxyCache, RegionPtr realRegion) {
     ProxyCachePtr pcp(proxyCache);

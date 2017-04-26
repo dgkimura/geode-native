@@ -102,6 +102,9 @@ class CPPCACHE_EXPORT Region : public SharedBase {
   */
   virtual RegionPtr getParentRegion() const = 0;
 
+  /** Returns the cache implementation of the parent cache, or NULLPTR if not set.
+  */
+  virtual CacheImpl* getCacheImpl() = 0;
   /** Return the RegionAttributes for this region.
   */
   virtual RegionAttributesPtr getAttributes() const = 0;

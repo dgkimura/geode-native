@@ -285,7 +285,7 @@ void CacheHelper::disconnect(bool keepalive) {
   try {
     if (m_doDisconnect) {
       LOG("Disconnecting...");
-      systemPtr->disconnect();
+      systemPtr->disconnect(getCache());
       LOG("Finished disconnect.");
     }
   } catch (...) {

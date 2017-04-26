@@ -77,7 +77,7 @@ void Cache::close(bool keepalive) {
   m_cacheImpl->close(keepalive);
 
   try {
-    DistributedSystem::disconnect();
+    DistributedSystem::disconnect(CachePtr(this));
   } catch (const apache::geode::client::NotConnectedException&) {
   } catch (const apache::geode::client::Exception&) {
   } catch (...) {

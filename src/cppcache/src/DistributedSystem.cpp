@@ -297,7 +297,7 @@ DistributedSystemPtr DistributedSystem::connect(
 /**
  *@brief disconnect from the distributed system
  */
-void DistributedSystem::disconnect() {
+void DistributedSystem::disconnect(CachePtr cachePtr) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> disconnectGuard(*g_disconnectLock);
 
   if (!m_connected) {
@@ -307,9 +307,8 @@ void DistributedSystem::disconnect() {
   }
 
   try {
-    CachePtr cache = CacheFactory::getAnyInstance();
-    if (cache != NULLPTR && !cache->isClosed()) {
-      cache->close();
+    if (cachePtr != NULLPTR && !cachePtr->isClosed()) {
+      cachePtr->close();
     }
   } catch (const apache::geode::client::Exception& e) {
     LOGWARN("Exception while closing: %s: %s", e.getName(), e.getMessage());

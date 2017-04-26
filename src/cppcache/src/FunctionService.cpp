@@ -55,9 +55,8 @@ ExecutionPtr FunctionService::onRegion(RegionPtr region) {
       RegionPtr tmpRegion;
       tmpRegion = NULLPTR;
       // getting real region to execute function on region
-      if (!CacheFactory::getAnyInstance()->isClosed()) {
-        CacheRegionHelper::getCacheImpl(CacheFactory::getAnyInstance().ptr())
-            ->getRegion(region->getName(), tmpRegion);
+      if (!pr->getRealRegion()->getCacheImpl()->isClosed()) {
+        pr->getRealRegion()->getCacheImpl()->getRegion(region->getName(), tmpRegion);
       } else {
         throw IllegalStateException("Cache has been closed");
       }
