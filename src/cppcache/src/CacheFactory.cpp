@@ -91,78 +91,15 @@ void CacheFactory::create_(const char* name, DistributedSystemPtr& system,
   if (name[0] == '\0') {
     name = "NativeCache";
   }
-
-  CachePtr cp = NULLPTR;
-  basicGetInstance(system, true, cp);
-  if ((cp == NULLPTR) || (cp->isClosed() == true)) {
-    Cache* cep = new Cache(name, system, id_data, ignorePdxUnreadFields,
-                           readPdxSerialized);
-    if (!cep) {
-      throw OutOfMemoryException("Out of Memory");
-    }
-    cptr = cep;
-    std::string key(system->getName());
-    if (cp != NULLPTR) {
-      ACE_Guard<ACE_Recursive_Thread_Mutex> guard(pimpl->m_lock);
-      m_cacheMap.erase(m_cacheMap.find(key));
-    }
-    std::pair<std::string, CachePtr> pc(key, cptr);
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(pimpl->m_lock);
-    m_cacheMap.insert(pc);
-    return;
+  
+  Cache *cep = new Cache(name, system, id_data, ignorePdxUnreadFields,
+                         readPdxSerialized);
+  if (!cep) {
+    throw OutOfMemoryException("Out of Memory");
   }
-  throw CacheExistsException("an open cache exists with the specified system");
-}
-
-CachePtr CacheFactory::getInstance(const DistributedSystemPtr& system) {
-  CachePtr cptr;
-  CppCacheLibrary::initLib();
-  if (system == NULLPTR) {
-    throw IllegalArgumentException(
-        "CacheFactory::getInstance: system uninitialized");
+  cptr = cep;
+  return;
   }
-  GfErrType err = s_factory->basicGetInstance(system, false, cptr);
-  GfErrTypeToException("CacheFactory::getInstance", err);
-  return cptr;
-}
-
-CachePtr CacheFactory::getInstanceCloseOk(const DistributedSystemPtr& system) {
-  CachePtr cptr;
-  CppCacheLibrary::initLib();
-  if (system == NULLPTR) {
-    throw IllegalArgumentException(
-        "CacheFactory::getInstanceClosedOK: system uninitialized");
-  }
-  GfErrType err = s_factory->basicGetInstance(system, true, cptr);
-  GfErrTypeToException("CacheFactory::getInstanceCloseOk", err);
-  return cptr;
-}
-
-CachePtr CacheFactory::getAnyInstance() {
-  return s_factory->getAnyInstance(true);
-}
-
-CachePtr CacheFactory::getAnyInstance(bool throwException) {
-  CachePtr cptr;
-  CppCacheLibrary::initLib();
-  ACE_Guard<ACE_Recursive_Thread_Mutex> guard(pimpl->m_lock);
-  if (m_cacheMap.empty() == true) {
-    if (throwException) {
-      throw EntryNotFoundException(
-          "CacheFactory::getAnyInstance: not found, no cache created yet");
-    } else {
-      return NULLPTR;
-    }
-  }
-  for (std::map<std::string, CachePtr>::iterator p = m_cacheMap.begin();
-       p != m_cacheMap.end(); ++p) {
-    if (!(p->second->isClosed())) {
-      cptr = p->second;
-      return cptr;
-    }
-  }
-  return NULLPTR;
-}
 
 const char* CacheFactory::getVersion() { return PRODUCT_VERSION; }
 
@@ -188,7 +125,6 @@ CacheFactory::CacheFactory(const PropertiesPtr dsProps) {
 }
 
 CachePtr CacheFactory::create() {
-  // bool pdxReadSerialized = false;
 
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
   DistributedSystemPtr dsPtr = NULLPTR;
@@ -202,34 +138,11 @@ CachePtr CacheFactory::create() {
   }
 
   CachePtr cache = NULLPTR;
-  basicGetInstance(dsPtr, false, cache);
   if (cache == NULLPTR)
   {
 	cache = create(DEFAULT_CACHE_NAME, dsPtr,
 	               dsPtr->getSystemProperties()->cacheXMLFile(), NULLPTR);
   }
-
-  /*if (cache == NULLPTR) {
-    CacheFactoryPtr cacheFac(this);
-    default_CacheFactory = cacheFac;
-    Cache_CreatedFromCacheFactory = true;
-    cache = create(DEFAULT_CACHE_NAME, dsPtr,
-                   dsPtr->getSystemProperties()->cacheXMLFile(), NULLPTR);
-    // if(cache->m_cacheImpl->getDefaultPool() == NULLPTR)
-    // determineDefaultPool(cache);
-  } else {
-    if (cache->m_cacheImpl->getDefaultPool() != NULLPTR) {
-      // we already choose or created deafult pool
-      determineDefaultPool(cache);
-    } else {
-      // not yet created, create from first cacheFactory instance
-      if (default_CacheFactory != NULLPTR) {
-        default_CacheFactory->determineDefaultPool(cache);
-        default_CacheFactory = NULLPTR;
-      }
-      determineDefaultPool(cache);
-    }
-  }*/
 
   SerializationRegistry::addType(GeodeTypeIdsImpl::PDX,
                                  PdxInstantiator::createDeserializable);
@@ -361,34 +274,6 @@ PoolFactoryPtr CacheFactory::getPoolFactory() {
 }
 
 CacheFactory::~CacheFactory() {}
-void CacheFactory::cleanup() {
-  m_cacheMap.clear();
-}
-
-GfErrType CacheFactory::basicGetInstance(const DistributedSystemPtr& system,
-                                         const bool closeOk, CachePtr& cptr) {
-  GfErrType err = GF_NOERR;
-  if (system == NULLPTR) {
-    return GF_CACHE_ILLEGAL_ARGUMENT_EXCEPTION;
-  }
-  cptr = NULLPTR;
-  ACE_Guard<ACE_Recursive_Thread_Mutex> guard(pimpl->m_lock);
-  if (m_cacheMap.empty() == true) {
-    return GF_CACHE_ENTRY_NOT_FOUND;
-  }
-  std::string key(system->getName());
-  std::map<std::string, CachePtr>::iterator p = m_cacheMap.find(key);
-  if (p != m_cacheMap.end()) {
-    if ((closeOk == true) || (!(p->second->isClosed()))) {
-      cptr = p->second;
-    } else {
-      return GF_CACHE_ENTRY_NOT_FOUND;
-    }
-  } else {
-    return GF_CACHE_ENTRY_NOT_FOUND;
-  }
-  return err;
-}
 
 CacheFactoryPtr CacheFactory::set(const char* name, const char* value) {
   if (this->dsProp == NULLPTR) this->dsProp = Properties::create();

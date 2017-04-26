@@ -62,38 +62,6 @@ class CPPCACHE_EXPORT CacheFactory : public SharedBase {
    */
   CachePtr create();
 
-  /**
-   * Gets the instance of {@link Cache} produced by an
-   * earlier call to {@link CacheFactory::create}.
-   * @param system the <code>DistributedSystem</code> the cache was created
-   * with.
-   * @return the {@link Cache} associated with the specified system.
-   * @throws CacheClosedException if a cache has not been created
-   * or the created one is {@link Cache::isClosed closed}
-   * @throws EntryNotFoundException if a cache with specified system not found
-   */
-  static CachePtr getInstance(const DistributedSystemPtr& system);
-
-  /**
-   * Gets the instance of {@link Cache} produced by an
-   * earlier call to {@link CacheFactory::create}, even if it has been closed.
-   * @param system the <code>DistributedSystem</code> the cache was created
-   * with.
-   * @return the {@link Cache} associated with the specified system.
-   * @throws CacheClosedException if a cache has not been created
-   * @throws EntryNotFoundException if a cache with specified system is not
-   * found
-   */
-  static CachePtr getInstanceCloseOk(const DistributedSystemPtr& system);
-
-  /**
-   * Gets an arbitrary open instance of {@link Cache} produced by an
-   * earlier call to {@link CacheFactory::create}.
-   * @throws CacheClosedException if a cache has not been created
-   * or the only created one is {@link Cache::isClosed closed}
-   */
-  static CachePtr getAnyInstance();
-
   /** Returns the version of the cache implementation.
    * For the 1.0 release of Geode, the string returned is <code>1.0</code>.
    * @return the version of the cache implementation as a <code>String</code>
@@ -104,7 +72,7 @@ class CPPCACHE_EXPORT CacheFactory : public SharedBase {
    */
   static const char* getProductDescription();
 
-  /**
+   /**
    * Sets the free connection timeout for this pool.
    * If the pool has a max connections setting, operations will block
    * if all of the connections are in use. The free connection timeout
@@ -486,14 +454,9 @@ class CPPCACHE_EXPORT CacheFactory : public SharedBase {
 
   PoolPtr determineDefaultPool(CacheImpl& cachePtr);
 
-  CachePtr getAnyInstance(bool throwException);
-  GfErrType basicGetInstance(const DistributedSystemPtr& system,
-                             bool closeOk, CachePtr& cptr);
-
   // Set very first time some creates cache
   static CacheFactoryPtr s_factory;
   static PoolPtr createOrGetDefaultPool(CacheImpl& cache);
-  std::map<std::string, CachePtr> m_cacheMap;
   void cleanup();
   friend class CppCacheLibrary;
   friend class RegionFactory;
