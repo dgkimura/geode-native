@@ -33,9 +33,9 @@ set_target_properties(testobject PROPERTIES FOLDER test)
 target_link_libraries(testobject
   PUBLIC 
     apache-geode
-    fwk
     c++11
   PRIVATE
+    framework
     ACE
 )
 

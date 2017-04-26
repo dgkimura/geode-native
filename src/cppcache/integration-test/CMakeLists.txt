@@ -22,7 +22,6 @@ target_link_libraries(${TEST_UTILS_LIB}
     ACE
   PUBLIC
     apache-geode
-    fwk
 )
 target_compile_definitions(${TEST_UTILS_LIB}
   PRIVATE
@@ -71,10 +70,10 @@ foreach(FILE ${SOURCES})
     PRIVATE
       ACE
       ${TEST_UTILS_LIB}
+      framework
     PUBLIC
       apache-geode
       testobject
-      fwk
       c++11
   )
   
