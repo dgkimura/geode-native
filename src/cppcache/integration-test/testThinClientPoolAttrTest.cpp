@@ -71,7 +71,7 @@ class putThread : public ACE_Task_Base {
 };
 
 void doAttrTestingAndCreatePool(const char* poolName) {
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getHelper()->cachePtr);
   poolFacPtr->setFreeConnectionTimeout(10000);
   poolFacPtr->setLoadConditioningInterval(60000);
   poolFacPtr->setSocketBufferSize(1024);
@@ -196,7 +196,7 @@ DUNIT_TASK(CLIENT1, StartC1)
     doAttrTestingAndCreatePool(poolName);
 
     // Do PoolCreation testing , create another pool with same name
-    PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
+    PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getHelper()->cachePtr);
     try {
       PoolPtr pptr = poolFacPtr->create(poolName);
       FAIL("Pool creation with same name should fail");

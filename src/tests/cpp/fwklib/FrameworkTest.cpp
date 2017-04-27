@@ -22,7 +22,6 @@
 //#include <geode/RegionAttributes.hpp>
 #include <geode/PoolFactory.hpp>
 #include "PoolAttributes.hpp"
-
 using namespace apache::geode::client;
 using namespace apache::geode::client::testframework;
 
@@ -341,7 +340,9 @@ void FrameworkTest::localDestroyRegion(RegionPtr& region) {
 void FrameworkTest::parseEndPoints(int32_t ep, std::string label,
                                    bool isServer) {
   std::string poolName = "_Test_Pool";
-  PoolFactoryPtr pfPtr = getPoolManager()->createFactory();
+  CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
+  CachePtr cachePtr = cacheFactoryPtr->create();
+  PoolFactoryPtr pfPtr = getPoolManager()->createFactory(cachePtr);
   std::string tag = getStringValue("TAG");
   std::string bb("GFE_BB");
 
@@ -447,7 +448,7 @@ void FrameworkTest::createPool() {
 }
 
 QueryServicePtr FrameworkTest::checkQueryService() {
-  PoolFactoryPtr pfPtr = getPoolManager()->createFactory();
+  PoolFactoryPtr pfPtr = getPoolManager()->createFactory(m_cache);
   std::string bb("GFE_BB");
   std::string keys("testScheme");
   std::string mode = bbGetString(bb, keys);

@@ -58,7 +58,7 @@ namespace Apache.Geode.Client.QuickStart
         Console.WriteLine("Created the Geode Cache");
 
         //Create Poolfactory with endpoint and then create pool using poolfactory.
-        PoolFactory pfact = PoolManager.CreateFactory();
+        PoolFactory pfact = PoolManager.CreateFactory(cache);
         Pool pptr = pfact.AddServer("localhost", 40404).Create("examplePool");
 
         RegionFactory regionFactory = cache.CreateRegionFactory(RegionShortcut.CACHING_PROXY);

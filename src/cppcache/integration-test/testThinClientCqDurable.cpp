@@ -183,10 +183,11 @@ void RunDurableCqClient() {
 
   // Create a Geode Cache Programmatically.
   CacheFactoryPtr cacheFactory = CacheFactory::createCacheFactory(pp);
-  CachePtr cachePtr = cacheFactory->setSubscriptionEnabled(true)
-                          ->setSubscriptionAckInterval(5000)
-                          ->setSubscriptionMessageTrackingTimeout(50000)
-                          ->create();
+  CachePtr cachePtr = cacheFactory->create();
+  cacheFactory->getPoolFactory(cachePtr)->setSubscriptionEnabled(true);
+  cacheFactory->getPoolFactory(cachePtr)->setSubscriptionAckInterval(5000);
+  cacheFactory->getPoolFactory(cachePtr)->setSubscriptionMessageTrackingTimeout(50000);
+
 
   LOGINFO("Created the Geode Cache Programmatically");
 

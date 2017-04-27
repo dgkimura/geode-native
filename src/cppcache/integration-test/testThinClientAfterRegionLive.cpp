@@ -58,7 +58,7 @@ CacheListenerPtr cptr4(new DisconnectCacheListioner(3));
 #include "LocatorHelper.hpp"
 
 void createPooledRegionMine(bool callReadyForEventsAPI = false) {
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getHelper()->cachePtr);
   poolFacPtr->setSubscriptionEnabled(true);
   getHelper()->addServerLocatorEPs(locatorsG, poolFacPtr);
   if ((getPoolManager()->find("__TEST_POOL1__")) ==

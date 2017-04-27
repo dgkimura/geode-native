@@ -20,7 +20,7 @@
 #include <geode/PoolFactory.hpp>
 #include "AutoDelete.hpp"
 #include "CacheImpl.hpp"
-
+#include <assert.h>
 #if defined(_WIN32)
 #include <windows.h>
 #else
@@ -600,7 +600,12 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
     throw CacheXmlException(s.c_str());
   }
 
-  PoolFactoryPtr factory = getPoolManager()->createFactory();
+  //TODO: WWJD we committed a big sin here to allow us to compile for the rest of what we are doing....
+  CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
+  CachePtr cachePtr = cacheFactoryPtr->create();
+  assert(false);
+
+  PoolFactoryPtr factory = getPoolManager()->createFactory(cachePtr);
   const char* poolName = NULL;
 
   while (atts[attrsCount] != NULL) {

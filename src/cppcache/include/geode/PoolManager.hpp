@@ -51,7 +51,7 @@ class CPPCACHE_EXPORT PoolManager : public SharedBase {
    * which is used to configure and create new {@link Pool}s.
    * @return the new pool factory
    */
-   PoolFactoryPtr createFactory();
+   PoolFactoryPtr createFactory(CachePtr cachePtr);
 
   /**
    * Returns a map containing all the pools in this manager.

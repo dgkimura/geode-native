@@ -204,7 +204,7 @@ PoolPtr CacheFactory::determineDefaultPool(CacheImpl& cacheimpl) {
 
   // means user has not set any pool attributes
   if (this->pf == NULLPTR) {
-    this->pf = getPoolFactory();
+    this->pf = getPoolFactory(CachePtr(cacheimpl.getCache()));
     if (currPoolSize == 0) {
       if (!this->pf->m_addedServerOrLocator) {
         this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
@@ -266,9 +266,9 @@ PoolPtr CacheFactory::determineDefaultPool(CacheImpl& cacheimpl) {
   }
 }
 
-PoolFactoryPtr CacheFactory::getPoolFactory() {
+PoolFactoryPtr CacheFactory::getPoolFactory(CachePtr cachePtr) {
   if (this->pf == NULLPTR) {
-    this->pf = getPoolManager()->createFactory();
+    this->pf = getPoolManager()->createFactory(cachePtr);
   }
   return this->pf;
 }
@@ -282,118 +282,6 @@ CacheFactoryPtr CacheFactory::set(const char* name, const char* value) {
   return cfPtr;
 }
 
-CacheFactoryPtr CacheFactory::setFreeConnectionTimeout(int connectionTimeout) {
-  getPoolFactory()->setFreeConnectionTimeout(connectionTimeout);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setLoadConditioningInterval(
-    int loadConditioningInterval) {
-  getPoolFactory()->setLoadConditioningInterval(loadConditioningInterval);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setSocketBufferSize(int bufferSize) {
-  getPoolFactory()->setSocketBufferSize(bufferSize);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setThreadLocalConnections(
-    bool threadLocalConnections) {
-  getPoolFactory()->setThreadLocalConnections(threadLocalConnections);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setReadTimeout(int timeout) {
-  getPoolFactory()->setReadTimeout(timeout);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setMinConnections(int minConnections) {
-  getPoolFactory()->setMinConnections(minConnections);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setMaxConnections(int maxConnections) {
-  getPoolFactory()->setMaxConnections(maxConnections);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setIdleTimeout(long idleTimeout) {
-  getPoolFactory()->setIdleTimeout(idleTimeout);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setRetryAttempts(int retryAttempts) {
-  getPoolFactory()->setRetryAttempts(retryAttempts);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setPingInterval(long pingInterval) {
-  getPoolFactory()->setPingInterval(pingInterval);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setUpdateLocatorListInterval(
-    long updateLocatorListInterval) {
-  getPoolFactory()->setUpdateLocatorListInterval(updateLocatorListInterval);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setStatisticInterval(int statisticInterval) {
-  getPoolFactory()->setStatisticInterval(statisticInterval);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setServerGroup(const char* group) {
-  getPoolFactory()->setServerGroup(group);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::addLocator(const char* host, int port) {
-  getPoolFactory()->addLocator(host, port);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::addServer(const char* host, int port) {
-  getPoolFactory()->addServer(host, port);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setSubscriptionEnabled(bool enabled) {
-  getPoolFactory()->setSubscriptionEnabled(enabled);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setSubscriptionRedundancy(int redundancy) {
-  getPoolFactory()->setSubscriptionRedundancy(redundancy);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setSubscriptionMessageTrackingTimeout(
-    int messageTrackingTimeout) {
-  getPoolFactory()->setSubscriptionMessageTrackingTimeout(
-      messageTrackingTimeout);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setSubscriptionAckInterval(int ackInterval) {
-  getPoolFactory()->setSubscriptionAckInterval(ackInterval);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-CacheFactoryPtr CacheFactory::setMultiuserAuthentication(
-    bool multiuserAuthentication) {
-  getPoolFactory()->setMultiuserAuthentication(multiuserAuthentication);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
-
-CacheFactoryPtr CacheFactory::setPRSingleHopEnabled(bool enabled) {
-  getPoolFactory()->setPRSingleHopEnabled(enabled);
-  CacheFactoryPtr cfPtr(this);
-  return cfPtr;
-}
 
 CacheFactoryPtr CacheFactory::setPdxIgnoreUnreadFields(bool ignore) {
   ignorePdxUnreadFields = ignore;

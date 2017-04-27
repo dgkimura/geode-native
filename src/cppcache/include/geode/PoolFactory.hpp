@@ -24,7 +24,7 @@
 #include "SharedBase.hpp"
 #include "geode_types.hpp"
 #include "Pool.hpp"
-
+#include "tcrConnectionManager.hpp"
 /**
  * @file
  */
@@ -36,7 +36,7 @@ namespace client {
 class CacheImpl;
 class PoolAttributes;
 
-PoolFactoryPtr getPoolFactory();
+PoolFactoryPtr getPoolFactory(CachePtr cachePtr);
 
 /**
  * This interface provides for the configuration and creation of instances of
@@ -522,7 +522,7 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
 
   ~PoolFactory();
 
-  PoolFactory();
+  PoolFactory(CachePtr cachePtr);
 
  private:
   PoolFactory(const PoolFactory&);
@@ -530,6 +530,7 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
   PoolAttributesPtr m_attrs;
   bool m_isSubscriptionRedundancy;
   bool m_addedServerOrLocator;
+  CachePtr m_cachePtr;
   friend class Cache;
   friend class CacheImpl;
   friend class PoolManager;

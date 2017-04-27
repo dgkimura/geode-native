@@ -51,7 +51,7 @@ namespace Apache.Geode.Client.QuickStart
     static void TestDistributedSystem(Cache cache, String hostname, int port, String poolName, String regionName)
     {
       //create pool factory to create the pool.
-      PoolFactory fact = PoolManager.CreateFactory();
+      PoolFactory fact = PoolManager.CreateFactory(cache);
 
       //adding host(endpoint) in pool
       fact.AddServer(hostname, port);

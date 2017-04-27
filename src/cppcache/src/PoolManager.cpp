@@ -44,14 +44,14 @@ void removePool(const char* name) {
   connectionPools->erase(CacheableString::create(name));
 }
 
-PoolFactoryPtr PoolManager::createFactory() {
+PoolFactoryPtr PoolManager::createFactory(CachePtr cachePtr) {
   if (connectionPools == NULL) {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
     if (connectionPools == NULL) {
       connectionPools = new HashMapOfPools();
     }
   }
-  return PoolFactoryPtr(new PoolFactory());
+  return PoolFactoryPtr(new PoolFactory(cachePtr));
 }
 
 void PoolManager::close(bool keepAlive) {
