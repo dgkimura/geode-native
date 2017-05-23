@@ -607,11 +607,6 @@
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
       <Name>QueryWrapper</Name>
     </ProjectReference>
-    <ProjectReference Include="$(CMAKE_BINARY_DIR)\tests\cli\NativeWrapper\NativeWrapper.vcxproj">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-      <Name>NativeWrapper</Name>
-    </ProjectReference>
     <ProjectReference Include="$(CMAKE_BINARY_DIR)\tests\cli\SecurityUtil\SecurityUtil.csproj">
       <Project>{29CFC13C-1D6C-4FE8-B56E-A5E7BA7F849F}</Project>
       <Name>SecurityUtil</Name>

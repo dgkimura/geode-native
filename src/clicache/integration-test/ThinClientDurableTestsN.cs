@@ -796,10 +796,12 @@ namespace Apache.Geode.Client.UnitTests
       pp.Insert("durable-timeout", "30");
 
       CacheFactory cacheFactory = CacheFactory.CreateCacheFactory(pp);
-      Cache cache = cacheFactory.SetSubscriptionEnabled(true)
-                                .SetSubscriptionAckInterval(5000)
-                                .SetSubscriptionMessageTrackingTimeout(5000)
-                                .Create();
+      Cache cache = cacheFactory.Create();
+      PoolFactory pf = PoolManager.CreateFactory(cache);
+      pf.SetSubscriptionEnabled(true);
+      pf.SetSubscriptionAckInterval(5000);
+      pf.SetSubscriptionMessageTrackingTimeout(5000);
+                           
       Util.Log("Created the Geode Cache Programmatically");
 
       RegionFactory regionFactory = cache.CreateRegionFactory(RegionShortcut.CACHING_PROXY);

@@ -49,7 +49,7 @@ namespace Apache
         /// <summary>
         /// Creates a new PoolFactory which is used to configure and create Pools.
         /// </summary>
-        static PoolFactory/*<TKey, TValue>*/^ CreateFactory();
+        static PoolFactory^ CreateFactory(Cache^ cache);
 
         /// <summary>
         /// Returns a map containing all the pools in this manager.

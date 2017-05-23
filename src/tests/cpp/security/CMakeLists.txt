@@ -26,6 +26,7 @@ target_link_libraries(security
     testobject
     crypto
     ssl
+	framework
 )
 
 set_target_properties(security PROPERTIES FOLDER test)

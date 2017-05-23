@@ -55,7 +55,7 @@
 #include "impl/PdxType.hpp"
 #include "impl/EnumInfo.hpp"
 #include "impl/ManagedPersistenceManager.hpp"
-
+#include "Cache.hpp"
 // disable spurious warning
 #pragma warning(disable:4091)
 #include <msclr/lock.h>
@@ -161,7 +161,7 @@ namespace Apache
         }
       }
 
-      void DistributedSystem::Disconnect()
+      void DistributedSystem::Disconnect(Cache^ cache)
       {
         native::DistributedSystemImpl::acquireDisconnectLock();
 
@@ -173,7 +173,7 @@ namespace Apache
             Serializable::UnregisterNativesGeneric();
             DistributedSystem::UnregisterBuiltinManagedTypes();
           }
-        native::DistributedSystem::disconnect();
+        native::DistributedSystem::disconnect(cache->GetNative());
 
         _GF_MG_EXCEPTION_CATCH_ALL2
 

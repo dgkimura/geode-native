@@ -1036,7 +1036,7 @@ namespace Apache.Geode.Client.FwkLib
         //poolRegionData = poolRegionData + "New";
         //Properties prop = GetNewPoolAttributes(poolRegionData);
         string poolName = null;
-        PoolFactory pf = PoolManager.CreateFactory();
+        PoolFactory pf = PoolManager.CreateFactory(CacheHelper<TKey, TVal>.DCache);
         SetPoolAttributes(pf, poolRegionData, ref poolName);
         long startTime;
         SetTrimTime("connects");

@@ -181,7 +181,6 @@ namespace Apache.Geode.Client.FwkLib
 
     #region Functions to initialize or close a cache and distributed system
 
-
     public static void Init()
     {
       InitConfig(null, null, false);
@@ -307,7 +306,7 @@ namespace Apache.Geode.Client.FwkLib
         CloseCache();
         if (m_doDisconnect)
         {
-          DistributedSystem.Disconnect();
+          DistributedSystem.Disconnect(m_cache);
         }
       }
       m_dsys = null;
@@ -329,7 +328,7 @@ namespace Apache.Geode.Client.FwkLib
         CloseCacheKeepAlive();
         if (m_doDisconnect)
         {
-          DistributedSystem.Disconnect();
+          DistributedSystem.Disconnect(m_cache);
         }
       }
       m_dsys = null;

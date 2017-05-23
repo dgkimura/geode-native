@@ -360,7 +360,7 @@ namespace Apache.Geode.Client.UnitTests
     {
       CacheHelper.Init();
 
-      PoolFactory factory = PoolManager.CreateFactory();
+      PoolFactory factory = PoolManager.CreateFactory(CacheHelper.GetCache());
       factory.SetFreeConnectionTimeout(10000);
       factory.SetLoadConditioningInterval(1);
       factory.SetSocketBufferSize(1024);
@@ -435,7 +435,7 @@ namespace Apache.Geode.Client.UnitTests
 
     public void testExistingPool(string poolName)
     {
-      PoolFactory factory = PoolManager.CreateFactory();
+      PoolFactory factory = PoolManager.CreateFactory(CacheHelper.GetCache());
       try
       {
         factory.Create(poolName);

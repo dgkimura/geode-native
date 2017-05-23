@@ -490,6 +490,11 @@ namespace Apache.Geode.Client.UnitTests
       }
     }
 
+    public static Cache  GetCache()
+        {
+            return m_cache;
+        }
+
     public static void Init()
     {
       InitConfig(null, null);
@@ -685,7 +690,7 @@ namespace Apache.Geode.Client.UnitTests
         CloseCacheKeepAlive();
         if (m_doDisconnect)
         {
-          DistributedSystem.Disconnect();
+          DistributedSystem.Disconnect(m_cache);
         }
       }
       m_dsys = null;
@@ -929,7 +934,7 @@ namespace Apache.Geode.Client.UnitTests
         Util.Log("resolver is null {0}", resolver);
       }
 
-      PoolFactory/*<TKey, TVal>*/ poolFactory = PoolManager/*<TKey, TVal>*/.CreateFactory();
+      PoolFactory/*<TKey, TVal>*/ poolFactory = PoolManager/*<TKey, TVal>*/.CreateFactory(m_cache);
 
       if (locators != null)
       {
@@ -1002,7 +1007,7 @@ namespace Apache.Geode.Client.UnitTests
 
       if (existing == null)
       {
-        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory();
+        PoolFactory fact = PoolManager.CreateFactory(m_cache);
         if (locators != null)
         {
           string[] list = locators.Split(',');
@@ -1090,7 +1095,7 @@ namespace Apache.Geode.Client.UnitTests
 
       if (PoolManager/*<TKey, TValue>*/.Find(poolName) == null)
       {
-        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory();
+        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory(m_cache);
         fact.SetSubscriptionEnabled(clientNotification);
         if (locators != null)
         {
@@ -1172,7 +1177,7 @@ namespace Apache.Geode.Client.UnitTests
       }
       if (pl == null)
       {
-        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory();
+        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory(m_cache);
         fact.SetSubscriptionEnabled(clientNotification);
         if (locators != null)
         {
@@ -1242,7 +1247,7 @@ namespace Apache.Geode.Client.UnitTests
 
       if (PoolManager/*<TKey, TValue>*/.Find(poolName) == null)
       {
-        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory();
+        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory(m_cache);
         fact.SetSubscriptionEnabled(clientNotification);
         if (locators != null)
         {
@@ -1308,7 +1313,7 @@ namespace Apache.Geode.Client.UnitTests
 
       if (PoolManager/*<TKey, TValue>*/.Find(poolName) == null)
       {
-        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory();
+        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory(m_cache);
         fact.SetSubscriptionEnabled(clientNotification);
         if (locators != null)
         {
@@ -1376,7 +1381,7 @@ namespace Apache.Geode.Client.UnitTests
 
       if (PoolManager/*<TKey, TValue>*/.Find(poolName) == null)
       {
-        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory();
+        PoolFactory/*<TKey, TValue>*/ fact = PoolManager/*<TKey, TValue>*/.CreateFactory(m_cache);
         fact.SetSubscriptionEnabled(clientNotification);
         if (serverGroup != null)
         {
@@ -1450,7 +1455,7 @@ namespace Apache.Geode.Client.UnitTests
 
       if (PoolManager.Find(poolName) == null)
       {
-        PoolFactory fact = PoolManager.CreateFactory();
+        PoolFactory fact = PoolManager.CreateFactory(m_cache);
         fact.SetSubscriptionEnabled(clientNotification);
         if (locators != null)
         {

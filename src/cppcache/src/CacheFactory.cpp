@@ -48,7 +48,7 @@ namespace apache {
 namespace geode {
 namespace client {
 
-CacheFactoryPtr s_factory = nullptr;
+CacheFactoryPtr* s_factory = nullptr;
 
 PoolPtr CacheFactory::createOrGetDefaultPool(CacheImpl& cacheimpl) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
@@ -62,7 +62,7 @@ PoolPtr CacheFactory::createOrGetDefaultPool(CacheImpl& cacheimpl) {
 
   // if default_poolFactory is null then we are not using latest API....
   if (pool == nullptr && s_factory != nullptr) {
-    pool = s_factory->determineDefaultPool(cacheimpl);
+    pool = (*s_factory)->determineDefaultPool(cacheimpl);
   }
 
   return pool;
@@ -71,8 +71,8 @@ PoolPtr CacheFactory::createOrGetDefaultPool(CacheImpl& cacheimpl) {
 CacheFactoryPtr CacheFactory::createCacheFactory(
     const PropertiesPtr& configPtr) {
   // need to create PoolFactory instance
-  s_factory = std::make_shared<CacheFactory>(configPtr);
-  return s_factory;
+  s_factory = &std::make_shared<CacheFactory>(configPtr);
+  return *s_factory;
 }
 
 void CacheFactory::create_(const char* name, DistributedSystemPtr& system,

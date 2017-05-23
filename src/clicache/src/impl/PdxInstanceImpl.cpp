@@ -89,8 +89,9 @@ namespace Apache
           System::Int64 sampleStartNanos = Utils::startStatOpTime();
           Object^ ret = Internal::PdxHelper::DeserializePdx(dataInput, true, m_typeId, m_bufferLength);
           //dataInput->ResetPdx(0);
+		  native::CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
 
-          CachePtr cache = CacheFactory::getAnyInstance();
+		  CachePtr cache = cacheFactoryPtr->create();
           if (cache == nullptr)
           {
             throw gcnew IllegalStateException("cache has not been created yet.");;

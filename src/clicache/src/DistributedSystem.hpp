@@ -87,7 +87,7 @@ namespace Apache
         /// Disconnect from the distributed system.
         /// </summary>
         /// <exception cref="IllegalStateException">if not connected</exception>
-        static void Disconnect();
+        static void Disconnect(Cache^ cache);
 
         /// <summary>
         /// Returns the SystemProperties used to create this instance of a

@@ -22,6 +22,7 @@
 #include "PoolManager.hpp"
 #include "PoolFactory.hpp"
 #include "CacheableString.hpp"
+#include "Cache.hpp"
 
 using namespace System;
 
@@ -33,9 +34,10 @@ namespace Apache
     {
       namespace native = apache::geode::client;
 
-      PoolFactory^ PoolManager::CreateFactory()
+      PoolFactory^ PoolManager::CreateFactory(Cache^ cache)
       {
-        return PoolFactory::Create(apache::geode::client::getPoolManager()->createFactory());
+		  
+        return PoolFactory::Create(apache::geode::client::getPoolManager()->createFactory(cache->GetNative()));
       }
 
       const Dictionary<String^, Pool^>^ PoolManager::GetAll()
@@ -68,9 +70,10 @@ namespace Apache
         native::getPoolManager()->close(KeepAlive);
       }
 
-      void PoolManager::Close()
-      {
+	  void PoolManager::Close()
+	  {
 		  native::getPoolManager()->close();
+	  }
     }  // namespace Client
   }  // namespace Geode
 }  // namespace Apache

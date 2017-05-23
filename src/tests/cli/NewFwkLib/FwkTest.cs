@@ -608,7 +608,7 @@ namespace Apache.Geode.Client.FwkLib
     public virtual void CreatePool()
     {
       CreateCache();
-      PoolFactory pf = PoolManager.CreateFactory();
+      PoolFactory pf = PoolManager.CreateFactory(CacheHelper<TKey, TVal>.DCache);
       ResetKey("poolSpec");
       string poolRegionData = GetStringValue("poolSpec");
       FwkInfo("PoolSpec is :{0}", poolRegionData);
@@ -1358,7 +1358,7 @@ namespace Apache.Geode.Client.FwkLib
     private void ParseEndPoints(string ep, bool isServer, int redundancyLevel)
     {
       string poolName = "_Test_Pool";
-      PoolFactory pf = PoolManager.CreateFactory();
+      PoolFactory pf = PoolManager.CreateFactory(CacheHelper<TKey, TVal>.DCache);
       string[] eps = ep.Split(',');
       foreach (string endpoint in eps)
       {

@@ -49,7 +49,6 @@ const char* apache::geode::client::testframework::dirAndFile(const char* str) {
   }
   return ptr;
 }
-
 void apache::geode::client::testframework::plog(const char* l, const char* s,
                                                 const char* filename,
                                                 int32_t lineno) {

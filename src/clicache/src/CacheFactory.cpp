@@ -117,9 +117,11 @@ namespace Apache
 
       Cache^ CacheFactory::GetInstance( DistributedSystem^ system )
       {
-        _GF_MG_EXCEPTION_TRY2
+		 _GF_MG_EXCEPTION_TRY2
+		
+		 native::CacheFactoryPtr cacheFactoryPtr = native::CacheFactory::createCacheFactory();
 
-         return Cache::Create( native::CacheFactory::getInstance( system->GetNative() ) );
+         return Cache::Create(cacheFactoryPtr->create());
 
         _GF_MG_EXCEPTION_CATCH_ALL2
       }
@@ -128,8 +130,9 @@ namespace Apache
       {
         _GF_MG_EXCEPTION_TRY2
 
-          return Cache::Create( native::CacheFactory::getInstanceCloseOk( system->GetNative() ) );
+			native::CacheFactoryPtr cacheFactoryPtr = native::CacheFactory::createCacheFactory();
 
+		return Cache::Create(cacheFactoryPtr->create());
         _GF_MG_EXCEPTION_CATCH_ALL2
       }
 
@@ -137,8 +140,9 @@ namespace Apache
       {
         _GF_MG_EXCEPTION_TRY2
 
-          return Cache::Create( native::CacheFactory::getAnyInstance( ) );
+		native::CacheFactoryPtr cacheFactoryPtr = native::CacheFactory::createCacheFactory();
 
+		return Cache::Create(cacheFactoryPtr->create());
         _GF_MG_EXCEPTION_CATCH_ALL2
       }
 
@@ -153,385 +157,22 @@ namespace Apache
           native::CacheFactory::getProductDescription( ) );
       }
 
+	  CacheFactory^ CacheFactory::SetPdxIgnoreUnreadFields(bool ignore)
+	  {
+		  _GF_MG_EXCEPTION_TRY2
 
-      CacheFactory^ CacheFactory::SetFreeConnectionTimeout( Int32 connectionTimeout )
+			  try
 		  {
-			  _GF_MG_EXCEPTION_TRY2
-
-			  try
-			  {
-			    m_nativeptr->get()->setFreeConnectionTimeout( connectionTimeout );
-			  }
-			  finally
-			  {
-			    GC::KeepAlive(m_nativeptr);
-			  }
-
-        return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
+			  m_nativeptr->get()->setPdxIgnoreUnreadFields(ignore);
 		  }
-
-		  CacheFactory^ CacheFactory::SetLoadConditioningInterval( Int32 loadConditioningInterval )
+		  finally
 		  {
-			  _GF_MG_EXCEPTION_TRY2
-
-			  try
-			  {
-			    m_nativeptr->get()->setLoadConditioningInterval( loadConditioningInterval );
-			  }
-			  finally
-			  {
-			    GC::KeepAlive(m_nativeptr);
-			  }
-        return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
+			  GC::KeepAlive(m_nativeptr);
 		  }
+		  return this;
 
-		  CacheFactory^ CacheFactory::SetSocketBufferSize( Int32 bufferSize )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setSocketBufferSize( bufferSize );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::SetReadTimeout( Int32 timeout )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setReadTimeout( timeout );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::SetMinConnections( Int32 minConnections )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setMinConnections( minConnections );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::SetMaxConnections( Int32 maxConnections )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setMaxConnections( maxConnections );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::SetIdleTimeout( Int32 idleTimeout )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setIdleTimeout( idleTimeout );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::SetRetryAttempts( Int32 retryAttempts )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-			  try
-			  {
-			    m_nativeptr->get()->setRetryAttempts( retryAttempts );
-			  }
-			  finally
-			  {
-			    GC::KeepAlive(m_nativeptr);
-			  }
-        return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::SetPingInterval( Int32 pingInterval )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setPingInterval( pingInterval );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-      CacheFactory^ CacheFactory::SetUpdateLocatorListInterval( Int32 updateLocatorListInterval )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setUpdateLocatorListInterval( updateLocatorListInterval );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-      CacheFactory^ CacheFactory::SetStatisticInterval( Int32 statisticInterval )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setStatisticInterval( statisticInterval );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-      CacheFactory^ CacheFactory::SetServerGroup( String^ group )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-        ManagedString mg_servergroup( group );
-        try
-        {
-          m_nativeptr->get()->setServerGroup( mg_servergroup.CharPtr );
-        }
-        finally
-        {
-          GC::KeepAlive(m_nativeptr);
-        }
-        return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::AddLocator( String^ host, Int32 port )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-        ManagedString mg_host( host );
-        try
-        {
-          m_nativeptr->get()->addLocator( mg_host.CharPtr, port );
-        }
-        finally
-        {
-          GC::KeepAlive(m_nativeptr);
-        }
-        return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-      CacheFactory^ CacheFactory::AddServer( String^ host, Int32 port )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-			  ManagedString mg_host( host );
-        try
-        {
-          m_nativeptr->get()->addServer( mg_host.CharPtr, port );
-        }
-        finally
-        {
-          GC::KeepAlive(m_nativeptr);
-        }
-        return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::SetSubscriptionEnabled( Boolean enabled )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-			  try
-			  {
-			    m_nativeptr->get()->setSubscriptionEnabled( enabled );
-			  }
-			  finally
-			  {
-			    GC::KeepAlive(m_nativeptr);
-			  }
-        return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-      CacheFactory^ CacheFactory::SetPRSingleHopEnabled( Boolean enabled )
-      {
-        _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setPRSingleHopEnabled(enabled);
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-         _GF_MG_EXCEPTION_CATCH_ALL2
-      }
-
-		  CacheFactory^ CacheFactory::SetSubscriptionRedundancy( Int32 redundancy )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setSubscriptionRedundancy( redundancy );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::SetSubscriptionMessageTrackingTimeout( Int32 messageTrackingTimeout )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setSubscriptionMessageTrackingTimeout( messageTrackingTimeout );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-		  CacheFactory^ CacheFactory::SetSubscriptionAckInterval( Int32 ackInterval )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setSubscriptionAckInterval( ackInterval );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-		  }
-
-      CacheFactory^ CacheFactory::SetThreadLocalConnections( bool enabled )
-      {
-        _GF_MG_EXCEPTION_TRY2
-
-        try
-        {
-          m_nativeptr->get()->setThreadLocalConnections( enabled );
-        }
-        finally
-        {
-          GC::KeepAlive(m_nativeptr);
-        }
-
-        _GF_MG_EXCEPTION_CATCH_ALL2
-
-        return this;
-      }
-
-      CacheFactory^ CacheFactory::SetMultiuserAuthentication( bool multiuserAuthentication )
-      {
-			  _GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setMultiuserAuthentication( multiuserAuthentication );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-	   }
-
-			CacheFactory^ CacheFactory::SetPdxIgnoreUnreadFields(bool ignore)
-			{
-				_GF_MG_EXCEPTION_TRY2
-
-          try
-          {
-            m_nativeptr->get()->setPdxIgnoreUnreadFields( ignore );
-          }
-          finally
-          {
-            GC::KeepAlive(m_nativeptr);
-          }
-          return this;
-
-			  _GF_MG_EXCEPTION_CATCH_ALL2
-			}
+		  _GF_MG_EXCEPTION_CATCH_ALL2
+	  }
 
       CacheFactory^ CacheFactory::SetPdxReadSerialized(bool pdxReadSerialized)
       {

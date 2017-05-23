@@ -48,7 +48,11 @@ namespace Apache
 
         CacheImpl* getCacheImpl()
         {
-          CachePtr cache = CacheFactory::getAnyInstance();
+			//TODO: this must be fixed... should not be just creating a cache magically.
+			CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
+
+			CachePtr cache = cacheFactoryPtr->create();
+
           if (cache == nullptr)
           {
             throw gcnew IllegalStateException("cache has not been created yet.");;
