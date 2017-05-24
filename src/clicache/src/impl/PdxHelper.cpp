@@ -46,22 +46,18 @@ namespace Apache
       namespace Internal
       {
 
-        CacheImpl* getCacheImpl()
+        CacheImpl* getCacheImpl(CachePtr cachePtr)
         {
-			//TODO: this must be fixed... should not be just creating a cache magically.
-			CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
 
-			CachePtr cache = cacheFactoryPtr->create();
-
-          if (cache == nullptr)
+          if (cachePtr == nullptr)
           {
             throw gcnew IllegalStateException("cache has not been created yet.");;
           }
-          if (cache->isClosed())
+          if (cachePtr->isClosed())
           {
             throw gcnew IllegalStateException("cache has been closed. ");
           }      
-          return CacheRegionHelper::getCacheImpl(cache.get());
+          return CacheRegionHelper::getCacheImpl(cachePtr.get());
         }
         
         void PdxHelper::SerializePdx(DataOutput^ dataOutput, IPdxSerializable^ pdxObject)
@@ -128,13 +124,15 @@ namespace Apache
 
             PdxTypeRegistry::AddLocalPdxType(pdxClassname, nType);//add classname VS pdxType
             PdxTypeRegistry::AddPdxType(nTypeId, nType);//add typeid vs pdxtype
-			//This is for pdx Statistics
-            CacheImpl* cacheImpl = getCacheImpl();
-            if (cacheImpl != NULL) {
-              System::Byte* stPos = dataOutput->GetStartBufferPosition() + ptc->getStartPositionOffset();
-              int pdxLen = PdxHelper::ReadInt32(stPos);       
-              cacheImpl->m_cacheStats->incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
-            }
+			//WWSD: TODO put this code back
+
+			////This is for pdx Statistics
+   //         CacheImpl* cacheImpl = getCacheImpl();
+   //         if (cacheImpl != NULL) {
+   //           System::Byte* stPos = dataOutput->GetStartBufferPosition() + ptc->getStartPositionOffset();
+   //           int pdxLen = PdxHelper::ReadInt32(stPos);       
+   //           cacheImpl->m_cacheStats->incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
+   //         }
           }
           else//we know locasl type, need to see preerved data
           {
@@ -158,13 +156,15 @@ namespace Apache
             pdxObject->ToData(prw);
 
             prw->EndObjectWriting();
-			//This is for pdx Statistics
-            CacheImpl* cacheImpl = getCacheImpl();
-            if (cacheImpl != NULL) {
-              System::Byte* stPos = dataOutput->GetStartBufferPosition() + prw->getStartPositionOffset();
-              int pdxLen = PdxHelper::ReadInt32(stPos);       
-              cacheImpl->m_cacheStats->incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
-            }
+			//WWSD: TODO put this code back
+
+			////This is for pdx Statistics
+   //         CacheImpl* cacheImpl = getCacheImpl();
+   //         if (cacheImpl != NULL) {
+   //           System::Byte* stPos = dataOutput->GetStartBufferPosition() + prw->getStartPositionOffset();
+   //           int pdxLen = PdxHelper::ReadInt32(stPos);       
+   //           cacheImpl->m_cacheStats->incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
+   //         }
           }
         }
 
@@ -317,11 +317,12 @@ namespace Apache
             int len = dataInput->ReadInt32();
             int typeId= dataInput->ReadInt32();
 
-			//This is for pdx Statistics
-            CacheImpl* cacheImpl = getCacheImpl();
-            if (cacheImpl != NULL) {        
-              cacheImpl->m_cacheStats->incPdxDeSerialization(len + 9);//pdxLen + 1 + 2*4
-            }
+			//WWSD: TODO put this code back
+			////This is for pdx Statistics
+   //         CacheImpl* cacheImpl = getCacheImpl();
+   //         if (cacheImpl != NULL) {        
+   //           cacheImpl->m_cacheStats->incPdxDeSerialization(len + 9);//pdxLen + 1 + 2*4
+   //         }
 
             return DeserializePdx(dataInput, forceDeserialize, typeId, len);
           }//create PdxInstance
@@ -354,11 +355,12 @@ namespace Apache
             
             dataInput->SetBuffer();
 
-            //This is for pdxinstance Statistics            
-            CacheImpl* cacheImpl = getCacheImpl();
-            if (cacheImpl != NULL) {
-              cacheImpl->m_cacheStats->incPdxInstanceCreations();		
-            }
+			//WWSD: TODO put this code back...
+            ////This is for pdxinstance Statistics            
+            //CacheImpl* cacheImpl = getCacheImpl();
+            //if (cacheImpl != NULL) {
+            //  cacheImpl->m_cacheStats->incPdxInstanceCreations();		
+            //}
             return pdxObject;
           }
           }finally

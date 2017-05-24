@@ -81,7 +81,7 @@ class PdxHelper {
 
   static EnumInfoPtr getEnum(int enumId);
 
-  static CacheImpl* getCacheImpl();
+ // static CacheImpl* getCacheImpl(CachePtr cachePtr);
 };
 }  // namespace client
 }  // namespace geode
