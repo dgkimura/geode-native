@@ -73,7 +73,8 @@ TEST(PdxLocalReaderTest, x) {
 
   // TODO: Refactor static singleton patterns in PdxTypeRegistry so that
   // tests will not interfere with each other.
-  PdxTypeRegistry::init();
+  PdxTypeRegistry* registry = getPdxTypeRegistry();
+  registry->init();
 
   // Here we construct a serialized stream of bytes representing MyPdxClass.
   // The stream is later deserialization and validated for consistency.

@@ -152,7 +152,8 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
 
 void CacheImpl::initServices() {
   m_tcrConnectionManager = new TcrConnectionManager(this);
-  PdxTypeRegistry::init();
+  PdxTypeRegistry* registry = getPdxTypeRegistry();
+  registry->init();
   CacheImpl::s_versionStampMemIdList =
       MemberListForVersionStampPtr(new MemberListForVersionStamp());
   if (!m_initDone && m_attributes != nullptr && m_attributes->getEndpoints()) {
@@ -406,7 +407,7 @@ void CacheImpl::close(bool keepalive) {
 
   LOGFINE("Closed pool manager with keepalive %s",
           keepalive ? "true" : "false");
-  PdxTypeRegistry::cleanup();
+  getPdxTypeRegistry()->cleanup();
 
   // Close CachePef Stats
   if (m_cacheStats) {

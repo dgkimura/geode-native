@@ -2124,7 +2124,7 @@ int ThinClientPoolDM::cliCallback(volatile bool& isRunning) {
       // this call for csharp client
       DistributedSystemImpl::CallCliCallBack();
       // this call for cpp client
-      PdxTypeRegistry::clear();
+      getPdxTypeRegistry()->clear();
       while (m_cliCallbackSema.tryacquire() != -1) {
         ;
       }

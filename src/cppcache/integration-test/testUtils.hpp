@@ -56,11 +56,11 @@ class TestUtils {
   }
 
   static int testGetNumberOfPdxIds() {
-    return PdxTypeRegistry::testGetNumberOfPdxIds();
+    return getPdxTypeRegistry()->testGetNumberOfPdxIds();
   }
 
   static int testNumberOfPreservedData() {
-    return PdxTypeRegistry::testNumberOfPreservedData();
+    return getPdxTypeRegistry()->testNumberOfPreservedData();
   }
 
   static DistributedSystemImpl* getDistributedSystemImpl() {

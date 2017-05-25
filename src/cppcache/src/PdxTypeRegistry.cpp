@@ -28,31 +28,29 @@ namespace apache {
 namespace geode {
 namespace client {
 
-TypeIdVsPdxType* PdxTypeRegistry::typeIdToPdxType = NULL;
 
-TypeIdVsPdxType* PdxTypeRegistry::remoteTypeIdToMergedPdxType = NULL;
-
-TypeNameVsPdxType* PdxTypeRegistry::localTypeToPdxType = NULL;
 
 // TODO::Add support for weakhashmap
 // std::map<PdxSerializablePtr, PdxRemotePreservedDataPtr>
 // *PdxTypeRegistry::preserveData = NULL;
-PreservedHashMap PdxTypeRegistry::preserveData;
+//PreservedHashMap PdxTypeRegistry::preserveData;
+    static PdxTypeRegistry* theGlobalPdxTypeRegistry = NULL;
+    PdxTypeRegistry *getPdxTypeRegistry() {
+      if (theGlobalPdxTypeRegistry == NULL)
+      {
+        theGlobalPdxTypeRegistry = new PdxTypeRegistry();
+      }
+      return theGlobalPdxTypeRegistry;
+    }
 
-CacheableHashMapPtr PdxTypeRegistry::enumToInt = nullptr;
+PdxTypeRegistry::PdxTypeRegistry()
+: typeIdToPdxType(NULL),
+  remoteTypeIdToMergedPdxType(NULL),
+  localTypeToPdxType(NULL),
+  enumToInt(nullptr) ,
+  intToEnum(nullptr),
+  pdxTypeToTypeIdMap(NULL)
 
-CacheableHashMapPtr PdxTypeRegistry::intToEnum = nullptr;
-
-ACE_RW_Thread_Mutex PdxTypeRegistry::g_readerWriterLock;
-
-ACE_RW_Thread_Mutex PdxTypeRegistry::g_preservedDataLock;
-
-PdxTypeToTypeIdMap* PdxTypeRegistry::pdxTypeToTypeIdMap = NULL;
-bool PdxTypeRegistry::pdxReadSerialized;
-bool PdxTypeRegistry::pdxIgnoreUnreadFields;
-
-PdxTypeRegistry::PdxTypeRegistry() /*:pdxIgnoreUnreadFields (false),
-                                      pdxReadSerialized(false)*/
 {}
 
 PdxTypeRegistry::~PdxTypeRegistry() {}
@@ -107,7 +105,7 @@ int32_t PdxTypeRegistry::getPDXIdForType(const char* type, const char* poolname,
   int typeId = SerializationRegistry::GetPDXIdForType(poolname, nType);
   nType->setTypeId(typeId);
 
-  PdxTypeRegistry::addPdxType(typeId, nType);
+  addPdxType(typeId, nType);
   return typeId;
 }
 
@@ -134,7 +132,7 @@ int32_t PdxTypeRegistry::getPDXIdForType(PdxTypePtr nType, const char* poolname)
   tmp = pdxTypeToTypeIdMap;
   tmp->insert(std::make_pair(nType, typeId));
   pdxTypeToTypeIdMap = tmp;
-  PdxTypeRegistry::addPdxType(typeId, nType);
+  addPdxType(typeId, nType);
   return typeId;
 }
 

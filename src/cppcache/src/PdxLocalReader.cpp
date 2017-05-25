@@ -302,9 +302,9 @@ PdxRemotePreservedDataPtr PdxLocalReader::getPreservedData(
   int nFieldExtra = m_pdxType->getNumberOfExtraFields();
   LOGDEBUG(
       "PdxLocalReader::getPreservedData::nFieldExtra = %d AND "
-      "PdxTypeRegistry::getPdxIgnoreUnreadFields = %d ",
-      nFieldExtra, PdxTypeRegistry::getPdxIgnoreUnreadFields());
-  if (nFieldExtra > 0 && PdxTypeRegistry::getPdxIgnoreUnreadFields() == false) {
+      "getPdxTypeRegistry()->getPdxIgnoreUnreadFields = %d ",
+      nFieldExtra, getPdxTypeRegistry()->getPdxIgnoreUnreadFields());
+  if (nFieldExtra > 0 && getPdxTypeRegistry()->getPdxIgnoreUnreadFields() == false) {
     m_pdxRemotePreserveData->initialize(
         m_pdxType != nullptr ? m_pdxType->getTypeId() : 0,
         mergedVersion->getTypeId(), nFieldExtra, pdxObject);
@@ -374,8 +374,8 @@ void PdxLocalReader::readCollection(const char* fieldName,
 
 PdxUnreadFieldsPtr PdxLocalReader::readUnreadFields() {
   LOGDEBUG("readUnreadFields:: %d ignore property %d", m_isDataNeedToPreserve,
-           PdxTypeRegistry::getPdxIgnoreUnreadFields());
-  if (PdxTypeRegistry::getPdxIgnoreUnreadFields() == true) return nullptr;
+           getPdxTypeRegistry()->getPdxIgnoreUnreadFields());
+  if (getPdxTypeRegistry()->getPdxIgnoreUnreadFields() == true) return nullptr;
   m_isDataNeedToPreserve = false;
   return m_pdxRemotePreserveData;
 }

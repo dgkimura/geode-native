@@ -241,7 +241,7 @@ void PdxType::initRemoteToLocal() {
 
   PdxTypePtr localPdxType = nullptr;
   //[TODO - open this up once PdxTypeRegistry is done]
-  localPdxType = PdxTypeRegistry::getLocalPdxType(m_className);
+  localPdxType = getPdxTypeRegistry()->getLocalPdxType(m_className);
   m_numberOfFieldsExtra = 0;
 
   if (localPdxType != nullptr) {
@@ -301,7 +301,7 @@ void PdxType::initLocalToRemote() {
   // 5. else if local field is not in remote type then -1
 
   PdxTypePtr localPdxType = nullptr;
-  localPdxType = PdxTypeRegistry::getLocalPdxType(m_className);
+  localPdxType = getPdxTypeRegistry()->getLocalPdxType(m_className);
 
   if (localPdxType != nullptr) {
     std::vector<PdxFieldTypePtr>* localPdxFields =

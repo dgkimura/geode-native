@@ -47,95 +47,98 @@ typedef HashMapT<PdxSerializablePtr, PdxRemotePreservedDataPtr>
     PreservedHashMap;
 typedef std::map<PdxTypePtr, int32_t, PdxTypeLessThan> PdxTypeToTypeIdMap;
 
+
 class CPPCACHE_EXPORT PdxTypeRegistry {
  private:
-  static TypeIdVsPdxType* typeIdToPdxType;
+  TypeIdVsPdxType* typeIdToPdxType;
 
-  static TypeIdVsPdxType* remoteTypeIdToMergedPdxType;
+  TypeIdVsPdxType* remoteTypeIdToMergedPdxType;
 
-  static TypeNameVsPdxType* localTypeToPdxType;
+  TypeNameVsPdxType* localTypeToPdxType;
 
   // TODO:: preserveData need to be of type WeakHashMap
   // static std::map<PdxSerializablePtr , PdxRemotePreservedDataPtr>
   // *preserveData;
   // static CacheableHashMapPtr preserveData;
-  static PreservedHashMap preserveData;
+  PreservedHashMap preserveData;
 
-  static ACE_RW_Thread_Mutex g_readerWriterLock;
+  ACE_RW_Thread_Mutex g_readerWriterLock;
 
-  static ACE_RW_Thread_Mutex g_preservedDataLock;
+  ACE_RW_Thread_Mutex g_preservedDataLock;
 
-  static bool pdxIgnoreUnreadFields;
+  bool pdxIgnoreUnreadFields;
 
-  static bool pdxReadSerialized;
+  bool pdxReadSerialized;
 
-  static CacheableHashMapPtr enumToInt;
+  CacheableHashMapPtr enumToInt;
 
-  static CacheableHashMapPtr intToEnum;
+  CacheableHashMapPtr intToEnum;
 
  public:
   PdxTypeRegistry();
 
   virtual ~PdxTypeRegistry();
 
-  static void init();
+  void init();
 
-  static void cleanup();
+  void cleanup();
 
   // test hook;
-  static int testGetNumberOfPdxIds();
+  int testGetNumberOfPdxIds();
 
   // test hook
-  static int testNumberOfPreservedData();
+  int testNumberOfPreservedData();
 
-  static void addPdxType(int32_t typeId, PdxTypePtr pdxType);
+  void addPdxType(int32_t typeId, PdxTypePtr pdxType);
 
-  static PdxTypePtr getPdxType(int32_t typeId);
+  PdxTypePtr getPdxType(int32_t typeId);
 
-  static void addLocalPdxType(const char* localType, PdxTypePtr pdxType);
+  void addLocalPdxType(const char* localType, PdxTypePtr pdxType);
 
   // newly added
-  static PdxTypePtr getLocalPdxType(const char* localType);
+  PdxTypePtr getLocalPdxType(const char* localType);
 
-  static void setMergedType(int32_t remoteTypeId, PdxTypePtr mergedType);
+  void setMergedType(int32_t remoteTypeId, PdxTypePtr mergedType);
 
-  static PdxTypePtr getMergedType(int32_t remoteTypeId);
+  PdxTypePtr getMergedType(int32_t remoteTypeId);
 
-  static void setPreserveData(PdxSerializablePtr obj,
+  void setPreserveData(PdxSerializablePtr obj,
                               PdxRemotePreservedDataPtr preserveDataPtr);
 
-  static PdxRemotePreservedDataPtr getPreserveData(PdxSerializablePtr obj);
+  PdxRemotePreservedDataPtr getPreserveData(PdxSerializablePtr obj);
 
-  static void clear();
+  void clear();
 
-  static int32_t getPDXIdForType(const char* type, const char* poolname,
+  int32_t getPDXIdForType(const char* type, const char* poolname,
                                PdxTypePtr nType, bool checkIfThere);
 
-  static bool getPdxIgnoreUnreadFields() { return pdxIgnoreUnreadFields; }
+  bool getPdxIgnoreUnreadFields() { return pdxIgnoreUnreadFields; }
 
-  static void setPdxIgnoreUnreadFields(bool value) {
+  void setPdxIgnoreUnreadFields(bool value) {
     pdxIgnoreUnreadFields = value;
   }
 
-  static void setPdxReadSerialized(bool value) { pdxReadSerialized = value; }
+  void setPdxReadSerialized(bool value) { pdxReadSerialized = value; }
 
-  static bool getPdxReadSerialized() { return pdxReadSerialized; }
+  bool getPdxReadSerialized() { return pdxReadSerialized; }
 
-  static inline PreservedHashMap& getPreserveDataMap() { return preserveData; };
+  inline PreservedHashMap& getPreserveDataMap() { return preserveData; };
 
-  static int32_t getEnumValue(EnumInfoPtr ei);
+  int32_t getEnumValue(EnumInfoPtr ei);
 
-  static EnumInfoPtr getEnum(int32_t enumVal);
+  EnumInfoPtr getEnum(int32_t enumVal);
 
-  static int32_t getPDXIdForType(PdxTypePtr nType, const char* poolname);
+  int32_t getPDXIdForType(PdxTypePtr nType, const char* poolname);
 
-  static ACE_RW_Thread_Mutex& getPreservedDataLock() {
+  ACE_RW_Thread_Mutex& getPreservedDataLock() {
     return g_preservedDataLock;
   }
 
  private:
-  static PdxTypeToTypeIdMap* pdxTypeToTypeIdMap;
+  PdxTypeToTypeIdMap* pdxTypeToTypeIdMap;
 };
+    PdxTypeRegistry *getPdxTypeRegistry();
+
 }  // namespace client
 }  // namespace geode
 }  // namespace apache

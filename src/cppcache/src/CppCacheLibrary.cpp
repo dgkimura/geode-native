@@ -60,7 +60,7 @@ CppCacheLibrary::CppCacheLibrary() {
     ExpEntryFactory::init();
     LRUExpEntryFactory::init();
     SerializationRegistry::init();
-    // PdxTypeRegistry::init();
+    // getPdxTypeRegistry()->init();
     // log( "Finished initializing CppCacheLibrary." );
   } catch (apache::geode::client::Exception& ge) {
     ge.printStackTrace();
@@ -71,7 +71,7 @@ CppCacheLibrary::CppCacheLibrary() {
 CppCacheLibrary::~CppCacheLibrary() {
   // Put any global clean up code here.
   //  CacheFactory::cleanup();
-  //  PdxTypeRegistry::cleanup();
+  //  getPdxTypeRegistry()->cleanup();
 
   ACE::fini();
 }

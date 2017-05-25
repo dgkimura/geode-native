@@ -76,7 +76,7 @@ void PdxHelper::serializePdx(DataOutput& output,
         piPt->getTypeId() ==
             0)  // from pdxInstance factory need to get typeid from server
     {
-      int typeId = PdxTypeRegistry::getPDXIdForType(piPt, output.getPoolName());
+      int typeId = getPdxTypeRegistry()->getPDXIdForType(piPt, output.getPoolName());
       pdxII->setPdxId(typeId);
     }
     auto plw = std::make_shared<PdxLocalWriter>(output, piPt);
@@ -93,7 +93,7 @@ void PdxHelper::serializePdx(DataOutput& output,
 
   const char* pdxType = pdxObject->getClassName();
   pdxClassname = pdxType;
-  PdxTypePtr localPdxType = PdxTypeRegistry::getLocalPdxType(pdxType);
+  PdxTypePtr localPdxType = getPdxTypeRegistry()->getLocalPdxType(pdxType);
 
   if (localPdxType == nullptr) {
     // need to grab type info, as fromdata is not called yet
@@ -106,13 +106,13 @@ void PdxHelper::serializePdx(DataOutput& output,
     nType->InitializeType();
 
     // SerializationRegistry::GetPDXIdForType(output.getPoolName(), nType);
-    int32_t nTypeId = PdxTypeRegistry::getPDXIdForType(
+    int32_t nTypeId = getPdxTypeRegistry()->getPDXIdForType(
         pdxType, output.getPoolName(), nType, true);
     nType->setTypeId(nTypeId);
 
     ptc->endObjectWriting();
-    PdxTypeRegistry::addLocalPdxType(pdxType, nType);
-    PdxTypeRegistry::addPdxType(nTypeId, nType);
+    getPdxTypeRegistry()->addLocalPdxType(pdxType, nType);
+    getPdxTypeRegistry()->addPdxType(nTypeId, nType);
 
 //    TODO: WWSD
 //    //[ToDo] need to write bytes for stats
@@ -130,7 +130,7 @@ void PdxHelper::serializePdx(DataOutput& output,
     // if object got from server than create instance of RemoteWriter otherwise
     // local writer.
 
-    PdxRemotePreservedDataPtr pd = PdxTypeRegistry::getPreserveData(pdxObject);
+    PdxRemotePreservedDataPtr pd = getPdxTypeRegistry()->getPreserveData(pdxObject);
 
     // now always remotewriter as we have API Read/WriteUnreadFields
     // so we don't know whether user has used those or not;; Can we do some
@@ -139,7 +139,7 @@ void PdxHelper::serializePdx(DataOutput& output,
 
     if (pd != nullptr) {
       PdxTypePtr mergedPdxType =
-          PdxTypeRegistry::getPdxType(pd->getMergedTypeId());
+          getPdxTypeRegistry()->getPdxType(pd->getMergedTypeId());
       prw = std::make_shared<PdxRemoteWriter>(output, mergedPdxType, pd);
     } else {
       prw = std::make_shared<PdxRemoteWriter>(output, pdxClassname);
@@ -167,9 +167,9 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
   PdxSerializablePtr pdxObjectptr = nullptr;
   PdxTypePtr pdxLocalType = nullptr;
 
-  PdxTypePtr pType = PdxTypeRegistry::getPdxType(typeId);
+  PdxTypePtr pType = getPdxTypeRegistry()->getPdxType(typeId);
   if (pType != nullptr) {  // this may happen with PdxInstanceFactory {
-    pdxLocalType = PdxTypeRegistry::getLocalPdxType(
+    pdxLocalType = getPdxTypeRegistry()->getLocalPdxType(
         pType->getPdxClassName());  // this should be fine for IPdxTypeMapper
   }
   if (pType != nullptr && pdxLocalType != nullptr)  // type found
@@ -190,12 +190,12 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
           std::make_shared<PdxRemoteReader>(dataInput, pType, length);
       pdxObjectptr->fromData(std::dynamic_pointer_cast<PdxReader>(prr));
       PdxTypePtr mergedVersion =
-          PdxTypeRegistry::getMergedType(pType->getTypeId());
+          getPdxTypeRegistry()->getMergedType(pType->getTypeId());
 
       PdxRemotePreservedDataPtr preserveData =
           prr->getPreservedData(mergedVersion, pdxObjectptr);
       if (preserveData != nullptr) {
-        PdxTypeRegistry::setPreserveData(
+        getPdxTypeRegistry()->setPreserveData(
             pdxObjectptr, preserveData);  // it will set data in weakhashmap
       }
       prr->MoveStream();
@@ -206,7 +206,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
       pType = std::static_pointer_cast<PdxType>(
           SerializationRegistry::GetPDXTypeById(dataInput.getPoolName(),
                                                 typeId));
-      pdxLocalType = PdxTypeRegistry::getLocalPdxType(pType->getPdxClassName());
+      pdxLocalType = getPdxTypeRegistry()->getLocalPdxType(pType->getPdxClassName());
     }
     /* adongre  - Coverity II
      * CID 29298: Unused pointer value (UNUSED_VALUE)
@@ -229,41 +229,41 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
       pdxLocalType = prtc->getLocalType();
 
       if (pType->Equals(pdxLocalType)) {
-        PdxTypeRegistry::addLocalPdxType(pdxRealObject->getClassName(), pType);
-        PdxTypeRegistry::addPdxType(pType->getTypeId(), pType);
+        getPdxTypeRegistry()->addLocalPdxType(pdxRealObject->getClassName(), pType);
+        getPdxTypeRegistry()->addPdxType(pType->getTypeId(), pType);
         pType->setLocal(true);
       } else {
         // Need to know local type and then merge type
         pdxLocalType->InitializeType();
-        pdxLocalType->setTypeId(PdxTypeRegistry::getPDXIdForType(
+        pdxLocalType->setTypeId(getPdxTypeRegistry()->getPDXIdForType(
             pdxObjectptr->getClassName(), dataInput.getPoolName(), pdxLocalType,
             true));
         pdxLocalType->setLocal(true);
-        PdxTypeRegistry::addLocalPdxType(pdxRealObject->getClassName(),
+        getPdxTypeRegistry()->addLocalPdxType(pdxRealObject->getClassName(),
                                          pdxLocalType);  // added local type
-        PdxTypeRegistry::addPdxType(pdxLocalType->getTypeId(), pdxLocalType);
+        getPdxTypeRegistry()->addPdxType(pdxLocalType->getTypeId(), pdxLocalType);
 
         pType->InitializeType();
-        PdxTypeRegistry::addPdxType(pType->getTypeId(),
+        getPdxTypeRegistry()->addPdxType(pType->getTypeId(),
                                     pType);  // adding remote type
 
         // create merge type
         createMergedType(pdxLocalType, pType, dataInput);
 
         PdxTypePtr mergedVersion =
-            PdxTypeRegistry::getMergedType(pType->getTypeId());
+            getPdxTypeRegistry()->getMergedType(pType->getTypeId());
 
         PdxRemotePreservedDataPtr preserveData =
             prtc->getPreservedData(mergedVersion, pdxObjectptr);
         if (preserveData != nullptr) {
-          PdxTypeRegistry::setPreserveData(pdxObjectptr, preserveData);
+          getPdxTypeRegistry()->setPreserveData(pdxObjectptr, preserveData);
         }
       }
       prtc->MoveStream();
     } else {  // remote reader will come here as local type is there
       pType->InitializeType();
       LOGDEBUG("Adding type %d ", pType->getTypeId());
-      PdxTypeRegistry::addPdxType(pType->getTypeId(),
+      getPdxTypeRegistry()->addPdxType(pType->getTypeId(),
                                   pType);  // adding remote type
       PdxRemoteReaderPtr prr =
           std::make_shared<PdxRemoteReader>(dataInput, pType, length);
@@ -274,12 +274,12 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
       createMergedType(pdxLocalType, pType, dataInput);
 
       PdxTypePtr mergedVersion =
-          PdxTypeRegistry::getMergedType(pType->getTypeId());
+          getPdxTypeRegistry()->getMergedType(pType->getTypeId());
 
       PdxRemotePreservedDataPtr preserveData =
           prr->getPreservedData(mergedVersion, pdxObjectptr);
       if (preserveData != nullptr) {
-        PdxTypeRegistry::setPreserveData(pdxObjectptr, preserveData);
+        getPdxTypeRegistry()->setPreserveData(pdxObjectptr, preserveData);
       }
       prr->MoveStream();
     }
@@ -289,7 +289,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
 
 PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
                                              bool forceDeserialize) {
-  if (PdxTypeRegistry::getPdxReadSerialized() == false || forceDeserialize) {
+  if (getPdxTypeRegistry()->getPdxReadSerialized() == false || forceDeserialize) {
     // Read Length
     int32_t len;
     dataInput.readInt(&len);
@@ -315,15 +315,15 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
     // read typeId
     dataInput.readInt(&typeId);
 
-    PdxTypePtr pType = PdxTypeRegistry::getPdxType(typeId);
+    PdxTypePtr pType = getPdxTypeRegistry()->getPdxType(typeId);
 
     if (pType == nullptr) {
       // TODO shared_ptr why redef?
       PdxTypePtr pType = std::static_pointer_cast<PdxType>(
           SerializationRegistry::GetPDXTypeById(dataInput.getPoolName(),
                                                 typeId));
-      PdxTypeRegistry::addLocalPdxType(pType->getPdxClassName(), pType);
-      PdxTypeRegistry::addPdxType(pType->getTypeId(), pType);
+      getPdxTypeRegistry()->addLocalPdxType(pType->getPdxClassName(), pType);
+      getPdxTypeRegistry()->addPdxType(pType->getTypeId(), pType);
     }
 
     // TODO::Enable it once the PdxInstanceImple is CheckedIn.
@@ -345,9 +345,9 @@ void PdxHelper::createMergedType(PdxTypePtr localType, PdxTypePtr remoteType,
   PdxTypePtr mergedVersion = localType->mergeVersion(remoteType);
 
   if (mergedVersion->Equals(localType)) {
-    PdxTypeRegistry::setMergedType(remoteType->getTypeId(), localType);
+    getPdxTypeRegistry()->setMergedType(remoteType->getTypeId(), localType);
   } else if (mergedVersion->Equals(remoteType)) {
-    PdxTypeRegistry::setMergedType(remoteType->getTypeId(), remoteType);
+    getPdxTypeRegistry()->setMergedType(remoteType->getTypeId(), remoteType);
   } else {  // need to create new version
     mergedVersion->InitializeType();
     if (mergedVersion->getTypeId() == 0) {
@@ -355,10 +355,10 @@ void PdxHelper::createMergedType(PdxTypePtr localType, PdxTypePtr remoteType,
           dataInput.getPoolName(), mergedVersion));
     }
 
-    // PdxTypeRegistry::AddPdxType(remoteType->TypeId, mergedVersion);
-    PdxTypeRegistry::addPdxType(mergedVersion->getTypeId(), mergedVersion);
-    PdxTypeRegistry::setMergedType(remoteType->getTypeId(), mergedVersion);
-    PdxTypeRegistry::setMergedType(mergedVersion->getTypeId(), mergedVersion);
+    // getPdxTypeRegistry()->AddPdxType(remoteType->TypeId, mergedVersion);
+    getPdxTypeRegistry()->addPdxType(mergedVersion->getTypeId(), mergedVersion);
+    getPdxTypeRegistry()->setMergedType(remoteType->getTypeId(), mergedVersion);
+    getPdxTypeRegistry()->setMergedType(mergedVersion->getTypeId(), mergedVersion);
   }
 }
 
@@ -419,11 +419,11 @@ int32_t PdxHelper::readInt(uint8_t* offsetPosition, int size) {
 int32_t PdxHelper::getEnumValue(const char* enumClassName, const char* enumName,
                                 int hashcode) {
   auto ei = std::make_shared<EnumInfo>(enumClassName, enumName, hashcode);
-  return PdxTypeRegistry::getEnumValue(ei);
+  return getPdxTypeRegistry()->getEnumValue(ei);
 }
 
 EnumInfoPtr PdxHelper::getEnum(int enumId) {
-  EnumInfoPtr ei = PdxTypeRegistry::getEnum(enumId);
+  EnumInfoPtr ei = getPdxTypeRegistry()->getEnum(enumId);
   return ei;
 }
 }  // namespace client

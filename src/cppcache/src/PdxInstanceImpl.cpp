@@ -806,7 +806,7 @@ PdxTypePtr PdxInstanceImpl::getPdxType() const {
     }
     return m_pdxType;
   }
-  PdxTypePtr pType = PdxTypeRegistry::getPdxType(m_typeId);
+  PdxTypePtr pType = getPdxTypeRegistry()->getPdxType(m_typeId);
   return pType;
 }
 
@@ -1785,7 +1785,7 @@ void PdxInstanceImpl::fromData(PdxReaderPtr input) {
 
 const char* PdxInstanceImpl::getClassName() const {
   if (m_typeId != 0) {
-    PdxTypePtr pdxtype = PdxTypeRegistry::getPdxType(m_typeId);
+    PdxTypePtr pdxtype = getPdxTypeRegistry()->getPdxType(m_typeId);
     if (pdxtype == nullptr) {
       char excpStr[256] = {0};
       ACE_OS::snprintf(excpStr, 256,

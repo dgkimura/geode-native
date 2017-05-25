@@ -130,7 +130,7 @@ void PdxRemoteWriter::writePreserveData() {
 void PdxRemoteWriter::initialize() {
   // this is default case
   if (m_preserveData == nullptr) {
-    m_pdxType = PdxTypeRegistry::getLocalPdxType(m_pdxClassName);
+    m_pdxType = getPdxTypeRegistry()->getLocalPdxType(m_pdxClassName);
   }
 }
 
