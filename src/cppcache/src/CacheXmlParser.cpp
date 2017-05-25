@@ -419,18 +419,18 @@ void CacheXmlParser::setAttributes(Cache* cache) {}
  * @throws UnknownException otherwise
  *
  */
-void CacheXmlParser::create(Cache* cache) {
+void CacheXmlParser::create(CachePtr cachePtr) {
   // use DeleteObject class to delete m_cacheCreation in case of exceptions
   DeleteObject<CacheXmlCreation> delCacheCreation(m_cacheCreation);
 
-  if (cache == NULL) {
+  if (cachePtr == nullptr) {
     std::string s = "XML:No cache specified for performing configuration";
     throw IllegalArgumentException(s.c_str());
   }
   if (!m_cacheCreation) {
     throw CacheXmlException("XML: Element <cache> was not provided in the xml");
   }
-  m_cacheCreation->create(cache);
+  m_cacheCreation->create(cachePtr);
   delCacheCreation.noDelete();
   Log::info("Declarative configuration of cache completed successfully");
 }
@@ -600,12 +600,7 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
     throw CacheXmlException(s.c_str());
   }
 
-  //TODO: WWJD we committed a big sin here to allow us to compile for the rest of what we are doing....
-  CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
-  CachePtr cachePtr = cacheFactoryPtr->create();
-  assert(false);
-
-  PoolFactoryPtr factory = getPoolManager()->createFactory(cachePtr);
+  PoolFactoryPtr factory = getPoolManager()->createFactory();
   const char* poolName = NULL;
 
   while (atts[attrsCount] != NULL) {

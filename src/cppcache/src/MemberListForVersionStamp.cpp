@@ -43,6 +43,14 @@ uint16_t MemberListForVersionStamp::add(DSMemberForVersionStampPtr member) {
   return m_memberCounter;
 }
 
+void MemberListForVersionStamp::clear() {
+	WriteGuard guard(m_mapLock);
+	m_members1.clear();
+	m_members2.clear();
+	return;
+}
+
+
 // This function is protected  using readers/writer lock
 DSMemberForVersionStampPtr MemberListForVersionStamp::getDSMember(
     uint16_t memberId) {

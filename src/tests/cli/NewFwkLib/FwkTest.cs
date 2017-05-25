@@ -617,7 +617,7 @@ namespace Apache.Geode.Client.FwkLib
       
       if (PoolManager.Find(poolName) == null)
       {
-        Pool pool = pf.Create(poolName);
+        Pool pool = pf.Create(poolName, CacheHelper<TKey, TVal>.DCache);
         FwkInfo("Pool attributes are {0}:", PoolAttributesToString(pool));
       }
     }
@@ -1399,7 +1399,7 @@ namespace Apache.Geode.Client.FwkLib
         pf.SetSubscriptionRedundancy(redundancyLevel);
       if (PoolManager.Find(poolName) == null)
       {
-        Pool pool = pf.Create(poolName);
+        Pool pool = pf.Create(poolName, CacheHelper<TKey, TVal>.DCache);
         FwkInfo("Pool attributes are {0}:", PoolAttributesToString(pool));
       }
       FwkInfo("Create Pool complete with poolName= {0}", poolName);

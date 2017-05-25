@@ -55,6 +55,7 @@ typedef PersistenceManager* (*LibraryPersistenceManagerFn)(
 
 class CPPCACHE_EXPORT CacheXmlParser : public CacheXml {
  private:
+  CachePtr m_cachePtr;
   std::stack<void*> _stack;
   xmlSAXHandler m_saxHandler;
   CacheXmlCreation* m_cacheCreation;
@@ -82,7 +83,7 @@ class CPPCACHE_EXPORT CacheXmlParser : public CacheXml {
   void parseFile(const char* filename);
   void parseMemory(const char* buffer, int size);
   void setAttributes(Cache* cache);
-  void create(Cache* cache);
+  void create(CachePtr cache);
   void endRootRegion();
   void endSubregion();
   void endRegion(bool isRoot);

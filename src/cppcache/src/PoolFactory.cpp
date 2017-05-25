@@ -39,7 +39,7 @@ static PoolFactoryPtr g_poolFactory = nullptr;
 PoolFactoryPtr getPoolFactory(CachePtr cachePtr)
 {
   if (g_poolFactory == nullptr) {
-    g_poolFactory = PoolFactoryPtr(new PoolFactory(cachePtr));
+    g_poolFactory = PoolFactoryPtr(new PoolFactory());
   }
   return g_poolFactory;
 }
@@ -48,11 +48,10 @@ PoolFactoryPtr getPoolFactory(CachePtr cachePtr)
 }  // namespace apache
 
 
-PoolFactory::PoolFactory(CachePtr cachePtr)
+PoolFactory::PoolFactory()
     : m_attrs(new PoolAttributes),
       m_isSubscriptionRedundancy(false),
-      m_addedServerOrLocator(false),
-      m_cachePtr(cachePtr) {}
+      m_addedServerOrLocator(false) {}
 
 PoolFactory::~PoolFactory() {}
 
@@ -129,7 +128,7 @@ void PoolFactory::setPRSingleHopEnabled(bool enabled) {
   m_attrs->setPRSingleHopEnabled(enabled);
 }
 
-PoolPtr PoolFactory::create(const char* name) {
+PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
   ThinClientPoolDMPtr poolDM;
   {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
@@ -155,7 +154,7 @@ PoolPtr PoolFactory::create(const char* name) {
       }
     }
 
-    CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(m_cachePtr.get());
+    CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cachePtr.get());
       TcrConnectionManager& tccm =   cacheImpl->tcrConnectionManager();
     if (!copyAttrs->getSubscriptionEnabled() &&
         copyAttrs->getSubscriptionRedundancy() == 0 && !tccm.isDurable()) {

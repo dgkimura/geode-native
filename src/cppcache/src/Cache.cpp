@@ -172,7 +172,7 @@ void Cache::initializeDeclarativeCache(const char* cacheXml) {
   CacheXmlParser* xmlParser = CacheXmlParser::parse(cacheXml);
   xmlParser->setAttributes(this);
   m_cacheImpl->initServices();
-  xmlParser->create(this);
+  xmlParser->create(shared_from_this());
   delete xmlParser;
   xmlParser = NULL;
 }

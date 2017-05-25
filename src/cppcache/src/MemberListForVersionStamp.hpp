@@ -46,6 +46,7 @@ class MemberListForVersionStamp : public SharedBase {
   MemberListForVersionStamp();
   virtual ~MemberListForVersionStamp();
   uint16_t add(DSMemberForVersionStampPtr member);
+  void clear();
   DSMemberForVersionStampPtr getDSMember(uint16_t memberId);
 
  private:

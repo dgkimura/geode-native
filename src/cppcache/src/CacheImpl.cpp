@@ -154,8 +154,11 @@ void CacheImpl::initServices() {
   m_tcrConnectionManager = new TcrConnectionManager(this);
   PdxTypeRegistry* registry = getPdxTypeRegistry();
   registry->init();
-  CacheImpl::s_versionStampMemIdList =
-      MemberListForVersionStampPtr(new MemberListForVersionStamp());
+  if (CacheImpl::s_versionStampMemIdList == nullptr)
+  {
+	  CacheImpl::s_versionStampMemIdList =
+		  MemberListForVersionStampPtr(new MemberListForVersionStamp());
+  }
   if (!m_initDone && m_attributes != nullptr && m_attributes->getEndpoints()) {
     if (getPoolManager()->getAll().size() > 0 && getCacheMode()) {
       LOGWARN(
@@ -366,7 +369,12 @@ void CacheImpl::close(bool keepalive) {
     m_adminRegion = nullptr;
   }
 
-  CacheImpl::s_versionStampMemIdList = nullptr;
+  // TODO: WWSD - issue is that if there are mutliple caches and we call close
+  // on one, it will clear the whole versionStampIdList that other caches reference.
+  // This was not a problem in previous versions because there was only one cache really used
+  // The challenge is in our test where we create and remove multiple caches and if we support
+  // more than one cache.
+  CacheImpl::s_versionStampMemIdList->clear();
 
   // The TCCM gets destroyed when CacheImpl is destroyed, but after that there
   // is still a window for the ping related registered task to get activated
