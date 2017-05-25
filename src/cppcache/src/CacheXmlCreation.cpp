@@ -28,21 +28,22 @@ void CacheXmlCreation::addRootRegion(RegionXmlCreation* root) {
 
 void CacheXmlCreation::addPool(PoolXmlCreation* pool) { pools.push_back(pool); }
 
-void CacheXmlCreation::create(Cache* cache) {
-  m_cache = cache;
+void CacheXmlCreation::create(CachePtr cachePtr) {
+  m_cache = cachePtr;
   m_cache->m_cacheImpl->setPdxIgnoreUnreadFields(m_pdxIgnoreUnreadFields);
   m_cache->m_cacheImpl->setPdxReadSerialized(m_readPdxSerialized);
   // Create any pools before creating any regions.
 
   std::vector<PoolXmlCreation*>::iterator pool = pools.begin();
   while (pool != pools.end()) {
-    (*pool)->create();
+	//FIXME: globals - pass in shared_ptr
+    (*pool)->create(cachePtr);
     ++pool;
   }
 
   std::vector<RegionXmlCreation*>::iterator start = rootRegions.begin();
   while (start != rootRegions.end()) {
-    (*start)->createRoot(cache);
+    (*start)->createRoot(cachePtr);
     ++start;
   }
 }
@@ -61,7 +62,7 @@ CacheXmlCreation::CacheXmlCreation()
     /* adongre
      * CID 28926: Uninitialized pointer field (UNINIT_CTOR)
      */
-    : m_cache((Cache*)0) {
+    : m_cache(nullptr) {
   m_pdxIgnoreUnreadFields = false;
   m_readPdxSerialized = false;
 }

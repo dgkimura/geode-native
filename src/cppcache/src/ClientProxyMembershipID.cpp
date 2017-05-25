@@ -91,6 +91,8 @@ void ClientProxyMembershipID::init(const std::string& dsName) {
     char ps[15] = {0};
     ACE_OS::snprintf(ps, 15, "%d", pid);
     g_randString = "GFNative_";
+	LOGINFO("g_randString = %s", g_randString.c_str());
+	LOGINFO("ps = %s", ps);
     g_randString.append(randString).append(ps);
     LOGINFO("Using %s as random data for ClientProxyMembershipID",
             g_randString.c_str());

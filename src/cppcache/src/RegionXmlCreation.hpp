@@ -105,7 +105,7 @@ class CPPCACHE_EXPORT RegionXmlCreation {
    *         at the time of region creation
    * @throws UnknownException otherwise
    */
-  void createRoot(Cache* cache);
+  void createRoot(CachePtr cache);
 
   /**
    * Creates a {@link Region} with the given parent using the

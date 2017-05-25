@@ -411,7 +411,7 @@ PoolPtr CacheHelper::createPool(const char* poolName, const char* locators,
                                 int loadConditioningInterval,
                                 bool isMultiuserMode) {
   // printf(" in createPool isMultiuserMode = %d \n", isMultiuserMode);
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getCache());
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
 
   addServerLocatorEPs(locators, poolFacPtr);
   if (serverGroup) {
@@ -434,7 +434,7 @@ PoolPtr CacheHelper::createPool(const char* poolName, const char* locators,
     poolFacPtr->setSubscriptionAckInterval(subscriptionAckInterval);
   }
 
-  return poolFacPtr->create(poolName);
+  return poolFacPtr->create(poolName, getCache());
 }
 
 // this will create pool even endpoints and locatorhost has been not defined
@@ -442,7 +442,7 @@ PoolPtr CacheHelper::createPool2(const char* poolName, const char* locators,
                                  const char* serverGroup, const char* servers,
                                  int redundancy, bool clientNotification,
                                  int subscriptionAckInterval, int connections) {
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getCache());
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
 
   if (servers != 0)  // with explicit server list
   {
@@ -466,7 +466,7 @@ PoolPtr CacheHelper::createPool2(const char* poolName, const char* locators,
     poolFacPtr->setSubscriptionAckInterval(subscriptionAckInterval);
   }
 
-  return poolFacPtr->create(poolName);
+  return poolFacPtr->create(poolName, getCache());
 }
 
 void CacheHelper::logPoolAttributes(PoolPtr& pool) {
@@ -608,7 +608,7 @@ RegionPtr CacheHelper::createPooledRegion(
     bool caching, bool clientNotificationEnabled, int ettl, int eit, int rttl,
     int rit, int lel, const CacheListenerPtr& cacheListener,
     ExpirationAction::Action action) {
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getCache());
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
   poolFacPtr->setSubscriptionEnabled(clientNotificationEnabled);
 
   if (locators) {
@@ -618,7 +618,7 @@ RegionPtr CacheHelper::createPooledRegion(
 
   if ((getPoolManager()->find(poolName)) == nullptr) {  
 	// Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, getCache());
   }
 
   RegionShortcut preDefRA = PROXY;
@@ -646,7 +646,7 @@ RegionPtr CacheHelper::createPooledRegionConcurrencyCheckDisabled(
     bool caching, bool clientNotificationEnabled, bool concurrencyCheckEnabled,
     int ettl, int eit, int rttl, int rit, int lel,
     const CacheListenerPtr& cacheListener, ExpirationAction::Action action) {
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getCache());
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
   poolFacPtr->setSubscriptionEnabled(clientNotificationEnabled);
 
   LOG("adding pool locators");
@@ -654,7 +654,7 @@ RegionPtr CacheHelper::createPooledRegionConcurrencyCheckDisabled(
 
   if ((getPoolManager()->find(poolName)) == nullptr) {
 	// Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, getCache());
   }
 
   RegionShortcut preDefRA = PROXY;
@@ -713,7 +713,7 @@ RegionPtr CacheHelper::createPooledRegionDiscOverFlow(
     bool caching, bool clientNotificationEnabled, int ettl, int eit, int rttl,
     int rit, int lel, const CacheListenerPtr& cacheListener,
     ExpirationAction::Action action) {
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getCache());
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
   poolFacPtr->setSubscriptionEnabled(clientNotificationEnabled);
 
   if (locators)  // with locator
@@ -723,7 +723,7 @@ RegionPtr CacheHelper::createPooledRegionDiscOverFlow(
   }
   if ((getPoolManager()->find(poolName)) == nullptr) {
 	// Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, getCache());
   }
 
   if (!caching) {
@@ -768,7 +768,7 @@ RegionPtr CacheHelper::createPooledRegionSticky(
     bool caching, bool clientNotificationEnabled, int ettl, int eit, int rttl,
     int rit, int lel, const CacheListenerPtr& cacheListener,
     ExpirationAction::Action action) {
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getCache());
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
   poolFacPtr->setSubscriptionEnabled(clientNotificationEnabled);
   poolFacPtr->setThreadLocalConnections(true);
   poolFacPtr->setPRSingleHopEnabled(false);
@@ -778,7 +778,7 @@ RegionPtr CacheHelper::createPooledRegionSticky(
 
   if ((getPoolManager()->find(poolName)) == nullptr) {  
 	// Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, getCache());
     LOG("createPooledRegionSticky logPoolAttributes");
     logPoolAttributes(pptr);
   }
@@ -809,7 +809,7 @@ RegionPtr CacheHelper::createPooledRegionStickySingleHop(
     int rit, int lel, const CacheListenerPtr& cacheListener,
     ExpirationAction::Action action) {
   LOG("createPooledRegionStickySingleHop");
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getCache());
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
   poolFacPtr->setSubscriptionEnabled(clientNotificationEnabled);
   poolFacPtr->setThreadLocalConnections(true);
   poolFacPtr->setPRSingleHopEnabled(true);
@@ -818,7 +818,7 @@ RegionPtr CacheHelper::createPooledRegionStickySingleHop(
 
   if ((getPoolManager()->find(poolName)) == nullptr) {
 	// Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, getCache());
     LOG("createPooledRegionStickySingleHop logPoolAttributes");
     logPoolAttributes(pptr);
   }

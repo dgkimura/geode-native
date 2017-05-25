@@ -34,6 +34,7 @@
 #include <PdxType.hpp>
 #include <PdxTypeRegistry.hpp>
 #include <CacheFactoryImpl.hpp>
+#include <CacheRegionHelper.hpp>
 
 #include "version.h"
 
@@ -50,19 +51,19 @@ namespace client {
 
 CacheFactoryPtr* s_factory = nullptr;
 
-PoolPtr CacheFactory::createOrGetDefaultPool(CacheImpl& cacheimpl) {
+PoolPtr CacheFactory::createOrGetDefaultPool(CachePtr cache) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
 
-  if (cacheimpl.isClosed() == false &&
-      cacheimpl.getDefaultPool() != nullptr) {
-    return cacheimpl.getDefaultPool();
+  if (cache->isClosed() == false &&
+      CacheRegionHelper::getCacheImpl(cache.get())->getDefaultPool() != nullptr) {
+    return  CacheRegionHelper::getCacheImpl(cache.get())->getDefaultPool();
   }
 
   PoolPtr pool = getPoolManager()->find(DEFAULT_POOL_NAME);
 
   // if default_poolFactory is null then we are not using latest API....
   if (pool == nullptr && s_factory != nullptr) {
-    pool = (*s_factory)->determineDefaultPool(cacheimpl);
+    pool = (*s_factory)->determineDefaultPool(cache);
   }
 
   return pool;
@@ -197,35 +198,35 @@ CachePtr CacheFactory::create(const char* name,
   return cptr;
 }
 
-PoolPtr CacheFactory::determineDefaultPool(CacheImpl& cacheimpl) {
+PoolPtr CacheFactory::determineDefaultPool(CachePtr cachePtr) {
   PoolPtr pool = nullptr;
   HashMapOfPools allPools = getPoolManager()->getAll();
   size_t currPoolSize = allPools.size();
-
+  CacheImpl * cacheImpl = CacheRegionHelper::getCacheImpl(cachePtr.get());
   // means user has not set any pool attributes
   if (this->pf == nullptr) {
-    this->pf = getPoolFactory(cacheimpl.getCache()->shared_from_this());
+    this->pf = getPoolFactory(cachePtr->shared_from_this());
     if (currPoolSize == 0) {
       if (!this->pf->m_addedServerOrLocator) {
         this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
       }
 
-      pool = this->pf->create(DEFAULT_POOL_NAME);
+      pool = this->pf->create(DEFAULT_POOL_NAME,cachePtr);
       // creatubg default pool so setting this as default pool
       LOGINFO("Set default pool with localhost:40404");
-      cacheimpl.setDefaultPool(pool);
+	  cacheImpl->setDefaultPool(pool);
       return pool;
     } else if (currPoolSize == 1) {
       pool = allPools.begin().second();
       LOGINFO("Set default pool from existing pool.");
-      cacheimpl.setDefaultPool(pool);
+	  cacheImpl->setDefaultPool(pool);
       return pool;
     } else {
       // can't set anything as deafult pool
       return nullptr;
     }
   } else {
-    PoolPtr defaulPool = cacheimpl.getDefaultPool();
+    PoolPtr defaulPool = cacheImpl->getDefaultPool();
 
     if (!this->pf->m_addedServerOrLocator) {
       this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
@@ -255,10 +256,10 @@ PoolPtr CacheFactory::determineDefaultPool(CacheImpl& cacheimpl) {
     GF_DEV_ASSERT(defaulPool == nullptr);
 
     if (defaulPool == nullptr) {
-      pool = this->pf->create(DEFAULT_POOL_NAME);
+      pool = this->pf->create(DEFAULT_POOL_NAME, cachePtr);
       LOGINFO("Created default pool");
       // creating default so setting this as defaul pool
-      cacheimpl.setDefaultPool(pool);
+	  cacheImpl->setDefaultPool(pool);
     }
 
     return pool;
@@ -267,7 +268,7 @@ PoolPtr CacheFactory::determineDefaultPool(CacheImpl& cacheimpl) {
 
 PoolFactoryPtr CacheFactory::getPoolFactory(CachePtr cachePtr) {
   if (this->pf == nullptr) {
-    this->pf = getPoolManager()->createFactory(cachePtr);
+    this->pf = getPoolManager()->createFactory();
   }
   return this->pf;
 }

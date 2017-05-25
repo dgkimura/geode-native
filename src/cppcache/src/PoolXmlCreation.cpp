@@ -33,8 +33,8 @@ void PoolXmlCreation::addServer(const char * host, const char * port)
 }
 */
 
-PoolPtr PoolXmlCreation::create() {
-  return poolFactory->create(poolName.c_str());
+PoolPtr PoolXmlCreation::create(CachePtr cachePtr) {
+  return poolFactory->create(poolName.c_str(), cachePtr);
 }
 
 PoolXmlCreation::PoolXmlCreation(const char* name, PoolFactoryPtr factory) {

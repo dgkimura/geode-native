@@ -496,7 +496,7 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
    * @throws IllegalStateException if a locator or server has not been added.
    * @return the newly created pool.
    */
-  PoolPtr create(const char* name);
+  PoolPtr create(const char* name, CachePtr cachePtr);
 
   /**
    * By default setPRSingleHopEnabled is true<br>
@@ -522,7 +522,7 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
 
   ~PoolFactory();
 
-  PoolFactory(CachePtr cachePtr);
+  PoolFactory();
 
  private:
   PoolFactory(const PoolFactory&);
@@ -530,7 +530,6 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
   PoolAttributesPtr m_attrs;
   bool m_isSubscriptionRedundancy;
   bool m_addedServerOrLocator;
-  CachePtr m_cachePtr;
   friend class Cache;
   friend class CacheImpl;
   friend class PoolManager;

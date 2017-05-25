@@ -156,12 +156,12 @@ class CPPCACHE_EXPORT CacheFactory
   ~CacheFactory();
   FRIEND_STD_SHARED_PTR(CacheFactory)
 
-  PoolPtr determineDefaultPool(CacheImpl& cachePtr);
+  PoolPtr determineDefaultPool(CachePtr cachePtr);
 
   // Set very first time some creates cache
   // TODO shared_ptr - remove or refactor with global work
 //  static CacheFactoryPtr* default_CacheFactory;
-  static PoolPtr createOrGetDefaultPool(CacheImpl& cacheimpl);
+  static PoolPtr createOrGetDefaultPool(CachePtr cache);
   static void* m_cacheMap;
   static void init();
   static void cleanup();

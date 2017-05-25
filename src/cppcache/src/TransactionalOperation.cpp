@@ -64,7 +64,7 @@ CacheablePtr TransactionalOperation::replay(Cache* cache) {
     case GF_EXECUTE_FUNCTION: {
       ExecutionPtr execution;
       if (m_regionName == NULL) {
-        execution = FunctionService::onServer(CachePtr(cache));
+        execution = FunctionService::onServer(cache->shared_from_this());
       } else {
         execution = FunctionService::onRegion(cache->getRegion(m_regionName));
       }

@@ -71,7 +71,7 @@ class putThread : public ACE_Task_Base {
 };
 
 void doAttrTestingAndCreatePool(const char* poolName) {
-  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getHelper()->cachePtr);
+  PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
   poolFacPtr->setFreeConnectionTimeout(10000);
   poolFacPtr->setLoadConditioningInterval(60000);
   poolFacPtr->setSocketBufferSize(1024);
@@ -92,7 +92,7 @@ void doAttrTestingAndCreatePool(const char* poolName) {
   // poolFacPtr->setMultiuserSecurityMode(true);
   poolFacPtr->setPRSingleHopEnabled(false);
 
-  PoolPtr pptr = poolFacPtr->create(poolName);
+  PoolPtr pptr = poolFacPtr->create(poolName, getHelper()->cachePtr);
 
   // Validate the attributes
   ASSERT(pptr->getFreeConnectionTimeout() == 10000,
@@ -196,9 +196,9 @@ DUNIT_TASK(CLIENT1, StartC1)
     doAttrTestingAndCreatePool(poolName);
 
     // Do PoolCreation testing , create another pool with same name
-    PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory(getHelper()->cachePtr);
+    PoolFactoryPtr poolFacPtr = getPoolManager()->createFactory();
     try {
-      PoolPtr pptr = poolFacPtr->create(poolName);
+      PoolPtr pptr = poolFacPtr->create(poolName, getHelper()->cachePtr);
       FAIL("Pool creation with same name should fail");
     } catch (IllegalStateException&) {
       LOG("OK:Pool creation with same name should fail");

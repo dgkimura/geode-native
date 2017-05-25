@@ -59,7 +59,8 @@ RegionPtr RegionFactory::create(const char* name) {
     ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
     // if local region no need to create default pool
     if (m_preDefinedRegion != LOCAL) {
-      PoolPtr pool = CacheFactory::createOrGetDefaultPool(m_cacheimpl);
+      // FIXME: globals - Make m_cacheimpl a shared_ptr
+      PoolPtr pool = CacheFactory::createOrGetDefaultPool(m_cacheimpl.getCache()->shared_from_this());
       if (pool == nullptr) {
         throw IllegalStateException("Pool is not defined create region.");
       }

@@ -69,7 +69,7 @@ class CPPCACHE_EXPORT CacheXmlCreation {
    * @throws UnknownException otherwise
    *
    */
-  void create(Cache* cache);
+  void create(CachePtr cachePtr);
 
   void setPdxIgnoreUnreadField(bool ignore);
 
@@ -88,7 +88,7 @@ class CPPCACHE_EXPORT CacheXmlCreation {
   /** This cache's pools */
   std::vector<PoolXmlCreation*> pools;
 
-  Cache* m_cache;
+  CachePtr m_cache;
   bool m_pdxIgnoreUnreadFields;
   bool m_readPdxSerialized;
 };

@@ -952,7 +952,7 @@ namespace Apache.Geode.Client.UnitTests
       }
 
       poolFactory.SetSubscriptionEnabled(clientNotification);
-      poolFactory.Create("__TESTPOOL__");
+      poolFactory.Create("__TESTPOOL__", m_cache);
       region = regionFactory.SetPoolName("__TESTPOOL__").Create<TradeKey, Object>(name);
 
       Assert.IsNotNull(region, "IRegion<TradeKey, Object> {0} was not created.", name);
@@ -1040,7 +1040,7 @@ namespace Apache.Geode.Client.UnitTests
           fact.SetMinConnections(numConnections);
           fact.SetMaxConnections(numConnections);
         }
-        Pool/*<TKey, TValue>*/ pool = fact.Create(name);
+        Pool/*<TKey, TValue>*/ pool = fact.Create(name, m_cache);
         if (pool == null)
         {
           Util.Log("Pool creation failed");
@@ -1110,7 +1110,7 @@ namespace Apache.Geode.Client.UnitTests
         {
           Util.Log("No locators or servers specified for pool");
         }
-        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName);
+        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName, m_cache);
         if (pool == null)
         {
           Util.Log("Pool creation failed");
@@ -1192,7 +1192,7 @@ namespace Apache.Geode.Client.UnitTests
         {
           Util.Log("No locators or servers specified for pool");
         }
-        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName);
+        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName, m_cache);
         if (pool == null)
         {
           Util.Log("Pool creation failed");
@@ -1262,7 +1262,7 @@ namespace Apache.Geode.Client.UnitTests
         {
           Util.Log("No locators or servers specified for pool");
         }
-        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName);
+        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName, m_cache);
         if (pool == null)
         {
           Util.Log("Pool creation failed");
@@ -1328,7 +1328,7 @@ namespace Apache.Geode.Client.UnitTests
         {
           Util.Log("No locators or servers specified for pool");
         }
-        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName);
+        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName, m_cache);
         if (pool == null)
         {
           Util.Log("Pool creation failed");
@@ -1400,7 +1400,7 @@ namespace Apache.Geode.Client.UnitTests
         {
           Util.Log("No locators or servers specified for pool");
         }
-        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName);
+        Pool/*<TKey, TValue>*/ pool = fact.Create(poolName, m_cache);
         if (pool == null)
         {
           Util.Log("Pool creation failed");
@@ -1470,7 +1470,7 @@ namespace Apache.Geode.Client.UnitTests
         {
           Util.Log("No locators or servers specified for pool");
         }
-        Pool pool = fact.Create(poolName);
+        Pool pool = fact.Create(poolName, m_cache);
         if (pool == null)
         {
           Util.Log("Pool creation failed");

@@ -579,7 +579,7 @@ FwkPool::FwkPool(const DOMNode* node) : m_locators(false), m_servers(false) {
   //TODO: WWSD
   CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
   CachePtr cachePtr = cacheFactoryPtr->create();
-  m_poolFactory = getPoolManager()->createFactory(cachePtr);
+  m_poolFactory = getPoolManager()->createFactory();
   // Set Attrs to Pool
   setAttributesToFactory(node);
 

@@ -1043,7 +1043,7 @@ namespace Apache.Geode.Client.FwkLib
         while (now < end)
         {
           startTime = InitPerfStat.perfstat[0].StartConnect();
-          Pool pool = pf.Create(poolName);
+          Pool pool = pf.Create(poolName, CacheHelper<TKey, TVal>.DCache);
           //FwkInfo("rjk: durable client id is {0}", DistributedSystem.SystemProperties.DurableClientId);
           if (pool != null)
           {

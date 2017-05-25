@@ -40,7 +40,7 @@
   </root-region>
 
   <pool
-    free-connection-timeout = "12345"    
+    free-connection-timeout = "12345"
     idle-timeout = "5555"
     load-conditioning-interval = "23456"
     max-connections = "7"
@@ -55,13 +55,11 @@
     statistic-interval = "10123"
     subscription-ack-interval = "567"
     subscription-enabled = "true"
-    subscription-message-tracking-timeout = "900123"    
-    subscription-redundancy = "0"    
+    subscription-message-tracking-timeout = "900123"
+    subscription-redundancy = "0"
     thread-local-connections = "5"
-    pr-single-hop-enabled="true"
-  >
+    pr-single-hop-enabled="true">
     <locator host="localhost" port="LOC_PORT1" />
-    <!--locator host="localhost" port="34757" /-->
   </pool>
   
   <pool
@@ -82,8 +80,7 @@
     subscription-message-tracking-timeout = "800222"    
     subscription-redundancy = "1"
     thread-local-connections = "3"
-    pr-single-hop-enabled="false"
-  >
+    pr-single-hop-enabled="false">
     <server host="localhost" port="HOST_PORT1" />
     <server host="localhost" port="HOST_PORT2" />
   </pool>
