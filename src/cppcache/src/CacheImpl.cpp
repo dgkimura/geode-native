@@ -49,7 +49,6 @@ volatile bool CacheImpl::s_networkhop = false;
 volatile int CacheImpl::s_blacklistBucketTimeout = 0;
 ACE_Recursive_Thread_Mutex CacheImpl::s_nwHopLock;
 volatile int8_t CacheImpl::s_serverGroupFlag = 0;
-MemberListForVersionStampPtr CacheImpl::s_versionStampMemIdList = nullptr;
 
 #define DEFAULT_LRU_MAXIMUM_ENTRIES 100000
 
@@ -154,12 +153,7 @@ void CacheImpl::initServices() {
   m_tcrConnectionManager = new TcrConnectionManager(this);
   PdxTypeRegistry* registry = getPdxTypeRegistry();
   registry->init();
-  if (CacheImpl::s_versionStampMemIdList == nullptr)
-  {
-	  CacheImpl::s_versionStampMemIdList =
-		  MemberListForVersionStampPtr(new MemberListForVersionStamp());
-  }
-  if (!m_initDone && m_attributes != nullptr && m_attributes->getEndpoints()) {
+    if (!m_initDone && m_attributes != nullptr && m_attributes->getEndpoints()) {
     if (getPoolManager()->getAll().size() > 0 && getCacheMode()) {
       LOGWARN(
           "At least one pool has been created so ignoring cache level "
@@ -933,5 +927,7 @@ CacheTransactionManagerPtr CacheImpl::getCacheTransactionManager() {
   return m_cacheTXManager;
 }
 MemberListForVersionStampPtr CacheImpl::getMemberListForVersionStamp() {
-  return CacheImpl::s_versionStampMemIdList;
+
+  static auto versionStampMemIdList = std::make_shared<MemberListForVersionStamp>();
+  return versionStampMemIdList;
 }
