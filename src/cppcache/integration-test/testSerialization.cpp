@@ -46,13 +46,13 @@ template <class T>
 SharedPtr<T> duplicate(const SharedPtr<T>& orig) {
   SharedPtr<T> result;
   DataOutput dout;
-  SerializationRegistry::serialize(orig, dout);
+  getSerializationRegistry()->serialize(orig, dout);
   // dout.writeObject(orig);
 
   uint32_t length = 0;
   const uint8_t* buffer = dout.getBuffer(&length);
   DataInput din(buffer, length);
-  result = std::static_pointer_cast<T>(SerializationRegistry::deserialize(din));
+  result = std::static_pointer_cast<T>(getSerializationRegistry()->deserialize(din));
   // din.readObject(result);
 
   return result;

@@ -64,7 +64,7 @@ class CPPCACHE_EXPORT SerializationRegistry {
    * then write whatever the object's toData requires. The length at the
    * front is backfilled after the serialization.
    */
-  inline static void serialize(const Serializable* obj, DataOutput& output,
+  inline void serialize(const Serializable* obj, DataOutput& output,
                                bool isDelta = false) {
     if (obj == NULL) {
       output.write(static_cast<int8_t>(GeodeTypeIds::NullObj));
@@ -106,7 +106,7 @@ class CPPCACHE_EXPORT SerializationRegistry {
     }
   }
 
-  inline static void serialize(const SerializablePtr& obj, DataOutput& output) {
+  inline void serialize(const SerializablePtr& obj, DataOutput& output) {
     serialize(obj.get(), output);
   }
 
@@ -114,45 +114,47 @@ class CPPCACHE_EXPORT SerializationRegistry {
    * Read the length, typeid, and run the objs fromData. Returns the New
    * object.
    */
-  static SerializablePtr deserialize(DataInput& input, int8_t typeId = -1);
+  SerializablePtr deserialize(DataInput& input, int8_t typeId = -1);
 
-  static void addType(TypeFactoryMethod func);
+  void addType(TypeFactoryMethod func);
 
-  static void addType(int64_t compId, TypeFactoryMethod func);
+  void addType(int64_t compId, TypeFactoryMethod func);
 
-  static void addPdxType(TypeFactoryMethodPdx func);
+  void addPdxType(TypeFactoryMethodPdx func);
 
-  static void setPdxSerializer(PdxSerializerPtr pdxSerializer);
+  void setPdxSerializer(PdxSerializerPtr pdxSerializer);
 
-  static PdxSerializerPtr getPdxSerializer();
+  PdxSerializerPtr getPdxSerializer();
 
-  static void removeType(int64_t compId);
+  void removeType(int64_t compId);
 
-  static void init();
+  void init();
 
   // following for internal types with Data Serializable Fixed IDs  - since GFE
   // 5.7
 
-  static void addType2(TypeFactoryMethod func);
+  void addType2(TypeFactoryMethod func);
 
-  static void addType2(int64_t compId, TypeFactoryMethod func);
+  void addType2(int64_t compId, TypeFactoryMethod func);
 
-  static void removeType2(int64_t compId);
+  void removeType2(int64_t compId);
 
-  static int32_t GetPDXIdForType(const char* poolName, SerializablePtr pdxType);
+  int32_t GetPDXIdForType(const char* poolName, SerializablePtr pdxType);
 
-  static SerializablePtr GetPDXTypeById(const char* poolName, int32_t typeId);
+  SerializablePtr GetPDXTypeById(const char* poolName, int32_t typeId);
 
-  static int32_t GetEnumValue(SerializablePtr enumInfo);
-  static SerializablePtr GetEnum(int32_t val);
+  int32_t GetEnumValue(SerializablePtr enumInfo);
+  SerializablePtr GetEnum(int32_t val);
 
-  static PdxSerializablePtr getPdxType(char* className);
+  PdxSerializablePtr getPdxType(char* className);
 
  private:
-  static PoolPtr getPool();
-  static IdToFactoryMap* s_typeMap;
-  static PdxSerializerPtr m_pdxSerializer;
+  PoolPtr getPool();
+  IdToFactoryMap* s_typeMap;
+  PdxSerializerPtr m_pdxSerializer;
 };
+
+CPPCACHE_EXPORT SerializationRegistry *  getSerializationRegistry();
 }  // namespace client
 }  // namespace geode
 }  // namespace apache

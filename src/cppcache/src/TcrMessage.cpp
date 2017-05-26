@@ -1047,11 +1047,11 @@ void TcrMessage::handleByteArrayResponse(const char* bytearray, int32_t len,
         // PdxType will come in response
         input.advanceCursor(5);  // part header
         m_value =
-            SerializationRegistry::deserialize(input, GeodeTypeIds::PdxType);
+            getSerializationRegistry()->deserialize(input, GeodeTypeIds::PdxType);
       } else if (m_msgTypeRequest == TcrMessage::GET_PDX_ENUM_BY_ID) {
         // PdxType will come in response
         input.advanceCursor(5);  // part header
-        m_value = SerializationRegistry::deserialize(input);
+        m_value = getSerializationRegistry()->deserialize(input);
       } else if (m_msgTypeRequest == TcrMessage::GET_FUNCTION_ATTRIBUTES) {
         int32_t lenObj;
         input.readInt(&lenObj);

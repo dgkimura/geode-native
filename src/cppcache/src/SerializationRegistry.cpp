@@ -62,6 +62,15 @@
 namespace apache {
 namespace geode {
 namespace client {
+
+SerializationRegistry* theGlobalSerializationRegistry = NULL;
+SerializationRegistry *getSerializationRegistry() {
+  if (theGlobalSerializationRegistry == NULL)
+  {
+    theGlobalSerializationRegistry = new SerializationRegistry();
+  }
+  return theGlobalSerializationRegistry;
+}
 /* adongre
  * CID 28729: Other violation (MISSING_COPY)
  * Class "apache::geode::client::TheTypeMap" owns resources that are managed in
@@ -338,8 +347,6 @@ TheTypeMap::TheTypeMap() {
 }
 
 typedef ACE_Singleton<TheTypeMap, ACE_Thread_Mutex> theTypeMap;
-
-PdxSerializerPtr SerializationRegistry::m_pdxSerializer = nullptr;
 
 /** This starts at reading the typeid.. assumes the length has been read. */
 SerializablePtr SerializationRegistry::deserialize(DataInput& input,

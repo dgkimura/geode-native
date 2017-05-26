@@ -24,7 +24,7 @@ namespace geode {
 namespace client {
 
 void DataInput::readObjectInternal(SerializablePtr& ptr, int8_t typeId) {
-  ptr = SerializationRegistry::deserialize(*this, typeId);
+  ptr = getSerializationRegistry()->deserialize(*this, typeId);
 }
 }  // namespace client
 }  // namespace geode

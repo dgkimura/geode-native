@@ -59,7 +59,7 @@ CppCacheLibrary::CppCacheLibrary() {
     LRUEntryFactory::init();
     ExpEntryFactory::init();
     LRUExpEntryFactory::init();
-    SerializationRegistry::init();
+    getSerializationRegistry()->init();
     // getPdxTypeRegistry()->init();
     // log( "Finished initializing CppCacheLibrary." );
   } catch (apache::geode::client::Exception& ge) {

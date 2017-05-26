@@ -41,7 +41,7 @@ PdxWrapper::PdxWrapper(void *userObject, const char *className) {
         "Class name not provided to PdxWrapper constructor");
   }
 
-  m_serializer = SerializationRegistry::getPdxSerializer();
+  m_serializer = getSerializationRegistry()->getPdxSerializer();
 
   if (m_serializer == nullptr) {
     LOGERROR("No registered PDX serializer found for PdxWrapper");
@@ -73,7 +73,7 @@ PdxWrapper::PdxWrapper(const char *className) {
         "Class name not provided to PdxWrapper for deserialization");
   }
 
-  m_serializer = SerializationRegistry::getPdxSerializer();
+  m_serializer = getSerializationRegistry()->getPdxSerializer();
 
   if (m_serializer == nullptr) {
     LOGERROR(

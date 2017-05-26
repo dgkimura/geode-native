@@ -102,7 +102,7 @@ int32_t PdxTypeRegistry::getPDXIdForType(const char* type, const char* poolname,
     }
   }
 
-  int typeId = SerializationRegistry::GetPDXIdForType(poolname, nType);
+  int typeId = getSerializationRegistry()->GetPDXIdForType(poolname, nType);
   nType->setTypeId(typeId);
 
   addPdxType(typeId, nType);
@@ -127,7 +127,7 @@ int32_t PdxTypeRegistry::getPDXIdForType(PdxTypePtr nType, const char* poolname)
       return typeId;
     }
   }*/
-  typeId = SerializationRegistry::GetPDXIdForType(poolname, nType);
+  typeId = getSerializationRegistry()->GetPDXIdForType(poolname, nType);
   nType->setTypeId(typeId);
   tmp = pdxTypeToTypeIdMap;
   tmp->insert(std::make_pair(nType, typeId));
@@ -268,7 +268,7 @@ int32_t PdxTypeRegistry::getEnumValue(EnumInfoPtr ei) {
     auto val = std::static_pointer_cast<CacheableInt32>(tmp->operator[](ei));
     return val->value();
   }
-  int val = SerializationRegistry::GetEnumValue(ei);
+  int val = getSerializationRegistry()->GetEnumValue(ei);
   tmp = enumToInt;
   tmp->update(ei, CacheableInt32::create(val));
   enumToInt = tmp;
@@ -300,7 +300,7 @@ EnumInfoPtr PdxTypeRegistry::getEnum(int32_t enumVal) {
   }
 
   ret = std::static_pointer_cast<EnumInfo>(
-      SerializationRegistry::GetEnum(enumVal));
+      getSerializationRegistry()->GetEnum(enumVal));
   tmp = intToEnum;
   tmp->update(enumValPtr, ret);
   intToEnum = tmp;

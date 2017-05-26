@@ -105,7 +105,7 @@ void PdxHelper::serializePdx(DataOutput& output,
 
     nType->InitializeType();
 
-    // SerializationRegistry::GetPDXIdForType(output.getPoolName(), nType);
+    // getSerializationRegistry()->GetPDXIdForType(output.getPoolName(), nType);
     int32_t nTypeId = getPdxTypeRegistry()->getPDXIdForType(
         pdxType, output.getPoolName(), nType, true);
     nType->setTypeId(nTypeId);
@@ -178,7 +178,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
     LOGDEBUG("deserializePdx ClassName = %s, isLocal = %d ",
              pType->getPdxClassName(), pType->isLocal());
 
-    pdxObjectptr = SerializationRegistry::getPdxType(pdxClassname);
+    pdxObjectptr = getSerializationRegistry()->getPdxType(pdxClassname);
     if (pType->isLocal())  // local type no need to read Unread data
     {
       PdxLocalReaderPtr plr =
@@ -204,7 +204,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
     // type not found; need to get from server
     if (pType == nullptr) {
       pType = std::static_pointer_cast<PdxType>(
-          SerializationRegistry::GetPDXTypeById(dataInput.getPoolName(),
+          getSerializationRegistry()->GetPDXTypeById(dataInput.getPoolName(),
                                                 typeId));
       pdxLocalType = getPdxTypeRegistry()->getLocalPdxType(pType->getPdxClassName());
     }
@@ -215,7 +215,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
      * Fix : Commented the line
      */
     // pdxClassname = pType->getPdxClassName();
-    pdxObjectptr = SerializationRegistry::getPdxType(pType->getPdxClassName());
+    pdxObjectptr = getSerializationRegistry()->getPdxType(pType->getPdxClassName());
     PdxSerializablePtr pdxRealObject = pdxObjectptr;
     if (pdxLocalType == nullptr)  // need to know local type
     {
@@ -320,7 +320,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
     if (pType == nullptr) {
       // TODO shared_ptr why redef?
       PdxTypePtr pType = std::static_pointer_cast<PdxType>(
-          SerializationRegistry::GetPDXTypeById(dataInput.getPoolName(),
+          getSerializationRegistry()->GetPDXTypeById(dataInput.getPoolName(),
                                                 typeId));
       getPdxTypeRegistry()->addLocalPdxType(pType->getPdxClassName(), pType);
       getPdxTypeRegistry()->addPdxType(pType->getTypeId(), pType);
@@ -351,7 +351,7 @@ void PdxHelper::createMergedType(PdxTypePtr localType, PdxTypePtr remoteType,
   } else {  // need to create new version
     mergedVersion->InitializeType();
     if (mergedVersion->getTypeId() == 0) {
-      mergedVersion->setTypeId(SerializationRegistry::GetPDXIdForType(
+      mergedVersion->setTypeId(getSerializationRegistry()->GetPDXIdForType(
           dataInput.getPoolName(), mergedVersion));
     }
 

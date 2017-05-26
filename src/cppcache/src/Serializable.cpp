@@ -43,15 +43,15 @@ int8_t Serializable::DSFID() const {
 uint32_t Serializable::objectSize() const { return 0; }
 
 void Serializable::registerType(TypeFactoryMethod creationFunction) {
-  SerializationRegistry::addType(creationFunction);
+  getSerializationRegistry()->addType(creationFunction);
 }
 
 void Serializable::registerPdxType(TypeFactoryMethodPdx creationFunction) {
-  SerializationRegistry::addPdxType(creationFunction);
+  getSerializationRegistry()->addPdxType(creationFunction);
 }
 
 void Serializable::registerPdxSerializer(PdxSerializerPtr pdxSerializer) {
-  SerializationRegistry::setPdxSerializer(pdxSerializer);
+  getSerializationRegistry()->setPdxSerializer(pdxSerializer);
 }
 
 CacheableStringPtr Serializable::toString() const {

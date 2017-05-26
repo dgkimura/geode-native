@@ -145,12 +145,12 @@ CachePtr CacheFactory::create() {
 	               dsPtr->getSystemProperties()->cacheXMLFile(), nullptr);
   }
 
-  SerializationRegistry::addType(GeodeTypeIdsImpl::PDX,
-                                 PdxInstantiator::createDeserializable);
-  SerializationRegistry::addType(GeodeTypeIds::CacheableEnum,
-                                 PdxEnumInstantiator::createDeserializable);
-  SerializationRegistry::addType(GeodeTypeIds::PdxType,
-                                 PdxType::CreateDeserializable);
+  getSerializationRegistry()->addType(GeodeTypeIdsImpl::PDX,
+                                      PdxInstantiator::createDeserializable);
+  getSerializationRegistry()->addType(GeodeTypeIds::CacheableEnum,
+                                      PdxEnumInstantiator::createDeserializable);
+  getSerializationRegistry()->addType(GeodeTypeIds::PdxType,
+                                      PdxType::CreateDeserializable);
   getPdxTypeRegistry()->setPdxIgnoreUnreadFields(cache->getPdxIgnoreUnreadFields());
   getPdxTypeRegistry()->setPdxReadSerialized(cache->getPdxReadSerialized());
 
