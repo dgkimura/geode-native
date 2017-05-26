@@ -137,7 +137,8 @@ class CPPCACHE_EXPORT PdxTypeRegistry {
  private:
   PdxTypeToTypeIdMap* pdxTypeToTypeIdMap;
 };
-    PdxTypeRegistry *getPdxTypeRegistry();
+
+CPPCACHE_EXPORT PdxTypeRegistry *  getPdxTypeRegistry();
 
 }  // namespace client
 }  // namespace geode

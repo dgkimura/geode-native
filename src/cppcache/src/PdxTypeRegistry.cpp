@@ -34,14 +34,14 @@ namespace client {
 // std::map<PdxSerializablePtr, PdxRemotePreservedDataPtr>
 // *PdxTypeRegistry::preserveData = NULL;
 //PreservedHashMap PdxTypeRegistry::preserveData;
-    static PdxTypeRegistry* theGlobalPdxTypeRegistry = NULL;
-    PdxTypeRegistry *getPdxTypeRegistry() {
-      if (theGlobalPdxTypeRegistry == NULL)
-      {
-        theGlobalPdxTypeRegistry = new PdxTypeRegistry();
-      }
-      return theGlobalPdxTypeRegistry;
-    }
+PdxTypeRegistry* theGlobalPdxTypeRegistry = NULL;
+PdxTypeRegistry *getPdxTypeRegistry() {
+  if (theGlobalPdxTypeRegistry == NULL)
+  {
+    theGlobalPdxTypeRegistry = new PdxTypeRegistry();
+  }
+  return theGlobalPdxTypeRegistry;
+}
 
 PdxTypeRegistry::PdxTypeRegistry()
 : typeIdToPdxType(NULL),
