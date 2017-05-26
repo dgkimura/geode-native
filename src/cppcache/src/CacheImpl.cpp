@@ -368,7 +368,7 @@ void CacheImpl::close(bool keepalive) {
   // This was not a problem in previous versions because there was only one cache really used
   // The challenge is in our test where we create and remove multiple caches and if we support
   // more than one cache.
-  CacheImpl::s_versionStampMemIdList->clear();
+  getMemberListForVersionStamp()->clear();
 
   // The TCCM gets destroyed when CacheImpl is destroyed, but after that there
   // is still a window for the ping related registered task to get activated

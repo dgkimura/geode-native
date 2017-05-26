@@ -19,7 +19,11 @@
 
 using namespace apache::geode::client;
 
-MemberListForVersionStamp::MemberListForVersionStamp() { m_memberCounter = 0; }
+MemberListForVersionStamp::MemberListForVersionStamp()
+: m_mapLock()
+{
+	m_memberCounter = 0;
+}
 
 MemberListForVersionStamp::~MemberListForVersionStamp() {}
 
