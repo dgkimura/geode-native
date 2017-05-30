@@ -258,24 +258,24 @@ namespace Apache
       System::Int32 Serializable::GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType)
       {
         native::CacheablePtr kPtr(SafeMSerializableConvertGeneric(pdxType));
-        return native::SerializationRegistry::GetPDXIdForType(poolName, kPtr);
+        return native::getSerializationRegistry()->GetPDXIdForType(poolName, kPtr);
       }
 
       IGeodeSerializable^ Serializable::GetPDXTypeById(const char* poolName, System::Int32 typeId)
       {
-        SerializablePtr sPtr = native::SerializationRegistry::GetPDXTypeById(poolName, typeId);
+        SerializablePtr sPtr = native::getSerializationRegistry()->GetPDXTypeById(poolName, typeId);
         return SafeUMSerializableConvertGeneric(sPtr);
       }
 
       int Serializable::GetEnumValue(Internal::EnumInfo^ ei)
       {
         native::CacheablePtr kPtr(SafeMSerializableConvertGeneric(ei));
-        return native::SerializationRegistry::GetEnumValue(kPtr);
+        return native::getSerializationRegistry()->GetEnumValue(kPtr);
       }
 
       Internal::EnumInfo^ Serializable::GetEnum(int val)
       {
-        SerializablePtr sPtr = native::SerializationRegistry::GetEnum(val);
+        SerializablePtr sPtr = native::getSerializationRegistry()->GetEnum(val);
         return (Internal::EnumInfo^)SafeUMSerializableConvertGeneric(sPtr);
       }
 
@@ -515,12 +515,12 @@ namespace Apache
       {
         if (!appDomainEnable)
         {
-          native::SerializationRegistry::addType(native::GeodeTypeIdsImpl::PDX,
+          native::getSerializationRegistry()->addType(native::GeodeTypeIdsImpl::PDX,
                                                                 &native::PdxManagedCacheableKey::CreateDeserializable);
         }
         else
         {
-          native::SerializationRegistry::addType(native::GeodeTypeIdsImpl::PDX,
+          native::getSerializationRegistry()->addType(native::GeodeTypeIdsImpl::PDX,
                                                                 &native::PdxManagedCacheableKeyBytes::CreateDeserializable);
         }
       }
@@ -593,14 +593,14 @@ namespace Apache
         {
           if (tmp->ClassId < 0xa0000000)
           {
-            native::SerializationRegistry::addType(typeId,
+            native::getSerializationRegistry()->addType(typeId,
                                                                   (native::TypeFactoryMethod)System::Runtime::InteropServices::
                                                                   Marshal::GetFunctionPointerForDelegate(
                                                                   nativeDelegate).ToPointer());
           }
           else
           {//special case for CacheableUndefined type
-            native::SerializationRegistry::addType2(typeId,
+            native::getSerializationRegistry()->addType2(typeId,
                                                                    (native::TypeFactoryMethod)System::Runtime::InteropServices::
                                                                    Marshal::GetFunctionPointerForDelegate(
                                                                    nativeDelegate).ToPointer());
@@ -618,7 +618,7 @@ namespace Apache
         BuiltInDelegatesGeneric->Remove(typeId);
         _GF_MG_EXCEPTION_TRY2
 
-          native::SerializationRegistry::removeType(typeId);
+          native::getSerializationRegistry()->removeType(typeId);
 
         _GF_MG_EXCEPTION_CATCH_ALL2
       }
