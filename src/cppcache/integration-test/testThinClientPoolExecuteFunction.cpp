@@ -629,11 +629,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1OpTest)
       // test data independant function
       //     test get function with result
       getResult = true;
-      //    PoolPtr pptr = getPoolManager()->find(poolName);
       args = routingObj;
-      // ExecutionPtr exc=nullptr;
-      // CacheableVectorPtr executeFunctionResult = nullptr;
-      // test data independant function on one server
+
+       // test data independant function on one server
       LOG("test data independant get function on one server");
       exc = FunctionService::onServer(getHelper()->cachePtr);
       executeFunctionResult =

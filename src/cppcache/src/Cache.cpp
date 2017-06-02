@@ -146,7 +146,8 @@ CacheTransactionManagerPtr Cache::getCacheTransactionManager() {
 }
 
 Cache::Cache(const char* name, DistributedSystemPtr sys, const char* id_data,
-             bool ignorePdxUnreadFields, bool readPdxSerialized) {
+             bool ignorePdxUnreadFields, bool readPdxSerialized)
+{
   m_cacheImpl = std::unique_ptr<CacheImpl>(new CacheImpl(
       this, name, sys, id_data, ignorePdxUnreadFields, readPdxSerialized));
 }
@@ -183,7 +184,7 @@ bool Cache::isPoolInMultiuserMode(RegionPtr regionPtr) {
   const char* poolName = regionPtr->getAttributes()->getPoolName();
 
   if (poolName != NULL) {
-    PoolPtr poolPtr = getPoolManager()->find(poolName);
+    PoolPtr poolPtr = m_cacheImpl->getPoolManager().find(poolName);
     if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
       return poolPtr->getMultiuserAuthentication();
     }
@@ -203,6 +204,12 @@ PdxInstanceFactoryPtr Cache::createPdxInstanceFactory(const char* className) {
   return std::make_shared<PdxInstanceFactoryImpl>(className);
 }
 
+
+PoolManager & Cache::getPoolManager()
+{
+  return m_cacheImpl->getPoolManager();
+}
+
 RegionServicePtr Cache::createAuthenticatedView(
     PropertiesPtr userSecurityProperties, const char* poolName) {
   if (poolName == NULL) {
@@ -217,7 +224,7 @@ RegionServicePtr Cache::createAuthenticatedView(
   } else {
     if (!this->isClosed()) {
       if (poolName != NULL) {
-        PoolPtr poolPtr = getPoolManager()->find(poolName);
+        PoolPtr poolPtr = m_cacheImpl->getPoolManager().find(poolName);
         if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
           return poolPtr->createSecureUserCache(userSecurityProperties, shared_from_this());
         }

@@ -948,7 +948,8 @@ int32_t ThinClientPoolDM::GetPDXIdForType(SerializablePtr pdxType) {
 
   // need to broadcast this id to all other pool
   {
-    const HashMapOfPools& pools = getPoolManager()->getAll();
+
+    const HashMapOfPools& pools = m_poolManager->getAll();
 
     for (HashMapOfPools::Iterator iter = pools.begin(); iter != pools.end();
          ++iter) {
@@ -1030,7 +1031,7 @@ int32_t ThinClientPoolDM::GetEnumValue(SerializablePtr enumInfo) {
 
   // need to broadcast this id to all other pool
   {
-    const HashMapOfPools& pools = getPoolManager()->getAll();
+    const HashMapOfPools& pools = m_poolManager->getAll();
 
     for (HashMapOfPools::Iterator iter = pools.begin(); iter != pools.end();
          ++iter) {

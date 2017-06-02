@@ -32,26 +32,12 @@ const char* PoolFactory::DEFAULT_SERVER_GROUP = "";
 extern HashMapOfPools* connectionPools;
 extern ACE_Recursive_Thread_Mutex connectionPoolsLock;
 
-namespace apache {
-namespace geode {
-namespace client {
-static PoolFactoryPtr g_poolFactory = nullptr;
-PoolFactoryPtr getPoolFactory(CachePtr cachePtr)
-{
-  if (g_poolFactory == nullptr) {
-    g_poolFactory = PoolFactoryPtr(new PoolFactory());
-  }
-  return g_poolFactory;
-}
-}  // namespace client
-}  // namespace geode
-}  // namespace apache
 
-
-PoolFactory::PoolFactory()
+PoolFactory::PoolFactory(PoolManager *poolManager)
     : m_attrs(new PoolAttributes),
       m_isSubscriptionRedundancy(false),
-      m_addedServerOrLocator(false) {}
+      m_addedServerOrLocator(false),
+      m_poolManager(poolManager) {}
 
 PoolFactory::~PoolFactory() {}
 
@@ -133,8 +119,8 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
   {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
 
-    
-    if (getPoolManager()->find(name) != nullptr) {
+    CacheImpl *cacheImpl = CacheRegionHelper::getCacheImpl(cachePtr.get());
+    if (m_poolManager->find(name) != nullptr) {
       throw IllegalStateException("Pool with the same name already exists");
     }
     // Create a clone of Attr;
@@ -145,21 +131,21 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
     if (copyAttrs->getMultiuserSecureModeEnabled()) {
       if (copyAttrs->getThreadLocalConnectionSetting()) {
         LOGERROR(
-            "When pool [%s] is in multiuser authentication mode then thread "
-            "local connections are not supported.",
-            name);
+              "When pool [%s] is in multiuser authentication mode then thread "
+                  "local connections are not supported.",
+              name);
         throw IllegalArgumentException(
             "When pool is in multiuser authentication mode then thread local "
-            "connections are not supported.");
+                "connections are not supported.");
       }
     }
 
-    CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cachePtr.get());
-      TcrConnectionManager& tccm =   cacheImpl->tcrConnectionManager();
+
+    TcrConnectionManager &tccm = cacheImpl->tcrConnectionManager();
     if (!copyAttrs->getSubscriptionEnabled() &&
         copyAttrs->getSubscriptionRedundancy() == 0 && !tccm.isDurable()) {
       if (copyAttrs
-              ->getThreadLocalConnectionSetting() /*&& !copyAttrs->getPRSingleHopEnabled()*/) {
+          ->getThreadLocalConnectionSetting() /*&& !copyAttrs->getPRSingleHopEnabled()*/) {
         // TODO: what should we do for sticky connections
         poolDM =
             std::make_shared<ThinClientPoolStickyDM>(name, copyAttrs, tccm);
@@ -170,7 +156,7 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
     } else {
       LOGDEBUG("ThinClientPoolHADM created ");
       if (copyAttrs
-              ->getThreadLocalConnectionSetting() /*&& !copyAttrs->getPRSingleHopEnabled()*/) {
+          ->getThreadLocalConnectionSetting() /*&& !copyAttrs->getPRSingleHopEnabled()*/) {
         poolDM =
             std::make_shared<ThinClientPoolStickyHADM>(name, copyAttrs, tccm);
       } else {
@@ -178,8 +164,8 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
       }
     }
 
-    connectionPools->insert(CacheableString::create(name),
-                            std::static_pointer_cast<GF_UNWRAP_SP(PoolPtr)>(poolDM));
+    m_poolManager->addPool(CacheableString::create(name),
+                           std::static_pointer_cast<GF_UNWRAP_SP(PoolPtr)>(poolDM));
   }
 
   // TODO: poolDM->init() should not throw exceptions!

@@ -18,7 +18,7 @@
 #include "fw_dunit.hpp"
 
 #include <geode/GeodeCppCache.hpp>
-
+#include "CacheHelper.hpp"
 #include <string>
 #include <vector>
 
@@ -352,9 +352,9 @@ int testXmlCacheCreationWithPools() {
     return -1;
   }
 
-  PoolPtr poolOfReg1 = getPoolManager()->find(poolNameReg1);
-  PoolPtr poolOfSubReg = getPoolManager()->find(poolNameSubReg);
-  PoolPtr poolOfReg2 = getPoolManager()->find(poolNameReg2);
+  PoolPtr poolOfReg1 = CacheHelper::getHelper().getCache()->getPoolManager().find(poolNameReg1);
+  PoolPtr poolOfSubReg = CacheHelper::getHelper().getCache()->getPoolManager().find(poolNameSubReg);
+  PoolPtr poolOfReg2 = CacheHelper::getHelper().getCache()->getPoolManager().find(poolNameReg2);
   SLIST locators;
   SLIST servers;
   SLIST emptylist;

@@ -327,7 +327,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1OnServerHATest)
       }
 
       // UNUSED bool getResult = true;
-      auto pool = apache::geode::client::getPoolManager()->find("__TEST_POOL1__");
+      auto pool = getHelper()->cachePtr->getPoolManager().find("__TEST_POOL1__");
       auto exc = FunctionService::onServer(pool);
       ASSERT(exc != nullptr, "onServer Returned NULL");
 

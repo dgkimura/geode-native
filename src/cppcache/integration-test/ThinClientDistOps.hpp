@@ -589,7 +589,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, VerifyUpdateLocatorListThread)
     int sleepSeconds = 60;
     dunit::sleep(sleepSeconds * 1000);
 
-    PoolPtr pptr = CacheHelper::getPoolPtr("__TESTPOOL1_");
+    PoolPtr pptr = getHelper()->getPoolPtr("__TESTPOOL1_");
     int updateIntervalSeconds = pptr->getUpdateLocatorListInterval() / 1000;
 
     int numLocatorListUpdates =
@@ -779,7 +779,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepEight_Pool_Sticky)
     RegionPtr reg1 = getHelper()->getRegion(regionNames[1]);
     reg0->localInvalidate(createKey(keys[1]));
     reg1->localInvalidate(createKey(keys[3]));
-    PoolPtr pool = getPoolManager()->find("__TESTPOOL1_");
+    PoolPtr pool = getHelper()->cachePtr->getPoolManager().find("__TESTPOOL1_");
     ASSERT(pool != nullptr, "Pool Should have been found");
     doNetsearch(regionNames[0], keys[1], nvals[1]);
     doNetsearch(regionNames[1], keys[3], nvals[3]);

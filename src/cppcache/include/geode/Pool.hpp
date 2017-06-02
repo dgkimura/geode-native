@@ -262,8 +262,11 @@ class CPPCACHE_EXPORT Pool : public SharedBase,
  protected:
   Pool(PoolAttributesPtr attr);
   PoolAttributesPtr m_attrs;
+  PoolManager * m_poolManager;
 
  private:
+
+    void setPoolManager(PoolManager* poolManager);
   /**
    * Returns the logical instance of cache from pool.
    * Each operation on this cache will use this "credentials"
@@ -277,8 +280,8 @@ class CPPCACHE_EXPORT Pool : public SharedBase,
   virtual RegionServicePtr createSecureUserCache(PropertiesPtr credentials, CachePtr cachePtr);
 
   Pool(const Pool&);
-
   friend class PoolFactory;
+  friend class PoolManager;
   friend class CacheFactory;
   friend class Cache;
 };

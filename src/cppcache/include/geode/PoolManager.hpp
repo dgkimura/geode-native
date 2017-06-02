@@ -32,7 +32,7 @@ namespace client {
 typedef HashMapT<CacheableStringPtr, PoolPtr> HashMapOfPools;
 
 CPPCACHE_EXPORT PoolManagerPtr getPoolManager();
-
+CPPCACHE_EXPORT void SetPoolManager(PoolManagerPtr poolManagerPtr);
 /**
  * Manages creation and access to {@link Pool connection pools} for clients.
  * <p>
@@ -74,7 +74,10 @@ class CPPCACHE_EXPORT PoolManager : public SharedBase {
    */
    PoolPtr find(const char* name);
 
-  /**
+   void addPool(CacheableStringPtr name, PoolPtr pool);
+    PoolPtr determineDefaultPool();
+    PoolPtr createOrGetDefaultPool();
+    /**
    * Find the pool used by the given region.
    * @param region is the region that is using the pool.
    * @return the pool used by that region or <code> nullptr </code> if the
@@ -92,7 +95,9 @@ class CPPCACHE_EXPORT PoolManager : public SharedBase {
    */
    void close(bool keepAlive = false);
 
-  PoolManager();
+  PoolManager(Cache * cache);
+private:
+    Cache * m_cache;
 };
 }  // namespace client
 }  // namespace geode

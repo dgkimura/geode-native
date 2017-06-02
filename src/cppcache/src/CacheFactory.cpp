@@ -40,8 +40,7 @@
 
 #define DEFAULT_DS_NAME "default_GeodeDS"
 #define DEFAULT_CACHE_NAME "default_GeodeCache"
-#define DEFAULT_SERVER_PORT 40404
-#define DEFAULT_SERVER_HOST "localhost"
+
 
 extern ACE_Recursive_Thread_Mutex* g_disconnectLock;
 
@@ -51,23 +50,6 @@ namespace client {
 
 CacheFactoryPtr* s_factory = nullptr;
 
-PoolPtr CacheFactory::createOrGetDefaultPool(CachePtr cache) {
-  ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
-
-  if (cache->isClosed() == false &&
-      CacheRegionHelper::getCacheImpl(cache.get())->getDefaultPool() != nullptr) {
-    return  CacheRegionHelper::getCacheImpl(cache.get())->getDefaultPool();
-  }
-
-  PoolPtr pool = getPoolManager()->find(DEFAULT_POOL_NAME);
-
-  // if default_poolFactory is null then we are not using latest API....
-  if (pool == nullptr && s_factory != nullptr) {
-    pool = (*s_factory)->determineDefaultPool(cache);
-  }
-
-  return pool;
-}
 
 CacheFactoryPtr CacheFactory::createCacheFactory(
     const PropertiesPtr& configPtr) {
@@ -198,77 +180,10 @@ CachePtr CacheFactory::create(const char* name,
   return cptr;
 }
 
-PoolPtr CacheFactory::determineDefaultPool(CachePtr cachePtr) {
-  PoolPtr pool = nullptr;
-  HashMapOfPools allPools = getPoolManager()->getAll();
-  size_t currPoolSize = allPools.size();
-  CacheImpl * cacheImpl = CacheRegionHelper::getCacheImpl(cachePtr.get());
-  // means user has not set any pool attributes
-  if (this->pf == nullptr) {
-    this->pf = getPoolFactory(cachePtr->shared_from_this());
-    if (currPoolSize == 0) {
-      if (!this->pf->m_addedServerOrLocator) {
-        this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
-      }
-
-      pool = this->pf->create(DEFAULT_POOL_NAME,cachePtr);
-      // creatubg default pool so setting this as default pool
-      LOGINFO("Set default pool with localhost:40404");
-	  cacheImpl->setDefaultPool(pool);
-      return pool;
-    } else if (currPoolSize == 1) {
-      pool = allPools.begin().second();
-      LOGINFO("Set default pool from existing pool.");
-	  cacheImpl->setDefaultPool(pool);
-      return pool;
-    } else {
-      // can't set anything as deafult pool
-      return nullptr;
-    }
-  } else {
-    PoolPtr defaulPool = cacheImpl->getDefaultPool();
-
-    if (!this->pf->m_addedServerOrLocator) {
-      this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
-    }
-
-    if (defaulPool != nullptr) {
-      // once default pool is created, we will not create
-      if (*(defaulPool->m_attrs) == *(this->pf->m_attrs)) {
-        return defaulPool;
-      } else {
-        throw IllegalStateException(
-            "Existing cache's default pool was not compatible");
-      }
-    }
-
-    pool = nullptr;
-
-    // return any existing pool if it matches
-    for (auto iter = allPools.begin(); iter != allPools.end(); ++iter) {
-      auto currPool = iter.second();
-      if (*(currPool->m_attrs) == *(this->pf->m_attrs)) {
-        return currPool;
-      }
-    }
-
-    // defaul pool is null
-    GF_DEV_ASSERT(defaulPool == nullptr);
-
-    if (defaulPool == nullptr) {
-      pool = this->pf->create(DEFAULT_POOL_NAME, cachePtr);
-      LOGINFO("Created default pool");
-      // creating default so setting this as defaul pool
-	  cacheImpl->setDefaultPool(pool);
-    }
-
-    return pool;
-  }
-}
 
 PoolFactoryPtr CacheFactory::getPoolFactory(CachePtr cachePtr) {
   if (this->pf == nullptr) {
-    this->pf = getPoolManager()->createFactory();
+    this->pf = cachePtr->getPoolManager().createFactory();
   }
   return this->pf;
 }

@@ -56,7 +56,7 @@ ExpiryTaskManager* getCacheImplExpiryTaskManager() {
   return CacheImpl::expiryTaskManager;
 }
 
-CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
+CacheImpl::CacheImpl(Cache* cache, const char* name, DistributedSystemPtr sys,
                      const char* id_data, bool iPUF, bool readPdxSerialized)
     : m_defaultPool(nullptr),
       m_ignorePdxUnreadFields(iPUF),
@@ -64,7 +64,7 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_closed(false),
       m_initialized(false),
       m_distributedSystem(sys),
-      m_implementee(c),
+      m_implementee(cache),
       m_cond(m_mutex),
       m_attributes(nullptr),
       m_evictionControllerPtr(NULL),
@@ -73,8 +73,10 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_destroyPending(false),
       m_initDone(false),
       m_adminRegion(nullptr) {
+  m_poolManagerPtr = std::make_shared<PoolManager>(cache);
+  SetPoolManager(m_poolManagerPtr);
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
-      new InternalCacheTransactionManager2PCImpl(c));
+      new InternalCacheTransactionManager2PCImpl(cache));
 
   m_name = Utils::copyString(name);
 
@@ -103,7 +105,7 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
   m_initialized = true;
 }
 
-CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
+CacheImpl::CacheImpl(Cache* cache, const char* name, DistributedSystemPtr sys,
                      bool iPUF, bool readPdxSerialized)
     : m_defaultPool(nullptr),
       m_ignorePdxUnreadFields(iPUF),
@@ -111,7 +113,7 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_closed(false),
       m_initialized(false),
       m_distributedSystem(sys),
-      m_implementee(c),
+      m_implementee(cache),
       m_cond(m_mutex),
       m_attributes(nullptr),
       m_evictionControllerPtr(NULL),
@@ -120,8 +122,10 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_destroyPending(false),
       m_initDone(false),
       m_adminRegion(nullptr) {
+      m_poolManagerPtr = std::make_shared<PoolManager>(cache);
+      SetPoolManager(m_poolManagerPtr);
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
-      new InternalCacheTransactionManager2PCImpl(c));
+      new InternalCacheTransactionManager2PCImpl(cache));
 
   m_name = Utils::copyString(name);
   if (!DistributedSystem::isConnected()) {
@@ -154,7 +158,7 @@ void CacheImpl::initServices() {
   PdxTypeRegistry* registry = getPdxTypeRegistry();
   registry->init();
     if (!m_initDone && m_attributes != nullptr && m_attributes->getEndpoints()) {
-    if (getPoolManager()->getAll().size() > 0 && getCacheMode()) {
+    if (getPoolManager().getAll().size() > 0 && getCacheMode()) {
       LOGWARN(
           "At least one pool has been created so ignoring cache level "
           "redundancy setting");
@@ -192,7 +196,7 @@ int8_t CacheImpl::getAndResetServerGroupFlag() {
 void CacheImpl::netDown() {
   m_tcrConnectionManager->netDown();
 
-  const HashMapOfPools& pools = getPoolManager()->getAll();
+  const HashMapOfPools& pools = getPoolManager().getAll();
   PoolPtr currPool = nullptr;
   for (HashMapOfPools::Iterator itr = pools.begin(); itr != pools.end();
        itr++) {
@@ -211,7 +215,7 @@ void CacheImpl::netDown() {
 void CacheImpl::revive() { m_tcrConnectionManager->revive(); }
 
 CacheImpl::RegionKind CacheImpl::getRegionKind(
-    const RegionAttributesPtr& rattrs) const {
+    const RegionAttributesPtr& rattrs)  {
   RegionKind regionKind = CPP_REGION;
   const char* endpoints = NULL;
 
@@ -231,7 +235,7 @@ CacheImpl::RegionKind CacheImpl::getRegionKind(
       regionKind = THINCLIENT_REGION;
     }
   } else if (rattrs->getPoolName()) {
-    PoolPtr pPtr = getPoolManager()->find(rattrs->getPoolName());
+    PoolPtr pPtr = m_poolManagerPtr->find(rattrs->getPoolName());
     if ((pPtr != nullptr && (pPtr->getSubscriptionRedundancy() > 0 ||
                              pPtr->getSubscriptionEnabled())) ||
         m_tcrConnectionManager->isDurable()) {
@@ -243,6 +247,11 @@ CacheImpl::RegionKind CacheImpl::getRegionKind(
   }
 
   return regionKind;
+}
+
+PoolManager & CacheImpl::getPoolManager()
+{
+  return *(m_poolManagerPtr.get());
 }
 
 int CacheImpl::removeRegion(const char* name) {
@@ -277,7 +286,7 @@ QueryServicePtr CacheImpl::getQueryService(const char* poolName) {
   if (poolName == NULL || strlen(poolName) == 0) {
     throw IllegalArgumentException("PoolName is NULL or not defined..");
   }
-  PoolPtr pool = getPoolManager()->find(poolName);
+  PoolPtr pool = getPoolManager().find(poolName);
 
   if (pool != nullptr) {
     if (pool->isDestroyed()) {
@@ -326,7 +335,7 @@ void CacheImpl::getDistributedSystem(DistributedSystemPtr& dptr) const {
 }
 
 void CacheImpl::sendNotificationCloseMsgs() {
-  HashMapOfPools pools = getPoolManager()->getAll();
+  HashMapOfPools pools = getPoolManager().getAll();
   for (HashMapOfPools::Iterator iter = pools.begin(); iter != pools.end();
        ++iter) {
     ThinClientPoolHADM* pool =
@@ -405,7 +414,7 @@ void CacheImpl::close(bool keepalive) {
     m_cacheStats->close();
   }
 
-  getPoolManager()->close(keepalive);
+  getPoolManager().close(keepalive);
 
   LOGFINE("Closed pool manager with keepalive %s",
           keepalive ? "true" : "false");
@@ -433,7 +442,7 @@ void CacheImpl::setDefaultPool(PoolPtr pool) { m_defaultPool = pool; }
 PoolPtr CacheImpl::getDefaultPool() { return m_defaultPool; }
 
 void CacheImpl::validateRegionAttributes(
-    const char* name, const RegionAttributesPtr& attrs) const {
+    const char* name, const RegionAttributesPtr& attrs) {
   RegionKind kind = getRegionKind(attrs);
   std::string buffer = "Cache::createRegion: \"";
   buffer += name;
@@ -557,7 +566,7 @@ void CacheImpl::createRegion(const char* name,
     if (!props->isGridClient()) {
       const char* poolName = aRegionAttributes->getPoolName();
       if (poolName != NULL) {
-        PoolPtr pool = getPoolManager()->find(poolName);
+        PoolPtr pool = getPoolManager().find(poolName);
         if (pool != nullptr && !pool->isDestroyed() &&
             pool->getPRSingleHopEnabled()) {
           ThinClientPoolDM* poolDM =
@@ -660,7 +669,7 @@ std::shared_ptr<RegionInternal> CacheImpl::createRegion_internal(
   }*/
 
   if (poolName != NULL) {
-    PoolPtr pool = getPoolManager()->find(poolName);
+    PoolPtr pool = getPoolManager().find(poolName);
     if (pool != nullptr && !pool->isDestroyed()) {
       bool isMultiUserSecureMode = pool->getMultiuserAuthentication();
       if (isMultiUserSecureMode && (attrs->getCachingEnabled())) {
@@ -754,7 +763,7 @@ void CacheImpl::readyForEvents() {
     return;
   }
 
-  const HashMapOfPools& pools = getPoolManager()->getAll();
+  const HashMapOfPools& pools = getPoolManager().getAll();
   if (pools.empty()) throw IllegalStateException("No pools found.");
   PoolPtr currPool = nullptr;
   for (HashMapOfPools::Iterator itr = pools.begin(); itr != pools.end();
@@ -778,7 +787,7 @@ void CacheImpl::readyForEvents() {
 }
 
 bool CacheImpl::getEndpointStatus(const std::string& endpoint) {
-  const HashMapOfPools& pools = getPoolManager()->getAll();
+  const HashMapOfPools& pools = getPoolManager().getAll();
   std::string fullName;
 
   /*
@@ -843,7 +852,7 @@ void CacheImpl::processMarker() {
 }
 
 int CacheImpl::getPoolSize(const char* poolName) {
-  PoolPtr pool = getPoolManager()->find(poolName);
+  PoolPtr pool = m_poolManagerPtr->find(poolName);
   if (pool == nullptr) {
     return -1;
   } else {

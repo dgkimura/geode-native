@@ -196,7 +196,7 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
   {
     try {
-      PoolPtr pool = getPoolManager()->find(regionNamesCq[0]);
+      PoolPtr pool = getHelper()->cachePtr->getPoolManager().find(regionNamesCq[0]);
       QueryServicePtr qs;
       if (pool != nullptr) {
         // Using region name as pool name as in ThinClientCq.hpp
@@ -258,7 +258,7 @@ END_TASK_DEFINITION
 
 DUNIT_TASK_DEFINITION(CLIENT1, StepThree3)
   {
-    auto pool = getPoolManager()->find(regionNamesCq[0]);
+    auto pool = getHelper()->cachePtr->getPoolManager().find(regionNamesCq[0]);
     QueryServicePtr qs;
     if (pool != nullptr) {
       // Using region name as pool name as in ThinClientCq.hpp
@@ -345,7 +345,7 @@ END_TASK_DEFINITION
 
 DUNIT_TASK_DEFINITION(CLIENT1, CloseCache1)
   {
-    auto pool = getPoolManager()->find(regionNamesCq[0]);
+    auto pool = getHelper()->cachePtr->getPoolManager().find(regionNamesCq[0]);
     QueryServicePtr qs;
     if (pool != nullptr) {
       // Using region name as pool name as in ThinClientCq.hpp

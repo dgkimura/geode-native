@@ -343,7 +343,7 @@ ThinClientRegion::ThinClientRegion(const std::string& name, CacheImpl* cache,
 
 void ThinClientRegion::initTCR() {
   bool subscription = false;
-  PoolPtr pool = getPoolManager()->find(getAttributes()->getPoolName());
+  PoolPtr pool = m_cacheImpl->getPoolManager().find(getAttributes()->getPoolName());
   if (pool != nullptr) {
     subscription = pool->getSubscriptionEnabled();
   }
@@ -374,7 +374,7 @@ void ThinClientRegion::initTCR() {
 void ThinClientRegion::registerKeys(const VectorOfCacheableKey& keys,
                                     bool isDurable, bool getInitialValues,
                                     bool receiveValues) {
-  PoolPtr pool = getPoolManager()->find(getAttributes()->getPoolName());
+  PoolPtr pool = m_cacheImpl->getPoolManager().find(getAttributes()->getPoolName());
   if (pool != nullptr) {
     if (!pool->getSubscriptionEnabled()) {
       LOGERROR(
@@ -417,7 +417,7 @@ void ThinClientRegion::registerKeys(const VectorOfCacheableKey& keys,
 }
 
 void ThinClientRegion::unregisterKeys(const VectorOfCacheableKey& keys) {
-  PoolPtr pool = getPoolManager()->find(getAttributes()->getPoolName());
+  PoolPtr pool = m_cacheImpl->getPoolManager().find(getAttributes()->getPoolName());
   if (pool != nullptr) {
     if (!pool->getSubscriptionEnabled()) {
       LOGERROR(
@@ -452,7 +452,7 @@ void ThinClientRegion::registerAllKeys(bool isDurable,
                                        VectorOfCacheableKeyPtr resultKeys,
                                        bool getInitialValues,
                                        bool receiveValues) {
-  PoolPtr pool = getPoolManager()->find(getAttributes()->getPoolName());
+  PoolPtr pool = m_cacheImpl->getPoolManager().find(getAttributes()->getPoolName());
   if (pool != nullptr) {
     if (!pool->getSubscriptionEnabled()) {
       LOGERROR(
@@ -509,7 +509,7 @@ void ThinClientRegion::registerRegex(const char* regex, bool isDurable,
                                      VectorOfCacheableKeyPtr resultKeys,
                                      bool getInitialValues,
                                      bool receiveValues) {
-  PoolPtr pool = getPoolManager()->find(getAttributes()->getPoolName());
+  PoolPtr pool = m_cacheImpl->getPoolManager().find(getAttributes()->getPoolName());
   if (pool != nullptr) {
     if (!pool->getSubscriptionEnabled()) {
       LOGERROR(
@@ -569,7 +569,7 @@ void ThinClientRegion::registerRegex(const char* regex, bool isDurable,
 }
 
 void ThinClientRegion::unregisterRegex(const char* regex) {
-  PoolPtr pool = getPoolManager()->find(getAttributes()->getPoolName());
+  PoolPtr pool = m_cacheImpl->getPoolManager().find(getAttributes()->getPoolName());
   if (pool != nullptr) {
     if (!pool->getSubscriptionEnabled()) {
       LOGERROR(
@@ -594,7 +594,7 @@ void ThinClientRegion::unregisterRegex(const char* regex) {
 }
 
 void ThinClientRegion::unregisterAllKeys() {
-  PoolPtr pool = getPoolManager()->find(getAttributes()->getPoolName());
+  PoolPtr pool = m_cacheImpl->getPoolManager().find(getAttributes()->getPoolName());
   if (pool != nullptr) {
     if (!pool->getSubscriptionEnabled()) {
       LOGERROR(
@@ -686,7 +686,7 @@ bool ThinClientRegion::existsValue(const char* predicate, uint32_t timeout) {
 }
 
 GfErrType ThinClientRegion::unregisterKeysBeforeDestroyRegion() {
-  PoolPtr pool = getPoolManager()->find(getAttributes()->getPoolName());
+  PoolPtr pool = m_cacheImpl->getPoolManager().find(getAttributes()->getPoolName());
   if (pool != nullptr) {
     if (!pool->getSubscriptionEnabled()) {
       LOGDEBUG(
