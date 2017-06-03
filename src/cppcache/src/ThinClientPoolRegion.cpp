@@ -40,7 +40,7 @@ ThinClientPoolRegion::~ThinClientPoolRegion() { m_tcrdm = NULL; }
 void ThinClientPoolRegion::initTCR() {
   try {
     ThinClientPoolDM* poolDM = dynamic_cast<ThinClientPoolDM*>(
-        getPoolManager()->find(m_regionAttributes->getPoolName()).get());
+        m_cacheImpl->getPoolManager().find(m_regionAttributes->getPoolName()).get());
     m_tcrdm = dynamic_cast<ThinClientBaseDM*>(poolDM);
     if (!m_tcrdm) {
       //  TODO: create a PoolNotFound exception.

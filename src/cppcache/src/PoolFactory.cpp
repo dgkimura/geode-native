@@ -35,13 +35,10 @@ extern ACE_Recursive_Thread_Mutex connectionPoolsLock;
 namespace apache {
 namespace geode {
 namespace client {
-static PoolFactoryPtr g_poolFactory = nullptr;
 PoolFactoryPtr getPoolFactory(CachePtr cachePtr)
 {
-  if (g_poolFactory == nullptr) {
-    g_poolFactory = PoolFactoryPtr(new PoolFactory());
-  }
-  return g_poolFactory;
+  static auto poolFactoryPtr = std::make_shared<PoolFactory>();
+  return poolFactoryPtr;
 }
 }  // namespace client
 }  // namespace geode

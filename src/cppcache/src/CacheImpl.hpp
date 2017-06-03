@@ -215,9 +215,9 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   /**
    * @brief constructors
    */
-  CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
+  CacheImpl(Cache* cache, const char* name, DistributedSystemPtr sys,
             bool ignorePdxUnreadFields, bool readPdxSerialized);
-  CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
+  CacheImpl(Cache* cache, const char* name, DistributedSystemPtr sys,
             const char* id_data, bool ignorePdxUnreadFields,
             bool readPdxSerialized);
   void initServices();
@@ -228,6 +228,8 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   TcrConnectionManager& tcrConnectionManager() {
     return *m_tcrConnectionManager;
   }
+
+    PoolManager & getPoolManager();
 
   int removeRegion(const char* name);
 
@@ -252,7 +254,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   void processMarker();
 
   // Pool helpers for unit tests
-  static int getPoolSize(const char* poolName);
+  int getPoolSize(const char* poolName);
 
   // CachePerfStats
   CachePerfStats* m_cacheStats;
@@ -289,7 +291,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   PoolPtr m_defaultPool;
   bool m_ignorePdxUnreadFields;
   bool m_readPdxSerialized;
-
+  PoolManagerPtr m_poolManagerPtr;
   enum RegionKind {
     CPP_REGION,
     THINCLIENT_REGION,
@@ -297,12 +299,12 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
     THINCLIENT_POOL_REGION
   };
 
-  RegionKind getRegionKind(const RegionAttributesPtr& rattrs) const;
+  RegionKind getRegionKind(const RegionAttributesPtr& rattrs);
 
   void sendNotificationCloseMsgs();
 
   void validateRegionAttributes(const char* name,
-                                const RegionAttributesPtr& attrs) const;
+                                const RegionAttributesPtr& attrs);
 
   inline void getSubRegions(MapOfRegionWithLock& srm) {
     MapOfRegionGuard guard(m_regions->mutex());

@@ -55,7 +55,7 @@ class CacheHelper {
 
   static CacheHelper& getHelper();
 
-  static PoolPtr getPoolPtr(const char* poolName);
+  PoolPtr getPoolPtr(const char* poolName);
   static std::string unitTestOutputFile();
   static int getNumLocatorListUpdates(const char* s);
 

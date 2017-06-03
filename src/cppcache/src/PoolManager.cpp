@@ -30,10 +30,11 @@ namespace client {
 static PoolManagerPtr g_poolManager = nullptr;
 PoolManagerPtr getPoolManager()
 {
-  if (g_poolManager == nullptr) {
-    g_poolManager = PoolManagerPtr(new PoolManager());
-  }
-  return g_poolManager;
+    return g_poolManager;
+}
+void SetPoolManager(PoolManagerPtr poolManagerPtr)
+{
+  g_poolManager = poolManagerPtr;
 }
 }  // namespace client
 }  // namespace geode
@@ -49,8 +50,8 @@ PoolFactoryPtr PoolManager::createFactory() {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
     if (connectionPools == NULL) {
       connectionPools = new HashMapOfPools();
-    }
   }
+}
   return PoolFactoryPtr(new PoolFactory());
 }
 
@@ -115,6 +116,18 @@ const HashMapOfPools& PoolManager::getAll() {
 }
 
 
-PoolManager::PoolManager()
+PoolManager::PoolManager(Cache* cache): m_cache(cache)
 {
+  if (connectionPools == NULL) {
+    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
+    if (connectionPools == NULL) {
+      connectionPools = new HashMapOfPools();
+    }
+  }
+
+}
+
+void PoolManager::addPool(CacheableStringPtr name, PoolPtr pool) {
+  pool->setPoolManager(this);
+  connectionPools->insert(name, pool);
 }

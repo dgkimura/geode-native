@@ -30,7 +30,7 @@
 #include "RegionShortcut.hpp"
 #include "RegionFactory.hpp"
 #include "InternalCacheTransactionManager2PC.hpp"
-
+#include "PoolManager.hpp"
 /**
  * @file
  */
@@ -221,6 +221,8 @@ class CPPCACHE_EXPORT Cache : public GeodeCache,
    */
   virtual PdxInstanceFactoryPtr createPdxInstanceFactory(const char* className);
 
+  PoolManager & getPoolManager();
+
   /**
     * @brief destructor
     */
@@ -233,11 +235,10 @@ class CPPCACHE_EXPORT Cache : public GeodeCache,
   Cache(const char* name, DistributedSystemPtr sys, const char* id_data,
         bool ignorePdxUnreadFields, bool readPdxSerialized);
   std::unique_ptr<CacheImpl> m_cacheImpl;
-
  protected:
   Cache();
 
-  static bool isPoolInMultiuserMode(RegionPtr regionPtr);
+  bool isPoolInMultiuserMode(RegionPtr regionPtr);
 
   friend class CacheFactory;
   friend class CacheRegionHelper;

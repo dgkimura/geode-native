@@ -180,7 +180,7 @@ int main(int argc, char** argv) {
     LOGINFO("Populated some Person Objects through PdxWrapper");
 
     // find the pool
-    PoolPtr poolPtr = getPoolManager()->find("examplePool");
+    PoolPtr poolPtr = cachePtr->getPoolManager().find("examplePool");
 
     // Get the QueryService from the Pool.
     QueryServicePtr qrySvcPtr = poolPtr->getQueryService();

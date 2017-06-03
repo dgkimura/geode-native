@@ -342,7 +342,7 @@ void FrameworkTest::parseEndPoints(int32_t ep, std::string label,
   std::string poolName = "_Test_Pool";
   CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
   CachePtr cachePtr = cacheFactoryPtr->create();
-  PoolFactoryPtr pfPtr = getPoolManager()->createFactory();
+  PoolFactoryPtr pfPtr = cachePtr->getPoolManager().createFactory();
   std::string tag = getStringValue("TAG");
   std::string bb("GFE_BB");
 
@@ -406,14 +406,14 @@ void FrameworkTest::parseEndPoints(int32_t ep, std::string label,
   if (!tag.empty()) {
     poolName.append(tag);
     // check if pool already exists
-    pptr = getPoolManager()->find(poolName.c_str());
+    pptr = cachePtr->getPoolManager().find(poolName.c_str());
     if (pptr == nullptr) {
       pptr = pfPtr->create(poolName.c_str(), m_cache);
     }
   }
   // create default pool
   else {
-    pptr = getPoolManager()->find(poolName.c_str());
+    pptr = cachePtr->getPoolManager().find(poolName.c_str());
     if (pptr == nullptr) {
       pptr = pfPtr->create(poolName.c_str(), m_cache);
     }
@@ -448,12 +448,12 @@ void FrameworkTest::createPool() {
 }
 
 QueryServicePtr FrameworkTest::checkQueryService() {
-  PoolFactoryPtr pfPtr = getPoolManager()->createFactory();
+  PoolFactoryPtr pfPtr = m_cache->getPoolManager().createFactory();
   std::string bb("GFE_BB");
   std::string keys("testScheme");
   std::string mode = bbGetString(bb, keys);
   if (mode == "poolwithendpoints" || mode == "poolwithlocator") {
-    PoolPtr pool = getPoolManager()->find("_Test_Pool");
+    PoolPtr pool = m_cache->getPoolManager().find("_Test_Pool");
     return pool->getQueryService();
   } else {
     return m_cache->getQueryService();

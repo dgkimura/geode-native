@@ -195,7 +195,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
 
       QueryServicePtr qs = nullptr;
 
-      PoolPtr pool = getPoolManager()->find("__TESTPOOL1_");
+      PoolPtr pool = getHelper()->cachePtr->getPoolManager().find("__TESTPOOL1_");
       qs = pool->getQueryService();
       LOG("Got query service from pool");
 

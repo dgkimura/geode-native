@@ -48,6 +48,7 @@ void RegionXmlCreation::createRoot(CachePtr cache) {
     // we may need to initialize default pool
     if (regAttrs->getEndpoints() == NULL) {
       if (regAttrs->getPoolName() == NULL) {
+        
         PoolPtr pool = CacheFactory::createOrGetDefaultPool(cache);
 
         if (pool == nullptr) {

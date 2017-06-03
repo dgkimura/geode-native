@@ -425,7 +425,7 @@ class SuspendTransactionThread : public ACE_Task_Base {
     sprintf(buf, " Out SuspendTransactionThread");
     LOG(buf);
 
-    getPoolManager()->find("__TESTPOOL1_")->releaseThreadLocalConnection();
+    getHelper()->cachePtr->getPoolManager().find("__TESTPOOL1_")->releaseThreadLocalConnection();
 
     return 0;
   }
@@ -567,7 +567,7 @@ class ResumeTransactionThread : public ACE_Task_Base {
         LOG("Got expected EntryNotFoundException for keyPtr4");
       }
     }
-    getPoolManager()->find("__TESTPOOL1_")->releaseThreadLocalConnection();
+    getHelper()->cachePtr->getPoolManager().find("__TESTPOOL1_")->releaseThreadLocalConnection();
     sprintf(buf, " Out ResumeTransactionThread");
     LOG(buf);
     return 0;
@@ -1065,7 +1065,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CreateClient1KeyThriceWithSticky)
     RegionPtr reg1 = getHelper()->getRegion(regionNames[1]);
     reg0->localInvalidate(createKey(keys[1]));
     reg1->localInvalidate(createKey(keys[3]));
-    PoolPtr pool = getPoolManager()->find("__TESTPOOL1_");
+    PoolPtr pool = getHelper()->cachePtr->getPoolManager().find("__TESTPOOL1_");
     ASSERT(pool != nullptr, "Pool Should have been found");
     doNetsearch(regionNames[0], keys[1], nvals[1]);
     doNetsearch(regionNames[1], keys[3], nvals[3]);

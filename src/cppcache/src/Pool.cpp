@@ -117,3 +117,8 @@ int Pool::getPendingEventCount() const {
 
   return poolHADM->getPrimaryServerQueueSize();
 }
+
+void Pool::setPoolManager(PoolManager *poolManager) {
+  m_poolManager  = poolManager;
+  return;
+}
