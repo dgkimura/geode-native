@@ -18,6 +18,7 @@
 #include "ThinClientPoolDM.hpp"
 #include <geode/PoolManager.hpp>
 #include "CqQueryImpl.hpp"
+#include "CacheRegionHelper.hpp"
 
 ProxyRemoteQueryService::ProxyRemoteQueryService(ProxyCachePtr cptr)
     : m_proxyCache(cptr) {}
@@ -25,7 +26,7 @@ ProxyRemoteQueryService::ProxyRemoteQueryService(ProxyCachePtr cptr)
 QueryPtr ProxyRemoteQueryService::newQuery(const char* querystring) {
   if (!m_proxyCache->isClosed()) {
     auto userAttachedPool = m_proxyCache->m_userAttributes->getPool();
-    auto pool = getPoolManager()->find(userAttachedPool->getName());
+    auto pool = CacheRegionHelper::getCacheImpl(m_proxyCache->m_cachePtr.get())->getPoolManager().find(userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
       GuardUserAttribures gua(m_proxyCache);
@@ -53,7 +54,7 @@ CqQueryPtr ProxyRemoteQueryService::newCq(const char* querystr,
                                           bool isDurable) {
   if (!m_proxyCache->isClosed()) {
     auto userAttachedPool = m_proxyCache->m_userAttributes->getPool();
-    auto pool = getPoolManager()->find(userAttachedPool->getName());
+    auto pool = CacheRegionHelper::getCacheImpl(m_proxyCache->m_cachePtr.get())->getPoolManager().find(userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
       GuardUserAttribures gua(m_proxyCache);
@@ -81,7 +82,7 @@ CqQueryPtr ProxyRemoteQueryService::newCq(const char* name,
                                           bool isDurable) {
   if (!m_proxyCache->isClosed()) {
     auto userAttachedPool = m_proxyCache->m_userAttributes->getPool();
-    auto pool = getPoolManager()->find(userAttachedPool->getName());
+    auto pool = CacheRegionHelper::getCacheImpl(m_proxyCache->m_cachePtr.get())->getPoolManager().find(userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
       GuardUserAttribures gua(m_proxyCache);
@@ -133,7 +134,7 @@ void ProxyRemoteQueryService::getCqs(query_container_type& vec) {
 CqQueryPtr ProxyRemoteQueryService::getCq(const char* name) {
   if (!m_proxyCache->isClosed()) {
     auto userAttachedPool = m_proxyCache->m_userAttributes->getPool();
-    auto pool = getPoolManager()->find(userAttachedPool->getName());
+    auto pool = CacheRegionHelper::getCacheImpl(m_proxyCache->m_cachePtr.get())->getPoolManager().find(userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
       GuardUserAttribures gua(m_proxyCache);

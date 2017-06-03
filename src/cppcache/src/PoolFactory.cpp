@@ -130,7 +130,7 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
   {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
 
-    
+    CacheImpl *cacheImpl = CacheRegionHelper::getCacheImpl(cachePtr.get());
     if (getPoolManager()->find(name) != nullptr) {
       throw IllegalStateException("Pool with the same name already exists");
     }
@@ -142,21 +142,21 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
     if (copyAttrs->getMultiuserSecureModeEnabled()) {
       if (copyAttrs->getThreadLocalConnectionSetting()) {
         LOGERROR(
-            "When pool [%s] is in multiuser authentication mode then thread "
-            "local connections are not supported.",
-            name);
+              "When pool [%s] is in multiuser authentication mode then thread "
+                  "local connections are not supported.",
+              name);
         throw IllegalArgumentException(
             "When pool is in multiuser authentication mode then thread local "
-            "connections are not supported.");
+                "connections are not supported.");
       }
     }
 
-    CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cachePtr.get());
-      TcrConnectionManager& tccm =   cacheImpl->tcrConnectionManager();
+
+    TcrConnectionManager &tccm = cacheImpl->tcrConnectionManager();
     if (!copyAttrs->getSubscriptionEnabled() &&
         copyAttrs->getSubscriptionRedundancy() == 0 && !tccm.isDurable()) {
       if (copyAttrs
-              ->getThreadLocalConnectionSetting() /*&& !copyAttrs->getPRSingleHopEnabled()*/) {
+          ->getThreadLocalConnectionSetting() /*&& !copyAttrs->getPRSingleHopEnabled()*/) {
         // TODO: what should we do for sticky connections
         poolDM =
             std::make_shared<ThinClientPoolStickyDM>(name, copyAttrs, tccm);
@@ -167,7 +167,7 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
     } else {
       LOGDEBUG("ThinClientPoolHADM created ");
       if (copyAttrs
-              ->getThreadLocalConnectionSetting() /*&& !copyAttrs->getPRSingleHopEnabled()*/) {
+          ->getThreadLocalConnectionSetting() /*&& !copyAttrs->getPRSingleHopEnabled()*/) {
         poolDM =
             std::make_shared<ThinClientPoolStickyHADM>(name, copyAttrs, tccm);
       } else {
@@ -175,8 +175,8 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
       }
     }
 
-    connectionPools->insert(CacheableString::create(name),
-                            std::static_pointer_cast<GF_UNWRAP_SP(PoolPtr)>(poolDM));
+    getPoolManager()->addPool(CacheableString::create(name),
+                           std::static_pointer_cast<GF_UNWRAP_SP(PoolPtr)>(poolDM));
   }
 
   // TODO: poolDM->init() should not throw exceptions!
