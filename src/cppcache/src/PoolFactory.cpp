@@ -29,8 +29,7 @@
 #include <ThinClientPoolStickyHADM.hpp>
 using namespace apache::geode::client;
 const char* PoolFactory::DEFAULT_SERVER_GROUP = "";
-extern HashMapOfPools* connectionPools;
-extern ACE_Recursive_Thread_Mutex connectionPoolsLock;
+
 
 
 PoolFactory::PoolFactory(PoolManager *poolManager)
@@ -81,11 +80,13 @@ void PoolFactory::setServerGroup(const char* group) {
   m_attrs->setServerGroup(group);
 }
 void PoolFactory::addLocator(const char* host, int port) {
+  LOGERROR("%s was called", __FUNCTION__);
   addCheck(host, port);
   m_attrs->addLocator(host, port);
   m_addedServerOrLocator = true;
 }
 void PoolFactory::addServer(const char* host, int port) {
+  LOGERROR("%s was called", __FUNCTION__);
   addCheck(host, port);
   m_attrs->addServer(host, port);
   m_addedServerOrLocator = true;
@@ -117,7 +118,7 @@ void PoolFactory::setPRSingleHopEnabled(bool enabled) {
 PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
   ThinClientPoolDMPtr poolDM;
   {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
+    LOGERROR("%s was called", __FUNCTION__);
 
     CacheImpl *cacheImpl = CacheRegionHelper::getCacheImpl(cachePtr.get());
     if (m_poolManager->find(name) != nullptr) {
@@ -149,20 +150,27 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
         // TODO: what should we do for sticky connections
         poolDM =
             std::make_shared<ThinClientPoolStickyDM>(name, copyAttrs, tccm);
+        LOGERROR("ThinClientPoolStickyDM created ");
+
       } else {
-        LOGDEBUG("ThinClientPoolDM created ");
         poolDM = std::make_shared<ThinClientPoolDM>(name, copyAttrs, tccm);
+        LOGERROR("ThinClientPoolDM created ");
+
       }
     } else {
-      LOGDEBUG("ThinClientPoolHADM created ");
       if (copyAttrs
           ->getThreadLocalConnectionSetting() /*&& !copyAttrs->getPRSingleHopEnabled()*/) {
         poolDM =
             std::make_shared<ThinClientPoolStickyHADM>(name, copyAttrs, tccm);
+        LOGERROR("ThinClientPoolStickyHADM created ");
+
       } else {
         poolDM = std::make_shared<ThinClientPoolHADM>(name, copyAttrs, tccm);
+        LOGERROR("ThinClientPoolHADM created");
+
       }
     }
+    LOGERROR("%s adding pool to the pool manager %s ", __FUNCTION__, name);
 
     m_poolManager->addPool(CacheableString::create(name),
                            std::static_pointer_cast<GF_UNWRAP_SP(PoolPtr)>(poolDM));
@@ -170,7 +178,9 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
 
   // TODO: poolDM->init() should not throw exceptions!
   // Pool DM should only be inited once.
-  if (DistributedSystem::getSystemProperties()->autoReadyForEvents()) {
+  static bool wasCalled = false;
+  if (DistributedSystem::getSystemProperties()->autoReadyForEvents() && !wasCalled) {
+    wasCalled = true;
     poolDM->init();
   }
 

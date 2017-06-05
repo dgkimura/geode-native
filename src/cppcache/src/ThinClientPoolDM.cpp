@@ -36,7 +36,6 @@ using namespace apache::geode::client;
 using namespace apache::geode::statistics;
 
 ExpiryTaskManager* getCacheImplExpiryTaskManager();
-void removePool(const char*);
 
 /* adongre
  * CID 28730: Other violation (MISSING_COPY)
@@ -834,7 +833,7 @@ void ThinClientPoolDM::destroy(bool keepAlive) {
       GF_SAFE_DELETE(m_clientMetadataService);
     }
 
-    removePool(m_poolName.c_str());
+    m_poolManager->removePool(m_poolName.c_str());
 
     stopChunkProcessor();
     m_manager->closeAllStickyConnections();

@@ -24,14 +24,14 @@
 #include "Pool.hpp"
 #include "PoolFactory.hpp"
 #include "Region.hpp"
-
+#include <mutex>
 namespace apache {
 namespace geode {
 namespace client {
 
 typedef HashMapT<CacheableStringPtr, PoolPtr> HashMapOfPools;
 
-CPPCACHE_EXPORT PoolManagerPtr getPoolManager();
+CPPCACHE_EXPORT PoolManagerPtr getPoolManager(Cache* cache=nullptr);
 CPPCACHE_EXPORT void SetPoolManager(PoolManagerPtr poolManagerPtr);
 /**
  * Manages creation and access to {@link Pool connection pools} for clients.
@@ -63,7 +63,7 @@ class CPPCACHE_EXPORT PoolManager : public SharedBase {
    * @return a Map that is a snapshot of all the pools currently known to this
    * manager.
    */
-   const HashMapOfPools& getAll();
+   HashMapOfPools& getAll();
 
   /**
    * Find by name an existing connection pool returning
@@ -77,6 +77,8 @@ class CPPCACHE_EXPORT PoolManager : public SharedBase {
    void addPool(CacheableStringPtr name, PoolPtr pool);
     PoolPtr determineDefaultPool();
     PoolPtr createOrGetDefaultPool();
+
+  void removePool(const char* name);
     /**
    * Find the pool used by the given region.
    * @param region is the region that is using the pool.
@@ -98,6 +100,11 @@ class CPPCACHE_EXPORT PoolManager : public SharedBase {
   PoolManager(Cache * cache);
 private:
     Cache * m_cache;
+
+  // TODO: make this a member of TcrConnectionManager.
+
+  HashMapOfPools* connectionPools = NULL; /*new HashMapOfPools( )*/
+  std::recursive_mutex connectionPoolsLock;
 };
 }  // namespace client
 }  // namespace geode

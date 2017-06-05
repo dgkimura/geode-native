@@ -73,8 +73,7 @@ CacheImpl::CacheImpl(Cache* cache, const char* name, DistributedSystemPtr sys,
       m_destroyPending(false),
       m_initDone(false),
       m_adminRegion(nullptr) {
-  m_poolManagerPtr = std::make_shared<PoolManager>(cache);
-  SetPoolManager(m_poolManagerPtr);
+  m_poolManagerPtr = ::getPoolManager(cache);
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(cache));
 
@@ -122,8 +121,7 @@ CacheImpl::CacheImpl(Cache* cache, const char* name, DistributedSystemPtr sys,
       m_destroyPending(false),
       m_initDone(false),
       m_adminRegion(nullptr) {
-      m_poolManagerPtr = std::make_shared<PoolManager>(cache);
-      SetPoolManager(m_poolManagerPtr);
+  m_poolManagerPtr = ::getPoolManager(cache);
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(cache));
 

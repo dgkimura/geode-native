@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 #include <geode/PoolManager.hpp>
-#include <ace/Recursive_Thread_Mutex.h>
-#include <ace/Guard_T.h>
 #include <CacheRegionHelper.hpp>
 
 #include <PoolAttributes.hpp>
@@ -24,28 +22,23 @@
 using namespace apache::geode::client;
 #define DEFAULT_SERVER_PORT 40404
 #define DEFAULT_SERVER_HOST "localhost"
-// TODO: make this a member of TcrConnectionManager.
-HashMapOfPools* connectionPools = NULL; /*new HashMapOfPools( )*/
-ACE_Recursive_Thread_Mutex connectionPoolsLock;
 
 namespace apache {
 namespace geode {
 namespace client {
-static PoolManagerPtr g_poolManager = nullptr;
-PoolManagerPtr getPoolManager()
+//PoolManagerPtr g_poolManager = nullptr;
+PoolManagerPtr getPoolManager(Cache* cache)
 {
-    return g_poolManager;
-}
-void SetPoolManager(PoolManagerPtr poolManagerPtr)
-{
-  g_poolManager = poolManagerPtr;
+  LOGERROR("%s: was called WITH cache == ", __FUNCTION__, cache == nullptr? "nullptr" : "a_cche");
+  static auto g_poolManager = std::make_shared<PoolManager>(cache);
+  return g_poolManager;
 }
 }  // namespace client
 }  // namespace geode
 }  // namespace apache
 
-void removePool(const char* name) {
-  ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
+void PoolManager::removePool(const char* name) {
+  std::lock_guard<std::recursive_mutex> guard(connectionPoolsLock);
   connectionPools->erase(CacheableString::create(name));
 }
 
@@ -56,6 +49,7 @@ PoolFactoryPtr PoolManager::createFactory() {
 
 
 PoolPtr PoolManager::determineDefaultPool() {
+  LOGERROR("%s: was called ", __FUNCTION__);
   PoolPtr pool = nullptr;
   HashMapOfPools allPools = getAll();
   size_t currPoolSize = allPools.size();
@@ -126,6 +120,7 @@ PoolPtr PoolManager::determineDefaultPool() {
 
 
 PoolPtr PoolManager::createOrGetDefaultPool() {
+  LOGERROR("%s was called", __FUNCTION__);
 
   if (m_cache->isClosed() == false &&
       CacheRegionHelper::getCacheImpl(m_cache)->getDefaultPool() != nullptr) {
@@ -144,7 +139,7 @@ PoolPtr PoolManager::createOrGetDefaultPool() {
 
 
 void PoolManager::close(bool keepAlive) {
-  ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
+  std::lock_guard<std::recursive_mutex> guard(connectionPoolsLock);
 
   if (connectionPools == NULL) {
     return;
@@ -166,7 +161,7 @@ void PoolManager::close(bool keepAlive) {
 }
 
 PoolPtr PoolManager::find(const char* name) {
-  ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
+  std::lock_guard<std::recursive_mutex> guard(connectionPoolsLock);
 
   if (connectionPools == NULL) {
     connectionPools = new HashMapOfPools();
@@ -192,10 +187,10 @@ PoolPtr PoolManager::find(const char* name) {
 PoolPtr PoolManager::find(RegionPtr region) {
   return find(region->getAttributes()->getPoolName());
 }
-
-const HashMapOfPools& PoolManager::getAll() {
+//WWSD This is bad...
+HashMapOfPools& PoolManager::getAll() {
   if (connectionPools == NULL) {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
+    std::lock_guard<std::recursive_mutex> guard(connectionPoolsLock);
     if (connectionPools == NULL) {
       connectionPools = new HashMapOfPools();
     }
@@ -204,18 +199,17 @@ const HashMapOfPools& PoolManager::getAll() {
 }
 
 
-PoolManager::PoolManager(Cache* cache): m_cache(cache)
+PoolManager::PoolManager(Cache* cache)
+  : m_cache(cache),
+    connectionPoolsLock()
 {
-  if (connectionPools == NULL) {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
-    if (connectionPools == NULL) {
-      connectionPools = new HashMapOfPools();
-    }
-  }
-
+    std::lock_guard<std::recursive_mutex> guard(connectionPoolsLock);
+    connectionPools = new HashMapOfPools();
 }
 
 void PoolManager::addPool(CacheableStringPtr name, PoolPtr pool) {
   pool->setPoolManager(this);
+  std::lock_guard<std::recursive_mutex> guard(connectionPoolsLock);
+
   connectionPools->insert(name, pool);
 }
