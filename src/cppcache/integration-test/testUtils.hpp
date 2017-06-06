@@ -55,12 +55,8 @@ class TestUtils {
     return CacheRegionHelper::getCacheImpl(cptr.get());
   }
 
-  static size_t testGetNumberOfPdxIds() {
-    return PdxTypeRegistry::testGetNumberOfPdxIds();
-  }
-
-  static size_t testNumberOfPreservedData() {
-    return PdxTypeRegistry::testNumberOfPreservedData();
+  static size_t testNumberOfPreservedData(const CacheImpl& cacheImpl) {
+    return cacheImpl.getPdxTypeRegistry()->testNumberOfPreservedData();
   }
 
   static DistributedSystemImpl* getDistributedSystemImpl() {

@@ -213,6 +213,10 @@ class PdxLocalReader : public PdxReader {
                               CacheableArrayListPtr& collection);
 
   virtual PdxUnreadFieldsPtr readUnreadFields();
+
+ private:
+  PdxTypeRegistryPtr getPdxTypeRegistry() const;
+
 };
 typedef std::shared_ptr<PdxLocalReader> PdxLocalReaderPtr;
 }  // namespace client

@@ -253,8 +253,9 @@ CachePtr CacheFactory::create() {
                                  PdxEnumInstantiator::createDeserializable);
   SerializationRegistry::addType(GeodeTypeIds::PdxType,
                                  PdxType::CreateDeserializable);
-  PdxTypeRegistry::setPdxIgnoreUnreadFields(cache->getPdxIgnoreUnreadFields());
-  PdxTypeRegistry::setPdxReadSerialized(cache->getPdxReadSerialized());
+  
+  cache->m_cacheImpl->m_pdxTypeRegistry->setPdxIgnoreUnreadFields(cache->getPdxIgnoreUnreadFields());
+  cache->m_cacheImpl->m_pdxTypeRegistry->setPdxReadSerialized(cache->getPdxReadSerialized());
 
   return cache;
 }

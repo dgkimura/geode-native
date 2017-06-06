@@ -130,7 +130,7 @@ void PdxRemoteWriter::writePreserveData() {
 void PdxRemoteWriter::initialize() {
   // this is default case
   if (m_preserveData == nullptr) {
-    m_pdxType = PdxTypeRegistry::getLocalPdxType(m_pdxClassName);
+    m_pdxType = getPdxTypeRegistry()->getLocalPdxType(m_pdxClassName);
   }
 }
 
@@ -323,6 +323,11 @@ PdxWriterPtr PdxRemoteWriter::writeArrayOfByteArrays(const char* fieldName,
                                          elementLength);
   return shared_from_this();
 }
+
+PdxTypeRegistryPtr PdxRemoteWriter::getPdxTypeRegistry() const {
+	return CacheImpl::getInstance()->getPdxTypeRegistry();
+}
+
 }  // namespace client
 }  // namespace geode
 }  // namespace apache

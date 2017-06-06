@@ -1237,16 +1237,17 @@ DUNIT_TASK_DEFINITION(CLIENT1, getPutAtVersionOne15)
            "Line_272");
 
     regPtr0->put(keyport, pRet);
+	auto testNumberOfPreservedData = TestUtils::testNumberOfPreservedData(*CacheImpl::getInstance());
     LOGDEBUG(
         "NIL:getPutAtVersionOne15 m_useWeakHashMap = %d and "
         "TestUtils::testNumberOfPreservedData() = %d",
-        m_useWeakHashMap, TestUtils::testNumberOfPreservedData());
+        m_useWeakHashMap, testNumberOfPreservedData);
     if (m_useWeakHashMap == false) {
-      ASSERT(TestUtils::testNumberOfPreservedData() == 0,
+      ASSERT(testNumberOfPreservedData == 0,
              "testNumberOfPreservedData should be zero at Line_288");
     } else {
       ASSERT(
-          TestUtils::testNumberOfPreservedData() > 0,
+		  testNumberOfPreservedData > 0,
           "testNumberOfPreservedData should be Greater than zero at Line_292");
     }
   }
@@ -1267,13 +1268,13 @@ DUNIT_TASK_DEFINITION(CLIENT2, getPutAtVersionTwo16)
         "Objects of type PdxTypes1V2 should be equal at getPutAtVersionTwo14");
 
     regPtr0->put(keyport, pRet);
-
+	auto testNumberOfPreservedData = TestUtils::testNumberOfPreservedData(*CacheImpl::getInstance());
     if (m_useWeakHashMap == false) {
-      ASSERT(TestUtils::testNumberOfPreservedData() == 0,
+      ASSERT(testNumberOfPreservedData == 0,
              "getPutAtVersionTwo16:testNumberOfPreservedData should be zero");
     } else {
       // it has extra fields, so no need to preserve data
-      ASSERT(TestUtils::testNumberOfPreservedData() == 0,
+      ASSERT(testNumberOfPreservedData == 0,
              "getPutAtVersionTwo16:testNumberOfPreservedData should be zero");
     }
   }

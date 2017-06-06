@@ -60,6 +60,8 @@ namespace client {
 
 class CacheFactory;
 class ExpiryTaskManager;
+class PdxTypeRegistry;
+
 
 /**
  * @class Cache Cache.hpp
@@ -273,6 +275,8 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
 
   static std::map<std::string, RegionAttributesPtr> getRegionShortcut();
 
+  PdxTypeRegistryPtr getPdxTypeRegistry() const;
+
  private:
   static volatile bool s_networkhop;
   static volatile int s_blacklistBucketTimeout;
@@ -323,6 +327,8 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   ACE_Thread_Mutex m_initDoneLock;
   AdminRegionPtr m_adminRegion;
   CacheTransactionManagerPtr m_cacheTXManager;
+
+  PdxTypeRegistryPtr m_pdxTypeRegistry;
 
   friend class CacheFactory;
   friend class Cache;

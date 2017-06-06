@@ -1,24 +1,24 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 #pragma once
 
 #ifndef GEODE_PDXTYPE_H_
 #define GEODE_PDXTYPE_H_
-
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 #include <geode/Serializable.hpp>
 #include "PdxFieldType.hpp"
@@ -40,6 +40,8 @@ namespace client {
 typedef std::map<std::string, PdxFieldTypePtr> NameVsPdxType;
 class PdxType;
 typedef std::shared_ptr<PdxType> PdxTypePtr;
+class PdxTypeRegistry;
+typedef std::shared_ptr<PdxTypeRegistry> PdxTypeRegistryPtr;
 /* adongre
  * Coverity - II
  * CID 29178: Other violation (MISSING_COPY)
@@ -101,6 +103,8 @@ class PdxType : public Serializable,
 
   PdxTypePtr isLocalTypeContains(PdxTypePtr otherType);
   PdxTypePtr isRemoteTypeContains(PdxTypePtr localType);
+
+  PdxTypeRegistryPtr getPdxTypeRegistry() const;
 
   PdxTypePtr shared_from_this() {
     return std::static_pointer_cast<PdxType>(Serializable::shared_from_this());

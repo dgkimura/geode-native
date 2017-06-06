@@ -171,11 +171,11 @@ PdxWriterPtr PdxLocalWriter::writeUnreadFields(PdxUnreadFieldsPtr unread) {
     m_preserveData = std::dynamic_pointer_cast<PdxRemotePreservedData>(unread);
     if (m_preserveData != nullptr) {
       m_pdxType =
-          PdxTypeRegistry::getPdxType(m_preserveData->getMergedTypeId());
+          getPdxTypeRegistry()->getPdxType(m_preserveData->getMergedTypeId());
       if (m_pdxType == nullptr) {
         // its local type
         // this needs to fix for IPdxTypemapper
-        m_pdxType = PdxTypeRegistry::getLocalPdxType(m_pdxClassName);
+        m_pdxType = getPdxTypeRegistry()->getLocalPdxType(m_pdxClassName);
       }
     } else {
       throw IllegalStateException(
@@ -526,6 +526,11 @@ uint8_t* PdxLocalWriter::getPdxStream(int& pdxLen) {
 }
 
 void PdxLocalWriter::writeByte(int8_t byte) { m_dataOutput->write(byte); }
+
+PdxTypeRegistryPtr PdxLocalWriter::getPdxTypeRegistry() const {
+	return CacheImpl::getInstance()->getPdxTypeRegistry();
+}
+
 }  // namespace client
 }  // namespace geode
 }  // namespace apache

@@ -33,7 +33,6 @@
 #include <geode/DataOutput.hpp>
 #include "TcrMessage.hpp"
 #include "Utils.hpp"
-#include "PdxTypeRegistry.hpp"
 
 #include <string>
 

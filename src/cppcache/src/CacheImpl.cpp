@@ -72,7 +72,8 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_remoteQueryServicePtr(nullptr),
       m_destroyPending(false),
       m_initDone(false),
-      m_adminRegion(nullptr) {
+      m_adminRegion(nullptr),
+      m_pdxTypeRegistry(std::make_shared<PdxTypeRegistry>()) {
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(c));
 
@@ -119,7 +120,8 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_remoteQueryServicePtr(nullptr),
       m_destroyPending(false),
       m_initDone(false),
-      m_adminRegion(nullptr) {
+      m_adminRegion(nullptr),
+      m_pdxTypeRegistry(std::make_shared<PdxTypeRegistry>()) {
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(c));
 
@@ -151,7 +153,6 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
 
 void CacheImpl::initServices() {
   m_tcrConnectionManager = new TcrConnectionManager(this);
-  PdxTypeRegistry::init();
   if (!m_initDone && m_attributes != nullptr && m_attributes->getEndpoints()) {
     if (PoolManager::getAll().size() > 0 && getCacheMode()) {
       LOGWARN(
@@ -391,7 +392,6 @@ void CacheImpl::close(bool keepalive) {
 
   LOGFINE("Closed pool manager with keepalive %s",
           keepalive ? "true" : "false");
-  PdxTypeRegistry::cleanup();
 
   // Close CachePef Stats
   if (m_cacheStats) {
@@ -885,6 +885,12 @@ std::map<std::string, RegionAttributesPtr> CacheImpl::getRegionShortcut() {
 
   return preDefined;
 }
+
+PdxTypeRegistryPtr CacheImpl::getPdxTypeRegistry() const
+{
+  return m_pdxTypeRegistry;
+}
+
 
 CacheTransactionManagerPtr CacheImpl::getCacheTransactionManager() {
   return m_cacheTXManager;
