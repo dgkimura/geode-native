@@ -404,14 +404,14 @@ void FrameworkTest::parseEndPoints(int32_t ep, std::string label,
     // check if pool already exists
     pptr = PoolManager::find(poolName.c_str());
     if (pptr == nullptr) {
-      pptr = pfPtr->create(poolName.c_str());
+      pptr = pfPtr->create(poolName.c_str(), *m_cache.get());
     }
   }
   // create default pool
   else {
     pptr = PoolManager::find(poolName.c_str());
     if (pptr == nullptr) {
-      pptr = pfPtr->create(poolName.c_str());
+      pptr = pfPtr->create(poolName.c_str(), *m_cache.get());
     }
   }
   if (pptr != nullptr)

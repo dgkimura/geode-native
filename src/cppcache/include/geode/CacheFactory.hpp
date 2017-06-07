@@ -60,38 +60,6 @@ class CPPCACHE_EXPORT CacheFactory : public std::enable_shared_from_this<CacheFa
    */
   CachePtr create();
 
-  /**
-   * Gets the instance of {@link Cache} produced by an
-   * earlier call to {@link CacheFactory::create}.
-   * @param system the <code>DistributedSystem</code> the cache was created
-   * with.
-   * @return the {@link Cache} associated with the specified system.
-   * @throws CacheClosedException if a cache has not been created
-   * or the created one is {@link Cache::isClosed closed}
-   * @throws EntryNotFoundException if a cache with specified system not found
-   */
-  static CachePtr getInstance(const DistributedSystemPtr& system);
-
-  /**
-   * Gets the instance of {@link Cache} produced by an
-   * earlier call to {@link CacheFactory::create}, even if it has been closed.
-   * @param system the <code>DistributedSystem</code> the cache was created
-   * with.
-   * @return the {@link Cache} associated with the specified system.
-   * @throws CacheClosedException if a cache has not been created
-   * @throws EntryNotFoundException if a cache with specified system is not
-   * found
-   */
-  static CachePtr getInstanceCloseOk(const DistributedSystemPtr& system);
-
-  /**
-   * Gets an arbitrary open instance of {@link Cache} produced by an
-   * earlier call to {@link CacheFactory::create}.
-   * @throws CacheClosedException if a cache has not been created
-   * or the only created one is {@link Cache::isClosed closed}
-   */
-  static CachePtr getAnyInstance();
-
   /** Returns the version of the cache implementation.
    * For the 1.0 release of Geode, the string returned is <code>1.0</code>.
    * @return the version of the cache implementation as a <code>String</code>
@@ -406,47 +374,46 @@ class CPPCACHE_EXPORT CacheFactory : public std::enable_shared_from_this<CacheFa
   CacheFactoryPtr setPRSingleHopEnabled(bool enabled);
 
   /**
-  * Control whether pdx ignores fields that were unread during deserialization.
-  * The default is to preserve unread fields be including their data during
-  * serialization.
-  * But if you configure the cache to ignore unread fields then their data will
-  * be lost
-  * during serialization.
-  * <P>You should only set this attribute to <code>true</code> if you know this
-  * member
-  * will only be reading cache data. In this use case you do not need to pay the
-  * cost
-  * of preserving the unread fields since you will never be reserializing pdx
-  * data.
-  *
-  * @param ignore <code>true</code> if fields not read during pdx
-  * deserialization should be ignored;
-  * <code>false</code>, the default, if they should be preserved.
-  *
-  *
-  * @return this CacheFactory
-  * @since 3.6
-  */
+   * Control whether pdx ignores fields that were unread during deserialization.
+   * The default is to preserve unread fields be including their data during
+   * serialization.
+   * But if you configure the cache to ignore unread fields then their data will
+   * be lost
+   * during serialization.
+   * <P>You should only set this attribute to <code>true</code> if you know this
+   * member
+   * will only be reading cache data. In this use case you do not need to pay
+   * the cost of preserving the unread fields since you will never be
+   * reserializing pdx data.
+   *
+   * @param ignore <code>true</code> if fields not read during pdx
+   * deserialization should be ignored;
+   * <code>false</code>, the default, if they should be preserved.
+   *
+   *
+   * @return this CacheFactory
+   * @since 3.6
+   */
   CacheFactoryPtr setPdxIgnoreUnreadFields(bool ignore);
 
   /** Sets the object preference to PdxInstance type.
-  * When a cached object that was serialized as a PDX is read
-  * from the cache a {@link PdxInstance} will be returned instead of the actual
-  * domain class.
-  * The PdxInstance is an interface that provides run time access to
-  * the fields of a PDX without deserializing the entire PDX.
-  * The PdxInstance implementation is a light weight wrapper
-  * that simply refers to the raw bytes of the PDX that are kept
-  * in the cache. Using this method applications can choose to
-  * access PdxInstance instead of C++ object.
-  * <p>Note that a PdxInstance is only returned if a serialized PDX is found in
-  * the cache.
-  * If the cache contains a deserialized PDX, then a domain class instance is
-  * returned instead of a PdxInstance.
-  *
-  *  @param pdxReadSerialized true to prefer PdxInstance
-  *  @return this ClientCacheFactory
-  */
+   * When a cached object that was serialized as a PDX is read
+   * from the cache a {@link PdxInstance} will be returned instead of the actual
+   * domain class.
+   * The PdxInstance is an interface that provides run time access to
+   * the fields of a PDX without deserializing the entire PDX.
+   * The PdxInstance implementation is a light weight wrapper
+   * that simply refers to the raw bytes of the PDX that are kept
+   * in the cache. Using this method applications can choose to
+   * access PdxInstance instead of C++ object.
+   * <p>Note that a PdxInstance is only returned if a serialized PDX is found in
+   * the cache.
+   * If the cache contains a deserialized PDX, then a domain class instance is
+   * returned instead of a PdxInstance.
+   *
+   *  @param pdxReadSerialized true to prefer PdxInstance
+   *  @return this ClientCacheFactory
+   */
   CacheFactoryPtr setPdxReadSerialized(bool pdxReadSerialized);
 
   /**
@@ -466,11 +433,12 @@ class CPPCACHE_EXPORT CacheFactory : public std::enable_shared_from_this<CacheFa
 
   PoolFactoryPtr getPoolFactory();
 
-  CachePtr create(const char* name, DistributedSystemPtr system = nullptr,
+  CachePtr create(const char* name, std::unique_ptr<DistributedSystem> system,
                   const char* cacheXml = 0,
                   const CacheAttributesPtr& attrs = nullptr);
 
-  static void create_(const char* name, DistributedSystemPtr& system,
+  static void create_(const char* name,
+                      std::unique_ptr<DistributedSystem> system,
                       const char* id_data, CachePtr& cptr,
                       bool ignorePdxUnreadFields, bool readPdxSerialized);
 
@@ -481,11 +449,7 @@ class CPPCACHE_EXPORT CacheFactory : public std::enable_shared_from_this<CacheFa
  private:
   ~CacheFactory();
 
-  PoolPtr determineDefaultPool(CachePtr cachePtr);
-
-  static CachePtr getAnyInstance(bool throwException);
-  static GfErrType basicGetInstance(const DistributedSystemPtr& system,
-                                    bool closeOk, CachePtr& cptr);
+  PoolPtr determineDefaultPool(CacheImpl* cacheImpl);
 
   // Set very first time some creates cache
   // TODO shared_ptr - remove or refactor with global work
@@ -495,7 +459,7 @@ class CPPCACHE_EXPORT CacheFactory : public std::enable_shared_from_this<CacheFa
   static void init();
   static void cleanup();
   static void handleXML(CachePtr& cachePtr, const char* cachexml,
-                        DistributedSystemPtr& system);
+                        DistributedSystem& system);
   friend class CppCacheLibrary;
   friend class RegionFactory;
   friend class RegionXmlCreation;

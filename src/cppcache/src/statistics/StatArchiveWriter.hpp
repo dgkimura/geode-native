@@ -24,6 +24,7 @@
 #include <list>
 #include <geode/geode_globals.hpp>
 #include <geode/ExceptionTypes.hpp>
+#include <geode/Cache.hpp>
 #include "StatsDef.hpp"
 #include <geode/statistics/Statistics.hpp>
 #include <geode/statistics/StatisticDescriptor.hpp>
@@ -34,9 +35,9 @@
 #include <geode/DataOutput.hpp>
 #include <NonCopyable.hpp>
 #include <chrono>
+#include "SerializationRegistry.hpp"
 
 using namespace apache::geode::client;
-
 /**
  * some constants to be used while archiving
  */
@@ -78,8 +79,11 @@ using std::chrono::steady_clock;
 
 class CPPCACHE_EXPORT StatDataOutput {
  public:
-  StatDataOutput() : bytesWritten(0), m_fp(nullptr), closed(false) {}
-  StatDataOutput(std::string);
+  StatDataOutput() : bytesWritten(0), m_fp(nullptr), closed(false) {
+    SerializationRegistry serializationRegistry;
+    dataBuffer = std::unique_ptr<DataOutput>(new DataOutput(serializationRegistry));
+  }
+  StatDataOutput( std::string);
   ~StatDataOutput();
   /**
    * Returns the number of bytes written into the buffer so far.
@@ -126,14 +130,14 @@ class CPPCACHE_EXPORT StatDataOutput {
   /**
    * This method is for the unit tests only for this class.
    */
-  const uint8_t *getBuffer() { return dataBuffer.getBuffer(); }
+  const uint8_t *getBuffer() { return dataBuffer->getBuffer(); }
   void close();
 
   void openFile(std::string, int64_t);
 
  private:
   int64_t bytesWritten;
-  DataOutput dataBuffer;
+  std::unique_ptr<DataOutput> dataBuffer;
   std::string outFile;
   FILE *m_fp;
   bool closed;

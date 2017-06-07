@@ -252,6 +252,11 @@ namespace Apache
         /// </summary>
         virtual IPdxInstanceFactory^ CreatePdxInstanceFactory(String^ className);
 
+        virtual DataInput^ CreateDataInput(array<Byte>^ buffer, System::Int32 len);
+        virtual DataInput^ CreateDataInput(array<Byte>^ buffer);
+        
+        virtual DataOutput^ Cache::CreateDataOutput();
+
       internal:
 
         /// <summary>

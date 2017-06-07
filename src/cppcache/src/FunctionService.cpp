@@ -16,12 +16,14 @@
  */
 #include <geode/FunctionService.hpp>
 #include <geode/ExceptionTypes.hpp>
-#include <ExecutionImpl.hpp>
-#include <ProxyRegion.hpp>
-#include <UserAttributes.hpp>
-#include <ProxyCache.hpp>
 #include <geode/PoolManager.hpp>
-#include <CacheRegionHelper.hpp>
+
+#include "CacheRegionHelper.hpp"
+#include "ExecutionImpl.hpp"
+#include "ProxyRegion.hpp"
+#include "UserAttributes.hpp"
+#include "ProxyCache.hpp"
+#include "CacheImpl.hpp"
 
 using namespace apache::geode::client;
 
@@ -54,9 +56,9 @@ ExecutionPtr FunctionService::onRegion(RegionPtr region) {
       RegionPtr tmpRegion;
       tmpRegion = nullptr;
       // getting real region to execute function on region
-      if (!CacheFactory::getAnyInstance()->isClosed()) {
-        CacheRegionHelper::getCacheImpl(CacheFactory::getAnyInstance().get())
-            ->getRegion(region->getName(), tmpRegion);
+      if (!region->getCache()->isClosed()) {
+        region->getCache()->m_cacheImpl->getRegion(region->getName(),
+                                                   tmpRegion);
       } else {
         throw IllegalStateException("Cache has been closed");
       }

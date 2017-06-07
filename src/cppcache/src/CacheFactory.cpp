@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#include "config.h"
 #include <geode/CacheFactory.hpp>
 #include <CppCacheLibrary.hpp>
 #include <geode/Cache.hpp>
@@ -34,7 +33,9 @@
 #include <PdxEnumInstantiator.hpp>
 #include <PdxType.hpp>
 #include <PdxTypeRegistry.hpp>
-
+#include "DiskVersionTag.hpp"
+#include "TXCommitMessage.hpp"
+#include <functional>
 #include "version.h"
 
 #define DEFAULT_DS_NAME "default_GeodeDS"
@@ -60,11 +61,8 @@ CacheFactoryPtr* CacheFactory::default_CacheFactory = nullptr;
 PoolPtr CacheFactory::createOrGetDefaultPool() {
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
 
-  CachePtr cache = CacheFactory::getAnyInstance();
-
-  if (cache != nullptr && cache->isClosed() == false &&
-      cache->m_cacheImpl->getDefaultPool() != nullptr) {
-    return cache->m_cacheImpl->getDefaultPool();
+  if (CacheImpl::getInstance()->getDefaultPool() != nullptr) {
+    return CacheImpl::getInstance()->getDefaultPool();
   }
 
   PoolPtr pool = PoolManager::find(DEFAULT_POOL_NAME);
@@ -72,7 +70,8 @@ PoolPtr CacheFactory::createOrGetDefaultPool() {
   // if default_poolFactory is null then we are not using latest API....
   if (pool == nullptr && Cache_CreatedFromCacheFactory) {
     if (default_CacheFactory && (*default_CacheFactory)) {
-      pool = (*default_CacheFactory)->determineDefaultPool(cache);
+      pool = (*default_CacheFactory)
+                 ->determineDefaultPool(CacheImpl::getInstance());
     }
     (*default_CacheFactory) = nullptr;
     default_CacheFactory = nullptr;
@@ -95,7 +94,8 @@ void CacheFactory::init() {
   }
 }
 
-void CacheFactory::create_(const char* name, DistributedSystemPtr& system,
+void CacheFactory::create_(const char* name,
+                           std::unique_ptr<DistributedSystem> system,
                            const char* id_data, CachePtr& cptr,
                            bool ignorePdxUnreadFields, bool readPdxSerialized) {
   CppCacheLibrary::initLib();
@@ -105,10 +105,6 @@ void CacheFactory::create_(const char* name, DistributedSystemPtr& system,
     throw IllegalArgumentException(
         "CacheFactory::create: cache map is not initialized");
   }
-  if (system == nullptr) {
-    throw IllegalArgumentException(
-        "CacheFactory::create: system uninitialized");
-  }
   if (name == nullptr) {
     throw IllegalArgumentException("CacheFactory::create: name is nullptr");
   }
@@ -116,74 +112,9 @@ void CacheFactory::create_(const char* name, DistributedSystemPtr& system,
     name = "NativeCache";
   }
 
-  CachePtr cp = nullptr;
-  basicGetInstance(system, true, cp);
-  if ((cp == nullptr) || (cp->isClosed() == true)) {
-    cptr = std::make_shared<Cache>(name, system, id_data, ignorePdxUnreadFields,
-                                   readPdxSerialized);
-    std::string key(system->getName());
-    if (cp != nullptr) {
-      ACE_Guard<ACE_Recursive_Thread_Mutex> guard(g_cfLock);
-      (reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))
-          ->erase(
-              (reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->find(key));
-    }
-    std::pair<std::string, CachePtr> pc(key, cptr);
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(g_cfLock);
-    (reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->insert(pc);
-    return;
-  }
-  throw CacheExistsException("an open cache exists with the specified system");
-}
-
-CachePtr CacheFactory::getInstance(const DistributedSystemPtr& system) {
-  CachePtr cptr;
-  CppCacheLibrary::initLib();
-  if (system == nullptr) {
-    throw IllegalArgumentException(
-        "CacheFactory::getInstance: system uninitialized");
-  }
-  GfErrType err = basicGetInstance(system, false, cptr);
-  GfErrTypeToException("CacheFactory::getInstance", err);
-  return cptr;
-}
-
-CachePtr CacheFactory::getInstanceCloseOk(const DistributedSystemPtr& system) {
-  CachePtr cptr;
-  CppCacheLibrary::initLib();
-  if (system == nullptr) {
-    throw IllegalArgumentException(
-        "CacheFactory::getInstanceClosedOK: system uninitialized");
-  }
-  GfErrType err = basicGetInstance(system, true, cptr);
-  GfErrTypeToException("CacheFactory::getInstanceCloseOk", err);
-  return cptr;
-}
-
-CachePtr CacheFactory::getAnyInstance() { return getAnyInstance(true); }
-
-CachePtr CacheFactory::getAnyInstance(bool throwException) {
-  CachePtr cptr;
-  CppCacheLibrary::initLib();
-  ACE_Guard<ACE_Recursive_Thread_Mutex> guard(g_cfLock);
-  if ((reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->empty() == true) {
-    if (throwException) {
-      throw EntryNotFoundException(
-          "CacheFactory::getAnyInstance: not found, no cache created yet");
-    } else {
-      return nullptr;
-    }
-  }
-  for (StringToCachePtrMap::iterator p =
-           (reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->begin();
-       p != (reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->end(); ++p) {
-    if (!(p->second->isClosed())) {
-      cptr = p->second;
-      return cptr;
-    }
-  }
-  return nullptr;
-}
+  cptr = std::make_shared<Cache>(name, std::move(system), ignorePdxUnreadFields,
+                                 readPdxSerialized);
+}  // namespace client
 
 const char* CacheFactory::getVersion() { return PRODUCT_VERSION; }
 
@@ -207,79 +138,60 @@ CacheFactory::CacheFactory(const PropertiesPtr dsProps) {
 }
 
 CachePtr CacheFactory::create() {
-  // bool pdxIgnoreUnreadFields = false;
-  // bool pdxReadSerialized = false;
-
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
-  DistributedSystemPtr dsPtr = nullptr;
 
-  // should we compare deafult DS properties here??
-  if (DistributedSystem::isConnected()) {
-    dsPtr = DistributedSystem::getInstance();
-  } else {
-    dsPtr = DistributedSystem::connect(DEFAULT_DS_NAME, dsProp);
-    LOGFINE("CacheFactory called DistributedSystem::connect");
-  }
+  auto dsPtr = DistributedSystem::create(DEFAULT_DS_NAME, dsProp);
+  dsPtr->connect();
+  LOGFINE("CacheFactory called DistributedSystem::connect");
 
-  CachePtr cache = nullptr;
+  default_CacheFactory = new CacheFactoryPtr(shared_from_this());
+  Cache_CreatedFromCacheFactory = true;
+  auto cacheXmlFile = dsPtr->getSystemProperties().cacheXMLFile();
+  auto cache =
+      create(DEFAULT_CACHE_NAME, std::move(dsPtr), cacheXmlFile, nullptr);
 
-  cache = getAnyInstance(false);
 
-  if (cache == nullptr) {
-    default_CacheFactory = new CacheFactoryPtr(shared_from_this());
-    Cache_CreatedFromCacheFactory = true;
-    cache = create(DEFAULT_CACHE_NAME, dsPtr,
-                   dsPtr->getSystemProperties()->cacheXMLFile(), nullptr);
-    // if(cache->m_cacheImpl->getDefaultPool() == nullptr)
-    // determineDefaultPool(cache);
-  } else {
-    if (cache->m_cacheImpl->getDefaultPool() != nullptr) {
-      // we already choose or created deafult pool
-      determineDefaultPool(cache);
-    } else {
-      // not yet created, create from first cacheFactory instance
-      if (default_CacheFactory && (*default_CacheFactory)) {
-        (*default_CacheFactory)->determineDefaultPool(cache);
-        (*default_CacheFactory) = nullptr;
-        default_CacheFactory = nullptr;
-      }
-      determineDefaultPool(cache);
-    }
-  }
+  cache->m_cacheImpl->getSerializationRegistry()->addType2(std::bind(TXCommitMessage::create,
+                                                                   std::ref(*(cache->m_cacheImpl->getMemberListForVersionStamp()))));
 
-  SerializationRegistry::addType(GeodeTypeIdsImpl::PDX,
-                                 PdxInstantiator::createDeserializable);
-  SerializationRegistry::addType(GeodeTypeIds::CacheableEnum,
-                                 PdxEnumInstantiator::createDeserializable);
-  SerializationRegistry::addType(GeodeTypeIds::PdxType,
-                                 PdxType::CreateDeserializable);
-  
-  cache->m_cacheImpl->m_pdxTypeRegistry->setPdxIgnoreUnreadFields(cache->getPdxIgnoreUnreadFields());
-  cache->m_cacheImpl->m_pdxTypeRegistry->setPdxReadSerialized(cache->getPdxReadSerialized());
+  cache->m_cacheImpl->getSerializationRegistry()->addType(
+      GeodeTypeIdsImpl::PDX, PdxInstantiator::createDeserializable);
+  cache->m_cacheImpl->getSerializationRegistry()->addType(
+      GeodeTypeIds::CacheableEnum, PdxEnumInstantiator::createDeserializable);
+  cache->m_cacheImpl->getSerializationRegistry()->addType(
+      GeodeTypeIds::PdxType, std::bind(PdxType::CreateDeserializable,
+                                       cache->m_cacheImpl->getPdxTypeRegistry()));
+
+  cache->m_cacheImpl->getSerializationRegistry()->addType(std::bind(VersionTag::createDeserializable,
+                                                                    std::ref(*(cache->m_cacheImpl->getMemberListForVersionStamp()))));
+  cache->m_cacheImpl->getSerializationRegistry()->addType2(GeodeTypeIdsImpl::DiskVersionTag,
+                                                           std::bind(DiskVersionTag::createDeserializable,
+                                                                     std::ref(*(cache->m_cacheImpl->getMemberListForVersionStamp()))));
+
+
+  cache->m_cacheImpl->getPdxTypeRegistry()->setPdxIgnoreUnreadFields(
+      cache->getPdxIgnoreUnreadFields());
+  cache->m_cacheImpl->getPdxTypeRegistry()->setPdxReadSerialized(
+      cache->getPdxReadSerialized());
 
   return cache;
 }
 
 CachePtr CacheFactory::create(const char* name,
-                              DistributedSystemPtr system /*= nullptr*/,
-                              const char* cacheXml /*= 0*/,
+                              std::unique_ptr<DistributedSystem> system,
+                              const char* cacheXml,
                               const CacheAttributesPtr& attrs /*= nullptr*/) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
 
   CachePtr cptr;
-  CacheFactory::create_(name, system, "", cptr, ignorePdxUnreadFields,
-                        pdxReadSerialized);
+  CacheFactory::create_(name, std::move(system), "", cptr,
+                        ignorePdxUnreadFields, pdxReadSerialized);
   cptr->m_cacheImpl->setAttributes(attrs);
   try {
     if (cacheXml != 0 && strlen(cacheXml) > 0) {
       cptr->initializeDeclarativeCache(cacheXml);
     } else {
-      std::string file = system->getSystemProperties()->cacheXMLFile();
-      if (file != "") {
-        cptr->initializeDeclarativeCache(file.c_str());
-      } else {
-        cptr->m_cacheImpl->initServices();
-      }
+      cptr->m_cacheImpl->initServices();
     }
   } catch (const apache::geode::client::RegionExistsException&) {
     LOGWARN("Attempt to create existing regions declaratively");
@@ -301,7 +213,7 @@ CachePtr CacheFactory::create(const char* name,
   return cptr;
 }
 
-PoolPtr CacheFactory::determineDefaultPool(CachePtr cachePtr) {
+PoolPtr CacheFactory::determineDefaultPool(CacheImpl* cacheImpl) {
   PoolPtr pool = nullptr;
   auto allPools = PoolManager::getAll();
   size_t currPoolSize = allPools.size();
@@ -314,31 +226,31 @@ PoolPtr CacheFactory::determineDefaultPool(CachePtr cachePtr) {
         this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
       }
 
-      pool = this->pf->create(DEFAULT_POOL_NAME);
+      pool = this->pf->create(DEFAULT_POOL_NAME, *cacheImpl->getCache());
       // creatubg default pool so setting this as default pool
       LOGINFO("Set default pool with localhost:40404");
-      cachePtr->m_cacheImpl->setDefaultPool(pool);
+      cacheImpl->setDefaultPool(pool);
       return pool;
     } else if (currPoolSize == 1) {
       pool = allPools.begin()->second;
       LOGINFO("Set default pool from existing pool.");
-      cachePtr->m_cacheImpl->setDefaultPool(pool);
+      cacheImpl->setDefaultPool(pool);
       return pool;
     } else {
       // can't set anything as deafult pool
       return nullptr;
     }
   } else {
-    PoolPtr defaulPool = cachePtr->m_cacheImpl->getDefaultPool();
+    PoolPtr defaultPool = cacheImpl->getDefaultPool();
 
     if (!this->pf->m_addedServerOrLocator) {
       this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
     }
 
-    if (defaulPool != nullptr) {
+    if (defaultPool != nullptr) {
       // once default pool is created, we will not create
-      if (*(defaulPool->m_attrs) == *(this->pf->m_attrs)) {
-        return defaulPool;
+      if (*(defaultPool->m_attrs) == *(this->pf->m_attrs)) {
+        return defaultPool;
       } else {
         throw IllegalStateException(
             "Existing cache's default pool was not compatible");
@@ -356,13 +268,13 @@ PoolPtr CacheFactory::determineDefaultPool(CachePtr cachePtr) {
     }
 
     // defaul pool is null
-    GF_DEV_ASSERT(defaulPool == nullptr);
+    GF_DEV_ASSERT(defaultPool == nullptr);
 
-    if (defaulPool == nullptr) {
-      pool = this->pf->create(DEFAULT_POOL_NAME);
+    if (defaultPool == nullptr) {
+      pool = this->pf->create(DEFAULT_POOL_NAME, *cacheImpl->getCache());
       LOGINFO("Created default pool");
       // creating default so setting this as defaul pool
-      cachePtr->m_cacheImpl->setDefaultPool(pool);
+      cacheImpl->setDefaultPool(pool);
     }
 
     return pool;
@@ -387,34 +299,8 @@ void CacheFactory::cleanup() {
   }
 }
 
-GfErrType CacheFactory::basicGetInstance(const DistributedSystemPtr& system,
-                                         const bool closeOk, CachePtr& cptr) {
-  GfErrType err = GF_NOERR;
-  if (system == nullptr) {
-    return GF_CACHE_ILLEGAL_ARGUMENT_EXCEPTION;
-  }
-  cptr = nullptr;
-  ACE_Guard<ACE_Recursive_Thread_Mutex> guard(g_cfLock);
-  if ((reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->empty() == true) {
-    return GF_CACHE_ENTRY_NOT_FOUND;
-  }
-  std::string key(system->getName());
-  StringToCachePtrMap::iterator p =
-      (reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->find(key);
-  if (p != (reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->end()) {
-    if ((closeOk == true) || (!(p->second->isClosed()))) {
-      cptr = p->second;
-    } else {
-      return GF_CACHE_ENTRY_NOT_FOUND;
-    }
-  } else {
-    return GF_CACHE_ENTRY_NOT_FOUND;
-  }
-  return err;
-}
-
 void CacheFactory::handleXML(CachePtr& cachePtr, const char* cachexml,
-                             DistributedSystemPtr& system) {
+                             DistributedSystem& system) {
   CacheConfig config(cachexml);
 
   RegionConfigMapT regionMap = config.getRegionList();

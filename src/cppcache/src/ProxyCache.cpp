@@ -86,10 +86,9 @@ RegionPtr ProxyCache::getRegion(const char* path) {
 
   if (!m_isProxyCacheClosed) {
     RegionPtr result;
-    CachePtr realCache = CacheFactory::getAnyInstance();
 
-    if (realCache != nullptr && !realCache->isClosed()) {
-      CacheRegionHelper::getCacheImpl(realCache.get())->getRegion(path, result);
+    if (m_cacheImpl != nullptr && !m_cacheImpl->isClosed()) {
+      m_cacheImpl->getRegion(path, result);
     }
 
     if (result != nullptr) {
@@ -134,13 +133,12 @@ void ProxyCache::rootRegions(VectorOfRegion& regions) {
 
   if (!m_isProxyCacheClosed) {
     RegionPtr result;
-    CachePtr realCache = CacheFactory::getAnyInstance();
 
-    if (realCache != nullptr && !realCache->isClosed()) {
+    if (m_cacheImpl != nullptr && !m_cacheImpl->isClosed()) {
       VectorOfRegion tmp;
       // this can cause issue when pool attached with region in multiuserSecure
       // mode
-      realCache->rootRegions(tmp);
+      m_cacheImpl->rootRegions(tmp);
 
       if (tmp.size() > 0) {
         for (int32_t i = 0; i < tmp.size(); i++) {
@@ -157,15 +155,23 @@ void ProxyCache::rootRegions(VectorOfRegion& regions) {
   }
 }
 
-ProxyCache::ProxyCache(PropertiesPtr credentials, PoolPtr pool) {
-  m_remoteQueryService = nullptr;
-  m_isProxyCacheClosed = false;
-  m_userAttributes = std::make_shared<UserAttributes>(credentials, pool, this);
-}
+ProxyCache::ProxyCache(PropertiesPtr credentials, PoolPtr pool,
+                       CacheImpl* cacheImpl)
+    : m_remoteQueryService(nullptr),
+      m_isProxyCacheClosed(false),
+      m_userAttributes(
+          std::make_shared<UserAttributes>(credentials, pool, this)),
+      m_cacheImpl(cacheImpl) {}
 
 ProxyCache::~ProxyCache() {}
 
 PdxInstanceFactoryPtr ProxyCache::createPdxInstanceFactory(
     const char* className) {
-  return std::make_shared<PdxInstanceFactoryImpl>(className);
+  return std::make_shared<PdxInstanceFactoryImpl>(
+      className, &(m_cacheImpl->getCachePerfStats()),
+      m_cacheImpl->getPdxTypeRegistry(),
+      *m_cacheImpl->getSerializationRegistry(),
+      m_cacheImpl->getDistributedSystem()
+          .getSystemProperties()
+          .getEnableTimeStatistics());
 }

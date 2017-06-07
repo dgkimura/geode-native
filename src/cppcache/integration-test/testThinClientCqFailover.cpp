@@ -38,6 +38,10 @@
 
 #include "ThinClientCQ.hpp"
 
+#include "SerializationRegistry.hpp"
+#include "CacheRegionHelper.hpp"
+#include "CacheImpl.hpp"
+
 using namespace apache::geode::client;
 using namespace test;
 using namespace testobject;
@@ -108,17 +112,19 @@ class KillServerThread : public ACE_Task_Base {
 };
 
 void initClientCq(const bool isthinClient) {
-  try {
-    Serializable::registerType(Position::createDeserializable);
-    Serializable::registerType(Portfolio::createDeserializable);
-  } catch (const IllegalStateException&) {
-    // ignore exception
-  }
-
   if (cacheHelper == nullptr) {
     cacheHelper = new CacheHelper(isthinClient);
   }
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
+
+  try {
+    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    serializationRegistry->addType(Position::createDeserializable);
+    serializationRegistry->addType(Portfolio::createDeserializable);
+  } catch (const IllegalStateException&) {
+    // ignore exception
+  }
+
 }
 
 const char* regionNamesCq[] = {"Portfolios", "Positions"};

@@ -36,7 +36,7 @@ void CacheXmlCreation::create(Cache* cache) {
 
   std::vector<PoolXmlCreation*>::iterator pool = pools.begin();
   while (pool != pools.end()) {
-    (*pool)->create();
+    (*pool)->create(*m_cache);
     ++pool;
   }
 

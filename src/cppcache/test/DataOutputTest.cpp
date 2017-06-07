@@ -22,13 +22,15 @@
 #include <gtest/gtest.h>
 
 #include <geode/DataOutput.hpp>
+#include <geode/CacheFactory.hpp>
 #include "ByteArrayFixture.hpp"
-
+#include "SerializationRegistry.hpp"
 using namespace apache::geode::client;
 
 class TestDataOutput : public DataOutput {
  public:
-  TestDataOutput() : m_byteArray(nullptr) {
+  TestDataOutput(SerializationRegistry& serializationRegistry)
+      : DataOutput(serializationRegistry), m_byteArray(nullptr) {
     // NOP
   }
 
@@ -58,6 +60,11 @@ class DataOutputTest : public ::testing::Test, public ByteArrayFixture {
     // NOP
   }
 
+  void SetUp() {
+    auto factory = CacheFactory::createCacheFactory();
+    cache = factory->create();
+  }
+
  protected:
   std::random_device m_randomDevice;
   std::mt19937 m_mersennesTwister;
@@ -74,24 +81,30 @@ class DataOutputTest : public ::testing::Test, public ByteArrayFixture {
     }
     return static_cast<int32_t>(result);
   }
+
+ private:
+  CachePtr cache;
 };
 
 TEST_F(DataOutputTest, TestWriteUint8) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.write(static_cast<uint8_t>(55U));
   dataOutput.write(static_cast<uint8_t>(66U));
   EXPECT_BYTEARRAY_EQ("3742", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteInt8) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.write(static_cast<int8_t>(66));
   dataOutput.write(static_cast<int8_t>(55));
   EXPECT_BYTEARRAY_EQ("4237", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteSequenceNumber) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeInt((int32_t)55);
   dataOutput.writeInt((int32_t)17);
   dataOutput.writeInt((int32_t)0);
@@ -102,7 +115,8 @@ TEST_F(DataOutputTest, TestWriteSequenceNumber) {
 }
 
 TEST_F(DataOutputTest, TestWriteBoolean) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeBoolean(true);
   dataOutput.writeBoolean(false);
   EXPECT_BYTEARRAY_EQ("0100", dataOutput.getByteArray());
@@ -111,7 +125,8 @@ TEST_F(DataOutputTest, TestWriteBoolean) {
 TEST_F(DataOutputTest, TestWriteBytesSigned) {
   int8_t bytes[] = {0, 1, 2, 3, 4, 5, -4, -3, -2, -1, 0};
 
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeBytes(bytes, 11);
   EXPECT_BYTEARRAY_EQ("0B000102030405FCFDFEFF00", dataOutput.getByteArray());
 }
@@ -119,7 +134,8 @@ TEST_F(DataOutputTest, TestWriteBytesSigned) {
 TEST_F(DataOutputTest, TestWriteBytesOnlyUnsigned) {
   uint8_t bytes[] = {0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0};
 
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeBytesOnly(bytes, 11);
   EXPECT_BYTEARRAY_EQ("0001020304050403020100", dataOutput.getByteArray());
 }
@@ -127,13 +143,15 @@ TEST_F(DataOutputTest, TestWriteBytesOnlyUnsigned) {
 TEST_F(DataOutputTest, TestWriteBytesOnlySigned) {
   int8_t bytes[] = {0, 1, 2, 3, 4, 5, -4, -3, -2, -1, 0};
 
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeBytesOnly(bytes, 11);
   EXPECT_BYTEARRAY_EQ("000102030405FCFDFEFF00", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteIntUInt16) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeInt(static_cast<uint16_t>(66));
   dataOutput.writeInt(static_cast<uint16_t>(55));
   dataOutput.writeInt(static_cast<uint16_t>(3333));
@@ -141,7 +159,8 @@ TEST_F(DataOutputTest, TestWriteIntUInt16) {
 }
 
 TEST_F(DataOutputTest, TestWriteCharUInt16) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeChar(static_cast<uint16_t>(66));
   dataOutput.writeChar(static_cast<uint16_t>(55));
   dataOutput.writeChar(static_cast<uint16_t>(3333));
@@ -149,20 +168,23 @@ TEST_F(DataOutputTest, TestWriteCharUInt16) {
 }
 
 TEST_F(DataOutputTest, TestWriteIntUInt32) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeInt(static_cast<uint32_t>(3435973836));
   EXPECT_BYTEARRAY_EQ("CCCCCCCC", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteIntUInt64) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   uint64_t big = 13455272147882261178U;
   dataOutput.writeInt(big);
   EXPECT_BYTEARRAY_EQ("BABABABABABABABA", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteIntInt16) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeInt(static_cast<int16_t>(66));
   dataOutput.writeInt(static_cast<int16_t>(55));
   dataOutput.writeInt(static_cast<int16_t>(3333));
@@ -170,40 +192,46 @@ TEST_F(DataOutputTest, TestWriteIntInt16) {
 }
 
 TEST_F(DataOutputTest, TestWriteIntInt32) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeInt(static_cast<int32_t>(3435973836));
   EXPECT_BYTEARRAY_EQ("CCCCCCCC", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteIntInt64) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   int64_t big = 773738426788457421;
   dataOutput.writeInt(big);
   EXPECT_BYTEARRAY_EQ("0ABCDEFFEDCBABCD", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteArrayLength) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeArrayLen(static_cast<int32_t>(3435973836));
   EXPECT_BYTEARRAY_EQ("CC", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteFloat) {
-  TestDataOutput dataOutput;
-  float pi = 3.14;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
+  float pi = 3.14f;
   dataOutput.writeFloat(pi);
   EXPECT_BYTEARRAY_EQ("4048F5C3", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteDouble) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   double pi = 3.14159265359;
   dataOutput.writeDouble(pi);
   EXPECT_BYTEARRAY_EQ("400921FB54442EEA", dataOutput.getByteArray());
 }
 
 TEST_F(DataOutputTest, TestWriteASCII) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeASCII("You had me at meat tornado.");
   EXPECT_BYTEARRAY_EQ(
       "001B596F7520686164206D65206174206D65617420746F726E61646F2E",
@@ -211,7 +239,8 @@ TEST_F(DataOutputTest, TestWriteASCII) {
 }
 
 TEST_F(DataOutputTest, TestWriteNativeString) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeNativeString("You had me at meat tornado.");
   EXPECT_BYTEARRAY_EQ(
       "57001B596F7520686164206D65206174206D65617420746F726E61646F2E",
@@ -219,7 +248,8 @@ TEST_F(DataOutputTest, TestWriteNativeString) {
 }
 
 TEST_F(DataOutputTest, TestWriteASCIIHuge) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeASCIIHuge("You had me at meat tornado.");
   EXPECT_BYTEARRAY_EQ(
       "0000001B596F7520686164206D65206174206D65617420746F726E61646F2E",
@@ -227,7 +257,8 @@ TEST_F(DataOutputTest, TestWriteASCIIHuge) {
 }
 
 TEST_F(DataOutputTest, TestWriteFullUTF) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeFullUTF("You had me at meat tornado.");
   EXPECT_BYTEARRAY_EQ(
       "0000001B00596F7520686164206D65206174206D65617420746F726E61646F2E",
@@ -235,7 +266,8 @@ TEST_F(DataOutputTest, TestWriteFullUTF) {
 }
 
 TEST_F(DataOutputTest, TestWriteUTF) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeUTF("You had me at meat tornado.");
   EXPECT_BYTEARRAY_EQ(
       "001B596F7520686164206D65206174206D65617420746F726E61646F2E",
@@ -243,7 +275,8 @@ TEST_F(DataOutputTest, TestWriteUTF) {
 }
 
 TEST_F(DataOutputTest, TestWriteUTFHuge) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeUTFHuge("You had me at meat tornado.");
   EXPECT_BYTEARRAY_EQ(
       "0000001B0059006F007500200068006100640020006D00650020006100740020006D0065"
@@ -252,7 +285,8 @@ TEST_F(DataOutputTest, TestWriteUTFHuge) {
 }
 
 TEST_F(DataOutputTest, TestWriteUTFWide) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeUTF(L"You had me at meat tornado!");
   EXPECT_BYTEARRAY_EQ(
       "001B596F7520686164206D65206174206D65617420746F726E61646F21",
@@ -260,7 +294,8 @@ TEST_F(DataOutputTest, TestWriteUTFWide) {
 }
 
 TEST_F(DataOutputTest, TestWriteUTFHugeWide) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeUTFHuge(L"You had me at meat tornado.");
   EXPECT_BYTEARRAY_EQ(
       "0000001B0059006F007500200068006100640020006D00650020006100740020006D0065"
@@ -269,17 +304,20 @@ TEST_F(DataOutputTest, TestWriteUTFHugeWide) {
 }
 
 TEST_F(DataOutputTest, TestEncodedLength) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   EXPECT_EQ(27, dataOutput.getEncodedLength("You had me at meat tornado!"));
 }
 
 TEST_F(DataOutputTest, TestEncodedLengthWide) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   EXPECT_EQ(27, dataOutput.getEncodedLength(L"You had me at meat tornado."));
 }
 
 TEST_F(DataOutputTest, TestWriteObjectSharedPtr) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   std::shared_ptr<CacheableString> objptr =
       CacheableString::create("You had me at meat tornado.");
   dataOutput.writeObject(objptr);
@@ -289,7 +327,8 @@ TEST_F(DataOutputTest, TestWriteObjectSharedPtr) {
 }
 
 TEST_F(DataOutputTest, TestWriteObjectCacheableString) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   CacheableStringPtr objptr =
       CacheableString::create("You had me at meat tornado.");
   dataOutput.writeObject(objptr);
@@ -299,7 +338,8 @@ TEST_F(DataOutputTest, TestWriteObjectCacheableString) {
 }
 
 TEST_F(DataOutputTest, TestCursorAdvance) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeUTF("You had me at meat tornado.");
   EXPECT_BYTEARRAY_EQ(
       "001B596F7520686164206D65206174206D65617420746F726E61646F2E",
@@ -312,7 +352,8 @@ TEST_F(DataOutputTest, TestCursorAdvance) {
 }
 
 TEST_F(DataOutputTest, TestCursorNegativeAdvance) {
-  TestDataOutput dataOutput;
+  SerializationRegistry serializationRegistry;
+  TestDataOutput dataOutput(serializationRegistry);
   dataOutput.writeUTF("You had me at meat tornado.");
   EXPECT_BYTEARRAY_EQ(
       "001B596F7520686164206D65206174206D65617420746F726E61646F2E",

@@ -65,8 +65,15 @@ Connector* ThinClientLocatorHelper::createConnection(Connector*& conn,
                                                      uint32_t waitSeconds,
                                                      int32_t maxBuffSizePool) {
   Connector* socket = nullptr;
-  if (DistributedSystem::getSystemProperties()->sslEnabled()) {
-    socket = new TcpSslConn(hostname, port, waitSeconds, maxBuffSizePool);
+  auto& systemProperties = m_poolDM->getConnectionManager()
+                               .getCacheImpl()
+                               ->getDistributedSystem()
+                               .getSystemProperties();
+  if (m_poolDM && systemProperties.sslEnabled()) {
+    socket = new TcpSslConn(hostname, port, waitSeconds, maxBuffSizePool,
+                            systemProperties.sslTrustStore(),
+                            systemProperties.sslKeyStore(),
+                            systemProperties.sslKeystorePassword());
   } else {
     socket = new TcpConn(hostname, port, waitSeconds, maxBuffSizePool);
   }
@@ -78,6 +85,11 @@ Connector* ThinClientLocatorHelper::createConnection(Connector*& conn,
 GfErrType ThinClientLocatorHelper::getAllServers(
     std::vector<ServerLocation>& servers, const std::string& serverGrp) {
   ACE_Guard<ACE_Thread_Mutex> guard(m_locatorLock);
+
+  auto& sysProps = m_poolDM->getConnectionManager()
+                       .getCacheImpl()
+                       ->getDistributedSystem()
+                       .getSystemProperties();
   for (unsigned i = 0; i < m_locHostPort.size(); i++) {
     ServerLocation loc = m_locHostPort[i];
     try {
@@ -89,11 +101,12 @@ GfErrType ThinClientLocatorHelper::getAllServers(
       }
       Connector* conn = nullptr;
       ConnectionWrapper cw(conn);
-      createConnection(
-          conn, loc.getServerName().c_str(), loc.getPort(),
-          DistributedSystem::getSystemProperties()->connectTimeout(), buffSize);
+      createConnection(conn, loc.getServerName().c_str(), loc.getPort(),
+                       sysProps.connectTimeout(), buffSize);
       GetAllServersRequest request(serverGrp);
-      DataOutput data;
+      DataOutput data(*m_poolDM->getConnectionManager()
+                           .getCacheImpl()
+                           ->getSerializationRegistry());
       data.writeInt((int32_t)1001);  // GOSSIPVERSION
       data.writeObject(&request);
       int sentLength = conn->send(
@@ -117,7 +130,10 @@ GfErrType ThinClientLocatorHelper::getAllServers(
         continue;
       }
 
-      DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength);
+      DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength,
+                   *(m_poolDM->getConnectionManager()
+                         .getCacheImpl()
+                         ->getSerializationRegistry()));
       GetAllServersResponsePtr response(nullptr);
 
       /* adongre
@@ -125,8 +141,7 @@ GfErrType ThinClientLocatorHelper::getAllServers(
        */
       int8_t acceptanceCode;
       di.read(&acceptanceCode);
-      if (acceptanceCode == REPLY_SSL_ENABLED &&
-          !DistributedSystem::getSystemProperties()->sslEnabled()) {
+      if (acceptanceCode == REPLY_SSL_ENABLED && !sysProps.sslEnabled()) {
         LOGERROR("SSL is enabled on locator, enable SSL in client as well");
         throw AuthenticationRequiredException(
             "SSL is enabled on locator, enable SSL in client as well");
@@ -154,6 +169,10 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewCallBackConn(
     /*const std::set<TcrEndpoint*>& exclEndPts,*/
     const std::string& serverGrp) {
   ACE_Guard<ACE_Thread_Mutex> guard(m_locatorLock);
+  auto& sysProps = m_poolDM->getConnectionManager()
+                       .getCacheImpl()
+                       ->getDistributedSystem()
+                       .getSystemProperties();
   int locatorsRetry = 3;
   if (m_poolDM) {
     int poolRetry = m_poolDM->getRetryAttempts();
@@ -183,20 +202,19 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewCallBackConn(
       }
       Connector* conn = nullptr;
       ConnectionWrapper cw(conn);
-      createConnection(
-          conn, loc.getServerName().c_str(), loc.getPort(),
-          DistributedSystem::getSystemProperties()->connectTimeout(), buffSize);
+      createConnection(conn, loc.getServerName().c_str(), loc.getPort(),
+                       sysProps.connectTimeout(), buffSize);
       QueueConnectionRequest request(memId, exclEndPts, redundancy, false,
                                      serverGrp);
-      DataOutput data;
+      DataOutput data(*m_poolDM->getConnectionManager()
+                           .getCacheImpl()
+                           ->getSerializationRegistry());
       data.writeInt((int32_t)1001);  // GOSSIPVERSION
       data.writeObject(&request);
       int sentLength = conn->send(
           (char*)(data.getBuffer()), data.getBufferLength(),
-          m_poolDM
-              ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
-              : DistributedSystem::getSystemProperties()->connectTimeout() *
-                    1000 * 1000,
+          m_poolDM ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
+                   : sysProps.connectTimeout() * 1000 * 1000,
           0);
       if (sentLength <= 0) {
         // conn->close(); delete conn; conn = nullptr;
@@ -205,17 +223,18 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewCallBackConn(
       char buff[BUFF_SIZE];
       int receivedLength = conn->receive(
           buff, BUFF_SIZE,
-          m_poolDM
-              ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
-              : DistributedSystem::getSystemProperties()->connectTimeout() *
-                    1000 * 1000,
+          m_poolDM ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
+                   : sysProps.connectTimeout() * 1000 * 1000,
           0);
       // conn->close();
       // delete conn; conn = nullptr;
       if (receivedLength <= 0) {
         continue;
       }
-      DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength);
+      DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength,
+                   *(m_poolDM->getConnectionManager()
+                         .getCacheImpl()
+                         ->getSerializationRegistry()));
       QueueConnectionResponsePtr response(nullptr);
 
       /* adongre
@@ -223,8 +242,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewCallBackConn(
        */
       int8_t acceptanceCode;
       di.read(&acceptanceCode);
-      if (acceptanceCode == REPLY_SSL_ENABLED &&
-          !DistributedSystem::getSystemProperties()->sslEnabled()) {
+      if (acceptanceCode == REPLY_SSL_ENABLED && !sysProps.sslEnabled()) {
         LOGERROR("SSL is enabled on locator, enable SSL in client as well");
         throw AuthenticationRequiredException(
             "SSL is enabled on locator, enable SSL in client as well");
@@ -251,6 +269,11 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
   bool locatorFound = false;
   int locatorsRetry = 3;
   ACE_Guard<ACE_Thread_Mutex> guard(m_locatorLock);
+  auto& sysProps = m_poolDM->getConnectionManager()
+                       .getCacheImpl()
+                       ->getDistributedSystem()
+                       .getSystemProperties();
+
   if (m_poolDM) {
     int poolRetry = m_poolDM->getRetryAttempts();
     locatorsRetry = poolRetry <= 0 ? locatorsRetry : poolRetry;
@@ -278,10 +301,11 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
       }
       Connector* conn = nullptr;
       ConnectionWrapper cw(conn);
-      createConnection(
-          conn, serLoc.getServerName().c_str(), serLoc.getPort(),
-          DistributedSystem::getSystemProperties()->connectTimeout(), buffSize);
-      DataOutput data;
+      createConnection(conn, serLoc.getServerName().c_str(), serLoc.getPort(),
+                       sysProps.connectTimeout(), buffSize);
+      DataOutput data(*m_poolDM->getConnectionManager()
+                           .getCacheImpl()
+                           ->getSerializationRegistry());
       data.writeInt(1001);  // GOSSIPVERSION
       if (currentServer == nullptr) {
         LOGDEBUG("Creating ClientConnectionRequest");
@@ -296,10 +320,8 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
       }
       int sentLength = conn->send(
           (char*)(data.getBuffer()), data.getBufferLength(),
-          m_poolDM
-              ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
-              : DistributedSystem::getSystemProperties()->connectTimeout() *
-                    1000 * 1000,
+          m_poolDM ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
+                   : sysProps.connectTimeout() * 1000 * 1000,
           0);
       if (sentLength <= 0) {
         // conn->close();
@@ -309,17 +331,18 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
       char buff[BUFF_SIZE];
       int receivedLength = conn->receive(
           buff, BUFF_SIZE,
-          m_poolDM
-              ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
-              : DistributedSystem::getSystemProperties()->connectTimeout() *
-                    1000 * 1000,
+          m_poolDM ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
+                   : sysProps.connectTimeout() * 1000 * 1000,
           0);
       // conn->close();
       // delete conn;
       if (receivedLength <= 0) {
         continue;  // return GF_EUNDEF;
       }
-      DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength);
+      DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength,
+                   *(m_poolDM->getConnectionManager()
+                         .getCacheImpl()
+                         ->getSerializationRegistry()));
       ClientConnectionResponsePtr response;
 
       /* adongre
@@ -327,8 +350,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
        */
       int8_t acceptanceCode;
       di.read(&acceptanceCode);
-      if (acceptanceCode == REPLY_SSL_ENABLED &&
-          !DistributedSystem::getSystemProperties()->sslEnabled()) {
+      if (acceptanceCode == REPLY_SSL_ENABLED && !sysProps.sslEnabled()) {
         LOGERROR("SSL is enabled on locator, enable SSL in client as well");
         throw AuthenticationRequiredException(
             "SSL is enabled on locator, enable SSL in client as well");
@@ -366,6 +388,11 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
 GfErrType ThinClientLocatorHelper::updateLocators(
     const std::string& serverGrp) {
   ACE_Guard<ACE_Thread_Mutex> guard(m_locatorLock);
+  auto& sysProps = m_poolDM->getConnectionManager()
+                       .getCacheImpl()
+                       ->getDistributedSystem()
+                       .getSystemProperties();
+
   for (unsigned attempts = 0; attempts < m_locHostPort.size(); attempts++) {
     ServerLocation serLoc = m_locHostPort[attempts];
     Connector* conn = nullptr;
@@ -378,19 +405,18 @@ GfErrType ThinClientLocatorHelper::updateLocators(
                serLoc.getServerName().c_str(), serLoc.getPort(),
                serverGrp.c_str());
       ConnectionWrapper cw(conn);
-      createConnection(
-          conn, serLoc.getServerName().c_str(), serLoc.getPort(),
-          DistributedSystem::getSystemProperties()->connectTimeout(), buffSize);
+      createConnection(conn, serLoc.getServerName().c_str(), serLoc.getPort(),
+                       sysProps.connectTimeout(), buffSize);
       LocatorListRequest request(serverGrp);
-      DataOutput data;
+      DataOutput data(*m_poolDM->getConnectionManager()
+                           .getCacheImpl()
+                           ->getSerializationRegistry());
       data.writeInt((int32_t)1001);  // GOSSIPVERSION
       data.writeObject(&request);
       int sentLength = conn->send(
           (char*)(data.getBuffer()), data.getBufferLength(),
-          m_poolDM
-              ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
-              : DistributedSystem::getSystemProperties()->connectTimeout() *
-                    1000 * 1000,
+          m_poolDM ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
+                   : sysProps.connectTimeout() * 1000 * 1000,
           0);
       if (sentLength <= 0) {
         //  conn->close();
@@ -401,17 +427,18 @@ GfErrType ThinClientLocatorHelper::updateLocators(
       char buff[BUFF_SIZE];
       int receivedLength = conn->receive(
           buff, BUFF_SIZE,
-          m_poolDM
-              ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
-              : DistributedSystem::getSystemProperties()->connectTimeout() *
-                    1000 * 1000,
+          m_poolDM ? (m_poolDM->getReadTimeout() / 1000) * 1000 * 1000
+                   : sysProps.connectTimeout() * 1000 * 1000,
           0);
       // conn->close();
       // delete conn; conn = nullptr;
       if (receivedLength <= 0) {
         continue;
       }
-      DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength);
+      DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength,
+                   *(m_poolDM->getConnectionManager()
+                         .getCacheImpl()
+                         ->getSerializationRegistry()));
       auto response = std::make_shared<LocatorListResponse>();
 
       /* adongre
@@ -419,8 +446,7 @@ GfErrType ThinClientLocatorHelper::updateLocators(
        */
       int8_t acceptanceCode;
       di.read(&acceptanceCode);
-      if (acceptanceCode == REPLY_SSL_ENABLED &&
-          !DistributedSystem::getSystemProperties()->sslEnabled()) {
+      if (acceptanceCode == REPLY_SSL_ENABLED && !sysProps.sslEnabled()) {
         LOGERROR("SSL is enabled on locator, enable SSL in client as well");
         throw AuthenticationRequiredException(
             "SSL is enabled on locator, enable SSL in client as well");

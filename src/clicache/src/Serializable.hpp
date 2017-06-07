@@ -31,6 +31,7 @@
 #include "Log.hpp"
 #include <vcclr.h>
 #include "IPdxTypeMapper.hpp"
+
 using namespace System::Reflection;
 using namespace System;
 using namespace System::Collections::Generic;
@@ -45,6 +46,8 @@ namespace Apache
 
 				interface class IPdxSerializable;
         interface class IPdxSerializer;
+        ref class Cache;
+
       /// <summary>
       /// Signature of native function delegates passed to native
       /// <c>native::Serializable::registerType</c>.
@@ -246,7 +249,8 @@ namespace Apache
         /// to a <c>Serializable</c>.
         /// </summary>
         static operator Apache::Geode::Client::Serializable^ (array<String^>^ value);
-
+        
+        
         /// <summary>
         /// Register an instance factory method for a given type.
         /// This should be used when registering types that implement
@@ -263,7 +267,7 @@ namespace Apache
         /// in registering the type; check <c>Utils::LastError</c> for more
         /// information in the latter case.
         /// </exception>
-        static void RegisterTypeGeneric(TypeFactoryMethodGeneric^ creationMethod);
+        static void RegisterTypeGeneric(TypeFactoryMethodGeneric^ creationMethod, Cache^ cache);
 
         /// <summary>
         /// Set the PDX serializer for the cache. If this serializer is set,
@@ -301,7 +305,7 @@ namespace Apache
 				static System::Int32 GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType);
 				static IGeodeSerializable^ GetPDXTypeById(const char* poolName, System::Int32 typeId);
 				static IPdxSerializable^ Serializable::GetPdxType(String^ className);
-				static void RegisterPDXManagedCacheableKey(bool appDomainEnable);
+				static void RegisterPDXManagedCacheableKey(bool appDomainEnable, Cache^ cache);
         static bool IsObjectAndPdxSerializerRegistered(String^ className);
 
         static IPdxSerializer^ GetPdxSerializer();
@@ -441,14 +445,14 @@ namespace Apache
         /// <exception cref="IllegalArgumentException">
         /// if the method is null
         /// </exception>
-        static void RegisterTypeGeneric(Byte typeId,
-          TypeFactoryMethodGeneric^ creationMethod, Type^ type);
+        static void RegisterTypeGeneric(Byte typeId, TypeFactoryMethodGeneric^ creationMethod, Type^ type, Cache^ cache);
+
 
         /// <summary>
         /// Unregister the type with the given typeId
         /// </summary>
         /// <param name="typeId">typeId of the type to unregister.</param>
-        static void UnregisterTypeGeneric(Byte typeId);
+        static void UnregisterTypeGeneric(Byte typeId, Cache^ cache);
 
         generic<class TValue>
         static TValue GetManagedValueGeneric(native::SerializablePtr val);

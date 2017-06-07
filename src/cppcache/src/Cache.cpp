@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <geode/geode_globals.hpp>
 #include <memory>
 
@@ -29,17 +30,19 @@
 #include <geode/PoolManager.hpp>
 #include <PdxInstanceFactoryImpl.hpp>
 
-using namespace apache::geode::client;
-
 extern bool Cache_CreatedFromCacheFactory;
 extern ACE_Recursive_Thread_Mutex* g_disconnectLock;
+
+namespace apache {
+namespace geode {
+namespace client {
 
 /** Returns the name of this cache.
  * This method does not throw
  * <code>CacheClosedException</code> if the cache is closed.
  * @return the string name of this cache
  */
-const char* Cache::getName() const { return m_cacheImpl->getName(); }
+const std::string& Cache::getName() const { return m_cacheImpl->getName(); }
 
 /**
  * Indicates if this cache has been closed.
@@ -56,10 +59,8 @@ bool Cache::isClosed() const { return m_cacheImpl->isClosed(); }
  * {@link CacheFactory::create created} with. This method does not throw
  * <code>CacheClosedException</code> if the cache is closed.
  */
-DistributedSystemPtr Cache::getDistributedSystem() const {
-  DistributedSystemPtr result;
-  m_cacheImpl->getDistributedSystem(result);
-  return result;
+DistributedSystem& Cache::getDistributedSystem() const {
+  return m_cacheImpl->getDistributedSystem();
 }
 
 void Cache::close() { close(false); }
@@ -80,7 +81,7 @@ void Cache::close(bool keepalive) {
   try {
     if (Cache_CreatedFromCacheFactory) {
       Cache_CreatedFromCacheFactory = false;
-      DistributedSystem::disconnect();
+      getDistributedSystem().disconnect();
     }
   } catch (const apache::geode::client::NotConnectedException&) {
   } catch (const apache::geode::client::Exception&) {
@@ -149,10 +150,10 @@ CacheTransactionManagerPtr Cache::getCacheTransactionManager() {
   return m_cacheImpl->getCacheTransactionManager();
 }
 
-Cache::Cache(const char* name, DistributedSystemPtr sys, const char* id_data,
+Cache::Cache(const std::string& name, std::unique_ptr<DistributedSystem> sys,
              bool ignorePdxUnreadFields, bool readPdxSerialized) {
   m_cacheImpl = std::unique_ptr<CacheImpl>(new CacheImpl(
-      this, name, sys, id_data, ignorePdxUnreadFields, readPdxSerialized));
+      this, name, std::move(sys), ignorePdxUnreadFields, readPdxSerialized));
 }
 
 Cache::~Cache() = default;
@@ -203,7 +204,12 @@ bool Cache::getPdxReadSerialized() {
 }
 
 PdxInstanceFactoryPtr Cache::createPdxInstanceFactory(const char* className) {
-  return std::make_shared<PdxInstanceFactoryImpl>(className);
+  return std::make_shared<PdxInstanceFactoryImpl>(
+      className, m_cacheImpl->m_cacheStats, m_cacheImpl->getPdxTypeRegistry(),
+      *(m_cacheImpl->getSerializationRegistry().get()),
+      m_cacheImpl->getDistributedSystem()
+          .getSystemProperties()
+          .getEnableTimeStatistics());
 }
 
 RegionServicePtr Cache::createAuthenticatedView(
@@ -211,7 +217,7 @@ RegionServicePtr Cache::createAuthenticatedView(
   if (poolName == nullptr) {
     if (!this->isClosed() && m_cacheImpl->getDefaultPool() != nullptr) {
       return m_cacheImpl->getDefaultPool()->createSecureUserCache(
-          userSecurityProperties);
+          userSecurityProperties, m_cacheImpl.get());
     }
 
     throw IllegalStateException(
@@ -222,7 +228,8 @@ RegionServicePtr Cache::createAuthenticatedView(
       if (poolName != nullptr) {
         PoolPtr poolPtr = PoolManager::find(poolName);
         if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
-          return poolPtr->createSecureUserCache(userSecurityProperties);
+          return poolPtr->createSecureUserCache(userSecurityProperties,
+                                                m_cacheImpl.get());
         }
         throw IllegalStateException(
             "Either pool not found or it has been destroyed");
@@ -234,3 +241,24 @@ RegionServicePtr Cache::createAuthenticatedView(
   }
   return nullptr;
 }
+
+StatisticsFactory* Cache::getStatisticsFactory() const {
+  return m_cacheImpl->getDistributedSystem()
+      .getStatisticsManager()
+      ->getStatisticsFactory();
+}
+
+std::unique_ptr<DataInput> Cache::createDataInput(const uint8_t* m_buffer,
+                                                  int32_t len) {
+  return std::unique_ptr<DataInput>(
+      new DataInput(m_buffer, len, *m_cacheImpl->getSerializationRegistry()));
+}
+
+std::unique_ptr<DataOutput> Cache::createDataOutput() const {
+  return std::unique_ptr<DataOutput>(
+      new DataOutput(*m_cacheImpl->getSerializationRegistry()));
+}
+
+}  // namespace client
+}  // namespace geode
+}  // namespace apache

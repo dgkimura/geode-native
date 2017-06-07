@@ -48,16 +48,7 @@ namespace Apache
 
         CacheImpl* getCacheImpl()
         {
-          CachePtr cache = CacheFactory::getAnyInstance();
-          if (cache == nullptr)
-          {
-            throw gcnew IllegalStateException("cache has not been created yet.");;
-          }
-          if (cache->isClosed())
-          {
-            throw gcnew IllegalStateException("cache has been closed. ");
-          }      
-          return CacheRegionHelper::getCacheImpl(cache.get());
+          return CacheImpl::getInstance();
         }
         
         void PdxHelper::SerializePdx(DataOutput^ dataOutput, IPdxSerializable^ pdxObject)
@@ -129,7 +120,7 @@ namespace Apache
             if (cacheImpl != NULL) {
               System::Byte* stPos = dataOutput->GetStartBufferPosition() + ptc->getStartPositionOffset();
               int pdxLen = PdxHelper::ReadInt32(stPos);       
-              cacheImpl->m_cacheStats->incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
+              cacheImpl->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
             }
           }
           else//we know locasl type, need to see preerved data
@@ -159,7 +150,7 @@ namespace Apache
             if (cacheImpl != NULL) {
               System::Byte* stPos = dataOutput->GetStartBufferPosition() + prw->getStartPositionOffset();
               int pdxLen = PdxHelper::ReadInt32(stPos);       
-              cacheImpl->m_cacheStats->incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
+              cacheImpl->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
             }
           }
         }
@@ -316,7 +307,7 @@ namespace Apache
 			//This is for pdx Statistics
             CacheImpl* cacheImpl = getCacheImpl();
             if (cacheImpl != NULL) {        
-              cacheImpl->m_cacheStats->incPdxDeSerialization(len + 9);//pdxLen + 1 + 2*4
+              cacheImpl->getCachePerfStats().incPdxDeSerialization(len + 9);//pdxLen + 1 + 2*4
             }
 
             return DeserializePdx(dataInput, forceDeserialize, typeId, len);
@@ -342,7 +333,7 @@ namespace Apache
             }
 
            // pdxObject = gcnew PdxInstanceImpl(gcnew DataInput(dataInput->GetBytes(dataInput->GetCursor(), len  + 8 ), len  + 8));
-             pdxObject = gcnew PdxInstanceImpl(dataInput->GetBytes(dataInput->GetCursor(), len ), len, typeId, true );
+             pdxObject = gcnew PdxInstanceImpl(dataInput->GetBytes(dataInput->GetCursor(), len ), len, typeId, true, CacheImpl::getInstance()->getSerializationRegistry().get());
 
             dataInput->AdvanceCursorPdx(len );
             
@@ -353,7 +344,7 @@ namespace Apache
             //This is for pdxinstance Statistics            
             CacheImpl* cacheImpl = getCacheImpl();
             if (cacheImpl != NULL) {
-              cacheImpl->m_cacheStats->incPdxInstanceCreations();		
+              cacheImpl->getCachePerfStats().incPdxInstanceCreations();		
             }
             return pdxObject;
           }

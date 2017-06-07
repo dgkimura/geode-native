@@ -15,15 +15,17 @@
  * limitations under the License.
  */
 
-//#include "geode_includes.hpp"
+#include "begin_native.hpp"
+#include "CacheRegionHelper.hpp"
+#include "CacheImpl.hpp"
+#include "end_native.hpp"
+
 #include "Cache.hpp"
 #include "ExceptionTypes.hpp"
 #include "DistributedSystem.hpp"
 #include "Region.hpp"
 #include "RegionAttributes.hpp"
 #include "QueryService.hpp"
-//#include "FunctionService.hpp"
-//#include "Execution.hpp"
 #include "CacheFactory.hpp"
 #include "impl/AuthenticatedCache.hpp"
 #include "impl/ManagedString.hpp"
@@ -47,7 +49,7 @@ namespace Apache
       {
         try
         {
-          return ManagedString::Get( m_nativeptr->get()->getName( ) );
+          return ManagedString::Get( m_nativeptr->get()->getName( ).c_str() );
         }
         finally
         {
@@ -71,7 +73,7 @@ namespace Apache
       {
         try
         {
-          return Client::DistributedSystem::Create(m_nativeptr->get()->getDistributedSystem());
+          return Client::DistributedSystem::Create(&(m_nativeptr->get()->getDistributedSystem()));
         }
         finally
         {
@@ -120,7 +122,7 @@ namespace Apache
           // If DS automatically disconnected due to the new bootstrap API, then cleanup the C++/CLI side
           //if (!apache::geode::client::DistributedSystem::isConnected())
           {
-            Apache::Geode::Client::DistributedSystem::UnregisterBuiltinManagedTypes();
+            Apache::Geode::Client::DistributedSystem::UnregisterBuiltinManagedTypes(this);
           }
 
         _GF_MG_EXCEPTION_CATCH_ALL2
@@ -343,7 +345,25 @@ namespace Apache
 
        IPdxInstanceFactory^ Cache::CreatePdxInstanceFactory(String^ className)
        {
-         return gcnew Internal::PdxInstanceFactoryImpl(className);
+    
+         return gcnew Internal::PdxInstanceFactoryImpl(className, &(native::CacheRegionHelper::getCacheImpl(m_nativeptr->get())->getCachePerfStats()));
+
+       }
+
+       DataInput^ Cache::CreateDataInput(array<Byte>^ buffer, System::Int32 len)
+       {
+         return gcnew DataInput(buffer, len, native::CacheRegionHelper::getCacheImpl(m_nativeptr->get())->getSerializationRegistry().get());
+       }
+
+       
+       DataInput^ Cache::CreateDataInput(array<Byte>^ buffer)
+       {
+         return gcnew DataInput(buffer, native::CacheRegionHelper::getCacheImpl(m_nativeptr->get())->getSerializationRegistry().get());
+       }
+
+        DataOutput^ Cache::CreateDataOutput()
+       {
+         return gcnew DataOutput(*native::CacheRegionHelper::getCacheImpl(m_nativeptr->get())->getSerializationRegistry());
        }
     }  // namespace Client
   }  // namespace Geode

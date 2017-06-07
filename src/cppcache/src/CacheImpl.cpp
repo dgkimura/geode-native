@@ -40,30 +40,22 @@
 #include "ThinClientPoolHADM.hpp"
 #include "InternalCacheTransactionManager2PCImpl.hpp"
 #include "PdxTypeRegistry.hpp"
+#include "SerializationRegistry.hpp"
 
 using namespace apache::geode::client;
 
-ExpiryTaskManager* CacheImpl::expiryTaskManager = nullptr;
 CacheImpl* CacheImpl::s_instance = nullptr;
-volatile bool CacheImpl::s_networkhop = false;
-volatile int CacheImpl::s_blacklistBucketTimeout = 0;
-ACE_Recursive_Thread_Mutex CacheImpl::s_nwHopLock;
-volatile int8_t CacheImpl::s_serverGroupFlag = 0;
 
-#define DEFAULT_LRU_MAXIMUM_ENTRIES 100000
-
-ExpiryTaskManager* getCacheImplExpiryTaskManager() {
-  return CacheImpl::expiryTaskManager;
-}
-
-CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
-                     const char* id_data, bool iPUF, bool readPdxSerialized)
-    : m_defaultPool(nullptr),
+CacheImpl::CacheImpl(Cache* c, const std::string& name,
+                     std::unique_ptr<DistributedSystem> sys, bool iPUF,
+                     bool readPdxSerialized)
+    : m_name(name),
+      m_defaultPool(nullptr),
       m_ignorePdxUnreadFields(iPUF),
       m_readPdxSerialized(readPdxSerialized),
       m_closed(false),
       m_initialized(false),
-      m_distributedSystem(sys),
+      m_distributedSystem(std::move(sys)),
       m_implementee(c),
       m_cond(m_mutex),
       m_attributes(nullptr),
@@ -73,79 +65,30 @@ CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
       m_destroyPending(false),
       m_initDone(false),
       m_adminRegion(nullptr),
-      m_pdxTypeRegistry(std::make_shared<PdxTypeRegistry>()) {
+      m_memberListForVersionStamp(
+          *(std::make_shared<MemberListForVersionStamp>())),
+      m_serializationRegistry(std::make_shared<SerializationRegistry>()),
+      m_pdxTypeRegistry(
+          std::make_shared<PdxTypeRegistry>(m_serializationRegistry)),
+      m_expiryTaskManager(
+          std::unique_ptr<ExpiryTaskManager>(new ExpiryTaskManager())),
+      m_clientProxyMembershipIDFactory(m_distributedSystem->getName()) {
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(c));
 
-  m_name = Utils::copyString(name);
-
-  if (!DistributedSystem::isConnected()) {
-    throw IllegalArgumentException("DistributedSystem is not up");
-  }
   m_regions = new MapOfRegionWithLock();
-  SystemProperties* prop = DistributedSystem::getSystemProperties();
-  if (prop && prop->heapLRULimitEnabled()) {
-    m_evictionControllerPtr = new EvictionController(
-        prop->heapLRULimit(), prop->heapLRUDelta(), this);
+  auto& prop = m_distributedSystem->getSystemProperties();
+  if (prop.heapLRULimitEnabled()) {
+    m_evictionControllerPtr =
+        new EvictionController(prop.heapLRULimit(), prop.heapLRUDelta(), this);
     m_evictionControllerPtr->start();
     LOGINFO("Heap LRU eviction controller thread started");
   }
-  /*
-  else {
-    LOGFINE("Eviction controller is nullptr");
-  }
-  */
 
-  ClientProxyMembershipID::init(sys->getName());
-
-  m_cacheStats = new CachePerfStats;
-
-  s_instance = this;
-  m_initialized = true;
-}
-
-CacheImpl::CacheImpl(Cache* c, const char* name, DistributedSystemPtr sys,
-                     bool iPUF, bool readPdxSerialized)
-    : m_defaultPool(nullptr),
-      m_ignorePdxUnreadFields(iPUF),
-      m_readPdxSerialized(readPdxSerialized),
-      m_closed(false),
-      m_initialized(false),
-      m_distributedSystem(sys),
-      m_implementee(c),
-      m_cond(m_mutex),
-      m_attributes(nullptr),
-      m_evictionControllerPtr(nullptr),
-      m_tcrConnectionManager(nullptr),
-      m_remoteQueryServicePtr(nullptr),
-      m_destroyPending(false),
-      m_initDone(false),
-      m_adminRegion(nullptr),
-      m_pdxTypeRegistry(std::make_shared<PdxTypeRegistry>()) {
-  m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
-      new InternalCacheTransactionManager2PCImpl(c));
-
-  m_name = Utils::copyString(name);
-  if (!DistributedSystem::isConnected()) {
-    throw IllegalArgumentException("DistributedSystem is not connected");
-  }
-  m_regions = new MapOfRegionWithLock();
-  SystemProperties* prop = DistributedSystem::getSystemProperties();
-  if (prop && prop->heapLRULimitEnabled()) {
-    m_evictionControllerPtr = new EvictionController(
-        prop->heapLRULimit(), prop->heapLRUDelta(), this);
-    m_evictionControllerPtr->start();
-    LOGINFO("Heap LRU eviction controller thread started");
-  }
-  /*
-  else {
-    LOGFINE("Eviction controller is nullptr");
-  }
-  */
-
-  ClientProxyMembershipID::init(sys->getName());
-
-  m_cacheStats = new CachePerfStats;
+  m_cacheStats = new CachePerfStats(m_distributedSystem.get()
+                                        ->getStatisticsManager()
+                                        ->getStatisticsFactory());
+  m_expiryTaskManager->begin();
 
   s_instance = this;
   m_initialized = true;
@@ -162,31 +105,12 @@ void CacheImpl::initServices() {
     m_tcrConnectionManager->init();
     m_remoteQueryServicePtr = std::make_shared<RemoteQueryService>(this);
     // StartAdminRegion
-    SystemProperties* prop = DistributedSystem::getSystemProperties();
-    if (prop && prop->statisticsEnabled()) {
+    auto& prop = m_distributedSystem->getSystemProperties();
+    if (prop.statisticsEnabled()) {
       m_adminRegion = AdminRegion::create(this);
     }
     m_initDone = true;
   }
-}
-
-int CacheImpl::blackListBucketTimeouts() { return s_blacklistBucketTimeout; }
-
-void CacheImpl::setBlackListBucketTimeouts() { s_blacklistBucketTimeout += 1; }
-
-bool CacheImpl::getAndResetNetworkHopFlag() {
-  ACE_Guard<ACE_Recursive_Thread_Mutex> _lock(s_nwHopLock);
-  bool networkhop = CacheImpl::s_networkhop;
-  CacheImpl::s_networkhop = false;
-  // This log should only appear in tests
-  LOGDEBUG("networkhop flag = %d", networkhop);
-  return networkhop;
-}
-
-int8_t CacheImpl::getAndResetServerGroupFlag() {
-  int8_t serverGroupFlag = CacheImpl::s_serverGroupFlag;
-  CacheImpl::s_serverGroupFlag = 0;
-  return serverGroupFlag;
 }
 
 void CacheImpl::netDown() {
@@ -290,13 +214,9 @@ CacheImpl::~CacheImpl() {
   if (m_regions != nullptr) {
     delete m_regions;
   }
-
-  if (m_name != nullptr) {
-    delete[] m_name;
-  }
 }
 
-const char* CacheImpl::getName() const {
+const std::string& CacheImpl::getName() const {
   if (m_closed || m_destroyPending) {
     throw CacheClosedException("Cache::getName: cache closed");
   }
@@ -311,11 +231,8 @@ void CacheImpl::setAttributes(const CacheAttributesPtr& attrs) {
   }
 }
 
-void CacheImpl::getDistributedSystem(DistributedSystemPtr& dptr) const {
-  if (m_closed || m_destroyPending) {
-    throw CacheClosedException("Cache::getDistributedSystem: cache closed");
-  }
-  dptr = m_distributedSystem;
+DistributedSystem& CacheImpl::getDistributedSystem() const {
+  return *m_distributedSystem;
 }
 
 void CacheImpl::sendNotificationCloseMsgs() {
@@ -403,6 +320,9 @@ void CacheImpl::close(bool keepalive) {
 
   GF_SAFE_DELETE(m_tcrConnectionManager);
   m_cacheTXManager = nullptr;
+
+  m_expiryTaskManager->stopExpiryTaskManager();
+
   m_closed = true;
 
   LOGFINE("Cache closed.");
@@ -440,8 +360,8 @@ void CacheImpl::createRegion(const char* name,
       if (!(aRegionAttributes->getPoolName())) {
         m_tcrConnectionManager->init();
         m_remoteQueryServicePtr = std::make_shared<RemoteQueryService>(this);
-        SystemProperties* prop = DistributedSystem::getSystemProperties();
-        if (prop && prop->statisticsEnabled()) {
+        auto& prop = m_distributedSystem->getSystemProperties();
+        if (prop.statisticsEnabled()) {
           m_adminRegion = AdminRegion::create(this);
         }
       }
@@ -535,8 +455,8 @@ void CacheImpl::createRegion(const char* name,
     // When region is created, added that region name in client meta data
     // service to fetch its
     // metadata for single hop.
-    SystemProperties* props = DistributedSystem::getSystemProperties();
-    if (!props->isGridClient()) {
+    auto& props = m_distributedSystem->getSystemProperties();
+    if (!props.isGridClient()) {
       const char* poolName = aRegionAttributes->getPoolName();
       if (poolName != nullptr) {
         PoolPtr pool = PoolManager::find(poolName);
@@ -718,7 +638,7 @@ EvictionController* CacheImpl::getEvictionController() {
 
 void CacheImpl::readyForEvents() {
   bool autoReadyForEvents =
-      DistributedSystem::getSystemProperties()->autoReadyForEvents();
+      m_distributedSystem->getSystemProperties().autoReadyForEvents();
   bool isDurable = m_tcrConnectionManager->isDurable();
 
   if (!isDurable && autoReadyForEvents) {
@@ -792,7 +712,8 @@ void CacheImpl::processMarker() {
     if (!q.int_id_->isDestroyed()) {
       if (const auto tcrHARegion =
               std::dynamic_pointer_cast<ThinClientHARegion>(q.int_id_)) {
-        auto regionMsg = new TcrMessageClientMarker(true);
+        auto regionMsg = new TcrMessageClientMarker(
+            this->getCache()->createDataOutput(), true);
         tcrHARegion->receiveNotification(regionMsg);
         VectorOfRegion subregions;
         tcrHARegion->subregions(true, subregions);
@@ -800,7 +721,8 @@ void CacheImpl::processMarker() {
           if (!iter->isDestroyed()) {
             if (const auto subregion =
                     std::dynamic_pointer_cast<ThinClientHARegion>(iter)) {
-              regionMsg = new TcrMessageClientMarker(true);
+              regionMsg = new TcrMessageClientMarker(
+                  this->getCache()->createDataOutput(), true);
               subregion->receiveNotification(regionMsg);
             }
           }
@@ -821,28 +743,7 @@ int CacheImpl::getPoolSize(const char* poolName) {
 
 RegionFactoryPtr CacheImpl::createRegionFactory(
     RegionShortcut preDefinedRegion) {
-  return std::make_shared<RegionFactory>(preDefinedRegion);
-}
-
-void CacheImpl::setRegionShortcut(AttributesFactoryPtr attrFact,
-                                  RegionShortcut preDefinedRegionAttr) {
-  switch (preDefinedRegionAttr) {
-    case PROXY: {
-      attrFact->setCachingEnabled(false);
-    } break;
-    case CACHING_PROXY: {
-      attrFact->setCachingEnabled(true);
-    } break;
-    case CACHING_PROXY_ENTRY_LRU: {
-      attrFact->setCachingEnabled(true);
-      attrFact->setLruEntriesLimit(DEFAULT_LRU_MAXIMUM_ENTRIES);
-    } break;
-    case LOCAL: {
-    } break;
-    case LOCAL_ENTRY_LRU: {
-      attrFact->setLruEntriesLimit(DEFAULT_LRU_MAXIMUM_ENTRIES);
-    } break;
-  }
+  return std::make_shared<RegionFactory>(preDefinedRegion, this);
 }
 
 std::map<std::string, RegionAttributesPtr> CacheImpl::getRegionShortcut() {
@@ -886,11 +787,13 @@ std::map<std::string, RegionAttributesPtr> CacheImpl::getRegionShortcut() {
   return preDefined;
 }
 
-PdxTypeRegistryPtr CacheImpl::getPdxTypeRegistry() const
-{
+PdxTypeRegistryPtr CacheImpl::getPdxTypeRegistry() const {
   return m_pdxTypeRegistry;
 }
 
+SerializationRegistryPtr CacheImpl::getSerializationRegistry() const {
+  return m_serializationRegistry;
+}
 
 CacheTransactionManagerPtr CacheImpl::getCacheTransactionManager() {
   return m_cacheTXManager;

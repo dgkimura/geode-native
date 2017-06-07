@@ -30,6 +30,11 @@
 #include <geode/CqListener.hpp>
 #include <geode/CqQuery.hpp>
 #include <geode/CqServiceStatistics.hpp>
+#include <geode/Cache.hpp>
+
+#include "SerializationRegistry.hpp"
+#include "CacheRegionHelper.hpp"
+#include "CacheImpl.hpp"
 
 using namespace apache::geode::client;
 using namespace test;
@@ -44,6 +49,11 @@ CacheHelper* cacheHelper = nullptr;
 #define SERVER1 s2p1
 #include "LocatorHelper.hpp"
 
+CacheHelper* getHelper() {
+  ASSERT(cacheHelper != nullptr, "No cacheHelper initialized.");
+  return cacheHelper;
+}
+
 class CqDeltaListener : public CqListener {
  public:
   CqDeltaListener() : m_deltaCount(0), m_valueCount(0) {}
@@ -51,7 +61,10 @@ class CqDeltaListener : public CqListener {
   virtual void onEvent(const CqEvent& aCqEvent) {
     CacheableBytesPtr deltaValue = aCqEvent.getDeltaValue();
     DeltaTestImpl newValue;
-    DataInput input(deltaValue->value(), deltaValue->length());
+    DataInput input(
+        deltaValue->value(), deltaValue->length(),
+        *CacheRegionHelper::getCacheImpl(getHelper()->getCache().get())
+             ->getSerializationRegistry());
     newValue.fromDelta(input);
     if (newValue.getIntVar() == 5) {
       m_deltaCount++;
@@ -90,11 +103,6 @@ void cleanProc() {
     delete cacheHelper;
     cacheHelper = nullptr;
   }
-}
-
-CacheHelper* getHelper() {
-  ASSERT(cacheHelper != nullptr, "No cacheHelper initialized.");
-  return cacheHelper;
 }
 
 void createPooledRegion(const char* name, bool ackMode, const char* locators,
@@ -146,7 +154,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, CreateClient1)
     createPooledRegion(regionNames[0], USE_ACK, locatorsG, "__TESTPOOL1_",
                        true);
     try {
-      Serializable::registerType(DeltaTestImpl::create);
+      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+
+      serializationRegistry->addType(DeltaTestImpl::create);
     } catch (IllegalStateException&) {
       //  ignore exception caused by type reregistration.
     }
@@ -159,7 +169,9 @@ DUNIT_TASK_DEFINITION(CLIENT2, CreateClient2)
     createPooledRegion(regionNames[0], USE_ACK, locatorsG, "__TESTPOOL1_",
                        true);
     try {
-      Serializable::registerType(DeltaTestImpl::create);
+      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+
+      serializationRegistry->addType(DeltaTestImpl::create);
     } catch (IllegalStateException&) {
       //  ignore exception caused by type reregistration.
     }
@@ -185,7 +197,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, CreateClient1_NoPools)
     initClientNoPools();
     createRegion(regionNames[0], USE_ACK, true);
     try {
-      Serializable::registerType(DeltaTestImpl::create);
+      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+
+      serializationRegistry->addType(DeltaTestImpl::create);
     } catch (IllegalStateException&) {
       //  ignore exception caused by type reregistration.
     }
@@ -197,7 +211,9 @@ DUNIT_TASK_DEFINITION(CLIENT2, CreateClient2_NoPools)
     initClientNoPools();
     createRegion(regionNames[0], USE_ACK, true);
     try {
-      Serializable::registerType(DeltaTestImpl::create);
+      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+
+      serializationRegistry->addType(DeltaTestImpl::create);
     } catch (IllegalStateException&) {
       //  ignore exception caused by type reregistration.
     }

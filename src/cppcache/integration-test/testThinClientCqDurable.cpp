@@ -61,23 +61,26 @@ const char* durableCQNamesClient2[] = {
 static bool m_isPdx = false;
 
 void initClientWithId(int ClientIdx, bool typeRegistered = false) {
-  if (typeRegistered == false) {
-    try {
-      Serializable::registerType(Position::createDeserializable);
-      Serializable::registerType(Portfolio::createDeserializable);
-
-      Serializable::registerPdxType(PositionPdx::createDeserializable);
-      Serializable::registerPdxType(PortfolioPdx::createDeserializable);
-    } catch (const IllegalStateException&) {
-      // ignore exception
-    }
-  }
   PropertiesPtr pp = Properties::create();
   pp->insert("durable-client-id", durableIds[ClientIdx]);
   pp->insert("durable-timeout", 60);
   pp->insert("notify-ack-interval", 1);
 
   initClient(true, pp);
+
+  if (typeRegistered == false) {
+    try {
+      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      serializationRegistry->addType(Position::createDeserializable);
+      serializationRegistry->addType(Portfolio::createDeserializable);
+
+      serializationRegistry->addPdxType(PositionPdx::createDeserializable);
+      serializationRegistry->addPdxType(PortfolioPdx::createDeserializable);
+    }
+    catch (const IllegalStateException&) {
+      // ignore exception
+    }
+  }
 }
 
 class MyCqListener1 : public CqListener {

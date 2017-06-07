@@ -91,6 +91,10 @@ class Delta {
   virtual DeltaPtr clone();
 
   virtual ~Delta() {}
+
+ protected:
+  Delta(SerializationRegistry* serializationRegistry);
+  SerializationRegistry* m_serializationRegistry;
 };
 }  // namespace client
 }  // namespace geode

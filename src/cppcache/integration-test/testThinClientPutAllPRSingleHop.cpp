@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "fw_dunit.hpp"
-#include <geode/GeodeCppCache.hpp>
-#include "BuiltinCacheableWrappers.hpp"
-#include <Utils.hpp>
-#include <geode/statistics/StatisticsFactory.hpp>
+#include <string>
+
+#include <ace/ACE.h>
 #include <ace/OS.h>
 #include <ace/High_Res_Timer.h>
 
-#include <ace/ACE.h>
+#include <geode/GeodeCppCache.hpp>
+#include <geode/statistics/StatisticsFactory.hpp>
 
-#include <string>
+#include "fw_dunit.hpp"
+#include "BuiltinCacheableWrappers.hpp"
+#include "Utils.hpp"
 
 #define ROOT_NAME "testThinClientPutAllPRSingleHop"
 #define ROOT_SCOPE DISTRIBUTED_ACK
@@ -137,8 +138,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, WarmUpTask)
         if (networkhop) {
           failureCount++;
         }
-        StatisticsFactory* factory = StatisticsFactory::getExistingInstance();
-        StatisticsType* type = factory->findType("RegionStatistics");
+        auto factory = cacheHelper->getCache()->getStatisticsFactory();
+        auto type = factory->findType("RegionStatistics");
         if (type) {
           Statistics* rStats = factory->findFirstStatisticsByType(type);
           if (rStats) {

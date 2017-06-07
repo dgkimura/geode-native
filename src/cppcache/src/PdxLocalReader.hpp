@@ -51,9 +51,10 @@ class PdxLocalReader : public PdxReader {
   void checkEmptyFieldName(const char* fieldName);
 
  public:
-  PdxLocalReader();
+  PdxLocalReader(PdxTypeRegistryPtr pdxTypeRegistry);
 
-  PdxLocalReader(DataInput& input, PdxTypePtr remoteType, int32_t pdxLen);
+  PdxLocalReader(DataInput& input, PdxTypePtr remoteType, int32_t pdxLen,
+                 PdxTypeRegistryPtr pdxTypeRegistry);
 
   virtual ~PdxLocalReader();
 
@@ -214,9 +215,9 @@ class PdxLocalReader : public PdxReader {
 
   virtual PdxUnreadFieldsPtr readUnreadFields();
 
- private:
-  PdxTypeRegistryPtr getPdxTypeRegistry() const;
+ protected:
 
+  PdxTypeRegistryPtr m_pdxTypeRegistry;
 };
 typedef std::shared_ptr<PdxLocalReader> PdxLocalReaderPtr;
 }  // namespace client

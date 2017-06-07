@@ -15,15 +15,35 @@
  * limitations under the License.
  */
 
-#include "GeodeStatisticsFactory.hpp"
+#pragma once
+
+#ifndef GEODE_CLIENTPROXYMEMBERSHIPIDFACTORY_H_
+#define GEODE_CLIENTPROXYMEMBERSHIPIDFACTORY_H_
+
+#include <string>
+
+#include "ClientProxyMembershipID.hpp"
 
 namespace apache {
 namespace geode {
-namespace statistics {
+namespace client {
 
-StatisticsFactory* StatisticsFactory::getExistingInstance() {
-  return GeodeStatisticsFactory::getExistingInstance();
-}
+class ClientProxyMembershipIDFactory {
+ public:
+  ClientProxyMembershipIDFactory(std::string dsName);
+
+  std::unique_ptr<ClientProxyMembershipID> create(
+      const char* hostname, uint32_t hostAddr, uint32_t hostPort,
+      const char* durableClientId = nullptr,
+      const uint32_t durableClntTimeOut = 0);
+
+ private:
+  std::string dsName;
+  std::string randString;
+};
+
 }  // namespace client
 }  // namespace geode
 }  // namespace apache
+
+#endif  // GEODE_CLIENTPROXYMEMBERSHIPID_H_

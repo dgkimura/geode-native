@@ -62,6 +62,9 @@ bool TcrConnection::InitTcrConnection(
   m_creationTime = ACE_OS::gettimeofday();
   connectionId = INITIAL_CONNECTION_ID;
   m_lastAccessed = ACE_OS::gettimeofday();
+  const auto& distributedSystem =
+      m_poolDM->getConnectionManager().getCacheImpl()->getDistributedSystem();
+  const auto& sysProp = distributedSystem.getSystemProperties();
 
   LOGDEBUG(
       "Tcrconnection const isSecondary = %d and isClientNotification = %d, "
@@ -77,8 +80,6 @@ bool TcrConnection::InitTcrConnection(
 
   GF_DEV_ASSERT(!isSecondary || isClientNotification);
 
-  DistributedSystemPtr dsys = DistributedSystem::getInstance();
-
   // Create TcpConn object which manages a socket connection with the endpoint.
   if (endpointObj && endpointObj->getPoolHADM()) {
     m_conn = createConnection(
@@ -87,12 +88,15 @@ bool TcrConnection::InitTcrConnection(
             endpointObj->getPoolHADM()->getSocketBufferSize()));
     isPool = true;
   } else {
-    m_conn = createConnection(m_endpoint, connectTimeout, 0);
+    m_conn = createConnection(m_endpoint, connectTimeout,
+                              sysProp.maxSocketBufferSize());
   }
 
   GF_DEV_ASSERT(m_conn != nullptr);
 
-  DataOutput handShakeMsg;
+  DataOutput handShakeMsg(*m_poolDM->getConnectionManager()
+                               .getCacheImpl()
+                               ->getSerializationRegistry());
   bool isNotificationChannel = false;
   // Send byte Acceptor.CLIENT_TO_SERVER = (byte) 100;
   // Send byte Acceptor.SERVER_TO_CLIENT = (byte) 101;
@@ -158,18 +162,17 @@ bool TcrConnection::InitTcrConnection(
     uint16_t hostPort = 0;
 
     // Add 3 durable Subcription properties to ClientProxyMembershipID
-    SystemProperties* sysProp = DistributedSystem::getSystemProperties();
 
-    const char* durableId =
-        (sysProp != nullptr) ? sysProp->durableClientId() : nullptr;
-    const uint32_t durableTimeOut =
-        (sysProp != nullptr) ? sysProp->durableTimeout() : 0;
+    const char* durableId = sysProp.durableClientId();
+    const uint32_t durableTimeOut = sysProp.durableTimeout();
 
     // Write ClientProxyMembershipID serialized object.
     uint32_t memIdBufferLength;
-    ClientProxyMembershipID memId(hostName, hostAddr, hostPort, durableId,
-                                  durableTimeOut);
-    const char* memIdBuffer = memId.getDSMemberId(memIdBufferLength);
+    const auto memId =
+        m_connectionManager->getCacheImpl()
+            ->getClientProxyMembershipIDFactory()
+            .create(hostName, hostAddr, hostPort, durableId, durableTimeOut);
+    const auto memIdBuffer = memId->getDSMemberId(memIdBufferLength);
     handShakeMsg.writeBytes((int8_t*)memIdBuffer, memIdBufferLength);
   }
   handShakeMsg.writeInt((int32_t)1);
@@ -179,21 +182,17 @@ bool TcrConnection::InitTcrConnection(
   PropertiesPtr credentials;
   CacheableBytesPtr serverChallenge;
 
-  SystemProperties* tmpSystemProperties =
-      DistributedSystem::getSystemProperties();
-
   // Write overrides (just conflation for now)
-  handShakeMsg.write(getOverrides(tmpSystemProperties));
+  handShakeMsg.write(getOverrides(&sysProp));
 
-  bool tmpIsSecurityOn = tmpSystemProperties->isSecurityOn();
-  isDhOn = tmpSystemProperties->isDhOn();
+  bool tmpIsSecurityOn = sysProp.isSecurityOn();
+  isDhOn = sysProp.isDhOn();
 
   if (m_endpointObj) {
-    tmpIsSecurityOn = tmpSystemProperties->isSecurityOn() ||
-                      this->m_endpointObj->isMultiUserMode();
+    tmpIsSecurityOn =
+        sysProp.isSecurityOn() || this->m_endpointObj->isMultiUserMode();
     CacheableStringPtr dhalgo =
-        tmpSystemProperties->getSecurityProperties()->find(
-            "security-client-dhalgo");
+        sysProp.getSecurityProperties()->find("security-client-dhalgo");
 
     LOGDEBUG("TcrConnection this->m_endpointObj->isMultiUserMode() = %d ",
              this->m_endpointObj->isMultiUserMode());
@@ -205,7 +204,7 @@ bool TcrConnection::InitTcrConnection(
   LOGDEBUG(
       "TcrConnection algo name %s tmpIsSecurityOn = %d isDhOn = %d "
       "isNotificationChannel = %d ",
-      tmpSystemProperties->securityClientDhAlgo(), tmpIsSecurityOn, isDhOn,
+      sysProp.securityClientDhAlgo(), tmpIsSecurityOn, isDhOn,
       isNotificationChannel);
   bool doIneedToSendCreds = true;
   if (isNotificationChannel && m_endpointObj &&
@@ -220,7 +219,7 @@ bool TcrConnection::InitTcrConnection(
         static_cast<uint8_t>(SECURITY_MULTIUSER_NOTIFICATIONCHANNEL));
   } else if (isDhOn) {
     m_dh = new DiffieHellman();
-    m_dh->initDhKeys(tmpSystemProperties->getSecurityProperties());
+    m_dh->initDhKeys(sysProp.getSecurityProperties());
     handShakeMsg.write(static_cast<uint8_t>(SECURITY_CREDENTIALS_DHENCRYPT));
   } else if (tmpIsSecurityOn) {
     handShakeMsg.write(static_cast<uint8_t>(SECURITY_CREDENTIALS_NORMAL));
@@ -231,33 +230,20 @@ bool TcrConnection::InitTcrConnection(
   if (tmpIsSecurityOn) {
     try {
       LOGFINER("TcrConnection: about to invoke authloader");
-      PropertiesPtr tmpSecurityProperties =
-          tmpSystemProperties->getSecurityProperties();
+      const auto& tmpSecurityProperties = sysProp.getSecurityProperties();
       if (tmpSecurityProperties == nullptr) {
         LOGWARN("TcrConnection: security properties not found.");
       }
-      // AuthInitializePtr authInitialize =
-      // tmpSystemProperties->getAuthLoader();
-      //:only for backward connection
+      // only for backward connection
       if (isClientNotification) {
-        AuthInitializePtr authInitialize =
-            DistributedSystem::m_impl->getAuthLoader();
-        if (authInitialize != nullptr) {
+        if (const auto& authInitialize =
+                distributedSystem.m_impl->getAuthLoader()) {
           LOGFINER(
               "TcrConnection: acquired handle to authLoader, "
               "invoking getCredentials");
-          /* adongre
-           * CID 28898: Copy into fixed size buffer (STRING_OVERFLOW)
-           * You might overrun the 100 byte fixed-size string "tmpEndpoint" by
-           * copying "this->m_endpoint" without checking the length.
-           * Note: This defect has an elevated risk because the source argument
-           * is a parameter of the current function.
-           */
-          // char tmpEndpoint[100] = { '\0' } ;
-          // strcpy(tmpEndpoint, m_endpoint);
-          PropertiesPtr tmpAuthIniSecurityProperties =
-              authInitialize->getCredentials(tmpSecurityProperties,
-                                             /*tmpEndpoint*/ m_endpoint);
+
+          const auto& tmpAuthIniSecurityProperties =
+              authInitialize->getCredentials(tmpSecurityProperties, m_endpoint);
           LOGFINER("TcrConnection: after getCredentials ");
           credentials = tmpAuthIniSecurityProperties;
         }
@@ -274,7 +260,7 @@ bool TcrConnection::InitTcrConnection(
 
         // Send the symmetric key algorithm name string
         handShakeMsg.write(static_cast<int8_t>(GeodeTypeIds::CacheableString));
-        handShakeMsg.writeASCII(tmpSystemProperties->securityClientDhAlgo());
+        handShakeMsg.writeASCII(sysProp.securityClientDhAlgo());
 
         // Send the client's DH public key to the server
         // CacheableBytesPtr dhPubKey = DiffieHellman::getPublicKey();
@@ -325,8 +311,7 @@ bool TcrConnection::InitTcrConnection(
 
     LOGDEBUG(" Handshake: Got Accept Code %d", (*acceptanceCode)[0]);
     /* adongre */
-    if ((*acceptanceCode)[0] == REPLY_SSL_ENABLED &&
-        !tmpSystemProperties->sslEnabled()) {
+    if ((*acceptanceCode)[0] == REPLY_SSL_ENABLED && !sysProp.sslEnabled()) {
       LOGERROR("SSL is enabled on server, enable SSL in client as well");
       AuthenticationRequiredException ex(
           "SSL is enabled on server, enable SSL in client as well");
@@ -370,7 +355,9 @@ bool TcrConnection::InitTcrConnection(
       LOGDEBUG("Handshake: Got challengeSize %d", challengeBytes->length());
 
       // encrypt the credentials and challenge bytes
-      DataOutput cleartext;
+      DataOutput cleartext(*m_poolDM->getConnectionManager()
+                                .getCacheImpl()
+                                ->getSerializationRegistry());
       if (isClientNotification) {  //:only for backward connection
         credentials->toData(cleartext);
       }
@@ -378,7 +365,9 @@ bool TcrConnection::InitTcrConnection(
       CacheableBytesPtr ciphertext =
           m_dh->encrypt(cleartext.getBuffer(), cleartext.getBufferLength());
 
-      DataOutput sendCreds;
+      DataOutput sendCreds(*m_poolDM->getConnectionManager()
+                                .getCacheImpl()
+                                ->getSerializationRegistry());
       ciphertext->toData(sendCreds);
       uint32_t credLen;
       char* credData = (char*)sendCreds.getBuffer(&credLen);
@@ -418,7 +407,9 @@ bool TcrConnection::InitTcrConnection(
       m_hasServerQueue = NON_REDUNDANT_SERVER;
     }
     CacheableBytesPtr queueSizeMsg = readHandshakeData(4, connectTimeout);
-    DataInput dI(queueSizeMsg->value(), queueSizeMsg->length());
+    DataInput dI(
+        queueSizeMsg->value(), queueSizeMsg->length(),
+        *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
     int32_t queueSize = 0;
     dI.readInt(&queueSize);
     m_queueSize = queueSize > 0 ? queueSize : 0;
@@ -449,33 +440,42 @@ bool TcrConnection::InitTcrConnection(
       if (static_cast<int8_t>((*arrayLenHeader)[0]) == -2) {
         CacheableBytesPtr recvMsgLenBytes =
             readHandshakeData(2, connectTimeout);
-        DataInput dI2(recvMsgLenBytes->value(), recvMsgLenBytes->length());
+        DataInput dI2(
+            recvMsgLenBytes->value(), recvMsgLenBytes->length(),
+            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
         int16_t recvMsgLenShort = 0;
         dI2.readInt(&recvMsgLenShort);
         recvMsgLen = recvMsgLenShort;
       } else if (static_cast<int8_t>((*arrayLenHeader)[0]) == -3) {
         CacheableBytesPtr recvMsgLenBytes =
             readHandshakeData(4, connectTimeout);
-        DataInput dI2(recvMsgLenBytes->value(), recvMsgLenBytes->length());
+        DataInput dI2(
+            recvMsgLenBytes->value(), recvMsgLenBytes->length(),
+            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
         dI2.readInt(&recvMsgLen);
       }
-      CacheableBytesPtr recvMessage =
-          readHandshakeData(recvMsgLen, connectTimeout);
+      auto recvMessage = readHandshakeData(recvMsgLen, connectTimeout);
       // If the distributed member has not been set yet, set it.
       if (getEndpointObject()->getDistributedMemberID() == 0) {
         LOGDEBUG("Deserializing distributed member Id");
-        DataInput diForClient(recvMessage->value(), recvMessage->length());
+        DataInput diForClient(
+            recvMessage->value(), recvMessage->length(),
+            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
         ClientProxyMembershipIDPtr member;
         diForClient.readObject(member);
-        uint16_t memId = CacheImpl::getMemberListForVersionStamp()->add(
-            (DSMemberForVersionStampPtr)member);
+        auto memId = m_poolDM->getConnectionManager()
+                         .getCacheImpl()
+                         ->getMemberListForVersionStamp()
+                         ->add(member);
         getEndpointObject()->setDistributedMemberID(memId);
         LOGDEBUG("Deserialized distributed member Id %d", memId);
       }
     }
 
     CacheableBytesPtr recvMsgLenBytes = readHandshakeData(2, connectTimeout);
-    DataInput dI3(recvMsgLenBytes->value(), recvMsgLenBytes->length());
+    DataInput dI3(
+        recvMsgLenBytes->value(), recvMsgLenBytes->length(),
+        *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
     uint16_t recvMsgLen2 = 0;
     dI3.readInt(&recvMsgLen2);
     CacheableBytesPtr recvMessage =
@@ -483,7 +483,9 @@ bool TcrConnection::InitTcrConnection(
 
     if (!isClientNotification) {
       CacheableBytesPtr deltaEnabledMsg = readHandshakeData(1, connectTimeout);
-      DataInput di(deltaEnabledMsg->value(), 1);
+      DataInput di(
+          deltaEnabledMsg->value(), 1,
+          *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
       bool isDeltaEnabledOnServer;
       di.readBoolean(&isDeltaEnabledOnServer);
       ThinClientBaseDM::setDeltaEnabledOnServer(isDeltaEnabledOnServer);
@@ -579,8 +581,14 @@ Connector* TcrConnection::createConnection(const char* endpoint,
                                            uint32_t connectTimeout,
                                            int32_t maxBuffSizePool) {
   Connector* socket = nullptr;
-  if (DistributedSystem::getSystemProperties()->sslEnabled()) {
-    socket = new TcpSslConn(endpoint, connectTimeout, maxBuffSizePool);
+  auto& systemProperties = m_connectionManager->getCacheImpl()
+                               ->getDistributedSystem()
+                               .getSystemProperties();
+  if (systemProperties.sslEnabled()) {
+    socket = new TcpSslConn(endpoint, connectTimeout, maxBuffSizePool,
+                            systemProperties.sslKeystorePassword(),
+                            systemProperties.sslTrustStore(),
+                            systemProperties.sslKeyStore());
   } else {
     socket = new TcpConn(endpoint, connectTimeout, maxBuffSizePool);
   }
@@ -611,7 +619,11 @@ inline ConnErrType TcrConnection::receiveData(char* buffer, int32_t length,
 
   // if gfcpp property unit set then sendTimeoutSec will be in millisecond
   // otherwise it will be in second
-  if (DistributedSystem::getSystemProperties()->readTimeoutUnitInMillis()) {
+  if (m_poolDM->getConnectionManager()
+          .getCacheImpl()
+          ->getDistributedSystem()
+          .getSystemProperties()
+          .readTimeoutUnitInMillis()) {
     LOGFINER("recieveData %d %d ", receiveTimeoutSec, notPublicApiWithTimeout);
     if (notPublicApiWithTimeout == TcrMessage::QUERY ||
         notPublicApiWithTimeout == TcrMessage::QUERY_WITH_PARAMETERS ||
@@ -694,7 +706,11 @@ inline ConnErrType TcrConnection::sendData(uint32_t& timeSpent,
   bool isPublicApiTimeout = false;
   // if gfcpp property unit set then sendTimeoutSec will be in millisecond
   // otherwise it will be in second
-  if (DistributedSystem::getSystemProperties()->readTimeoutUnitInMillis()) {
+  if (m_poolDM->getConnectionManager()
+          .getCacheImpl()
+          ->getDistributedSystem()
+          .getSystemProperties()
+          .readTimeoutUnitInMillis()) {
     LOGFINER("sendData %d  %d", sendTimeoutSec, notPublicApiWithTimeout);
     if (notPublicApiWithTimeout == TcrMessage::QUERY ||
         notPublicApiWithTimeout == TcrMessage::QUERY_WITH_PARAMETERS ||
@@ -950,7 +966,9 @@ char* TcrConnection::readMessage(size_t* recvLen, uint32_t receiveTimeoutSec,
       m_endpoint,
       Utils::convertBytesToString(msg_header, HEADER_LENGTH)->asChar());
 
-  DataInput input(reinterpret_cast<uint8_t*>(msg_header), HEADER_LENGTH);
+  DataInput input(
+      reinterpret_cast<uint8_t*>(msg_header), HEADER_LENGTH,
+      *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
   input.readInt(&msgType);
   input.readInt(&msgLen);
   //  check that message length is valid.
@@ -1059,7 +1077,9 @@ void TcrConnection::readMessageChunked(TcrMessageReply& reply,
       m_endpoint,
       Utils::convertBytesToString(msg_header, HDR_LEN_12)->asChar());
 
-  DataInput input(msg_header, HDR_LEN_12);
+  DataInput input(
+      msg_header, HDR_LEN_12,
+      *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
   int32_t msgType;
   input.readInt(&msgType);
   reply.setMessageType(msgType);
@@ -1125,7 +1145,9 @@ void TcrConnection::readMessageChunked(TcrMessageReply& reply,
         Utils::convertBytesToString((msg_header + HDR_LEN_12), HDR_LEN)
             ->asChar());
 
-    DataInput inp((msg_header + HDR_LEN_12), HDR_LEN);
+    DataInput inp(
+        (msg_header + HDR_LEN_12), HDR_LEN,
+        *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
     int32_t chunkLen;
     inp.readInt(&chunkLen);
     //  check that chunk length is valid.
@@ -1172,17 +1194,19 @@ void TcrConnection::readMessageChunked(TcrMessageReply& reply,
 void TcrConnection::close() {
   // If this is a short lived grid client, don't bother with this close ack
   // message
-  if (DistributedSystem::getSystemProperties()->isGridClient()) {
+  if (m_poolDM->getConnectionManager()
+          .getCacheImpl()
+          ->getDistributedSystem()
+          .getSystemProperties()
+          .isGridClient()) {
     return;
   }
 
-  TcrMessage* closeMsg = TcrMessage::getCloseConnMessage();
+  TcrMessage* closeMsg = TcrMessage::getCloseConnMessage(
+      m_poolDM->getConnectionManager().getCacheImpl()->getCache());
   try {
-    // LOGINFO("TcrConnection::close DC  = %d; netdown = %d endpoint %s",
-    // TcrConnectionManager::TEST_DURABLE_CLIENT_CRASH,
-    // TcrConnectionManager::isNetDown, m_endpoint);
     if (!TcrConnectionManager::TEST_DURABLE_CLIENT_CRASH &&
-        !TcrConnectionManager::isNetDown) {
+        !m_connectionManager->isNetDown()) {
       send(closeMsg->getMsgData(), closeMsg->getMsgLength(), 2, false);
     }
   } catch (Exception& e) {
@@ -1285,7 +1309,9 @@ CacheableBytesPtr TcrConnection::readHandshakeByteArray(
 // read a byte array
 uint32_t TcrConnection::readHandshakeArraySize(uint32_t connectTimeout) {
   CacheableBytesPtr codeBytes = readHandshakeData(1, connectTimeout);
-  DataInput codeDI(codeBytes->value(), codeBytes->length());
+  DataInput codeDI(
+      codeBytes->value(), codeBytes->length(),
+      *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
   uint8_t code = 0;
   codeDI.read(&code);
   uint32_t arraySize = 0;
@@ -1296,13 +1322,17 @@ uint32_t TcrConnection::readHandshakeArraySize(uint32_t connectTimeout) {
     if (tempLen > 252) {  // 252 is java's ((byte)-4 && 0xFF)
       if (code == 0xFE) {
         CacheableBytesPtr lenBytes = readHandshakeData(2, connectTimeout);
-        DataInput lenDI(lenBytes->value(), lenBytes->length());
+        DataInput lenDI(
+            lenBytes->value(), lenBytes->length(),
+            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
         uint16_t val;
         lenDI.readInt(&val);
         tempLen = val;
       } else if (code == 0xFD) {
         CacheableBytesPtr lenBytes = readHandshakeData(4, connectTimeout);
-        DataInput lenDI(lenBytes->value(), lenBytes->length());
+        DataInput lenDI(
+            lenBytes->value(), lenBytes->length(),
+            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
         uint32_t val;
         lenDI.readInt(&val);
         tempLen = val;
@@ -1393,7 +1423,9 @@ int32_t TcrConnection::readHandShakeInt(uint32_t connectTimeout) {
     }
   }
 
-  DataInput di(recvMessage, 4);
+  DataInput di(
+      recvMessage, 4,
+      *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
   int32_t val;
   di.readInt(&val);
 
@@ -1431,7 +1463,9 @@ CacheableStringPtr TcrConnection::readHandshakeString(uint32_t connectTimeout) {
     case GF_STRING: {
       uint16_t shortLen = 0;
       CacheableBytesPtr lenBytes = readHandshakeData(2, connectTimeout);
-      DataInput lenDI(lenBytes->value(), lenBytes->length());
+      DataInput lenDI(
+          lenBytes->value(), lenBytes->length(),
+          *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
       lenDI.readInt(&shortLen);
       length = shortLen;
       break;
@@ -1512,7 +1546,7 @@ void TcrConnection::touch() { m_lastAccessed = ACE_OS::gettimeofday(); }
 
 ACE_Time_Value TcrConnection::getLastAccessed() { return m_lastAccessed; }
 
-uint8_t TcrConnection::getOverrides(SystemProperties* props) {
+uint8_t TcrConnection::getOverrides(const SystemProperties* props) {
   const char* conflate = props->conflateEvents();
   uint8_t conflateByte = 0;
   if (conflate != nullptr) {
@@ -1522,27 +1556,7 @@ uint8_t TcrConnection::getOverrides(SystemProperties* props) {
       conflateByte = 2;
     }
   }
-  /*
-  const char * removeUnresponsive = props->removeUnresponsiveClientOverride();
-  uint8_t removeByte = 0;
-  if (removeUnresponsive != nullptr ) {
-  if ( ACE_OS::strcasecmp(removeUnresponsive, "true") == 0 ) {
-  removeByte = 1;
-  } else if ( ACE_OS::strcasecmp(removeUnresponsive, "false") == 0 ) {
-  removeByte = 2;
-  }
-  }
-  const char * notify = props->notifyBySubscriptionOverride();
-  uint8_t notifyByte = 0;
-  if (notify != nullptr ) {
-  if ( ACE_OS::strcasecmp(notify, "true") == 0 ) {
-  notifyByte = 1;
-  } else if ( ACE_OS::strcasecmp(notify, "false") == 0 ) {
-  notifyByte = 2;
-  }
-  }
-  return (((notifyByte << 2) | removeByte) << 2) | conflateByte;
-  */
+
   return conflateByte;
 }
 

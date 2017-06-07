@@ -32,9 +32,9 @@
 #include <ace/Activation_Queue.h>
 #include <ace/Condition_T.h>
 #include <ace/Singleton.h>
-#include <ace/Recursive_Thread_Mutex.h>
 #include <ace/Guard_T.h>
-
+#include <mutex>
+#include <condition_variable>
 namespace apache {
 namespace geode {
 namespace client {
@@ -42,43 +42,35 @@ namespace client {
 template <class T>
 class PooledWork : public ACE_Method_Request {
  private:
-  // ACE_Future<T> result_;
   T m_retVal;
-  ACE_Recursive_Thread_Mutex m_mutex;
-  ACE_Condition<ACE_Recursive_Thread_Mutex> m_cond;
+  std::recursive_mutex m_mutex;
+  std::condition_variable_any m_cond;
   bool m_done;
 
  public:
-  PooledWork() : m_mutex(), m_cond(m_mutex), m_done(false) {}
+  PooledWork() : m_mutex(), m_cond(), m_done(false) {}
 
   virtual ~PooledWork() {}
 
   virtual int call(void) {
     T res = execute();
 
-    ACE_Guard<ACE_Recursive_Thread_Mutex> sync(m_mutex);
+    std::lock_guard<decltype(m_mutex)> lock(m_mutex);
 
     m_retVal = res;
     m_done = true;
-    m_cond.broadcast();
-    // result_.set(res);
+    m_cond.notify_all();
+
     return 0;
   }
 
-  /*
-  void attach(ACE_Future_Observer<T> *cb) {
-    result_.attach(cb);
-  }
-  */
-
   T getResult(void) {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> sync(m_mutex);
+    std::unique_lock<decltype(m_mutex)> lock(m_mutex);
 
     while (!m_done) {
-      m_cond.wait();
+      m_cond.wait(lock, [this] { return m_done; });
     }
-    // T res;
-    // result_.get(res);
+
     return m_retVal;
   }
 

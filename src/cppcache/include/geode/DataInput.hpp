@@ -46,6 +46,7 @@ namespace client {
 
 extern int gf_sprintf(char* buffer, const char* fmt, ...);
 
+class SerializationRegistry;
 /**
  * Provide operations for reading primitive data values, byte arrays,
  * strings, <code>Serializable</code> objects from a byte stream.
@@ -892,11 +893,13 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   /** constructor given a pre-allocated byte array with size */
-  DataInput(const uint8_t* m_buffer, int32_t len)
+  DataInput(const uint8_t* m_buffer, int32_t len,
+            const SerializationRegistry& serializationRegistry)
       : m_buf(m_buffer),
         m_bufHead(m_buffer),
         m_bufLength(len),
-        m_poolName(nullptr) {}
+        m_poolName(nullptr),
+        m_serializationRegistry(serializationRegistry) {}
 
   /** destructor */
   ~DataInput() {}
@@ -969,6 +972,7 @@ class CPPCACHE_EXPORT DataInput {
   const uint8_t* m_bufHead;
   int32_t m_bufLength;
   const char* m_poolName;
+  const SerializationRegistry& m_serializationRegistry;
 
   void readObjectInternal(SerializablePtr& ptr, int8_t typeId = -1);
 
@@ -1072,9 +1076,9 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   // disable other constructors and assignment
-  DataInput();
-  DataInput(const DataInput&);
-  DataInput& operator=(const DataInput&);
+  DataInput() = delete;
+  DataInput(const DataInput&) = delete;
+  DataInput& operator=(const DataInput&) = delete;
 };
 }  // namespace client
 }  // namespace geode

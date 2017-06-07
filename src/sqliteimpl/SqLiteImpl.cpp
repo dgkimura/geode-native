@@ -16,6 +16,8 @@
  */
 
 #include "SqLiteImpl.hpp"
+#include "CacheRegionHelper.hpp"
+#include "CacheImpl.hpp"
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -31,6 +33,7 @@ void SqLiteImpl::init(const RegionPtr& region, PropertiesPtr& diskProperties) {
 
   int maxPageCount = 0;
   int pageSize = 0;
+  m_regionPtr = region;
   m_persistanceDir = g_default_persistence_directory;
   std::string regionName = region->getName();
   if (diskProperties != nullptr) {
@@ -108,7 +111,11 @@ void SqLiteImpl::init(const RegionPtr& region, PropertiesPtr& diskProperties) {
 void SqLiteImpl::write(const CacheableKeyPtr& key, const CacheablePtr& value,
                        void*& dbHandle) {
   // Serialize key and value.
-  DataOutput keyDataBuffer, valueDataBuffer;
+  auto& serializationRegistry =
+      *CacheRegionHelper::getCacheImpl(m_regionPtr->getCache().get())
+           ->getSerializationRegistry();
+  DataOutput keyDataBuffer(serializationRegistry),
+      valueDataBuffer(serializationRegistry);
   uint32_t keyBufferSize, valueBufferSize;
 
   keyDataBuffer.writeObject(key);
@@ -127,7 +134,9 @@ bool SqLiteImpl::writeAll() { return true; }
 
 CacheablePtr SqLiteImpl::read(const CacheableKeyPtr& key, void*& dbHandle) {
   // Serialize key.
-  DataOutput keyDataBuffer;
+  DataOutput keyDataBuffer(
+      *CacheRegionHelper::getCacheImpl(m_regionPtr->getCache().get())
+           ->getSerializationRegistry());
   uint32_t keyBufferSize;
   keyDataBuffer.writeObject(key);
   void* keyData = const_cast<uint8_t*>(keyDataBuffer.getBuffer(&keyBufferSize));
@@ -140,8 +149,10 @@ CacheablePtr SqLiteImpl::read(const CacheableKeyPtr& key, void*& dbHandle) {
   }
 
   // Deserialize object and return value.
-  DataInput valueDataBuffer(reinterpret_cast<uint8_t*>(valueData),
-                            valueBufferSize);
+  DataInput valueDataBuffer(
+      reinterpret_cast<uint8_t*>(valueData), valueBufferSize,
+      *(CacheRegionHelper::getCacheImpl(m_regionPtr->getCache().get())
+            ->getSerializationRegistry()));
   CacheablePtr retValue;
   valueDataBuffer.readObject(retValue);
 
@@ -170,7 +181,9 @@ void SqLiteImpl::destroyRegion() {
 
 void SqLiteImpl::destroy(const CacheableKeyPtr& key, void*& dbHandle) {
   // Serialize key and value.
-  DataOutput keyDataBuffer;
+  DataOutput keyDataBuffer(
+      *CacheRegionHelper::getCacheImpl(m_regionPtr->getCache().get())
+           ->getSerializationRegistry());
   uint32_t keyBufferSize;
   keyDataBuffer.writeObject(key);
   void* keyData = const_cast<uint8_t*>(keyDataBuffer.getBuffer(&keyBufferSize));

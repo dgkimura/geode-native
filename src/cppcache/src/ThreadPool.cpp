@@ -25,6 +25,7 @@
 #include <geode/DistributedSystem.hpp>
 #include <geode/SystemProperties.hpp>
 #include "DistributedSystemImpl.hpp"
+#include "CacheImpl.hpp"
 using namespace apache::geode::client;
 
 ThreadPoolWorker::ThreadPoolWorker(IThreadPool* manager)
@@ -69,8 +70,9 @@ ACE_thread_t ThreadPoolWorker::threadId(void) { return threadId_; }
 
 ThreadPool::ThreadPool()
     : shutdown_(0), workersLock_(), workersCond_(workersLock_) {
-  SystemProperties* sysProp = DistributedSystem::getSystemProperties();
-  poolSize_ = sysProp->threadPoolSize();
+  const auto& sysProp =
+      CacheImpl::getInstance()->getDistributedSystem().getSystemProperties();
+  poolSize_ = sysProp.threadPoolSize();
   activate();
 }
 

@@ -16,6 +16,9 @@
  */
 
 #pragma once
+#include "begin_native.hpp"
+#include "CachePerfStats.hpp"
+#include "end_native.hpp"
 
 #include "../IPdxInstanceFactory.hpp"
 #include "../IPdxSerializable.hpp"
@@ -37,11 +40,14 @@ namespace Apache
           bool                          m_created;
           PdxType^                      m_pdxType;
           Dictionary<String^, Object^>^ m_FieldVsValues;
+          CachePerfStats*                m_cachePerfStats;
         internal:
-          PdxInstanceFactoryImpl(String^ className);
+          PdxInstanceFactoryImpl(String^ className, CachePerfStats* cachePerfStats);
           void isFieldAdded(String^ fieldName);
+         
+
          public:
-                  /// <summary>
+         /// <summary>
          /// Create a {@link PdxInstance}. The instance
          /// will contain any data written to this factory
          /// using the write methods.

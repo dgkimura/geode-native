@@ -59,10 +59,6 @@ class TestUtils {
     return cacheImpl.getPdxTypeRegistry()->testNumberOfPreservedData();
   }
 
-  static DistributedSystemImpl* getDistributedSystemImpl() {
-    return CacheRegionHelper::getDistributedSystemImpl();
-  }
-
   static bool waitForKey(CacheableKeyPtr& keyPtr, RegionPtr& rptr, int maxTry,
                          uint32_t msleepTime) {
     int tries = 0;

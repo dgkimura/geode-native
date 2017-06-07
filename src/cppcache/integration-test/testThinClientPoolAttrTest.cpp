@@ -92,7 +92,7 @@ void doAttrTestingAndCreatePool(const char* poolName) {
   // poolFacPtr->setMultiuserSecurityMode(true);
   poolFacPtr->setPRSingleHopEnabled(false);
 
-  PoolPtr pptr = poolFacPtr->create(poolName);
+  PoolPtr pptr = poolFacPtr->create(poolName, *cachePtr.get());
 
   // Validate the attributes
   ASSERT(pptr->getFreeConnectionTimeout() == 10000,
@@ -198,7 +198,7 @@ DUNIT_TASK(CLIENT1, StartC1)
     // Do PoolCreation testing , create another pool with same name
     PoolFactoryPtr poolFacPtr = PoolManager::createFactory();
     try {
-      PoolPtr pptr = poolFacPtr->create(poolName);
+      PoolPtr pptr = poolFacPtr->create(poolName, *cachePtr.get());
       FAIL("Pool creation with same name should fail");
     } catch (IllegalStateException&) {
       LOG("OK:Pool creation with same name should fail");

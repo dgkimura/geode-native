@@ -26,7 +26,9 @@
 
 #include "CacheHelper.hpp"
 
-//#include "QueryHelper.hpp"
+#include "SerializationRegistry.hpp"
+#include "CacheRegionHelper.hpp"
+#include "CacheImpl.hpp"
 
 #include <geode/Query.hpp>
 #include <geode/QueryService.hpp>
@@ -78,23 +80,25 @@ class KillServerThread : public ACE_Task_Base {
 };
 
 void initClient() {
-  try {
-    Serializable::registerType(Portfolio::createDeserializable);
-    Serializable::registerType(Position::createDeserializable);
-  } catch (const IllegalStateException&) {
-    // ignore reregistration exception
-  }
   if (cacheHelper == nullptr) {
     cacheHelper = new CacheHelper(true);
   }
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
+  try {
+    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+
+    serializationRegistry->addType(Portfolio::createDeserializable);
+    serializationRegistry->addType(Position::createDeserializable);
+  } catch (const IllegalStateException&) {
+    // ignore reregistration exception
+  }
 }
 
 /*
 void initClient( const bool isthinClient )
 {
-  Serializable::registerType( Portfolio::createDeserializable);
-  Serializable::registerType( Position::createDeserializable);
+  serializationRegistry->addType( Portfolio::createDeserializable);
+  serializationRegistry->addType( Position::createDeserializable);
 
   if ( cacheHelper == nullptr ) {
     cacheHelper = new CacheHelper(isthinClient);

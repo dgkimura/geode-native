@@ -151,13 +151,6 @@ void initCredentialGenerator() {
 
 PropertiesPtr userCreds;
 void initClientCq(const bool isthinClient) {
-  try {
-    Serializable::registerType(Position::createDeserializable);
-    Serializable::registerType(Portfolio::createDeserializable);
-  } catch (const IllegalStateException&) {
-    // ignore exception
-  }
-
   userCreds = Properties::create();
   PropertiesPtr config = Properties::create();
   // credentialGeneratorHandler->getAuthInit(config);
@@ -167,6 +160,13 @@ void initClientCq(const bool isthinClient) {
     cacheHelper = new CacheHelper(isthinClient, config);
   }
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
+  try {
+    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    serializationRegistry->addType(Position::createDeserializable);
+    serializationRegistry->addType(Portfolio::createDeserializable);
+  } catch (const IllegalStateException&) {
+    // ignore exception
+  }
 }
 
 DUNIT_TASK_DEFINITION(CLIENT1, CreateServer1)
@@ -247,8 +247,6 @@ END_TASK_DEFINITION
 PoolPtr getPool(const char* name) { return PoolManager::find(name); }
 
 RegionServicePtr getVirtualCache(PropertiesPtr creds, const char* name) {
-  // PoolPtr pool = getPool(name);
-  // return pool->createSecureUserCache(creds);
   return getHelper()->getCache()->createAuthenticatedView(creds, name);
 }
 
@@ -267,11 +265,6 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepTwo)
     userCache = getVirtualCache(creds, regionNamesCq[0]);
     RegionPtr regPtr0 = userCache->getRegion(regionNamesCq[0]);
     RegionPtr subregPtr0 = regPtr0->getSubregion(regionNamesCq[1]);
-
-    // QueryHelper * qh = &QueryHelper::getHelper();
-
-    // qh->populatePortfolioData(regPtr0  , 2, 1, 1);
-    // qh->populatePositionData(subregPtr0, 2, 1);
 
     LOG("StepTwo complete.");
   }

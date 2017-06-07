@@ -37,7 +37,7 @@
 namespace apache {
 namespace geode {
 namespace client {
-
+class SerializationRegistry;
 /**
  * C style memory allocation that throws OutOfMemoryException
  * if it fails
@@ -76,7 +76,7 @@ class CPPCACHE_EXPORT DataOutput {
   /**
    * Construct a new DataOutput.
    */
-  DataOutput();
+  DataOutput(const SerializationRegistry& serializationRegistry);
 
   /**
    * Write an unsigned byte to the <code>DataOutput</code>.
@@ -724,11 +724,6 @@ class CPPCACHE_EXPORT DataOutput {
 
   static void safeDelete(uint8_t* src) { GF_SAFE_DELETE(src); }
 
-  static DataOutput* getDataOutput() { return new DataOutput(); }
-  static void releaseDataOutput(DataOutput* dataOutput) {
-    GF_SAFE_DELETE(dataOutput);
-  }
-
  private:
   void writeObjectInternal(const Serializable* ptr, bool isDelta = false);
 
@@ -747,6 +742,7 @@ class CPPCACHE_EXPORT DataOutput {
   static uint32_t m_highWaterMark;
   // flag to indicate we have a big buffer
   volatile bool m_haveBigBuffer;
+  const SerializationRegistry& m_serializationRegistry;
 
   inline static void getEncodedLength(const char val, int32_t& encodedLen) {
     if ((val == 0) || (val & 0x80)) {

@@ -110,17 +110,20 @@ class KillServerThread : public ACE_Task_Base {
 };
 
 void initClientCq(int redundancyLevel) {
-  try {
-    Serializable::registerType(Position::createDeserializable);
-    Serializable::registerType(Portfolio::createDeserializable);
-  } catch (const IllegalStateException&) {
-    // ignore exception
-  }
-
   if (cacheHelper == nullptr) {
     cacheHelper = new CacheHelper(true);
   }
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
+
+  try {
+    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+
+    serializationRegistry->addType(Position::createDeserializable);
+    serializationRegistry->addType(Portfolio::createDeserializable);
+  }
+  catch (const IllegalStateException&) {
+    // ignore exception
+  }
 }
 
 KillServerThread* kst = nullptr;

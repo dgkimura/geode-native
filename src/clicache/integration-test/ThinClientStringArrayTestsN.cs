@@ -72,8 +72,8 @@ namespace Apache.Geode.Client.UnitTests
       CacheHelper.Init();
       try
       {
-        Serializable.RegisterTypeGeneric(Portfolio.CreateDeserializable);
-        Serializable.RegisterTypeGeneric(Position.CreateDeserializable);
+        Serializable.RegisterTypeGeneric(Portfolio.CreateDeserializable, CacheHelper.DCache);
+        Serializable.RegisterTypeGeneric(Position.CreateDeserializable, CacheHelper.DCache);
       }
       catch (IllegalStateException)
       {
@@ -104,7 +104,7 @@ namespace Apache.Geode.Client.UnitTests
       IRegion<object, object> region2 = CacheHelper.GetRegion<object, object>(QueryRegionNames[2]);
       IRegion<object, object> region3 = CacheHelper.GetRegion<object, object>(QueryRegionNames[3]);
 
-      QueryHelper<object, object> qh = QueryHelper<object, object>.GetHelper();
+      QueryHelper<object, object> qh = QueryHelper<object, object>.GetHelper(CacheHelper.DCache);
       Util.Log("SetSize {0}, NumSets {1}.", qh.PortfolioSetSize,
         qh.PortfolioNumSets);
 
@@ -127,7 +127,7 @@ namespace Apache.Geode.Client.UnitTests
       IRegion<object, object> region0 = CacheHelper.GetRegion<object, object>(QueryRegionNames[0]);
       IRegion<object, object> subRegion0 = region0.GetSubRegion(QueryRegionNames[1]);
 
-      QueryHelper<object, object> qh = QueryHelper<object, object>.GetHelper();
+      QueryHelper<object, object> qh = QueryHelper<object, object>.GetHelper(CacheHelper.DCache);
       string[] /*sta*/ cnm = { "C#aaa", "C#bbb", "C#ccc", "C#ddd" };
       //CacheableStringArray cnm = CacheableStringArray.Create(sta);
       qh.PopulatePortfolioData(region0, 4, 2, 2, cnm);

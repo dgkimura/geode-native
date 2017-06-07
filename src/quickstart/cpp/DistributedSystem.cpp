@@ -53,7 +53,7 @@ void distributedsystem(CachePtr cachePtr, char *hostname, int port,
   poolFacPtr->setSubscriptionEnabled(true);
 
   // creating pool with name "examplePool"
-  poolFacPtr->create(poolName);
+  poolFacPtr->create(poolName, *cachePtr.get());
 
   RegionFactoryPtr regionFactory = cachePtr->createRegionFactory(CACHING_PROXY);
 

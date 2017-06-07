@@ -22,26 +22,22 @@
  */
 
 #include "PdxTypeRegistry.hpp"
-#include "SerializationRegistry.hpp"
 
 namespace apache {
 namespace geode {
 namespace client {
 
+PdxTypeRegistry::PdxTypeRegistry(
+    const SerializationRegistryPtr& serializationRegistry)
+    : serializationRegistry(serializationRegistry),
+      typeIdToPdxType(),
+      remoteTypeIdToMergedPdxType(),
+      localTypeToPdxType(),
+      pdxTypeToTypeIdMap(),
+      enumToInt(CacheableHashMap::create()),
+      intToEnum(CacheableHashMap::create()) {}
 
-PdxTypeRegistry::PdxTypeRegistry()
-  : typeIdToPdxType(),
-	remoteTypeIdToMergedPdxType(),
-	localTypeToPdxType(), 
-	pdxTypeToTypeIdMap(),
-	enumToInt(CacheableHashMap::create()),
-	intToEnum(CacheableHashMap::create())
-{
-}
-
-PdxTypeRegistry::~PdxTypeRegistry()
-{
-}
+PdxTypeRegistry::~PdxTypeRegistry() {}
 
 size_t PdxTypeRegistry::testNumberOfPreservedData() const {
   return preserveData.size();
@@ -60,14 +56,15 @@ int32_t PdxTypeRegistry::getPDXIdForType(const char* type, const char* poolname,
     }
   }
 
-  int typeId = SerializationRegistry::GetPDXIdForType(poolname, nType);
+  int typeId = serializationRegistry->GetPDXIdForType(poolname, nType);
   nType->setTypeId(typeId);
 
   PdxTypeRegistry::addPdxType(typeId, nType);
   return typeId;
 }
 
-int32_t PdxTypeRegistry::getPDXIdForType(PdxTypePtr nType, const char* poolname) {
+int32_t PdxTypeRegistry::getPDXIdForType(PdxTypePtr nType,
+                                         const char* poolname) {
   int32_t typeId = 0;
   {
     ReadGuard read(g_readerWriterLock);
@@ -79,7 +76,7 @@ int32_t PdxTypeRegistry::getPDXIdForType(PdxTypePtr nType, const char* poolname)
       }
     }
   }
-  
+
   WriteGuard write(g_readerWriterLock);
 
   PdxTypeToTypeIdMap::iterator iter = pdxTypeToTypeIdMap.find(nType);
@@ -90,7 +87,7 @@ int32_t PdxTypeRegistry::getPDXIdForType(PdxTypePtr nType, const char* poolname)
     }
   }
 
-  typeId = SerializationRegistry::GetPDXIdForType(poolname, nType);
+  typeId = serializationRegistry->GetPDXIdForType(poolname, nType);
   nType->setTypeId(typeId);
   pdxTypeToTypeIdMap.insert(std::make_pair(nType, typeId));
   addPdxType(typeId, nType);
@@ -174,23 +171,22 @@ PdxTypePtr PdxTypeRegistry::getMergedType(int32_t remoteTypeId) {
 }
 
 void PdxTypeRegistry::setPreserveData(PdxSerializablePtr obj,
-                                      PdxRemotePreservedDataPtr pData) {
+                                      PdxRemotePreservedDataPtr pData,
+                                      ExpiryTaskManager& expiryTaskManager) {
   WriteGuard guard(getPreservedDataLock());
   pData->setOwner(obj);
   if (preserveData.find(obj) != preserveData.end()) {
     // reset expiry task
     // TODO: check value for nullptr
     auto expTaskId = preserveData[obj]->getPreservedDataExpiryTaskId();
-    CacheImpl::expiryTaskManager->resetTask(expTaskId, 5);
+    expiryTaskManager.resetTask(expTaskId, 5);
     LOGDEBUG("PdxTypeRegistry::setPreserveData Reset expiry task Done");
     pData->setPreservedDataExpiryTaskId(expTaskId);
     preserveData[obj] = pData;
   } else {
     // schedule new expiry task
-    auto handler =
-        new PreservedDataExpiryHandler(shared_from_this(), obj, 20);
-    long id =
-        CacheImpl::expiryTaskManager->scheduleExpiryTask(handler, 20, 0, false);
+    auto handler = new PreservedDataExpiryHandler(shared_from_this(), obj, 20);
+    long id = expiryTaskManager.scheduleExpiryTask(handler, 20, 0, false);
     pData->setPreservedDataExpiryTaskId(id);
     LOGDEBUG(
         "PdxTypeRegistry::setPreserveData Schedule new expirt task with id=%ld",
@@ -230,7 +226,7 @@ int32_t PdxTypeRegistry::getEnumValue(EnumInfoPtr ei) {
     const auto val2 = std::static_pointer_cast<CacheableInt32>(entry2->second);
     return val2->value();
   }
-  int val = SerializationRegistry::GetEnumValue(ei);
+  int val = serializationRegistry->GetEnumValue(ei);
   tmp = enumToInt;
   tmp->emplace(ei, CacheableInt32::create(val));
   enumToInt = tmp;
@@ -269,7 +265,7 @@ EnumInfoPtr PdxTypeRegistry::getEnum(int32_t enumVal) {
   }
 
   ret = std::static_pointer_cast<EnumInfo>(
-      SerializationRegistry::GetEnum(enumVal));
+      serializationRegistry->GetEnum(enumVal));
   tmp = intToEnum;
   (*tmp)[enumValPtr] = ret;
   intToEnum = tmp;

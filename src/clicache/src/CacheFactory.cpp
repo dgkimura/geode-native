@@ -64,16 +64,21 @@ namespace Apache
 				bool pdxIgnoreUnreadFields = false;
         bool pdxReadSerialized = false;
 				bool appDomainEnable = false; 
+        native::CachePtr nativeCache = nullptr;
         _GF_MG_EXCEPTION_TRY2
           //msclr::lock lockInstance(m_singletonSync);
           DistributedSystem::acquireDisconnectLock();
     
+          nativeCache = m_nativeptr->get()->create( );
+
+           auto cache = Cache::Create( nativeCache );
+          // TODO global create SerializerRegistry
           if(!m_connected)
           {
-            DistributedSystem::AppDomainInstanceInitialization(m_dsProps->GetNative());                  
+            DistributedSystem::AppDomainInstanceInitialization(cache);                  
           }
 
-          auto nativeCache = m_nativeptr->get()->create( );
+
 					pdxIgnoreUnreadFields = nativeCache->getPdxIgnoreUnreadFields();
           pdxReadSerialized = nativeCache->getPdxReadSerialized();
 
@@ -91,56 +96,33 @@ namespace Apache
             Serializable::RegisterTypeGeneric(
               native::GeodeTypeIds::PdxType,
               gcnew TypeFactoryMethodGeneric(Apache::Geode::Client::Internal::PdxType::CreateDeserializable),
-              nullptr);
+              nullptr, cache);
 
            if(!m_connected)
            {
              //it registers types in unmanage layer, so should be once only 
-             DistributedSystem::ManagedPostConnect();
+             DistributedSystem::ManagedPostConnect(cache);
              DistributedSystem::AppDomainInstancePostInitialization();
              DistributedSystem::connectInstance();
            }
           
            m_connected = true;
            
-           return Cache::Create( nativeCache );
+          
+
+           DistributedSystem::registerCliCallback();
+           Serializable::RegisterPDXManagedCacheableKey(appDomainEnable, cache);
+
+           return cache;
         _GF_MG_EXCEPTION_CATCH_ALL2
           finally {
             GC::KeepAlive(m_nativeptr);
-            DistributedSystem::registerCliCallback();
-						Serializable::RegisterPDXManagedCacheableKey(appDomainEnable);
 					Apache::Geode::Client::Internal::PdxTypeRegistry::PdxIgnoreUnreadFields = pdxIgnoreUnreadFields; 
           Apache::Geode::Client::Internal::PdxTypeRegistry::PdxReadSerialized = pdxReadSerialized; 
           DistributedSystem::releaseDisconnectLock();
         }
       }
-
-      Cache^ CacheFactory::GetInstance( DistributedSystem^ system )
-      {
-        _GF_MG_EXCEPTION_TRY2
-
-         return Cache::Create( native::CacheFactory::getInstance( system->GetNative() ) );
-
-        _GF_MG_EXCEPTION_CATCH_ALL2
-      }
-
-      Cache^ CacheFactory::GetInstanceCloseOk( DistributedSystem^ system )
-      {
-        _GF_MG_EXCEPTION_TRY2
-
-          return Cache::Create( native::CacheFactory::getInstanceCloseOk( system->GetNative() ) );
-
-        _GF_MG_EXCEPTION_CATCH_ALL2
-      }
-
-      Cache^ CacheFactory::GetAnyInstance( )
-      {
-        _GF_MG_EXCEPTION_TRY2
-
-          return Cache::Create( native::CacheFactory::getAnyInstance( ) );
-
-        _GF_MG_EXCEPTION_CATCH_ALL2
-      }
+   
 
       String^ CacheFactory::Version::get( )
       {

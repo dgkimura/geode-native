@@ -17,6 +17,7 @@
 
 #include "begin_native.hpp"
 #include <SerializationRegistry.hpp>
+#include <CacheImpl.hpp>
 #include "end_native.hpp"
 
 #include <msclr/lock.h>
@@ -42,6 +43,9 @@
 #include "CacheableIdentityHashMap.hpp"
 #include "IPdxSerializer.hpp"
 #include "impl/DotNetTypes.hpp"
+#include "CacheRegionHelper.hpp"
+#include "Cache.hpp"
+
 #pragma warning(disable:4091)
 
 using namespace System::Reflection;
@@ -258,24 +262,24 @@ namespace Apache
       System::Int32 Serializable::GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType)
       {
         native::CacheablePtr kPtr(SafeMSerializableConvertGeneric(pdxType));
-        return native::SerializationRegistry::GetPDXIdForType(poolName, kPtr);
+        return native::CacheImpl::getInstance()->getSerializationRegistry()->GetPDXIdForType(poolName, kPtr);
       }
 
       IGeodeSerializable^ Serializable::GetPDXTypeById(const char* poolName, System::Int32 typeId)
       {
-        SerializablePtr sPtr = native::SerializationRegistry::GetPDXTypeById(poolName, typeId);
+        SerializablePtr sPtr = native::CacheImpl::getInstance()->getSerializationRegistry()->GetPDXTypeById(poolName, typeId);
         return SafeUMSerializableConvertGeneric(sPtr);
       }
 
       int Serializable::GetEnumValue(Internal::EnumInfo^ ei)
       {
         native::CacheablePtr kPtr(SafeMSerializableConvertGeneric(ei));
-        return native::SerializationRegistry::GetEnumValue(kPtr);
+        return native::CacheImpl::getInstance()->getSerializationRegistry()->GetEnumValue(kPtr);
       }
 
       Internal::EnumInfo^ Serializable::GetEnum(int val)
       {
-        SerializablePtr sPtr = native::SerializationRegistry::GetEnum(val);
+        SerializablePtr sPtr = native::CacheImpl::getInstance()->getSerializationRegistry()->GetEnum(val);
         return (Internal::EnumInfo^)SafeUMSerializableConvertGeneric(sPtr);
       }
 
@@ -511,21 +515,22 @@ namespace Apache
         return retVal();
       }
 
-      void Serializable::RegisterPDXManagedCacheableKey(bool appDomainEnable)
+      void Serializable::RegisterPDXManagedCacheableKey(bool appDomainEnable, Cache^ cache)
       {
+        CacheImpl *cacheImpl = CacheRegionHelper::getCacheImpl(cache->GetNative().get());
         if (!appDomainEnable)
         {
-          native::SerializationRegistry::addType(native::GeodeTypeIdsImpl::PDX,
+          cacheImpl->getSerializationRegistry()->addType(native::GeodeTypeIdsImpl::PDX,
                                                                 &native::PdxManagedCacheableKey::CreateDeserializable);
         }
         else
         {
-          native::SerializationRegistry::addType(native::GeodeTypeIdsImpl::PDX,
+          cacheImpl->getSerializationRegistry()->addType(native::GeodeTypeIdsImpl::PDX,
                                                                 &native::PdxManagedCacheableKeyBytes::CreateDeserializable);
         }
       }
 
-      void Apache::Geode::Client::Serializable::RegisterTypeGeneric(TypeFactoryMethodGeneric^ creationMethod)
+      void Apache::Geode::Client::Serializable::RegisterTypeGeneric(TypeFactoryMethodGeneric^ creationMethod, Cache^ cache)
       {
         if (creationMethod == nullptr) {
           throw gcnew IllegalArgumentException("Serializable.RegisterType(): "
@@ -554,16 +559,14 @@ namespace Apache
         DelegateMapGeneric[tmp->ClassId] = creationMethod;
 
         _GF_MG_EXCEPTION_TRY2
-
-          native::Serializable::registerType((native::TypeFactoryMethod)
-          System::Runtime::InteropServices::Marshal::
-          GetFunctionPointerForDelegate(nativeDelegate).ToPointer());
+          CacheImpl *cacheImpl = CacheRegionHelper::getCacheImpl(cache->GetNative().get());
+          cacheImpl->getSerializationRegistry()->addType((native::Serializable*(*)())System::Runtime::InteropServices::Marshal::GetFunctionPointerForDelegate(nativeDelegate).ToPointer());
 
         _GF_MG_EXCEPTION_CATCH_ALL2
       }
 
       void Apache::Geode::Client::Serializable::RegisterTypeGeneric(Byte typeId,
-                                                                    TypeFactoryMethodGeneric^ creationMethod, Type^ type)
+                                                                    TypeFactoryMethodGeneric^ creationMethod, Type^ type, Cache^ cache)
       {
         if (creationMethod == nullptr) {
           throw gcnew IllegalArgumentException("Serializable.RegisterType(): "
@@ -591,17 +594,18 @@ namespace Apache
 
         try
         {
+           CacheImpl *cacheImpl = CacheRegionHelper::getCacheImpl(cache->GetNative().get());
           if (tmp->ClassId < 0xa0000000)
           {
-            native::SerializationRegistry::addType(typeId,
-                                                                  (native::TypeFactoryMethod)System::Runtime::InteropServices::
+            cacheImpl->getSerializationRegistry()->addType(typeId,
+                                                                  (native::Serializable*(*)())System::Runtime::InteropServices::
                                                                   Marshal::GetFunctionPointerForDelegate(
                                                                   nativeDelegate).ToPointer());
           }
           else
           {//special case for CacheableUndefined type
-            native::SerializationRegistry::addType2(typeId,
-                                                                   (native::TypeFactoryMethod)System::Runtime::InteropServices::
+            cacheImpl->getSerializationRegistry()->addType2(typeId,
+                                                                   (native::Serializable*(*)())System::Runtime::InteropServices::
                                                                    Marshal::GetFunctionPointerForDelegate(
                                                                    nativeDelegate).ToPointer());
           }
@@ -613,12 +617,12 @@ namespace Apache
         }
       }
 
-      void Apache::Geode::Client::Serializable::UnregisterTypeGeneric(Byte typeId)
+      void Apache::Geode::Client::Serializable::UnregisterTypeGeneric(Byte typeId, Cache^ cache)
       {
         BuiltInDelegatesGeneric->Remove(typeId);
         _GF_MG_EXCEPTION_TRY2
 
-          native::SerializationRegistry::removeType(typeId);
+          CacheRegionHelper::getCacheImpl(cache->GetNative().get())->getSerializationRegistry()->removeType(typeId);
 
         _GF_MG_EXCEPTION_CATCH_ALL2
       }

@@ -29,6 +29,7 @@
 #include "DistributedSystemImpl.hpp"
 #include "TimeBomb.hpp"
 #include "Utils.hpp"
+#include "CacheImpl.hpp"
 
 #include "CacheHelper.hpp"
 #define __DUNIT_NO_MAIN__
@@ -259,11 +260,6 @@ void CacheHelper::disconnect(bool keepalive) {
 
   LOG("Beginning cleanup after CacheHelper.");
 
-  DistributedSystemPtr systemPtr;
-  if (m_doDisconnect) {
-    systemPtr = cachePtr->getDistributedSystem();
-  }
-
   // rootRegionPtr->localDestroyRegion();
   rootRegionPtr = nullptr;
   LOG("Destroyed root region.");
@@ -280,17 +276,17 @@ void CacheHelper::disconnect(bool keepalive) {
     LOG("exception throw while closing cache");
   }
 
-  cachePtr = nullptr;
   LOG("Closed cache.");
   try {
     if (m_doDisconnect) {
       LOG("Disconnecting...");
-      systemPtr->disconnect();
+      cachePtr->getDistributedSystem().disconnect();
       LOG("Finished disconnect.");
     }
   } catch (...) {
     LOG("Throwing exception while disconnecting....");
   }
+  cachePtr = nullptr;
   singleton = nullptr;
   LOG("Finished cleanup after CacheHelper.");
 }
@@ -432,7 +428,7 @@ PoolPtr CacheHelper::createPool(const char* poolName, const char* locators,
     poolFacPtr->setSubscriptionAckInterval(subscriptionAckInterval);
   }
 
-  return poolFacPtr->create(poolName);
+  return poolFacPtr->create(poolName, *cachePtr.get());
 }
 
 // this will create pool even endpoints and locatorhost has been not defined
@@ -464,7 +460,7 @@ PoolPtr CacheHelper::createPool2(const char* poolName, const char* locators,
     poolFacPtr->setSubscriptionAckInterval(subscriptionAckInterval);
   }
 
-  return poolFacPtr->create(poolName);
+  return poolFacPtr->create(poolName, *cachePtr.get());
 }
 
 void CacheHelper::logPoolAttributes(PoolPtr& pool) {
@@ -613,7 +609,7 @@ RegionPtr CacheHelper::createPooledRegion(
 
   if ((PoolManager::find(poolName)) ==
       nullptr) {  // Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, *cachePtr.get());
   }
 
   RegionShortcut preDefRA = PROXY;
@@ -649,7 +645,7 @@ RegionPtr CacheHelper::createPooledRegionConcurrencyCheckDisabled(
 
   if ((PoolManager::find(poolName)) ==
       nullptr) {  // Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, *(getCache().get()));
   }
 
   RegionShortcut preDefRA = PROXY;
@@ -718,7 +714,7 @@ RegionPtr CacheHelper::createPooledRegionDiscOverFlow(
   }
   if ((PoolManager::find(poolName)) ==
       nullptr) {  // Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, *(getCache().get()));
   }
 
   if (!caching) {
@@ -773,7 +769,7 @@ RegionPtr CacheHelper::createPooledRegionSticky(
 
   if ((PoolManager::find(poolName)) ==
       nullptr) {  // Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, *(getCache().get()));
     LOG("createPooledRegionSticky logPoolAttributes");
     logPoolAttributes(pptr);
   }
@@ -813,7 +809,7 @@ RegionPtr CacheHelper::createPooledRegionStickySingleHop(
 
   if ((PoolManager::find(poolName)) ==
       nullptr) {  // Pool does not exist with the same name.
-    PoolPtr pptr = poolFacPtr->create(poolName);
+    PoolPtr pptr = poolFacPtr->create(poolName, *(getCache().get()));
     LOG("createPooledRegionStickySingleHop logPoolAttributes");
     logPoolAttributes(pptr);
   }
@@ -1735,13 +1731,20 @@ void CacheHelper::initLocator(int instance, bool ssl, bool multiDS, int dsId,
 }
 
 void CacheHelper::clearSecProp() {
-  PropertiesPtr tmpSecProp =
-      DistributedSystem::getSystemProperties()->getSecurityProperties();
+  PropertiesPtr tmpSecProp = CacheHelper::getHelper()
+                                 .getCache()
+                                 ->getDistributedSystem()
+                                 .getSystemProperties()
+                                 .getSecurityProperties();
   tmpSecProp->remove("security-username");
   tmpSecProp->remove("security-password");
 }
 void CacheHelper::setJavaConnectionPoolSize(long size) {
-  DistributedSystem::getSystemProperties()->setjavaConnectionPoolSize(size);
+  CacheHelper::getHelper()
+      .getCache()
+      ->getDistributedSystem()
+      .getSystemProperties()
+      .setjavaConnectionPoolSize(size);
 }
 
 bool CacheHelper::setSeed() {

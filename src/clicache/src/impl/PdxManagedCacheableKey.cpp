@@ -62,7 +62,7 @@ namespace apache
       {
         try {
           int pos = input.getBytesRead();
-          Apache::Geode::Client::DataInput mg_input(&input, true);
+          Apache::Geode::Client::DataInput mg_input(&input, true, m_serializationRegistry);
           //m_managedptr = m_managedptr->FromData( %mg_input );
           Apache::Geode::Client::IPdxSerializable^ tmp = Apache::Geode::Client::Internal::PdxHelper::DeserializePdx(%mg_input, false);
           m_managedptr = tmp;
@@ -262,7 +262,7 @@ namespace apache
       void PdxManagedCacheableKey::fromDelta(DataInput& input)
       {
         try {
-          Apache::Geode::Client::DataInput mg_input(&input, true);
+          Apache::Geode::Client::DataInput mg_input(&input, true, m_serializationRegistry);
           m_managedDeltaptr->FromDelta(%mg_input);
 
           //this will move the cursor in c++ layer

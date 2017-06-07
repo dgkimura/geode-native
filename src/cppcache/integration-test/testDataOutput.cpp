@@ -22,6 +22,7 @@
 
 #include <geode/DataOutput.hpp>
 #include <geode/DataInput.hpp>
+#include "SerializationRegistry.hpp"
 
 #include "fw_helper.hpp"
 
@@ -49,7 +50,8 @@ void dumpnwords(const uint32_t* buf, uint32_t length) {
 
 BEGIN_TEST(Byte)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     dataOutput.write(static_cast<uint8_t>(0x11));
     const uint8_t* buffer = dataOutput.getBuffer();
@@ -57,7 +59,9 @@ BEGIN_TEST(Byte)
     ASSERT(buffer[0] == (uint8_t)0x11, "expected 0x11.");
 
     int8_t result;
-    DataInput dataInput(buffer, dataOutput.getBufferLength());
+
+    DataInput dataInput(buffer, dataOutput.getBufferLength(),
+                        serializationRegistry);
     dataInput.read(&result);
     ASSERT(result == (uint8_t)0x11, "expected 0x11");
   }
@@ -65,7 +69,8 @@ END_TEST(Byte)
 
 BEGIN_TEST(Boolean)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     dataOutput.writeBoolean(true);
     dataOutput.writeBoolean(false);
@@ -75,7 +80,9 @@ BEGIN_TEST(Boolean)
     ASSERT(buffer[1] == (uint8_t)0x0, "expected 0x0.");
 
     bool result;
-    DataInput dataInput(buffer, dataOutput.getBufferLength());
+
+    DataInput dataInput(buffer, dataOutput.getBufferLength(),
+                        serializationRegistry);
     dataInput.readBoolean(&result);
     ASSERT(result, "expected true");
     dataInput.readBoolean(&result);
@@ -85,7 +92,8 @@ END_TEST(Boolean)
 
 BEGIN_TEST(Short)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     dataOutput.writeInt(static_cast<int16_t>(0x1122));
     const uint8_t* buffer = dataOutput.getBuffer();
@@ -93,7 +101,9 @@ BEGIN_TEST(Short)
     ASSERT(buffer[1] == (uint8_t)0x22, "expected 0x11.");
 
     int16_t result;
-    DataInput dataInput(buffer, dataOutput.getBufferLength());
+
+    DataInput dataInput(buffer, dataOutput.getBufferLength(),
+                        serializationRegistry);
     dataInput.readInt(&result);
     ASSERT(result == 0x1122, "expected 0x1122");
   }
@@ -101,7 +111,8 @@ END_TEST(Short)
 
 BEGIN_TEST(int_t)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     dataOutput.writeInt((int32_t)0x11223344);
     const uint8_t* buffer = dataOutput.getBuffer();
@@ -111,7 +122,8 @@ BEGIN_TEST(int_t)
     ASSERT(buffer[2] == (uint8_t)0x33, "expected 0x33.");
     ASSERT(buffer[3] == (uint8_t)0x44, "expected 0x44.");
 
-    DataInput dataInput(buffer, dataOutput.getBufferLength());
+    DataInput dataInput(buffer, dataOutput.getBufferLength(),
+                        serializationRegistry);
     int32_t result;
     dataInput.readInt(&result);
     ASSERT(result == 0x11223344, "expected 0x11223344");
@@ -120,7 +132,8 @@ END_TEST(int_t)
 
 BEGIN_TEST(Long)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     int64_t value = ((static_cast<int64_t>(0x11223344)) << 32) | 0x55667788;
     dataOutput.writeInt(value);
@@ -134,7 +147,8 @@ BEGIN_TEST(Long)
     ASSERT(buffer[6] == (uint8_t)0x77, "expected 0x77.");
     ASSERT(buffer[7] == (uint8_t)0x88, "expected 0x88.");
 
-    DataInput dataInput(buffer, dataOutput.getBufferLength());
+    DataInput dataInput(buffer, dataOutput.getBufferLength(),
+                        serializationRegistry);
     int64_t result;
     dataInput.readInt(&result);
     ASSERT(result == value, "expected 0x1122334455667788");
@@ -143,7 +157,8 @@ END_TEST(Long)
 
 BEGIN_TEST(Float)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     dataOutput.writeFloat(1.2f);
     const uint8_t* buffer = dataOutput.getBuffer();
@@ -152,7 +167,8 @@ BEGIN_TEST(Float)
     ASSERT(buffer[2] == (uint8_t)0x99, "expected 0x99.");
     ASSERT(buffer[3] == (uint8_t)0x9a, "expected 0x9a.");
 
-    DataInput dataInput(buffer, dataOutput.getBufferLength());
+    DataInput dataInput(buffer, dataOutput.getBufferLength(),
+                        serializationRegistry);
     float result;
     dataInput.readFloat(&result);
     ASSERT(result == 1.2f, "expected 1.2f");
@@ -161,7 +177,8 @@ END_TEST(Float)
 
 BEGIN_TEST(Double)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     dataOutput.writeDouble(1.2);
     const uint8_t* buffer = dataOutput.getBuffer();
@@ -174,7 +191,8 @@ BEGIN_TEST(Double)
     ASSERT(buffer[6] == (uint8_t)0x33, "expected 0x33.");
     ASSERT(buffer[7] == (uint8_t)0x33, "expected 0x33.");
 
-    DataInput dataInput(buffer, dataOutput.getBufferLength());
+    DataInput dataInput(buffer, dataOutput.getBufferLength(),
+                        serializationRegistry);
     double result;
     dataInput.readDouble(&result);
     ASSERT(result == 1.2, "expected 1.2");
@@ -184,7 +202,8 @@ END_TEST(Double)
 // Test data output numbers.
 BEGIN_TEST(Numbers)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     dataOutput.write(static_cast<uint8_t>(0x11));
     dataOutput.write(static_cast<uint8_t>(0xAA));
@@ -206,7 +225,8 @@ END_TEST(Numbers)
 
 BEGIN_TEST(NarrowStrings)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     const char* strOrig = "This is fun.";
     dataOutput.writeASCII(strOrig);
@@ -230,7 +250,8 @@ BEGIN_TEST(NarrowStrings)
     ASSERT(buffer[12] == 'n', "wrong utf encoding.");
     ASSERT(buffer[13] == '.', "wrong utf encoding.");
 
-    DataInput dataInput(buffer, dataOutput.getBufferLength());
+    DataInput dataInput(buffer, dataOutput.getBufferLength(),
+                        serializationRegistry);
     char* str = nullptr;
     uint16_t res_length;
     dataInput.readASCII(&str, &res_length);
@@ -246,7 +267,8 @@ END_TEST(NarrowStrings)
 
 BEGIN_TEST(WideStrings)
   {
-    DataOutput dataOutput;
+    SerializationRegistry serializationRegistry;
+    DataOutput dataOutput(serializationRegistry);
 
     wchar_t* strOrig = new wchar_t[40];
     strOrig[0] = 0;
@@ -275,7 +297,8 @@ BEGIN_TEST(WideStrings)
     ASSERT(buffer[10] == 0xbf, "wrong utf encoding.");
     ASSERT(buffer[11] == 0xbf, "wrong utf encoding.");
     std::cout << "sizeof wchar_t " << sizeof(wchar_t) << std::endl;
-    DataInput dataInput(buffer, dataOutput.getBufferLength());
+    DataInput dataInput(buffer, dataOutput.getBufferLength(),
+                        serializationRegistry);
     wchar_t* str = nullptr;
     uint16_t res_length;
     dataInput.readUTF(&str, &res_length);

@@ -18,13 +18,14 @@
 #include <geode/DataInput.hpp>
 
 #include <SerializationRegistry.hpp>
+#include "CacheImpl.hpp"
 
 namespace apache {
 namespace geode {
 namespace client {
 
 void DataInput::readObjectInternal(SerializablePtr& ptr, int8_t typeId) {
-  ptr = SerializationRegistry::deserialize(*this, typeId);
+  ptr = m_serializationRegistry.deserialize(*this, typeId);
 }
 }  // namespace client
 }  // namespace geode

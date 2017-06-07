@@ -19,6 +19,10 @@
 
 #include "../geode_defs.hpp"
 
+#include "begin_native.hpp"
+#include "CacheImpl.hpp"
+#include "end_native.hpp"
+
 #include "ManagedCacheableKey.hpp"
 #include "ManagedCacheableDelta.hpp"
 #include "ManagedCacheableKeyBytes.hpp"
@@ -155,9 +159,10 @@ namespace Apache
           }
           else{
             if(!SafeConvertClassGeneric::isAppDomainEnabled)
-              return new ManagedWrapper(mg_obj, mg_obj->GetHashCode(), mg_obj->ClassId);
+              return new ManagedWrapper(mg_obj, mg_obj->GetHashCode(), mg_obj->ClassId, native::CacheImpl::getInstance()->getSerializationRegistry().get());
             else
-              return new native::ManagedCacheableKeyBytesGeneric( mg_obj, true);
+              return new native::ManagedCacheableKeyBytesGeneric(mg_obj, true,
+                native::CacheImpl::getInstance()->getSerializationRegistry().get());
           }
         }
          //if (mg_obj == nullptr) return NULL;
@@ -254,7 +259,8 @@ namespace Apache
 					if(!SafeConvertClassGeneric::isAppDomainEnabled)
 						return new native::PdxManagedCacheableKey(pdxType);
 					else
-						return new native::PdxManagedCacheableKeyBytes(pdxType, true);
+						return new native::PdxManagedCacheableKeyBytes(pdxType, true,
+              native::CacheImpl::getInstance()->getSerializationRegistry().get());
         }
       
 				Apache::Geode::Client::IGeodeDelta^ sDelta =
@@ -274,11 +280,12 @@ namespace Apache
 						{
 							if(!SafeConvertClassGeneric::isAppDomainEnabled)
 							{
-									return new native::ManagedCacheableKeyGeneric( tmpIGFS );
+									return new native::ManagedCacheableKeyGeneric( tmpIGFS, native::CacheImpl::getInstance()->getSerializationRegistry().get());
 							}
 							else
 							{
-								return new native::ManagedCacheableKeyBytesGeneric( tmpIGFS, true);
+								return new native::ManagedCacheableKeyBytesGeneric( tmpIGFS, true,
+                  native::CacheImpl::getInstance()->getSerializationRegistry().get());
 							}
 						}
             
@@ -288,7 +295,8 @@ namespace Apache
 					    if(!SafeConvertClassGeneric::isAppDomainEnabled)
 					    	return new native::PdxManagedCacheableKey(gcnew PdxWrapper(mg_obj));
 					    else
-						    return new native::PdxManagedCacheableKeyBytes(gcnew PdxWrapper(mg_obj), true);
+						    return new native::PdxManagedCacheableKeyBytes(gcnew PdxWrapper(mg_obj), true,
+                  native::CacheImpl::getInstance()->getSerializationRegistry().get());
             }
             throw gcnew Apache::Geode::Client::IllegalStateException(String::Format("Unable to map object type {0}. Possible Object type may not be registered or PdxSerializer is not registered. ", mg_obj->GetType()));
           }	
@@ -353,9 +361,10 @@ namespace Apache
         else
         {
           if(!SafeConvertClassGeneric::isAppDomainEnabled)
-            return new native::ManagedCacheableKeyGeneric( SafeUMSerializableConvertGeneric(obj) );
+            return new native::ManagedCacheableKeyGeneric(SafeUMSerializableConvertGeneric(obj), native::CacheImpl::getInstance()->getSerializationRegistry().get());
           else
-            return new native::ManagedCacheableKeyBytesGeneric( SafeUMSerializableConvertGeneric(obj), true );
+            return new native::ManagedCacheableKeyBytesGeneric(SafeUMSerializableConvertGeneric(obj), true,
+              native::CacheImpl::getInstance()->getSerializationRegistry().get());
         }
       }
 

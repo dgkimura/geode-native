@@ -25,16 +25,16 @@ using namespace apache::geode::client;
 const char* host_name = "Suds";
 DUNIT_TASK(s1p1, CreateRegionOne)
   {
+    auto dsys = DistributedSystem::create(host_name);
     try {
-      DistributedSystem::disconnect();
+      dsys->disconnect();
       FAIL("Expected an exception.");
     } catch (const NotConnectedException& ex) {
       LOG("Got expected exception.");
       LOG(ex.getMessage());
     }
     try {
-      DistributedSystemPtr dsys = DistributedSystem::connect(host_name);
-      if (!dsys->isConnected()) FAIL("Distributed system is not connected");
+      dsys->connect();
     } catch (const Exception& ex) {
       LOG(ex.getMessage());
       ASSERT(false, "connect failed.");

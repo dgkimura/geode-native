@@ -34,6 +34,12 @@
 #include <geode/StructSet.hpp>
 #include <geode/SelectResultsIterator.hpp>
 
+
+#include "SerializationRegistry.hpp"
+#include "CacheRegionHelper.hpp"
+#include "CacheImpl.hpp"
+
+
 using namespace apache::geode::client;
 using namespace test;
 using namespace testobject;
@@ -52,13 +58,16 @@ const char* locHostPort =
 const char* qRegionNames[] = {"Portfolios", "Positions"};
 
 void clientOperations() {
+  initClient(true);
   try {
-    Serializable::registerType(Position::createDeserializable);
-    Serializable::registerType(Portfolio::createDeserializable);
-  } catch (const IllegalStateException&) {
+    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+
+    serializationRegistry->addType(Position::createDeserializable);
+    serializationRegistry->addType(Portfolio::createDeserializable);
+  }
+  catch (const IllegalStateException&) {
     // ignore exception
   }
-  initClient(true);
 
   try {
     QueryServicePtr qs = nullptr;  // getHelper()->cachePtr->getQueryService();

@@ -72,59 +72,13 @@ namespace Apache
         Cache^ Create();
 
         /// <summary>
-        /// Gets the instance of <see cref="Cache" /> produced by an
-        /// earlier call to <see cref="CacheFactory.Create" />.
+        /// Set allocators for non default Microsoft CRT versions.
         /// </summary>
-        /// <param name="system">
-        /// the <see cref="DistributedSystem" /> the cache was created with.
-        /// </param>
-        /// <returns>the <see cref="Cache" /> associated with the specified system.</returns>
-        /// <exception cref="IllegalArgumentException">
-        /// if the distributed system argument is null
-        /// </exception>
-        /// <exception cref="CacheClosedException">
-        /// if a cache has not been created or the created one is closed
-        /// ( <see cref="Cache.IsClosed" /> )
-        /// </exception>
-        /// <exception cref="EntryNotFoundException">
-        /// if a cache with specified system not found
-        /// </exception>
-        static Cache^ GetInstance(DistributedSystem^ system);
-
-        /// <summary>
-        /// Gets the instance of <see cref="Cache" /> produced by an
-        /// earlier call to <see cref="CacheFactory.Create" />, even if it has been closed.
-        /// </summary>
-        /// <param name="system">
-        /// the <see cref="DistributedSystem" /> the cache was created with.
-        /// </param>
-        /// <returns>
-        /// the <c>Cache</c> associated with the specified system.
-        /// </returns>
-        /// <exception cref="IllegalArgumentException">
-        /// if the distributed system argument is null
-        /// </exception>
-        /// <exception cref="CacheClosedException">
-        /// if a cache has not been created.
-        /// </exception>
-        /// <exception cref="EntryNotFoundException">
-        /// if a cache with specified system not found
-        /// </exception>
-        static Cache^ GetInstanceCloseOk(DistributedSystem^ system);
-
-        /// <summary>
-        /// Gets an arbitrary open instance of <see cref="Cache" /> produced by an
-        /// earlier call to <see cref="CacheFactory.Create" />.
-        /// </summary>
-        /// <exception cref="CacheClosedException">
-        /// if a cache has not been created or the only created one is
-        /// closed ( <see cref="Cache.IsClosed" /> )
-        /// </exception>
-        /// <exception cref="EntryNotFoundException">
-        /// if a cache with specified system not found
-        /// </exception>
-        static Cache^ GetAnyInstance();
-
+       /* static void SetNewAndDelete()
+        {
+          native::setNewAndDelete(&operator new, &operator delete);
+        }
+*/
         /// <summary>
         /// Returns the version of the cache implementation.
         /// For the 1.0 release of Geode, the string returned is <c>1.0</c>.

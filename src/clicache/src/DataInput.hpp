@@ -57,7 +57,7 @@ namespace Apache
         /// <exception cref="IllegalArgumentException">
         /// if the buffer is null
         /// </exception>
-        DataInput( array<Byte>^ buffer );
+        DataInput( array<Byte>^ buffer, native::SerializationRegistry* serializationRegistry );
 
         /// <summary>
         /// Construct <c>DataInput</c> using a given length of an array of
@@ -72,7 +72,7 @@ namespace Apache
         /// <exception cref="IllegalArgumentException">
         /// if the buffer is null
         /// </exception>
-        DataInput( array<Byte>^ buffer, System::Int32 len );
+        DataInput( array<Byte>^ buffer, System::Int32 len, native::SerializationRegistry* serializationRegistry );
 
         /// <summary>
         /// Dispose: frees the internal buffer.
@@ -656,11 +656,12 @@ namespace Apache
         /// Internal constructor to wrap a native object pointer
         /// </summary>
         /// <param name="nativeptr">The native object pointer</param>
-        inline DataInput( apache::geode::client::DataInput* nativeptr, bool managedObject )
+        inline DataInput( apache::geode::client::DataInput* nativeptr, bool managedObject, native::SerializationRegistry* serializationRegistry )
         { 
           m_nativeptr = gcnew native_conditional_unique_ptr<native::DataInput>(nativeptr);
           m_ispdxDesrialization = false;
           m_isRootObjectPdx = false;
+          m_serializationRegistry = serializationRegistry;
           m_cursor = 0;
           m_isManagedObject = managedObject;
           m_forStringDecode = gcnew array<Char>(100);
@@ -673,7 +674,7 @@ namespace Apache
           }
         }
 
-        DataInput( System::Byte* buffer, int size );
+        DataInput( System::Byte* buffer, int size, native::SerializationRegistry* serializationRegistry );
 
         bool IsManagedObject()
         {
@@ -693,6 +694,7 @@ namespace Apache
         /// </summary>
         bool m_ispdxDesrialization;
         bool m_isRootObjectPdx;
+        native::SerializationRegistry* m_serializationRegistry;
         System::Byte* m_buffer;
         unsigned int m_bufferLength;
         int m_cursor;

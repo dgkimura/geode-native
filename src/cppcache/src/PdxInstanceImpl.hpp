@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #pragma once
 
@@ -51,7 +51,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    * registered.
    * @return the deserialized domain object.
    *
-   * @see Serializable::registerPdxType
+   * @see serializationRegistry->addPdxType
    */
   virtual PdxSerializablePtr getObject();
 
@@ -405,7 +405,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    * For deserialization C++ Native Client requires the domain class to be
    * registered.
    *
-   * @see Serializable::registerPdxType
+   * @see serializationRegistry->addPdxType
    * @see PdxInstance#hasField
    */
   virtual void getField(const char* fieldname, CacheablePtr& value) const;
@@ -421,7 +421,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    * type.
    * @throws IllegalStateException if PdxInstance doesn't has the named field.
    *
-   * @see Serializable::registerPdxType
+   * @see serializationRegistry->addPdxType
    * @see PdxInstance#hasField
    */
   virtual void getField(const char* fieldname,
@@ -933,7 +933,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    * @throws IllegalStateException if the field contains an element that is not
    * of CacheableKey derived type.
    *
-   * @see Serializable::registerPdxType
+   * @see serializationRegistry->addPdxType
    */
   virtual int32_t hashcode() const;
 
@@ -946,7 +946,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    * For deserialization C++ Native Client requires the domain class to be
    * registered.
    *
-   * @see Serializable::registerPdxType
+   * @see serializationRegistry->addPdxType
    */
   virtual CacheableStringPtr toString() const;
 
@@ -1003,7 +1003,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    * @throws IllegalStateException if the field contains an element that is not
    * of CacheableKey derived type.
    *
-   * @see Serializable::registerPdxType
+   * @see serializationRegistry->addPdxType
    */
   virtual bool operator==(const CacheableKey& other) const;
 
@@ -1050,32 +1050,48 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
   /**
    * @brief constructors
    */
-  PdxInstanceImpl();
 
-  PdxInstanceImpl(uint8_t* buffer, int length, int typeId) {
-    m_buffer = DataInput::getBufferCopy(buffer, length);
-    m_bufferLength = length;
+  PdxInstanceImpl(uint8_t* buffer, int length, int typeId,
+                  CachePerfStats* cacheStats,
+                  PdxTypeRegistryPtr pdxTypeRegistry,
+                  SerializationRegistry& serializationRegistry,
+                  bool enableTimeStatistics)
+      : m_buffer(DataInput::getBufferCopy(buffer, length)),
+        m_bufferLength(length),
+        m_typeId(typeId),
+        m_pdxType(nullptr),
+        m_cacheStats(cacheStats),
+        m_pdxTypeRegistry(pdxTypeRegistry),
+        m_serializationRegistry(serializationRegistry),
+        m_enableTimeStatistics(enableTimeStatistics) {
     LOGDEBUG("PdxInstanceImpl::m_bufferLength = %d ", m_bufferLength);
-    m_typeId = typeId;
-    m_pdxType = nullptr;
   }
 
-  PdxInstanceImpl(FieldVsValues fieldVsValue, PdxTypePtr pdxType);
+  PdxInstanceImpl(FieldVsValues fieldVsValue, PdxTypePtr pdxType,
+                  CachePerfStats* cacheStats,
+                  PdxTypeRegistryPtr pdxTypeRegistry,
+                  SerializationRegistry& serializationRegistry,
+                  bool enableTimeStatistics);
+
+  PdxInstanceImpl(const PdxInstanceImpl& other) = delete;
+
+  void operator=(const PdxInstanceImpl& other) = delete;
 
   PdxTypePtr getPdxType() const;
 
   void updatePdxStream(uint8_t* newPdxStream, int len);
 
  private:
-  // never implemented.
-  PdxInstanceImpl(const PdxInstanceImpl& other);
-  void operator=(const PdxInstanceImpl& other);
-
   uint8_t* m_buffer;
   int m_bufferLength;
   int m_typeId;
   PdxTypePtr m_pdxType;
   FieldVsValues m_updatedFields;
+  CachePerfStats* m_cacheStats;
+
+  PdxTypeRegistryPtr m_pdxTypeRegistry;
+  SerializationRegistry& m_serializationRegistry;
+  bool m_enableTimeStatistics;
 
   std::vector<PdxFieldTypePtr> getIdentityPdxFields(PdxTypePtr pt) const;
 

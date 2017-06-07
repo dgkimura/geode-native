@@ -56,12 +56,7 @@ CppCacheLibrary::CppCacheLibrary() {
   // Put initialization code for statics and other such things here.
   try {
     gf_log_libinit();
-    EntryFactory::init();
-    LRUEntryFactory::init();
-    ExpEntryFactory::init();
-    LRUExpEntryFactory::init();
     CacheFactory::init();
-    SerializationRegistry::init();
     // PdxTypeRegistry::init();
     // log( "Finished initializing CppCacheLibrary." );
   } catch (apache::geode::client::Exception& ge) {

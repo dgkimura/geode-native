@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #pragma once
 
@@ -41,19 +41,8 @@ typedef std::map<std::string, PdxFieldTypePtr> NameVsPdxType;
 class PdxType;
 typedef std::shared_ptr<PdxType> PdxTypePtr;
 class PdxTypeRegistry;
-typedef std::shared_ptr<PdxTypeRegistry> PdxTypeRegistryPtr;
-/* adongre
- * Coverity - II
- * CID 29178: Other violation (MISSING_COPY)
- * Class "apache::geode::client::PdxType" owns resources that are managed
- * in its constructor and destructor but has no user-written copy constructor.
- * Fix : Make the class Non Copyable
- *
- * CID 29173: Other violation (MISSING_ASSIGN)
- * Class "apache::geode::client::PdxType" owns resources that are managed in its
- * constructor and destructor but has no user-written assignment operator.
- * Fix : Make the class Non Assignable
- */
+typedef std::shared_ptr <PdxTypeRegistry> PdxTypeRegistryPtr;
+
 class PdxType : public Serializable,
                 private NonCopyable,
                 private NonAssignable {
@@ -88,6 +77,8 @@ class PdxType : public Serializable,
 
   bool m_noJavaClass;
 
+  PdxTypeRegistryPtr m_pdxTypeRegistryPtr;
+
   void initRemoteToLocal();
   void initLocalToRemote();
   int32_t fixedLengthFieldPosition(PdxFieldTypePtr fixLenField,
@@ -104,16 +95,13 @@ class PdxType : public Serializable,
   PdxTypePtr isLocalTypeContains(PdxTypePtr otherType);
   PdxTypePtr isRemoteTypeContains(PdxTypePtr localType);
 
-  PdxTypeRegistryPtr getPdxTypeRegistry() const;
-
   PdxTypePtr shared_from_this() {
     return std::static_pointer_cast<PdxType>(Serializable::shared_from_this());
   }
 
  public:
-  PdxType();
 
-  PdxType(const char* pdxDomainClassName, bool isLocal);
+  PdxType(PdxTypeRegistryPtr pdxTypeRegistryPtr, const char* pdxDomainClassName, bool isLocal);
 
   virtual ~PdxType();
 
@@ -123,7 +111,7 @@ class PdxType : public Serializable,
 
   virtual int32_t classId() const { return GeodeTypeIds::PdxType; }
 
-  static Serializable* CreateDeserializable() { return new PdxType(); }
+  static Serializable* CreateDeserializable(PdxTypeRegistryPtr pdxTypeRegistryPtr) { return new PdxType(pdxTypeRegistryPtr, nullptr, false); }
 
   virtual uint32_t objectSize() const {
     uint32_t size = sizeof(PdxType);

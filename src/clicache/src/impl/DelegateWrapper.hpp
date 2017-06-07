@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include "begin_native.hpp"
+#include "CacheImpl.hpp"
+#include "end_native.hpp"
+
 #include "../geode_defs.hpp"
 #include "../Serializable.hpp"
 #include "ManagedCacheableKey.hpp"
@@ -87,9 +91,9 @@ namespace Apache
               return new apache::geode::client::ManagedCacheableDeltaBytesGeneric( tempDelta, false );
           }
           else if(!SafeConvertClassGeneric::isAppDomainEnabled)
-            return new apache::geode::client::ManagedCacheableKeyGeneric( tempObj);
+            return new apache::geode::client::ManagedCacheableKeyGeneric( tempObj, CacheImpl::getInstance()->getSerializationRegistry().get());
           else
-            return new apache::geode::client::ManagedCacheableKeyBytesGeneric( tempObj, false);
+            return new apache::geode::client::ManagedCacheableKeyBytesGeneric( tempObj, false, CacheImpl::getInstance()->getSerializationRegistry().get());
         }
 
 

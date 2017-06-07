@@ -66,9 +66,9 @@ namespace Apache
         /// <summary>
         /// Default constructor.
         /// </summary>
-        inline DataOutput( )
+        inline DataOutput(native::SerializationRegistry & serializationRegistry)
         { 
-          m_nativeptr = gcnew native_conditional_unique_ptr<native::DataOutput>(std::make_unique<native::DataOutput>());
+          m_nativeptr = gcnew native_conditional_unique_ptr<native::DataOutput>(std::make_unique<native::DataOutput>(serializationRegistry));
           m_isManagedObject = true;
           m_cursor = 0;
           try

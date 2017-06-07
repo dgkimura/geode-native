@@ -67,10 +67,11 @@ namespace apache
     /// The managed object.
     /// </param>
     inline PdxManagedCacheableKeyBytes(
-      Apache::Geode::Client::IPdxSerializable^ managedptr, bool storeBytes )
-      : m_domainId(System::Threading::Thread::GetDomainID()),
+      Apache::Geode::Client::IPdxSerializable^ managedptr, bool storeBytes, SerializationRegistry * serializationRegistry)
+      : Delta(serializationRegistry), m_domainId(System::Threading::Thread::GetDomainID()),
         m_bytes(NULL),
         m_size(0),
+        m_serializationRegistry(serializationRegistry),
         m_hashCode(0)
     {
       m_hasDelta = false;
@@ -85,7 +86,7 @@ namespace apache
       {
         if(storeBytes)//if value is from app 
         {
-          apache::geode::client::DataOutput dataOut;
+          apache::geode::client::DataOutput dataOut(*serializationRegistry);
           Apache::Geode::Client::DataOutput mg_output( &dataOut, true);
 					 Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr);
         //  managedptr->ToData( %mg_output );
@@ -105,7 +106,7 @@ namespace apache
     }
 
 		inline PdxManagedCacheableKeyBytes( )
-      : m_domainId(System::Threading::Thread::GetDomainID()),
+      : Delta(nullptr), m_domainId(System::Threading::Thread::GetDomainID()),
         m_bytes(NULL),
         m_size(0),
         m_hashCode(0)
@@ -227,6 +228,7 @@ namespace apache
     UInt32 m_classId;
     System::Byte * m_bytes;
     System::UInt32 m_size;
+    SerializationRegistry * m_serializationRegistry;
     bool m_hasDelta;
     System::Int32 m_hashCode;
     // Disable the copy and assignment constructors

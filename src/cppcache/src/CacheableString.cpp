@@ -25,7 +25,7 @@
 #include <cstdlib>
 #include <ace/ACE.h>
 #include <ace/OS.h>
-
+#include "SerializationRegistry.hpp"
 using namespace apache::geode::client;
 
 void CacheableString::toData(DataOutput& output) const {
@@ -196,7 +196,11 @@ char* CacheableString::getASCIIString(const wchar_t* value, int32_t& len,
     }
     len -= clen;
   } else {
-    DataOutput out;
+    SerializationRegistry bogusSerializationRegistry;
+
+    // CAREFUL: Doing a transform will use this registry which is bogus...
+    // if you need to do a transform, get a real serialization registry.
+    DataOutput out(bogusSerializationRegistry);
     const wchar_t* pvalue = value;
     while ((currentChar = *pvalue) != 0) {
       c = getASCIIChar(currentChar, isASCII, encodedLen);

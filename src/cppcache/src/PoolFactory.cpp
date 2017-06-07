@@ -26,6 +26,7 @@
 #include <ace/INET_Addr.h>
 #include <ThinClientPoolStickyDM.hpp>
 #include <ThinClientPoolStickyHADM.hpp>
+#include "CacheRegionHelper.hpp"
 using namespace apache::geode::client;
 const char* PoolFactory::DEFAULT_SERVER_GROUP = "";
 extern HashMapOfPools* connectionPools;
@@ -111,7 +112,7 @@ void PoolFactory::setPRSingleHopEnabled(bool enabled) {
   m_attrs->setPRSingleHopEnabled(enabled);
 }
 
-PoolPtr PoolFactory::create(const char* name) {
+PoolPtr PoolFactory::create(const char* name, Cache &cache) {
   ThinClientPoolDMPtr poolDM;
   {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
@@ -122,21 +123,19 @@ PoolPtr PoolFactory::create(const char* name) {
     // Create a clone of Attr;
     PoolAttributesPtr copyAttrs = m_attrs->clone();
 
-    if (CacheImpl::getInstance() == nullptr) {
-      throw IllegalStateException("Cache has not been created.");
-    }
+    CacheImpl *cacheImpl = CacheRegionHelper::getCacheImpl(&cache);
 
-    if (CacheImpl::getInstance()->isClosed()) {
+    if (cache.isClosed()) {
       throw CacheClosedException("Cache is closed");
     }
-    if (CacheImpl::getInstance()->getCacheMode() &&
+    if (cacheImpl->getCacheMode() &&
         m_isSubscriptionRedundancy) {
       LOGWARN(
           "At least one pool has been created so ignoring cache level "
           "redundancy setting");
     }
-    TcrConnectionManager& tccm =
-        CacheImpl::getInstance()->tcrConnectionManager();
+    TcrConnectionManager& tccm = cacheImpl->tcrConnectionManager();
+
     LOGDEBUG("PoolFactory::create mulitusermode = %d ",
              copyAttrs->getMultiuserSecureModeEnabled());
     if (copyAttrs->getMultiuserSecureModeEnabled()) {
@@ -177,7 +176,9 @@ PoolPtr PoolFactory::create(const char* name) {
 
   // TODO: poolDM->init() should not throw exceptions!
   // Pool DM should only be inited once.
-  if (DistributedSystem::getSystemProperties()->autoReadyForEvents()) {
+  if (cache.getDistributedSystem()
+          .getSystemProperties()
+          .autoReadyForEvents()) {
     poolDM->init();
   }
 

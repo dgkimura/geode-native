@@ -65,18 +65,19 @@ namespace apache
         /// The managed object.
         /// </param>
         inline ManagedCacheableKeyBytesGeneric(
-          Apache::Geode::Client::IGeodeSerializable^ managedptr, bool storeBytes)
+          Apache::Geode::Client::IGeodeSerializable^ managedptr, bool storeBytes, SerializationRegistry * serializationRegistry)
           : m_domainId(System::Threading::Thread::GetDomainID()),
           m_classId(managedptr->ClassId),
           m_bytes(NULL),
           m_size(0),
+          m_serializationRegistry(serializationRegistry),
           m_hashCode(0)
         {
           if (managedptr != nullptr)
           {
             if (storeBytes)//if value is from app 
             {
-              apache::geode::client::DataOutput dataOut;
+              apache::geode::client::DataOutput dataOut(*serializationRegistry);
               Apache::Geode::Client::DataOutput mg_output(&dataOut, true);
               managedptr->ToData(%mg_output);
 
@@ -196,6 +197,7 @@ namespace apache
         UInt32 m_classId;
         System::Byte * m_bytes;
         System::UInt32 m_size;
+        SerializationRegistry * m_serializationRegistry;
         System::UInt32 m_hashCode;
         // Disable the copy and assignment constructors
         ManagedCacheableKeyBytesGeneric(const ManagedCacheableKeyBytesGeneric&);

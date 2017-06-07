@@ -35,10 +35,11 @@ namespace apache {
 namespace geode {
 namespace client {
 
-RegionFactory::RegionFactory(RegionShortcut preDefinedRegion) {
-  m_preDefinedRegion = preDefinedRegion;
-  m_attributeFactory = std::make_shared<AttributesFactory>();
-  ;
+RegionFactory::RegionFactory(RegionShortcut preDefinedRegion,
+                             CacheImpl* cacheImpl)
+    : m_preDefinedRegion(preDefinedRegion),
+      m_attributeFactory(std::make_shared<AttributesFactory>()),
+      m_cacheImpl(cacheImpl) {
   setRegionShortcut();
 }
 
@@ -51,9 +52,8 @@ RegionPtr RegionFactory::create(const char* name) {
   // assuming pool name is not DEFAULT_POOL_NAME
   if (regAttr->getPoolName() != nullptr && strlen(regAttr->getPoolName()) > 0) {
     // poolname is set
-    CachePtr cache = CacheFactory::getAnyInstance();
-    CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cache.get());
-    cacheImpl->createRegion(name, regAttr, retRegionPtr);
+
+    m_cacheImpl->createRegion(name, regAttr, retRegionPtr);
   } else {
     // need to look default Pool
     ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
@@ -67,16 +67,30 @@ RegionPtr RegionFactory::create(const char* name) {
     }
 
     regAttr = m_attributeFactory->createRegionAttributes();
-    CachePtr cache = CacheFactory::getAnyInstance();
-    CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cache.get());
-    cacheImpl->createRegion(name, regAttr, retRegionPtr);
+    m_cacheImpl->createRegion(name, regAttr, retRegionPtr);
   }
 
   return retRegionPtr;
 }
 
 void RegionFactory::setRegionShortcut() {
-  CacheImpl::setRegionShortcut(m_attributeFactory, m_preDefinedRegion);
+  switch (m_preDefinedRegion) {
+    case PROXY: {
+      m_attributeFactory->setCachingEnabled(false);
+    } break;
+    case CACHING_PROXY: {
+      m_attributeFactory->setCachingEnabled(true);
+    } break;
+    case CACHING_PROXY_ENTRY_LRU: {
+      m_attributeFactory->setCachingEnabled(true);
+      m_attributeFactory->setLruEntriesLimit(DEFAULT_LRU_MAXIMUM_ENTRIES);
+    } break;
+    case LOCAL: {
+    } break;
+    case LOCAL_ENTRY_LRU: {
+      m_attributeFactory->setLruEntriesLimit(DEFAULT_LRU_MAXIMUM_ENTRIES);
+    } break;
+  }
 }
 
 RegionFactoryPtr RegionFactory::setCacheLoader(

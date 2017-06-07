@@ -23,6 +23,8 @@
 #include "impl/ManagedString.hpp"
 #include "ExceptionTypes.hpp"
 
+#include "Cache.hpp"
+
 using namespace System;
 
 namespace Apache
@@ -429,14 +431,14 @@ namespace Apache
 		  }
 
 
-      Pool^ PoolFactory::Create(String^ name)
+      Pool^ PoolFactory::Create(String^ name, Cache^ cache)
       {
         _GF_MG_EXCEPTION_TRY2/* due to auto replace */
 
           ManagedString mg_name(name);
           try
           {
-            return Pool::Create(m_nativeptr->get()->create(mg_name.CharPtr));
+            return Pool::Create(m_nativeptr->get()->create(mg_name.CharPtr, *(cache->GetNative().get())));
           }
           finally
           {

@@ -23,7 +23,6 @@
 #include <geode/PdxReader.hpp>
 #include "CacheRegionHelper.hpp"
 #include <geode/Cache.hpp>
-#include "CacheImpl.hpp"
 #include "Utils.hpp"
 #include <algorithm>
 
@@ -78,21 +77,19 @@ PdxInstanceImpl::~PdxInstanceImpl() { GF_SAFE_DELETE_ARRAY(m_buffer); }
 
 PdxInstanceImpl::PdxInstanceImpl(
     apache::geode::client::FieldVsValues fieldVsValue,
-    apache::geode::client::PdxTypePtr pdxType) {
-  m_pdxType = pdxType;
-  m_updatedFields = fieldVsValue;
-  m_buffer = nullptr;
-  m_bufferLength = 0;
-  m_typeId = 0;
-
+    apache::geode::client::PdxTypePtr pdxType, CachePerfStats* cacheStats,
+    PdxTypeRegistryPtr pdxTypeRegistry,
+    SerializationRegistry& serializationRegistry, bool enableTimeStatistics)
+    : m_pdxType(pdxType),
+      m_updatedFields(fieldVsValue),
+      m_buffer(nullptr),
+      m_bufferLength(0),
+      m_typeId(0),
+      m_cacheStats(cacheStats),
+      m_pdxTypeRegistry(pdxTypeRegistry),
+      m_serializationRegistry(serializationRegistry),
+      m_enableTimeStatistics(enableTimeStatistics) {
   m_pdxType->InitializeType();  // to generate static position map
-}
-
-PdxInstanceImpl::PdxInstanceImpl() {
-  m_pdxType = nullptr;
-  m_buffer = nullptr;
-  m_bufferLength = 0;
-  m_typeId = 0;
 }
 
 void PdxInstanceImpl::writeField(PdxWriterPtr writer, const char* fieldName,
@@ -302,8 +299,9 @@ WritablePdxInstancePtr PdxInstanceImpl::createWriter() {
   LOGDEBUG("PdxInstanceImpl::createWriter m_bufferLength = %d m_typeId = %d ",
            m_bufferLength, m_typeId);
   return std::make_shared<PdxInstanceImpl>(
-      m_buffer, m_bufferLength,
-      m_typeId);  // need to create duplicate byte stream);
+      m_buffer, m_bufferLength, m_typeId, m_cacheStats, m_pdxTypeRegistry,
+      m_serializationRegistry,
+      m_enableTimeStatistics);  // need to create duplicate byte stream);
 }
 
 bool PdxInstanceImpl::enumerateObjectArrayEquals(
@@ -702,7 +700,7 @@ int32_t PdxInstanceImpl::hashcode() const {
 
   std::vector<PdxFieldTypePtr> pdxIdentityFieldList = getIdentityPdxFields(pt);
 
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
 
   for (uint32_t i = 0; i < pdxIdentityFieldList.size(); i++) {
     PdxFieldTypePtr pField = pdxIdentityFieldList.at(i);
@@ -810,7 +808,7 @@ void PdxInstanceImpl::getField(const char* fieldname, bool& value) const {
 
   VERIFY_PDX_INSTANCE_FIELD_THROW;
 
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
 
   dataInput.reset();
@@ -825,7 +823,7 @@ void PdxInstanceImpl::getField(const char* fieldname,
 
   VERIFY_PDX_INSTANCE_FIELD_THROW;
 
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
 
   dataInput.reset();
@@ -842,7 +840,7 @@ void PdxInstanceImpl::getField(const char* fieldname,
 
   VERIFY_PDX_INSTANCE_FIELD_THROW;
 
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
 
   dataInput.reset();
@@ -856,7 +854,7 @@ void PdxInstanceImpl::getField(const char* fieldname, int16_t& value) const {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -867,7 +865,7 @@ void PdxInstanceImpl::getField(const char* fieldname, int32_t& value) const {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
 
   dataInput.reset();
@@ -879,7 +877,7 @@ void PdxInstanceImpl::getField(const char* fieldname, int64_t& value) const {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -890,7 +888,7 @@ void PdxInstanceImpl::getField(const char* fieldname, float& value) const {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -901,7 +899,7 @@ void PdxInstanceImpl::getField(const char* fieldname, double& value) const {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -912,7 +910,7 @@ void PdxInstanceImpl::getField(const char* fieldname, wchar_t& value) const {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -925,7 +923,7 @@ void PdxInstanceImpl::getField(const char* fieldname, char& value) const {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -939,7 +937,7 @@ void PdxInstanceImpl::getField(const char* fieldname, bool** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -951,7 +949,7 @@ void PdxInstanceImpl::getField(const char* fieldname, signed char** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -965,7 +963,7 @@ void PdxInstanceImpl::getField(const char* fieldname, unsigned char** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -979,7 +977,7 @@ void PdxInstanceImpl::getField(const char* fieldname, int16_t** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -991,7 +989,7 @@ void PdxInstanceImpl::getField(const char* fieldname, int32_t** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1003,7 +1001,7 @@ void PdxInstanceImpl::getField(const char* fieldname, int64_t** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1015,7 +1013,7 @@ void PdxInstanceImpl::getField(const char* fieldname, float** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1027,7 +1025,7 @@ void PdxInstanceImpl::getField(const char* fieldname, double** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1039,7 +1037,7 @@ void PdxInstanceImpl::getField(const char* fieldname, wchar_t** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1051,7 +1049,7 @@ void PdxInstanceImpl::getField(const char* fieldname, char** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1062,7 +1060,7 @@ void PdxInstanceImpl::getField(const char* fieldname, wchar_t** value) const {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1075,7 +1073,7 @@ void PdxInstanceImpl::getField(const char* fieldname, char** value) const {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1089,7 +1087,7 @@ void PdxInstanceImpl::getField(const char* fieldname, wchar_t*** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1101,7 +1099,7 @@ void PdxInstanceImpl::getField(const char* fieldname, char*** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1113,7 +1111,7 @@ void PdxInstanceImpl::getField(const char* fieldname,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1126,7 +1124,7 @@ void PdxInstanceImpl::getField(const char* fieldname,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1138,7 +1136,7 @@ void PdxInstanceImpl::getField(const char* fieldname,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1152,7 +1150,7 @@ void PdxInstanceImpl::getField(const char* fieldname, int8_t*** value,
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldname);
   VERIFY_PDX_INSTANCE_FIELD_THROW;
-  DataInput dataInput(m_buffer, m_bufferLength);
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
   int pos = getOffset(dataInput, pt, pft->getSequenceId());
   dataInput.reset();
   dataInput.advanceCursor(pos);
@@ -1418,26 +1416,21 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
 }
 
 PdxSerializablePtr PdxInstanceImpl::getObject() {
-  DataInput dataInput(m_buffer, m_bufferLength);
-  int64_t sampleStartNanos = Utils::startStatOpTime();
+  DataInput dataInput(m_buffer, m_bufferLength, m_serializationRegistry);
+  int64_t sampleStartNanos =
+      m_enableTimeStatistics ? Utils::startStatOpTime() : 0;
   //[ToDo] do we have to call incPdxDeSerialization here?
   PdxSerializablePtr ret =
       PdxHelper::deserializePdx(dataInput, true, m_typeId, m_bufferLength);
-  CachePtr cache = CacheFactory::getAnyInstance();
-  if (cache == nullptr) {
-    throw IllegalStateException("cache has not been created yet.");
-    ;
-  }
-  if (cache->isClosed()) {
-    throw IllegalStateException("cache has been closed. ");
-  }
-  CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cache.get());
-  if (cacheImpl != nullptr) {
-    Utils::updateStatOpTime(
-        cacheImpl->m_cacheStats->getStat(),
-        cacheImpl->m_cacheStats->getPdxInstanceDeserializationTimeId(),
-        sampleStartNanos);
-    cacheImpl->m_cacheStats->incPdxInstanceDeserializations();
+
+  if (m_cacheStats != nullptr) {
+    if (m_enableTimeStatistics) {
+      Utils::updateStatOpTime(
+          m_cacheStats->getStat(),
+          m_cacheStats->getPdxInstanceDeserializationTimeId(),
+          sampleStartNanos);
+    }
+    m_cacheStats->incPdxInstanceDeserializations();
   }
   return ret;
 }
@@ -1502,8 +1495,9 @@ bool PdxInstanceImpl::operator==(const CacheableKey& other) const {
   equatePdxFields(myPdxIdentityFieldList, otherPdxIdentityFieldList);
   equatePdxFields(otherPdxIdentityFieldList, myPdxIdentityFieldList);
 
-  DataInput myDataInput(m_buffer, m_bufferLength);
-  DataInput otherDataInput(otherPdx->m_buffer, otherPdx->m_bufferLength);
+  DataInput myDataInput(m_buffer, m_bufferLength, m_serializationRegistry);
+  DataInput otherDataInput(otherPdx->m_buffer, otherPdx->m_bufferLength,
+                           m_serializationRegistry);
 
   int fieldTypeId = -1;
   for (size_t i = 0; i < myPdxIdentityFieldList.size(); i++) {
@@ -1711,7 +1705,8 @@ void PdxInstanceImpl::toData(PdxWriterPtr writer) /*const*/ {
   if (m_buffer != nullptr) {
     uint8_t* copy = apache::geode::client::DataInput::getBufferCopy(
         m_buffer, m_bufferLength);
-    DataInput dataInput(copy, m_bufferLength);  // this will delete buffer
+    DataInput dataInput(copy, m_bufferLength,
+                        m_serializationRegistry);  // this will delete buffer
     for (size_t i = 0; i < pdxFieldList->size(); i++) {
       PdxFieldTypePtr currPf = pdxFieldList->at(i);
       LOGDEBUG("toData filedname = %s , isVarLengthType = %d ",
@@ -2755,7 +2750,7 @@ uint32_t PdxInstanceImpl::objectSize() const {
 }
 
 PdxTypeRegistryPtr PdxInstanceImpl::getPdxTypeRegistry() const {
-	return CacheImpl::getInstance()->getPdxTypeRegistry();
+  return m_pdxTypeRegistry;
 }
 
 }  // namespace client

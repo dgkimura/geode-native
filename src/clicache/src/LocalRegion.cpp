@@ -195,15 +195,15 @@ namespace Apache
           {
             return false;
           }
-          apache::geode::client::DataOutput out1;
-          apache::geode::client::DataOutput out2;
-          val1->toData(out1);
-          val2->toData(out2);
-          if ( out1.getBufferLength() != out2.getBufferLength() )
+          std::unique_ptr<apache::geode::client::DataOutput> out1 = m_nativeptr->get_shared_ptr()->getCache()->createDataOutput();
+          std::unique_ptr<apache::geode::client::DataOutput> out2 = m_nativeptr->get_shared_ptr()->getCache()->createDataOutput();
+          val1->toData(*out1);
+          val2->toData(*out2);
+          if ( out1->getBufferLength() != out2->getBufferLength() )
           {
             return false;
           }
-          else if (memcmp(out1.getBuffer(), out2.getBuffer(), out1.getBufferLength()) != 0)
+          else if (memcmp(out1->getBuffer(), out2->getBuffer(), out1->getBufferLength()) != 0)
           {
             return false;
           }

@@ -77,21 +77,22 @@ const char* queryStrings[MAX_LISTNER] = {
     "select * from /Portfolios p where p.ID != 7"};
 
 void initClientCq(const bool isthinClient) {
-  try {
-    Serializable::registerType(Position::createDeserializable);
-    Serializable::registerType(Portfolio::createDeserializable);
-
-    Serializable::registerPdxType(PositionPdx::createDeserializable);
-    Serializable::registerPdxType(PortfolioPdx::createDeserializable);
-
-  } catch (const IllegalStateException&) {
-    // ignore exception
-  }
-
   if (cacheHelper == nullptr) {
     cacheHelper = new CacheHelper(isthinClient);
   }
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
+
+  try {
+    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    serializationRegistry->addType(Position::createDeserializable);
+    serializationRegistry->addType(Portfolio::createDeserializable);
+
+    serializationRegistry->addPdxType(PositionPdx::createDeserializable);
+    serializationRegistry->addPdxType(PortfolioPdx::createDeserializable);
+
+  } catch (const IllegalStateException&) {
+    // ignore exception
+  }
 }
 
 const char* regionNamesCq[] = {"Portfolios", "Positions", "Portfolios2",

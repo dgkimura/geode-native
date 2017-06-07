@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include "SerializationRegistry.hpp"
 #include "PkcsAuthInit.hpp"
 #include "geode/Properties.hpp"
 #include "geode/CacheableBuiltins.hpp"
@@ -90,7 +90,7 @@ static bool s_initDone = openSSLInit();
 }
 // end of extern "C"
 
-PropertiesPtr PKCSAuthInit::getCredentials(PropertiesPtr& securityprops,
+PropertiesPtr PKCSAuthInit::getCredentials(const PropertiesPtr& securityprops,
                                            const char* server) {
   if (!s_initDone) {
     throw AuthenticationFailedException(
@@ -132,7 +132,6 @@ PropertiesPtr PKCSAuthInit::getCredentials(PropertiesPtr& securityprops,
         "PKCSAuthInit::getCredentials: "
         "key-store password property KEYSTORE_PASSWORD not set.");
   }
-  DataOutput additionalMsg;
 
   FILE* keyStoreFP = fopen(keyStorePath, "r");
   if (keyStoreFP == NULL) {
@@ -157,6 +156,9 @@ PropertiesPtr PKCSAuthInit::getCredentials(PropertiesPtr& securityprops,
   }
 
   fclose(keyStoreFP);
+
+  SerializationRegistry defaultSerializationRegistry;
+  DataOutput additionalMsg(defaultSerializationRegistry);
 
   additionalMsg.writeUTF(alias);
 

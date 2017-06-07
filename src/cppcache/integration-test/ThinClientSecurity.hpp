@@ -74,7 +74,6 @@ PoolPtr getPool(const char* name) { return PoolManager::find(name); }
 
 RegionServicePtr getVirtualCache(PropertiesPtr creds, PoolPtr pool) {
   CachePtr cachePtr = getHelper()->getCache();
-  // return pool->createSecureUserCache(creds);
   return cachePtr->createAuthenticatedView(creds, pool->getName());
 }
 

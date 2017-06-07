@@ -493,7 +493,7 @@ class CPPCACHE_EXPORT PoolFactory  {
    * @throws IllegalStateException if a locator or server has not been added.
    * @return the newly created pool.
    */
-  PoolPtr create(const char* name);
+  PoolPtr create(const char* name, Cache &cache);
 
   /**
    * By default setPRSingleHopEnabled is true<br>

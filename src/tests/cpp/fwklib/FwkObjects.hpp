@@ -600,16 +600,16 @@ class FwkPool {
     }
   }
 
-  PoolPtr createPoolForPerf() { return m_poolFactory->create(m_name.c_str()); }
+//  PoolPtr createPoolForPerf() { return m_poolFactory->create(m_name.c_str()); }
 
-  PoolPtr createPool() const {
-    if (m_name.empty()) {
-      FWKEXCEPTION("Pool name not specified.");
-    } else {
-      return m_poolFactory->create(m_name.c_str());
-    }
-    return nullptr;
-  }
+//  PoolPtr createPool() const {
+//    if (m_name.empty()) {
+//      FWKEXCEPTION("Pool name not specified.");
+//    } else {
+//      return m_poolFactory->create(m_name.c_str());
+//    }
+//    return nullptr;
+//  }
   const std::string& getName() const { return m_name; }
   void print() const { FWKINFO("FwkPool " << m_name); }
 };

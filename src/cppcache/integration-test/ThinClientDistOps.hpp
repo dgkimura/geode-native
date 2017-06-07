@@ -316,7 +316,7 @@ void createAndVerifyEntry(const char* name) {
   /*5.create new with entry userobject cantain all cacheable type ( like
    * cacheableInt,CacheableDouble, CacheableString,CacheableHashMap etc) key and
    * null value*/
-  // Serializable::registerPdxType(PdxTests::PdxType::createDeserializable);
+  // serializationRegistry->addPdxType(PdxTests::PdxType::createDeserializable);
   auto keyObject1 = std::make_shared<PdxTests::PdxType>();
   regPtr->create(keyObject1, x);
   CacheablePtr retVal = regPtr->get(keyObject1);
