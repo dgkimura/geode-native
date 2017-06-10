@@ -37,7 +37,7 @@ namespace geode {
 namespace client {
 PoolFactoryPtr getPoolFactory(CachePtr cachePtr)
 {
-  static auto poolFactoryPtr = std::make_shared<PoolFactory>();
+  static auto poolFactoryPtr = std::make_shared<PoolFactory>(nullptr);
   return poolFactoryPtr;
 }
 }  // namespace client
@@ -45,10 +45,11 @@ PoolFactoryPtr getPoolFactory(CachePtr cachePtr)
 }  // namespace apache
 
 
-PoolFactory::PoolFactory()
+PoolFactory::PoolFactory(PoolManager *poolManager)
     : m_attrs(new PoolAttributes),
       m_isSubscriptionRedundancy(false),
-      m_addedServerOrLocator(false) {}
+      m_addedServerOrLocator(false),
+      m_poolManager(poolManager){}
 
 PoolFactory::~PoolFactory() {}
 

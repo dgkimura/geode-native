@@ -60,7 +60,7 @@ RegionPtr RegionFactory::create(const char* name) {
     // if local region no need to create default pool
     if (m_preDefinedRegion != LOCAL) {
       // FIXME: globals - Make m_cacheimpl a shared_ptr
-      PoolPtr pool = CacheFactory::createOrGetDefaultPool(m_cacheimpl.getCache()->shared_from_this());
+      PoolPtr pool = m_cacheimpl.getPoolManager().createOrGetDefaultPool();
       if (pool == nullptr) {
         throw IllegalStateException("Pool is not defined create region.");
       }

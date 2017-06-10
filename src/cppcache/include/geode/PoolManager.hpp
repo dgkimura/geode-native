@@ -96,6 +96,7 @@ class CPPCACHE_EXPORT PoolManager : public SharedBase {
    void close(bool keepAlive = false);
 
   PoolManager(Cache * cache);
+  PoolFactoryPtr m_poolFactoryPtr;
 private:
     Cache * m_cache;
 };

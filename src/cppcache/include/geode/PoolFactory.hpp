@@ -522,7 +522,7 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
 
   ~PoolFactory();
 
-  PoolFactory();
+  PoolFactory(PoolManager * poolManager);
 
  private:
   PoolFactory(const PoolFactory&);
@@ -530,6 +530,7 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
   PoolAttributesPtr m_attrs;
   bool m_isSubscriptionRedundancy;
   bool m_addedServerOrLocator;
+  PoolManager * m_poolManager;
   friend class Cache;
   friend class CacheImpl;
   friend class PoolManager;

@@ -17,9 +17,13 @@
 #include <geode/PoolManager.hpp>
 #include <ace/Recursive_Thread_Mutex.h>
 #include <ace/Guard_T.h>
+#include <CacheRegionHelper.hpp>
+
+#include <PoolAttributes.hpp>
 
 using namespace apache::geode::client;
-
+#define DEFAULT_SERVER_PORT 40404
+#define DEFAULT_SERVER_HOST "localhost"
 // TODO: make this a member of TcrConnectionManager.
 HashMapOfPools* connectionPools = NULL; /*new HashMapOfPools( )*/
 ACE_Recursive_Thread_Mutex connectionPoolsLock;
@@ -46,14 +50,113 @@ void removePool(const char* name) {
 }
 
 PoolFactoryPtr PoolManager::createFactory() {
-  if (connectionPools == NULL) {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
-    if (connectionPools == NULL) {
-      connectionPools = new HashMapOfPools();
+  return PoolFactoryPtr(new PoolFactory(this));
+}
+extern ACE_Recursive_Thread_Mutex* g_disconnectLock;
+
+
+PoolPtr PoolManager::createOrGetDefaultPool() {
+//  ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
+
+  if (m_cache->isClosed() == false &&
+      CacheRegionHelper::getCacheImpl(m_cache)->getDefaultPool() != nullptr) {
+  
+    return  CacheRegionHelper::getCacheImpl(m_cache)->getDefaultPool();
   }
+
+  PoolPtr pool = getPoolManager()->find(DEFAULT_POOL_NAME);
+
+  // if default_poolFactory is null then we are not using latest API....
+  if (pool == nullptr) {
+  
+    pool = determineDefaultPool();
+  }
+
+  return pool;
 }
-  return PoolFactoryPtr(new PoolFactory());
+
+
+PoolPtr PoolManager::determineDefaultPool() {
+      PoolPtr pool = nullptr;
+    HashMapOfPools allPools = getPoolManager()->getAll();
+    size_t currPoolSize = allPools.size();
+
+  CacheImpl * cacheImpl = CacheRegionHelper::getCacheImpl(m_cache);
+    // means user has not set any pool attributes
+    if (m_poolFactoryPtr == nullptr) {
+    
+      m_poolFactoryPtr = std::make_shared<PoolFactory>(this);
+      if (currPoolSize == 0) {
+        if (!m_poolFactoryPtr->m_addedServerOrLocator) {
+        
+          m_poolFactoryPtr->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
+        }
+      
+        pool = m_poolFactoryPtr->create(DEFAULT_POOL_NAME,m_cache->shared_from_this());
+        // creatubg default pool so setting this as default pool
+        LOGINFO("Set default pool with localhost:40404");
+      
+        cacheImpl->setDefaultPool(pool);
+      } else if (currPoolSize == 1) {
+      
+        pool = allPools.begin().second();
+        LOGINFO("Set default pool from existing pool.");
+        cacheImpl->setDefaultPool(pool);
+      } else {
+      
+        // can't set anything as deafult pool
+        return nullptr;
+      }
+    } else {
+    
+      PoolPtr defaulPool = cacheImpl->getDefaultPool();
+
+      if (!m_poolFactoryPtr->m_addedServerOrLocator) {
+      
+        m_poolFactoryPtr->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
+      }
+
+      if (defaulPool != nullptr) {
+        // once default pool is created, we will not create
+        if (*(defaulPool->m_attrs) == *(m_poolFactoryPtr->m_attrs)) {
+        
+          return defaulPool;
+        } else {
+        
+          throw IllegalStateException(
+              "Existing cache's default pool was not compatible");
+        }
+      }
+
+      pool = nullptr;
+    
+      // return any existing pool if it matches
+      for (auto iter = allPools.begin(); iter != allPools.end(); ++iter) {
+        auto currPool = iter.second();
+        if (*(currPool->m_attrs) == *(m_poolFactoryPtr->m_attrs)) {
+        
+          return currPool;
+        }
+      }
+
+      // defaul pool is null
+      GF_DEV_ASSERT(defaulPool == nullptr);
+
+      if (defaulPool == nullptr) {
+      
+        pool = m_poolFactoryPtr->create(DEFAULT_POOL_NAME, m_cache->shared_from_this());
+        LOGINFO("Created default pool");
+        // creating default so setting this as defaul pool
+      
+        cacheImpl->setDefaultPool(pool);
+      }
+    
+      return pool;
+    }
+
+  return pool;
 }
+
 
 void PoolManager::close(bool keepAlive) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
