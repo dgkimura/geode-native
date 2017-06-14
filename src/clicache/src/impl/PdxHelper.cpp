@@ -48,17 +48,8 @@ namespace Apache
 
         CacheImpl* getCacheImpl(CachePtr cachePtr)
         {
-<<<<<<< 933b1d55292a96d09a2cc41c21d2f76754e4936b
 
           if (cachePtr == nullptr)
-=======
-			//TODO: this must be fixed... should not be just creating a cache magically.
-			CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
-
-			CachePtr cache = cacheFactoryPtr->create();
-
-          if (cache == nullptr)
->>>>>>> GEODE-2740 Compiling successfully on windows.
           {
             throw gcnew IllegalStateException("cache has not been created yet.");;
           }
