@@ -54,7 +54,7 @@ CacheFactoryPtr* s_factory = nullptr;
 CacheFactoryPtr CacheFactory::createCacheFactory(
     const PropertiesPtr& configPtr) {
   // need to create PoolFactory instance
-  s_factory = new CacheFactoryPtr(std::make_shared<CacheFactory>(configPtr));
+  s_factory = &std::make_shared<CacheFactory>(configPtr);
   return *s_factory;
 }
 
