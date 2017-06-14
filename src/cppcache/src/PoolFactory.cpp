@@ -45,11 +45,10 @@ PoolFactoryPtr getPoolFactory(CachePtr cachePtr)
 }  // namespace apache
 
 
-PoolFactory::PoolFactory(PoolManager *poolManager)
+PoolFactory::PoolFactory()
     : m_attrs(new PoolAttributes),
       m_isSubscriptionRedundancy(false),
-      m_addedServerOrLocator(false),
-      m_poolManager(poolManager){}
+      m_addedServerOrLocator(false) {}
 
 PoolFactory::~PoolFactory() {}
 
@@ -152,8 +151,8 @@ PoolPtr PoolFactory::create(const char* name, CachePtr cachePtr) {
       }
     }
 
-
-    TcrConnectionManager &tccm = cacheImpl->tcrConnectionManager();
+    CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cachePtr.get());
+      TcrConnectionManager& tccm =   cacheImpl->tcrConnectionManager();
     if (!copyAttrs->getSubscriptionEnabled() &&
         copyAttrs->getSubscriptionRedundancy() == 0 && !tccm.isDurable()) {
       if (copyAttrs

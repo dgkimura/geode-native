@@ -522,7 +522,11 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
 
   ~PoolFactory();
 
+<<<<<<< 2643adb54abb3bf5f2ba06fb94b2ce79b6b455c1
   PoolFactory(PoolManager * poolManager);
+=======
+  PoolFactory();
+>>>>>>> Unwinding poolfactory's use of cacheptr to fix a bug...
 
  private:
   PoolFactory(const PoolFactory&);
@@ -530,7 +534,10 @@ class CPPCACHE_EXPORT PoolFactory : public SharedBase {
   PoolAttributesPtr m_attrs;
   bool m_isSubscriptionRedundancy;
   bool m_addedServerOrLocator;
+<<<<<<< 2643adb54abb3bf5f2ba06fb94b2ce79b6b455c1
   PoolManager * m_poolManager;
+=======
+>>>>>>> Unwinding poolfactory's use of cacheptr to fix a bug...
   friend class Cache;
   friend class CacheImpl;
   friend class PoolManager;

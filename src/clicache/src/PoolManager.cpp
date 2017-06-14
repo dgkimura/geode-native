@@ -37,7 +37,7 @@ namespace Apache
       PoolFactory^ PoolManager::CreateFactory(Cache^ cache)
       {
 		  
-        return PoolFactory::Create(apache::geode::client::getPoolManager()->createFactory(cache->GetNative()));
+        return PoolFactory::Create(apache::geode::client::getPoolManager()->createFactory());
       }
 
       const Dictionary<String^, Pool^>^ PoolManager::GetAll()
