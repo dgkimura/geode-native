@@ -97,7 +97,7 @@ namespace Apache.Geode.Client.UnitTests
         CacheFactory cacheFactory = CacheFactory.CreateCacheFactory();
         Cache cache = cacheFactory.Create();
         QueryService <object, object> qsFail = null;
-        qsFail = PoolManager.CreateFactory(cache).Create("_TESTFAILPOOL_", cache).GetQueryService<object, object>();
+        qsFail = PoolManager.CreateFactory(cache).Create("_TESTFAILPOOL_").GetQueryService<object, object>();
         Query<object> qryFail = qsFail.NewQuery("select distinct * from /" + QERegionName);
         ISelectResults<object> resultsFail = qryFail.Execute();
         Assert.Fail("Since no endpoints defined, so exception expected");
