@@ -83,13 +83,13 @@ void DistributedSystemImpl::disconnectInstance() {
   g_numInstances--;
 }
 
-void DistributedSystemImpl::CallCliCallBack() {
+void DistributedSystemImpl::CallCliCallBack(Cache& cache) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> disconnectGuard(m_cliCallbackLock);
   if (m_isCliCallbackSet == true) {
     for (std::map<int, CliCallbackMethod>::iterator iter =
              m_cliCallbackMap.begin();
          iter != m_cliCallbackMap.end(); ++iter) {
-      (*iter).second();
+      (*iter).second(cache);
     }
   }
 }

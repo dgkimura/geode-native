@@ -15,16 +15,13 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "CliCallbackDelgate.hpp"
 
-#include "../geode_defs.hpp"
-#include "../Serializable.hpp"
-#include "ManagedCacheableKey.hpp"
-#include "SafeConvert.hpp"
-#include "../Log.hpp"
-#include "PdxTypeRegistry.hpp"
+#include "begin_native.hpp"
+#include "CacheRegionHelper.hpp"
+#include "end_native.hpp"
 
-
+#include "../Cache.hpp"
 using namespace System;
 
 namespace Apache
@@ -33,23 +30,11 @@ namespace Apache
   {
     namespace Client
     {
-      ref class Cache;
-      /// <summary>
-      /// to get the callback from c++ layer
-      /// </summary>
-      ref class CliCallbackDelegate
-      {
-      public:
-
-        CliCallbackDelegate()
-        {}
-
-        void Callback(apache::geode::client::Cache& cache);
-        
-        CliCallbackDelegate(const CliCallbackDelegate^ other){}
-      private:
-
-      };
+      void CliCallbackDelegate::Callback(apache::geode::client::Cache& cache)
+        {
+          Apache::Geode::Client::Log::Fine("CliCallbackDelgate::Callback( ) ");
+          CacheRegionHelper::getCacheImpl(&cache)->getPdxTypeRegistry()->clear();
+        }
     }  // namespace Client
   }  // namespace Geode
 }  // namespace Apache

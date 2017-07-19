@@ -14,12 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
- * PdxTypeRegistry.cpp
- *
- *  Created on: Dec 9, 2011
- *      Author: npatel
- */
 
 #include "PdxTypeRegistry.hpp"
 

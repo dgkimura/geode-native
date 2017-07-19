@@ -131,7 +131,7 @@ namespace Apache
 
         static void connectInstance();
 
-        delegate void cliCallback();
+        delegate void cliCallback(apache::geode::client::Cache& cache);
 
         static void registerCliCallback();
 

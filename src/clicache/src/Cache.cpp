@@ -128,7 +128,7 @@ namespace Apache
         _GF_MG_EXCEPTION_CATCH_ALL2
         finally
         {
-					Apache::Geode::Client::Internal::PdxTypeRegistry::clear();
+					CacheRegionHelper::getCacheImpl(m_nativeptr->get())->getPdxTypeRegistry()->clear();
           Serializable::Clear();
           Apache::Geode::Client::DistributedSystem::releaseDisconnectLock();
           Apache::Geode::Client::DistributedSystem::unregisterCliCallback();

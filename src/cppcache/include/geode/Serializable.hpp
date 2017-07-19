@@ -35,7 +35,7 @@ namespace client {
 class DataOutput;
 class DataInput;
 
-typedef void (*CliCallbackMethod)();
+typedef void (*CliCallbackMethod)(Cache& cache);
 
 /** @brief signature of functions passed to registerType. Such functions
  * should return an empty instance of the type they represent. The instance

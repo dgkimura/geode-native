@@ -2158,7 +2158,8 @@ int ThinClientPoolDM::cliCallback(volatile bool& isRunning) {
     if (isRunning) {
       LOGFINE("Clearing Pdx Type Registry");
       // this call for csharp client
-      DistributedSystemImpl::CallCliCallBack();
+      DistributedSystemImpl::CallCliCallBack(
+          *(m_connManager.getCacheImpl()->getCache()));
       // this call for cpp client
       m_connManager.getCacheImpl()->getPdxTypeRegistry()->clear();
       while (m_cliCallbackSema.tryacquire() != -1) {
