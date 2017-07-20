@@ -724,6 +724,10 @@ class CPPCACHE_EXPORT DataOutput {
 
   static void safeDelete(uint8_t* src) { GF_SAFE_DELETE(src); }
 
+  const SerializationRegistry& getSerializationRegistry() {
+    return m_serializationRegistry;
+  }
+
  private:
   void writeObjectInternal(const Serializable* ptr, bool isDelta = false);
 

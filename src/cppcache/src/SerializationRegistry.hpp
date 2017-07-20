@@ -203,9 +203,9 @@ class CPPCACHE_EXPORT SerializationRegistry {
 
   void removeType2(int64_t compId);
 
-  int32_t GetPDXIdForType(const char* poolName, SerializablePtr pdxType);
+  int32_t GetPDXIdForType(const char* poolName, SerializablePtr pdxType) const;
 
-  SerializablePtr GetPDXTypeById(const char* poolName, int32_t typeId);
+  SerializablePtr GetPDXTypeById(const char* poolName, int32_t typeId) const;
 
   int32_t GetEnumValue(SerializablePtr enumInfo);
   SerializablePtr GetEnum(int32_t val);

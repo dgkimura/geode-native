@@ -40,7 +40,7 @@ namespace Apache
 					return preserveData->Count;
 				}
 
-        Int32 PdxTypeRegistry::GetPDXIdForType(Type^ pdxType, const char* poolname, PdxType^ nType, bool checkIfThere)
+        Int32 PdxTypeRegistry::GetPDXIdForType(Type^ pdxType, const char* poolname, PdxType^ nType, bool checkIfThere, const native::SerializationRegistry* serializationRegistry)
         {
           if(checkIfThere)
           {
@@ -62,7 +62,7 @@ namespace Apache
                   return lpdx->TypeId;
               } 
             }
-            return Serializable::GetPDXIdForType(poolname, nType);            
+            return Serializable::GetPDXIdForType(poolname, nType, serializationRegistry);            
           }
           finally
           {
@@ -71,7 +71,7 @@ namespace Apache
             
         }
 
-        Int32 PdxTypeRegistry::GetPDXIdForType(PdxType^ pType, const char* poolname)
+        Int32 PdxTypeRegistry::GetPDXIdForType(PdxType^ pType, const char* poolname, const native::SerializationRegistry* serializationRegistry)
         {
           IDictionary<PdxType^, Int32>^ tmp = pdxTypeToTypeId;
           Int32 typeId = 0;
@@ -92,7 +92,7 @@ namespace Apache
                 return typeId;
 
             }
-            typeId = Serializable::GetPDXIdForType(poolname, pType);            
+            typeId = Serializable::GetPDXIdForType(poolname, pType, serializationRegistry);            
             pType->TypeId = typeId;
 
             IDictionary<PdxType^, Int32>^ newDict = gcnew Dictionary<PdxType^, Int32>(pdxTypeToTypeId);

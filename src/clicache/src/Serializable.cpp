@@ -259,15 +259,15 @@ namespace Apache
         return (Apache::Geode::Client::Serializable^)CacheableStringArray::Create(value);
       }
 
-      System::Int32 Serializable::GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType)
+      System::Int32 Serializable::GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType, const native::SerializationRegistry* serializationRegistry)
       {
         native::CacheablePtr kPtr(SafeMSerializableConvertGeneric(pdxType));
-        return native::CacheImpl::getInstance()->getSerializationRegistry()->GetPDXIdForType(poolName, kPtr);
+        return serializationRegistry->GetPDXIdForType(poolName, kPtr);
       }
 
-      IGeodeSerializable^ Serializable::GetPDXTypeById(const char* poolName, System::Int32 typeId)
-      {
-        SerializablePtr sPtr = native::CacheImpl::getInstance()->getSerializationRegistry()->GetPDXTypeById(poolName, typeId);
+      IGeodeSerializable^ Serializable::GetPDXTypeById(const char* poolName, System::Int32 typeId, const native::SerializationRegistry* serializationRegistry)
+      {        
+        SerializablePtr sPtr = serializationRegistry->GetPDXTypeById(poolName, typeId);
         return SafeUMSerializableConvertGeneric(sPtr);
       }
 

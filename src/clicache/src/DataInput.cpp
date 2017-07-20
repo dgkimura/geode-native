@@ -662,7 +662,7 @@ namespace Apache
           int cacheCursor = m_cursor;
           System::Byte* cacheBuffer = m_buffer;
           unsigned int cacheBufferLength = m_bufferLength;
-          Object^ ret = Internal::PdxHelper::DeserializePdx(this, false);
+          Object^ ret = Internal::PdxHelper::DeserializePdx(this, false, m_serializationRegistry);
           int tmp = m_nativeptr->get()->getBytesRemaining();
           m_cursor = cacheBufferLength - tmp;
           m_buffer = cacheBuffer;
@@ -813,7 +813,7 @@ namespace Apache
         }
         else if (compId == GeodeClassIds::PDX)
         {
-          return Internal::PdxHelper::DeserializePdx(this, false);
+          return Internal::PdxHelper::DeserializePdx(this, false, m_serializationRegistry);
         }
         else if (compId == GeodeTypeIds::CacheableNullString) {
           //return SerializablePtr(CacheableString::createDeserializable());

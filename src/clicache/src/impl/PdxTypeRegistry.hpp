@@ -16,6 +16,9 @@
  */
 
 #pragma once
+#include "begin_native.hpp"
+#include "SerializationRegistry.hpp"
+#include "end_native.hpp"
 #include "PdxType.hpp"
 #include "PdxRemotePreservedData.hpp"
 #include "../IPdxSerializable.hpp"
@@ -63,9 +66,9 @@ namespace Apache
 
            void clear();
 
-           static Int32 GetPDXIdForType(Type^ type, const char* poolname, PdxType^ nType, bool checkIfThere);
+           static Int32 GetPDXIdForType(Type^ type, const char* poolname, PdxType^ nType, bool checkIfThere, const native::SerializationRegistry* serializationRegistry);
 
-           static Int32 GetPDXIdForType(PdxType^ type, const char* poolname);
+           static Int32 GetPDXIdForType(PdxType^ type, const char* poolname, const native::SerializationRegistry* serializationRegistry);
 
 					static property bool PdxIgnoreUnreadFields
 					{

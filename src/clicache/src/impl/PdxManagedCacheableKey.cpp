@@ -43,7 +43,7 @@ namespace apache
         try {
           System::UInt32 pos = (int)output.getBufferLength();
           Apache::Geode::Client::DataOutput mg_output(&output, true);
-          Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, m_managedptr);
+          Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, m_managedptr, m_serializationRegistry);
           //m_managedptr->ToData( %mg_output );
           //this will move the cursor in c++ layer
           mg_output.WriteBytesToUMDataOutput();
@@ -64,7 +64,7 @@ namespace apache
           int pos = input.getBytesRead();
           Apache::Geode::Client::DataInput mg_input(&input, true, m_serializationRegistry);
           //m_managedptr = m_managedptr->FromData( %mg_input );
-          Apache::Geode::Client::IPdxSerializable^ tmp = Apache::Geode::Client::Internal::PdxHelper::DeserializePdx(%mg_input, false);
+          Apache::Geode::Client::IPdxSerializable^ tmp = Apache::Geode::Client::Internal::PdxHelper::DeserializePdx(%mg_input, false, m_serializationRegistry);
           m_managedptr = tmp;
           m_managedDeltaptr = dynamic_cast<Apache::Geode::Client::IGeodeDelta^>(tmp);
 

@@ -259,7 +259,7 @@ PdxSerializerPtr SerializationRegistry::getPdxSerializer() {
 }
 
 int32_t SerializationRegistry::GetPDXIdForType(const char* poolName,
-                                               SerializablePtr pdxType) {
+                                               SerializablePtr pdxType) const {
   PoolPtr pool = nullptr;
 
   if (poolName == nullptr) {
@@ -279,7 +279,7 @@ int32_t SerializationRegistry::GetPDXIdForType(const char* poolName,
 }
 
 SerializablePtr SerializationRegistry::GetPDXTypeById(const char* poolName,
-                                                      int32_t typeId) {
+                                                      int32_t typeId) const {
   PoolPtr pool = nullptr;
 
   if (poolName == nullptr) {

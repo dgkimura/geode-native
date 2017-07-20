@@ -60,6 +60,7 @@ namespace Apache
         System::Int32 m_remainingBufferLength;
         bool m_ispdxSerialization;
         native_conditional_unique_ptr<native::DataOutput>^ m_nativeptr;
+        const native::SerializationRegistry* m_serializationRegistry;
 
       public:
 
@@ -81,6 +82,7 @@ namespace Apache
             GC::KeepAlive(m_nativeptr);
           }
           m_ispdxSerialization = false;
+          m_serializationRegistry = &serializationRegistry;
         }
 
         /// <summary>
@@ -652,6 +654,7 @@ namespace Apache
           m_bytes = const_cast<System::Byte *>(nativeptr->getCursor());
           m_remainingBufferLength = (System::Int32)nativeptr->getRemainingBufferLength();
           m_ispdxSerialization = false;
+          m_serializationRegistry = &nativeptr->getSerializationRegistry();
         }
       };
     }  // namespace Client

@@ -21,6 +21,7 @@
 #include "begin_native.hpp"
 #include <geode/CacheableKey.hpp>
 #include <geode/CacheableBuiltins.hpp>
+#include "SerializationRegistry.hpp"
 #include "end_native.hpp"
 
 #include "IGeodeSerializable.hpp"
@@ -302,8 +303,8 @@ namespace Apache
 
       internal:
 
-				static System::Int32 GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType);
-				static IGeodeSerializable^ GetPDXTypeById(const char* poolName, System::Int32 typeId);
+				static System::Int32 GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType, const native::SerializationRegistry* serializationRegistry);
+				static IGeodeSerializable^ GetPDXTypeById(const char* poolName, System::Int32 typeId, const native::SerializationRegistry* serializationRegistry);
 				static IPdxSerializable^ Serializable::GetPdxType(String^ className);
 				static void RegisterPDXManagedCacheableKey(bool appDomainEnable, Cache^ cache);
         static bool IsObjectAndPdxSerializerRegistered(String^ className);

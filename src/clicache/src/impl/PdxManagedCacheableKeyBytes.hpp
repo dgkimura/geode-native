@@ -88,7 +88,7 @@ namespace apache
         {
           apache::geode::client::DataOutput dataOut(*serializationRegistry);
           Apache::Geode::Client::DataOutput mg_output( &dataOut, true);
-					 Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr);
+					 Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr, m_serializationRegistry);
         //  managedptr->ToData( %mg_output );
           
           //move cursor

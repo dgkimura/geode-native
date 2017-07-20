@@ -63,7 +63,7 @@ namespace Apache
           try
           {
             Apache::Geode::Client::DataOutput mg_output(&(*output), true);
-            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, this);
+            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, this, serializationRegistry);
           }
           finally
           {
@@ -88,7 +88,7 @@ namespace Apache
           DataInput^ dataInput = gcnew DataInput(m_buffer, m_bufferLength, m_serializationRegistry);
           dataInput->setRootObjectPdx(true);
           System::Int64 sampleStartNanos = Utils::startStatOpTime();
-          Object^ ret = Internal::PdxHelper::DeserializePdx(dataInput, true, m_typeId, m_bufferLength);
+          Object^ ret = Internal::PdxHelper::DeserializePdx(dataInput, true, m_typeId, m_bufferLength, m_serializationRegistry);
           //dataInput->ResetPdx(0);
 
           if(m_cachePerfStats)
