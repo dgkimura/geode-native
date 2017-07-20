@@ -150,10 +150,13 @@ CacheTransactionManagerPtr Cache::getCacheTransactionManager() {
   return m_cacheImpl->getCacheTransactionManager();
 }
 
+TypeRegistry& Cache::getTypeRegistry() { return *(m_typeRegistry.get()); }
+
 Cache::Cache(const std::string& name, std::unique_ptr<DistributedSystem> sys,
              bool ignorePdxUnreadFields, bool readPdxSerialized) {
   m_cacheImpl = std::unique_ptr<CacheImpl>(new CacheImpl(
       this, name, std::move(sys), ignorePdxUnreadFields, readPdxSerialized));
+  m_typeRegistry = std::unique_ptr<TypeRegistry>(new TypeRegistry(*this));
 }
 
 Cache::~Cache() = default;

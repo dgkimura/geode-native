@@ -34,7 +34,7 @@
 #include "RegionFactory.hpp"
 #include "InternalCacheTransactionManager2PC.hpp"
 #include "statistics/StatisticsFactory.hpp"
-
+#include "geode/TypeRegistry.hpp"
 /**
  * @file
  */
@@ -214,6 +214,8 @@ class CPPCACHE_EXPORT Cache : public GeodeCache,
    */
   virtual bool getPdxReadSerialized();
 
+  virtual TypeRegistry& getTypeRegistry();
+
   /**
    * Returns a factory that can create a {@link PdxInstance}.
    * @param className the fully qualified class name that the PdxInstance will
@@ -243,6 +245,7 @@ class CPPCACHE_EXPORT Cache : public GeodeCache,
         bool ignorePdxUnreadFields, bool readPdxSerialized);
 
   std::unique_ptr<CacheImpl> m_cacheImpl;
+  std::unique_ptr<TypeRegistry> m_typeRegistry;
 
  protected:
   Cache() = delete;
