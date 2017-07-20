@@ -255,7 +255,7 @@ namespace Apache
           return nullptr;
         }
 
-        Int32 PdxTypeRegistry::GetEnumValue(EnumInfo^ ei)
+        Int32 PdxTypeRegistry::GetEnumValue(EnumInfo^ ei, const native::SerializationRegistry* serializationRegistry)
         {
           IDictionary<EnumInfo^, Int32>^ tmp = enumToInt;
           if(tmp->ContainsKey(ei))
@@ -267,7 +267,7 @@ namespace Apache
              if(tmp->ContainsKey(ei))
               return tmp[ei];
 
-             int val = Serializable::GetEnumValue(ei);
+             int val = Serializable::GetEnumValue(ei, serializationRegistry);
              tmp = gcnew Dictionary<EnumInfo^, Int32>(enumToInt);
              tmp[ei] = val;
              enumToInt = tmp;
@@ -280,7 +280,7 @@ namespace Apache
           return 0;
         }
 
-        EnumInfo^ PdxTypeRegistry::GetEnum(Int32 enumVal)
+        EnumInfo^ PdxTypeRegistry::GetEnum(Int32 enumVal, const native::SerializationRegistry* serializationRegistry)
         {
           IDictionary<Int32, EnumInfo^>^ tmp = intToEnum;
           EnumInfo^ ret = nullptr;
@@ -298,7 +298,7 @@ namespace Apache
             if(ret != nullptr)
               return ret;
 
-             ret = Serializable::GetEnum(enumVal);
+             ret = Serializable::GetEnum(enumVal, serializationRegistry);
              tmp = gcnew Dictionary<Int32, EnumInfo^>(intToEnum);
              tmp[enumVal] = ret;
              intToEnum = tmp;

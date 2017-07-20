@@ -316,8 +316,8 @@ namespace Apache
 
         static Type^ GetType(String^ className);
 
-        static int GetEnumValue(Internal::EnumInfo^ ei);
-        static Internal::EnumInfo^ GetEnum(int val);
+        static int GetEnumValue(Internal::EnumInfo^ ei, const native::SerializationRegistry* serializationRegistry);
+        static Internal::EnumInfo^ GetEnum(int val, const native::SerializationRegistry* serializationRegistry);
 
          static Dictionary<String^, PdxTypeFactoryMethod^>^ PdxDelegateMap =
           gcnew Dictionary<String^, PdxTypeFactoryMethod^>();

@@ -82,9 +82,9 @@ namespace Apache
 						void set(bool value){pdxReadSerialized= value;}
 					}
 
-           static Int32 GetEnumValue(EnumInfo^ ei);
+           static Int32 GetEnumValue(EnumInfo^ ei, const native::SerializationRegistry* serializationRegistry);
 
-           static EnumInfo^ GetEnum(Int32 enumVal);
+           static EnumInfo^ GetEnum(Int32 enumVal, const native::SerializationRegistry* serializationRegistry);
 
         private:
             Cache^ m_cache;

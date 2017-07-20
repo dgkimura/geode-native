@@ -354,17 +354,17 @@ namespace Apache
           }
         }
 
-        Int32 PdxHelper::GetEnumValue(String^ enumClassName, String^ enumName, int hashcode)
+        Int32 PdxHelper::GetEnumValue(String^ enumClassName, String^ enumName, int hashcode, const native::SerializationRegistry* serializationRegistry)
         {
           //in case app want different name
           enumClassName = Serializable::GetPdxTypeName(enumClassName);
           EnumInfo^ ei = gcnew EnumInfo(enumClassName, enumName, hashcode);
-          return PdxTypeRegistry::GetEnumValue(ei);        
+          return PdxTypeRegistry::GetEnumValue(ei, serializationRegistry);        
         }
 
-        Object^ PdxHelper::GetEnum(int enumId)
+        Object^ PdxHelper::GetEnum(int enumId, const native::SerializationRegistry* serializationRegistry)
         {
-          EnumInfo^ ei = PdxTypeRegistry::GetEnum(enumId);
+          EnumInfo^ ei = PdxTypeRegistry::GetEnum(enumId, serializationRegistry);
           return ei->GetEnum();
         }
 

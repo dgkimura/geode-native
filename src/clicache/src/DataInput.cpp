@@ -686,7 +686,7 @@ namespace Apache
           int tmp = ReadArrayLen();
           int enumId = (dsId << 24) | (tmp & 0xFFFFFF);
 
-          Object^ enumVal = Internal::PdxHelper::GetEnum(enumId);
+          Object^ enumVal = Internal::PdxHelper::GetEnum(enumId, m_serializationRegistry);
           return enumVal;
         }
         else if (compId == GeodeTypeIds::CacheableNullString) {

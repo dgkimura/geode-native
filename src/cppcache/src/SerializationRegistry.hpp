@@ -207,13 +207,13 @@ class CPPCACHE_EXPORT SerializationRegistry {
 
   SerializablePtr GetPDXTypeById(const char* poolName, int32_t typeId) const;
 
-  int32_t GetEnumValue(SerializablePtr enumInfo);
-  SerializablePtr GetEnum(int32_t val);
+  int32_t GetEnumValue(SerializablePtr enumInfo) const;
+  SerializablePtr GetEnum(int32_t val) const;
 
   PdxSerializablePtr getPdxType(char* className);
 
  private:
-  PoolPtr getPool();
+  PoolPtr getPool() const;
   PdxSerializerPtr m_pdxSerializer;
   TheTypeMap theTypeMap;
 };

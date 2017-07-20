@@ -271,15 +271,15 @@ namespace Apache
         return SafeUMSerializableConvertGeneric(sPtr);
       }
 
-      int Serializable::GetEnumValue(Internal::EnumInfo^ ei)
+      int Serializable::GetEnumValue(Internal::EnumInfo^ ei, const native::SerializationRegistry* serializationRegistry)
       {
         native::CacheablePtr kPtr(SafeMSerializableConvertGeneric(ei));
-        return native::CacheImpl::getInstance()->getSerializationRegistry()->GetEnumValue(kPtr);
+        return serializationRegistry->GetEnumValue(kPtr);
       }
 
-      Internal::EnumInfo^ Serializable::GetEnum(int val)
+      Internal::EnumInfo^ Serializable::GetEnum(int val, const native::SerializationRegistry* serializationRegistry)
       {
-        SerializablePtr sPtr = native::CacheImpl::getInstance()->getSerializationRegistry()->GetEnum(val);
+        SerializablePtr sPtr = serializationRegistry->GetEnum(val);
         return (Internal::EnumInfo^)SafeUMSerializableConvertGeneric(sPtr);
       }
 
