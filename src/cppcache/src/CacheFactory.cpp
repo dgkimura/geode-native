@@ -58,11 +58,11 @@ void* CacheFactory::m_cacheMap = (void*)nullptr;
 
 CacheFactoryPtr* CacheFactory::default_CacheFactory = nullptr;
 
-PoolPtr CacheFactory::createOrGetDefaultPool() {
+PoolPtr CacheFactory::createOrGetDefaultPool(CacheImpl& cacheImpl) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
 
-  if (CacheImpl::getInstance()->getDefaultPool() != nullptr) {
-    return CacheImpl::getInstance()->getDefaultPool();
+  if (cacheImpl.getDefaultPool() != nullptr) {
+    return cacheImpl.getDefaultPool();
   }
 
   PoolPtr pool = PoolManager::find(DEFAULT_POOL_NAME);
@@ -70,8 +70,7 @@ PoolPtr CacheFactory::createOrGetDefaultPool() {
   // if default_poolFactory is null then we are not using latest API....
   if (pool == nullptr && Cache_CreatedFromCacheFactory) {
     if (default_CacheFactory && (*default_CacheFactory)) {
-      pool = (*default_CacheFactory)
-                 ->determineDefaultPool(CacheImpl::getInstance());
+      pool = (*default_CacheFactory)->determineDefaultPool(&cacheImpl);
     }
     (*default_CacheFactory) = nullptr;
     default_CacheFactory = nullptr;
@@ -150,24 +149,27 @@ CachePtr CacheFactory::create() {
   auto cache =
       create(DEFAULT_CACHE_NAME, std::move(dsPtr), cacheXmlFile, nullptr);
 
-
-  cache->m_cacheImpl->getSerializationRegistry()->addType2(std::bind(TXCommitMessage::create,
-                                                                   std::ref(*(cache->m_cacheImpl->getMemberListForVersionStamp()))));
+  cache->m_cacheImpl->getSerializationRegistry()->addType2(std::bind(
+      TXCommitMessage::create,
+      std::ref(*(cache->m_cacheImpl->getMemberListForVersionStamp()))));
 
   cache->m_cacheImpl->getSerializationRegistry()->addType(
       GeodeTypeIdsImpl::PDX, PdxInstantiator::createDeserializable);
   cache->m_cacheImpl->getSerializationRegistry()->addType(
       GeodeTypeIds::CacheableEnum, PdxEnumInstantiator::createDeserializable);
   cache->m_cacheImpl->getSerializationRegistry()->addType(
-      GeodeTypeIds::PdxType, std::bind(PdxType::CreateDeserializable,
-                                       cache->m_cacheImpl->getPdxTypeRegistry()));
+      GeodeTypeIds::PdxType,
+      std::bind(PdxType::CreateDeserializable,
+                cache->m_cacheImpl->getPdxTypeRegistry()));
 
-  cache->m_cacheImpl->getSerializationRegistry()->addType(std::bind(VersionTag::createDeserializable,
-                                                                    std::ref(*(cache->m_cacheImpl->getMemberListForVersionStamp()))));
-  cache->m_cacheImpl->getSerializationRegistry()->addType2(GeodeTypeIdsImpl::DiskVersionTag,
-                                                           std::bind(DiskVersionTag::createDeserializable,
-                                                                     std::ref(*(cache->m_cacheImpl->getMemberListForVersionStamp()))));
-
+  cache->m_cacheImpl->getSerializationRegistry()->addType(std::bind(
+      VersionTag::createDeserializable,
+      std::ref(*(cache->m_cacheImpl->getMemberListForVersionStamp()))));
+  cache->m_cacheImpl->getSerializationRegistry()->addType2(
+      GeodeTypeIdsImpl::DiskVersionTag,
+      std::bind(
+          DiskVersionTag::createDeserializable,
+          std::ref(*(cache->m_cacheImpl->getMemberListForVersionStamp()))));
 
   cache->m_cacheImpl->getPdxTypeRegistry()->setPdxIgnoreUnreadFields(
       cache->getPdxIgnoreUnreadFields());

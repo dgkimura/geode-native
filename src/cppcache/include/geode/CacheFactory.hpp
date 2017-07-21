@@ -454,7 +454,7 @@ class CPPCACHE_EXPORT CacheFactory : public std::enable_shared_from_this<CacheFa
   // Set very first time some creates cache
   // TODO shared_ptr - remove or refactor with global work
   static CacheFactoryPtr* default_CacheFactory;
-  static PoolPtr createOrGetDefaultPool();
+  static PoolPtr createOrGetDefaultPool(CacheImpl& cacheImpl);
   static void* m_cacheMap;
   static void init();
   static void cleanup();
