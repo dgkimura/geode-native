@@ -65,4 +65,4 @@ class TypeRegistry {
 }  // namespace geode
 }  // namespace apache
 
-#endif GEODE_TYPEREGISTRY_H_
+#endif //GEODE_TYPEREGISTRY_H_
