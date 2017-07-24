@@ -31,12 +31,8 @@ namespace geode {
 namespace client {
 
 PdxWrapper::PdxWrapper(void *userObject, const char *className,
-                       PdxSerializerPtr pdxSerializerPtr,
-                       const PdxTypeRegistryPtr &pdxTypeRegistry,
-                       CachePerfStats *cachePerfStats)
-    : PdxSerializable(pdxTypeRegistry, cachePerfStats),
-      m_userObject(userObject),
-      m_serializer(pdxSerializerPtr) {
+                       PdxSerializerPtr pdxSerializerPtr)
+    : m_userObject(userObject), m_serializer(pdxSerializerPtr) {
   if (className != nullptr) {
     m_className = Utils::copyString(className);
   } else {
@@ -66,11 +62,8 @@ PdxWrapper::PdxWrapper(void *userObject, const char *className,
   m_sizer = m_serializer->getObjectSizer(className);
 }
 
-PdxWrapper::PdxWrapper(const char *className, PdxSerializerPtr pdxSerializerPtr,
-                       const PdxTypeRegistryPtr &pdxTypeRegistry,
-                       CachePerfStats *cachePerfStats)
-    : PdxSerializable(pdxTypeRegistry, cachePerfStats),
-      m_serializer(pdxSerializerPtr) {
+PdxWrapper::PdxWrapper(const char *className, PdxSerializerPtr pdxSerializerPtr)
+    : m_serializer(pdxSerializerPtr) {
   if (className != nullptr) {
     m_className = Utils::copyString(className);
   } else {
@@ -148,7 +141,7 @@ void PdxWrapper::fromData(PdxReaderPtr input) {
 }
 
 void PdxWrapper::toData(DataOutput &output) const {
-  PdxHelper::serializePdx(output, *this, m_pdxTypeRegistry, m_cachePerfStats);
+  PdxHelper::serializePdx(output, *this);
 }
 
 Serializable *PdxWrapper::fromData(DataInput &input) {

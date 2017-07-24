@@ -80,9 +80,9 @@ class TESTOBJECT_EXPORT NonPdxAddress {
   }
 };
 
-class TESTOBJECT_EXPORT NonPdxType {
-  enum pdxEnumTest { pdx1, pdx2, pdx3 };
+enum pdxEnumTest { pdx1, pdx2, pdx3 };
 
+class TESTOBJECT_EXPORT NonPdxType {
  public:
   char m_char;
   bool m_bool;
@@ -300,36 +300,36 @@ class TESTOBJECT_EXPORT NonPdxType {
     m_add[9] = new NonPdxAddress(10, "street9", "city9");
 
     m_objectArray = CacheableObjectArray::create();
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(1, "street0", "city0"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(2, "street1", "city1"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(3, "street2", "city2"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(4, "street3", "city3"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(5, "street4", "city4"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(6, "street5", "city5"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(7, "street6", "city6"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(8, "street7", "city7"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(9, "street8", "city8"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
-    m_objectArray->push_back(PdxWrapperPtr(
-        new PdxWrapper(new NonPdxAddress(10, "street9", "city9"),
-                       "PdxTests.Address", pdxSerializer, nullptr, nullptr)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(1, "street0", "city0"),
+                                     "PdxTests.Address", pdxSerializer)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(2, "street1", "city1"),
+                                     "PdxTests.Address", pdxSerializer)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(3, "street2", "city2"),
+                                     "PdxTests.Address", pdxSerializer)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(4, "street3", "city3"),
+                                     "PdxTests.Address", pdxSerializer)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(5, "street4", "city4"),
+                                     "PdxTests.Address", pdxSerializer)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(6, "street5", "city5"),
+                                     "PdxTests.Address", pdxSerializer)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(7, "street6", "city6"),
+                                     "PdxTests.Address", pdxSerializer)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(8, "street7", "city7"),
+                                     "PdxTests.Address", pdxSerializer)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(9, "street8", "city8"),
+                                     "PdxTests.Address", pdxSerializer)));
+    m_objectArray->push_back(
+        PdxWrapperPtr(new PdxWrapper(new NonPdxAddress(10, "street9", "city9"),
+                                     "PdxTests.Address", pdxSerializer)));
 
     m_byte252 = new int8_t[252];
     for (int i = 0; i < 252; i++) {

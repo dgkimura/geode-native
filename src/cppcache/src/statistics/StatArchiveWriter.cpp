@@ -44,9 +44,9 @@ StatDataOutput::StatDataOutput(std::string filename) {
     std::string s("undefined archive file name");
     throw IllegalArgumentException(s.c_str());
   }
-  SerializationRegistry *serializationRegistry = nullptr;
-  dataBuffer =
-      std::unique_ptr<DataOutput>(new DataOutput(*serializationRegistry));
+
+  SerializationRegistry serializationRegistry;
+  dataBuffer = std::unique_ptr<DataOutput>(new DataOutput(serializationRegistry));
   outFile = filename;
   closed = false;
   bytesWritten = 0;

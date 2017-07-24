@@ -22,8 +22,6 @@
 
 #include "PdxSerializer.hpp"
 #include "PdxSerializable.hpp"
-#include "CachePerfStats.hpp"
-#include "PdxType.hpp"
 
 namespace apache {
 namespace geode {
@@ -46,9 +44,7 @@ class CPPCACHE_EXPORT PdxWrapper : public PdxSerializable {
    * the Java side.
    */
   PdxWrapper(void* userObject, const char* className,
-             PdxSerializerPtr pdxSerializerPtr,
-             const PdxTypeRegistryPtr& pdxTypeRegistry,
-             CachePerfStats* cachePerfStats);
+             PdxSerializerPtr pdxSerializerPtr);
 
   /**
    * Returns the pointer to the user object which is deserialized with a
@@ -117,9 +113,7 @@ class CPPCACHE_EXPORT PdxWrapper : public PdxSerializable {
  private:
   /** hide default constructor */
   PdxWrapper();
-  PdxWrapper(const char* className, PdxSerializerPtr pdxSerializerPtr,
-             const PdxTypeRegistryPtr& pdxTypeRegistry,
-             CachePerfStats* cachePerfStats);
+  PdxWrapper(const char* className, PdxSerializerPtr pdxSerializerPtr);
 
   FRIEND_STD_SHARED_PTR(PdxWrapper)
 

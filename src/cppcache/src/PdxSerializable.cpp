@@ -30,9 +30,7 @@
 namespace apache {
 namespace geode {
 namespace client {
-PdxSerializable::PdxSerializable(const PdxTypeRegistryPtr& pdxTypeRegistry,
-                                 CachePerfStats* cachePerfStats)
-    : m_pdxTypeRegistry(pdxTypeRegistry), m_cachePerfStats(cachePerfStats) {}
+PdxSerializable::PdxSerializable() {}
 
 PdxSerializable::~PdxSerializable() {}
 
@@ -43,7 +41,7 @@ int8_t PdxSerializable::typeId() const {
 void PdxSerializable::toData(DataOutput& output) const {
   LOGDEBUG("SerRegistry.cpp:serializePdx:86: PDX Object Type = %s",
            typeid(*this).name());
-  PdxHelper::serializePdx(output, *this, m_pdxTypeRegistry, m_cachePerfStats);
+  PdxHelper::serializePdx(output, *this);
 }
 
 Serializable* PdxSerializable::fromData(DataInput& input) {

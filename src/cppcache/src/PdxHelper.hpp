@@ -47,14 +47,11 @@ class PdxHelper {
 
   virtual ~PdxHelper();
 
-  static void serializePdx(DataOutput& output, const PdxSerializable& pdxObject,
-                           const PdxTypeRegistryPtr& pdxTypeRegistry,
-                           CachePerfStats* cachePerfStats);
+  static void serializePdx(DataOutput& output,
+                           const PdxSerializable& pdxObject);
 
   static void serializePdx(DataOutput& output,
-                           const PdxSerializablePtr& pdxObject,
-                           const PdxTypeRegistryPtr& pdxTypeRegistry,
-                           CachePerfStats* cachePerfStats);
+                           const PdxSerializablePtr& pdxObject);
 
   static PdxSerializablePtr deserializePdx(DataInput& dataInput,
                                            bool forceDeserialize);

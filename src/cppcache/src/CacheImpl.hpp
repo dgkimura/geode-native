@@ -292,6 +292,9 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   bool m_readPdxSerialized;
   std::unique_ptr<ExpiryTaskManager> m_expiryTaskManager;
 
+  // CachePerfStats
+  CachePerfStats* m_cacheStats;
+
   enum RegionKind {
     CPP_REGION,
     THINCLIENT_REGION,
@@ -319,7 +322,6 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   bool m_initialized;
 
   std::unique_ptr<DistributedSystem> m_distributedSystem;
-  CachePerfStats* m_cacheStats;
   ClientProxyMembershipIDFactory m_clientProxyMembershipIDFactory;
   MapOfRegionWithLock* m_regions;
   Cache* m_implementee;
@@ -338,8 +340,8 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   CacheTransactionManagerPtr m_cacheTXManager;
 
   MemberListForVersionStamp& m_memberListForVersionStamp;
-  PdxTypeRegistryPtr m_pdxTypeRegistry;
   SerializationRegistryPtr m_serializationRegistry;
+  PdxTypeRegistryPtr m_pdxTypeRegistry;
 
   friend class CacheFactory;
   friend class Cache;

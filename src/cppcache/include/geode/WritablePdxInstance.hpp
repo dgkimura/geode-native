@@ -527,9 +527,7 @@ class CPPCACHE_EXPORT WritablePdxInstance : public PdxInstance {
   /**
    * @brief constructors
    */
-  WritablePdxInstance(const PdxTypeRegistryPtr& pdxTypeRegistry,
-                      CachePerfStats* cachePerfStats)
-      : PdxInstance(pdxTypeRegistry, cachePerfStats){};
+  WritablePdxInstance(){};
 
  private:
   // never implemented.
