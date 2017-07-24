@@ -95,8 +95,8 @@ void ClientProxyMembershipID::initObjectVars(
     const uint32_t durableClntTimeOut, int32_t dcPort, int32_t vPID,
     int8_t vmkind, int8_t splitBrainFlag, const char* dsname,
     const char* uniqueTag, uint32_t vmViewId) {
-  SerializationRegistry defaultSerializationRegistry;
-  DataOutput m_memID(defaultSerializationRegistry);
+  SerializationRegistry* serializationRegistry = nullptr;
+  DataOutput m_memID(*serializationRegistry);
   if (dsname == nullptr) {
     m_dsname = std::string("");
   } else {

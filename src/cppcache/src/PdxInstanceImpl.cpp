@@ -80,13 +80,12 @@ PdxInstanceImpl::PdxInstanceImpl(
     apache::geode::client::PdxTypePtr pdxType, CachePerfStats* cacheStats,
     PdxTypeRegistryPtr pdxTypeRegistry,
     SerializationRegistry& serializationRegistry, bool enableTimeStatistics)
-    : m_pdxType(pdxType),
+    : WritablePdxInstance(pdxTypeRegistry, cacheStats),
+      m_pdxType(pdxType),
       m_updatedFields(fieldVsValue),
       m_buffer(nullptr),
       m_bufferLength(0),
       m_typeId(0),
-      m_cacheStats(cacheStats),
-      m_pdxTypeRegistry(pdxTypeRegistry),
       m_serializationRegistry(serializationRegistry),
       m_enableTimeStatistics(enableTimeStatistics) {
   m_pdxType->InitializeType();  // to generate static position map
@@ -299,7 +298,7 @@ WritablePdxInstancePtr PdxInstanceImpl::createWriter() {
   LOGDEBUG("PdxInstanceImpl::createWriter m_bufferLength = %d m_typeId = %d ",
            m_bufferLength, m_typeId);
   return std::make_shared<PdxInstanceImpl>(
-      m_buffer, m_bufferLength, m_typeId, m_cacheStats, m_pdxTypeRegistry,
+      m_buffer, m_bufferLength, m_typeId, m_cachePerfStats, m_pdxTypeRegistry,
       m_serializationRegistry,
       m_enableTimeStatistics);  // need to create duplicate byte stream);
 }
@@ -1423,14 +1422,14 @@ PdxSerializablePtr PdxInstanceImpl::getObject() {
   PdxSerializablePtr ret =
       PdxHelper::deserializePdx(dataInput, true, m_typeId, m_bufferLength);
 
-  if (m_cacheStats != nullptr) {
+  if (m_cachePerfStats != nullptr) {
     if (m_enableTimeStatistics) {
       Utils::updateStatOpTime(
-          m_cacheStats->getStat(),
-          m_cacheStats->getPdxInstanceDeserializationTimeId(),
+          m_cachePerfStats->getStat(),
+          m_cachePerfStats->getPdxInstanceDeserializationTimeId(),
           sampleStartNanos);
     }
-    m_cacheStats->incPdxInstanceDeserializations();
+    m_cachePerfStats->incPdxInstanceDeserializations();
   }
   return ret;
 }

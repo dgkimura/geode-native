@@ -1056,12 +1056,11 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
                   PdxTypeRegistryPtr pdxTypeRegistry,
                   SerializationRegistry& serializationRegistry,
                   bool enableTimeStatistics)
-      : m_buffer(DataInput::getBufferCopy(buffer, length)),
+      : WritablePdxInstance(pdxTypeRegistry, cacheStats),
+        m_buffer(DataInput::getBufferCopy(buffer, length)),
         m_bufferLength(length),
         m_typeId(typeId),
         m_pdxType(nullptr),
-        m_cacheStats(cacheStats),
-        m_pdxTypeRegistry(pdxTypeRegistry),
         m_serializationRegistry(serializationRegistry),
         m_enableTimeStatistics(enableTimeStatistics) {
     LOGDEBUG("PdxInstanceImpl::m_bufferLength = %d ", m_bufferLength);
@@ -1087,9 +1086,6 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
   int m_typeId;
   PdxTypePtr m_pdxType;
   FieldVsValues m_updatedFields;
-  CachePerfStats* m_cacheStats;
-
-  PdxTypeRegistryPtr m_pdxTypeRegistry;
   SerializationRegistry& m_serializationRegistry;
   bool m_enableTimeStatistics;
 

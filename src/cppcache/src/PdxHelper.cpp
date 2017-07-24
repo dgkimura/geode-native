@@ -47,21 +47,24 @@ PdxHelper::~PdxHelper() {}
 CacheImpl* PdxHelper::getCacheImpl() { return CacheImpl::getInstance(); }
 
 void PdxHelper::serializePdx(DataOutput& output,
-                             const PdxSerializable& pdxObject) {
+                             const PdxSerializable& pdxObject,
+                             const PdxTypeRegistryPtr& pdxTypeRegistry,
+                             CachePerfStats* cachePerfStats) {
   serializePdx(
       output,
       std::static_pointer_cast<PdxSerializable>(
-          std::const_pointer_cast<Serializable>(pdxObject.shared_from_this())));
+          std::const_pointer_cast<Serializable>(pdxObject.shared_from_this())),
+      pdxTypeRegistry, cachePerfStats);
 }
 
 void PdxHelper::serializePdx(DataOutput& output,
-                             const PdxSerializablePtr& pdxObject) {
+                             const PdxSerializablePtr& pdxObject,
+                             const PdxTypeRegistryPtr& pdxTypeRegistry,
+                             CachePerfStats* cachePerfStats) {
   const char* pdxClassname = nullptr;
 
   auto pdxII = std::dynamic_pointer_cast<PdxInstanceImpl>(pdxObject);
   auto cacheImpl = PdxHelper::getCacheImpl();
-  auto pdxTypeRegistry = cacheImpl->getPdxTypeRegistry();
-  auto& cachePerfStats = cacheImpl->getCachePerfStats();
 
   if (pdxII != nullptr) {
     PdxTypePtr piPt = pdxII->getPdxType();
@@ -112,7 +115,7 @@ void PdxHelper::serializePdx(DataOutput& output,
       uint8_t* stPos = const_cast<uint8_t*>(output.getBuffer()) +
                        ptc->getStartPositionOffset();
       int pdxLen = PdxHelper::readInt32(stPos);
-      cachePerfStats.incPdxSerialization(
+      cachePerfStats->incPdxSerialization(
           pdxLen + 1 + 2 * 4);  // pdxLen + 93 DSID + len + typeID
     }
 
@@ -145,7 +148,7 @@ void PdxHelper::serializePdx(DataOutput& output,
       uint8_t* stPos = const_cast<uint8_t*>(output.getBuffer()) +
                        prw->getStartPositionOffset();
       int pdxLen = PdxHelper::readInt32(stPos);
-      cachePerfStats.incPdxSerialization(
+      cachePerfStats->incPdxSerialization(
           pdxLen + 1 + 2 * 4);  // pdxLen + 93 DSID + len + typeID
     }
   }

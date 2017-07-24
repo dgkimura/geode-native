@@ -67,9 +67,13 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
       m_adminRegion(nullptr),
       m_memberListForVersionStamp(
           *(std::make_shared<MemberListForVersionStamp>())),
-      m_serializationRegistry(std::make_shared<SerializationRegistry>()),
+      m_cacheStats(new CachePerfStats(m_distributedSystem.get()
+                                          ->getStatisticsManager()
+                                          ->getStatisticsFactory())),
       m_pdxTypeRegistry(
           std::make_shared<PdxTypeRegistry>(m_serializationRegistry)),
+      m_serializationRegistry(std::make_shared<SerializationRegistry>(
+          m_pdxTypeRegistry, m_cacheStats)),
       m_expiryTaskManager(
           std::unique_ptr<ExpiryTaskManager>(new ExpiryTaskManager())),
       m_clientProxyMembershipIDFactory(m_distributedSystem->getName()) {
@@ -85,9 +89,6 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
     LOGINFO("Heap LRU eviction controller thread started");
   }
 
-  m_cacheStats = new CachePerfStats(m_distributedSystem.get()
-                                        ->getStatisticsManager()
-                                        ->getStatisticsFactory());
   m_expiryTaskManager->begin();
 
   s_instance = this;

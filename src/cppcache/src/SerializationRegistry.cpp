@@ -54,6 +54,8 @@
 #include "DiskStoreId.hpp"
 #include "DiskVersionTag.hpp"
 #include "CachedDeserializableHelper.hpp"
+#include "CachePerfStats.hpp"
+#include "PdxType.hpp"
 #include <mutex>
 #include <functional>
 
@@ -119,6 +121,15 @@ void TheTypeMap::setup() {
   bind2(CachedDeserializableHelper::createForVmCachedDeserializable);
   bind2(CachedDeserializableHelper::createForPreferBytesDeserializable);
 }
+
+SerializationRegistry::SerializationRegistry(
+    const PdxTypeRegistryPtr& pdxTypeRegistry, CachePerfStats* cachePerfStats)
+    : theTypeMap(),
+      m_pdxTypeRegistry(pdxTypeRegistry),
+      m_cachePerfStats(cachePerfStats) {}
+
+SerializationRegistry::SerializationRegistry()
+    : SerializationRegistry(nullptr, nullptr) {}
 
 /** This starts at reading the typeid.. assumes the length has been read. */
 SerializablePtr SerializationRegistry::deserialize(DataInput& input,
@@ -235,7 +246,8 @@ PdxSerializablePtr SerializationRegistry::getPdxType(char* className) {
   if (nullptr == objectType) {
     try {
       pdxObj =
-          std::make_shared<PdxWrapper>((const char*)className, m_pdxSerializer);
+          std::make_shared<PdxWrapper>((const char*)className, m_pdxSerializer,
+                                       m_pdxTypeRegistry, m_cachePerfStats);
     } catch (const Exception&) {
       LOGERROR(
           "Unregistered class %s during PDX deserialization: Did the "

@@ -57,6 +57,10 @@ namespace apache {
 namespace geode {
 namespace client {
 
+class CachePerfStats;
+class PdxTypeRegistry;
+typedef std::shared_ptr<PdxTypeRegistry> PdxTypeRegistryPtr;
+
 typedef ACE_Hash_Map_Manager<int64_t, TypeFactoryMethod, ACE_Null_Mutex>
     IdToFactoryMap;
 
@@ -124,7 +128,10 @@ class TheTypeMap : private NonCopyable {
 
 class CPPCACHE_EXPORT SerializationRegistry {
  public:
-  SerializationRegistry() : theTypeMap() {}
+  SerializationRegistry(const PdxTypeRegistryPtr& pdxTypeRegistry,
+                        CachePerfStats* cachePerfStats);
+
+  SerializationRegistry();
 
   /** write the length of the serialization, write the typeId of the object,
    * then write whatever the object's toData requires. The length at the
@@ -214,8 +221,10 @@ class CPPCACHE_EXPORT SerializationRegistry {
 
  private:
   PoolPtr getPool() const;
-  PdxSerializerPtr m_pdxSerializer;
   TheTypeMap theTypeMap;
+  PdxSerializerPtr m_pdxSerializer;
+  const PdxTypeRegistryPtr& m_pdxTypeRegistry;
+  CachePerfStats* m_cachePerfStats;
 };
 
 typedef std::shared_ptr<SerializationRegistry> SerializationRegistryPtr;

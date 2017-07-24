@@ -26,9 +26,14 @@ namespace apache {
 namespace geode {
 namespace client {
 
+class CachePerfStats;
+class PdxTypeRegistry;
+typedef std::shared_ptr<PdxTypeRegistry> PdxTypeRegistryPtr;
+
 class CPPCACHE_EXPORT PdxSerializable : public CacheableKey {
  public:
-  PdxSerializable();
+  PdxSerializable(const PdxTypeRegistryPtr& pdxTypeRegistry,
+                  CachePerfStats* cachePerfStats);
   virtual ~PdxSerializable();
 
   // for virtual overloads bring base toData/fromData in scope otherwise
@@ -100,6 +105,11 @@ class CPPCACHE_EXPORT PdxSerializable : public CacheableKey {
    * Get the Type for the Object. Equivalent to the C# Type->GetType() API.
    */
   virtual const char* getClassName() const = 0;
+
+ protected:
+  PdxSerializable() : m_pdxTypeRegistry(nullptr), m_cachePerfStats(nullptr) {}
+  const PdxTypeRegistryPtr& m_pdxTypeRegistry;
+  CachePerfStats* m_cachePerfStats;
 };
 }  // namespace client
 }  // namespace geode

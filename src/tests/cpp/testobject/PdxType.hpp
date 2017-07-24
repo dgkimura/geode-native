@@ -30,6 +30,7 @@
 #include <geode/GeodeCppCache.hpp>
 #include <geode/PdxWriter.hpp>
 #include <geode/PdxReader.hpp>
+#include <geode/CacheableEnum.hpp>
 
 #ifdef _WIN32
 #ifdef BUILD_TESTOBJECT
