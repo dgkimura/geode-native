@@ -544,7 +544,7 @@ namespace Apache
         if (!ManagedDelegatesGeneric->ContainsKey(classId))
           ManagedDelegatesGeneric->Add(classId, creationMethod);
 
-        DelegateWrapperGeneric^ delegateObj = gcnew DelegateWrapperGeneric(creationMethod);
+        DelegateWrapperGeneric^ delegateObj = gcnew DelegateWrapperGeneric(creationMethod, cache);
         TypeFactoryNativeMethodGeneric^ nativeDelegate =
           gcnew TypeFactoryNativeMethodGeneric(delegateObj,
           &DelegateWrapperGeneric::NativeDelegateGeneric);
@@ -572,7 +572,7 @@ namespace Apache
           throw gcnew IllegalArgumentException("Serializable.RegisterType(): "
                                                "null TypeFactoryMethod delegate passed");
         }
-        DelegateWrapperGeneric^ delegateObj = gcnew DelegateWrapperGeneric(creationMethod);
+        DelegateWrapperGeneric^ delegateObj = gcnew DelegateWrapperGeneric(creationMethod, cache);
         TypeFactoryNativeMethodGeneric^ nativeDelegate =
           gcnew TypeFactoryNativeMethodGeneric(delegateObj,
           &DelegateWrapperGeneric::NativeDelegateGeneric);

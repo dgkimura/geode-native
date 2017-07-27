@@ -19,8 +19,10 @@
 
 #include "begin_native.hpp"
 #include "CacheImpl.hpp"
+#include "CacheRegionHelper.hpp"
 #include "end_native.hpp"
 
+#include "Cache.hpp"
 #include "../geode_defs.hpp"
 #include "../Serializable.hpp"
 #include "ManagedCacheableKey.hpp"
@@ -35,7 +37,7 @@ namespace Apache
   {
     namespace Client
     {
-
+      namespace native = apache::geode::client;
       /// <summary>
       /// Template class to wrap a managed <see cref="TypeFactoryMethod" />
       /// delegate that returns an <see cref="IGeodeSerializable" /> object. It contains
@@ -67,8 +69,8 @@ namespace Apache
         /// <summary>
         /// Constructor to wrap the given managed delegate.
         /// </summary>
-        inline DelegateWrapperGeneric( TypeFactoryMethodGeneric^ typeDelegate )
-          : m_delegate( typeDelegate ) { }
+        inline DelegateWrapperGeneric( TypeFactoryMethodGeneric^ typeDelegate, Cache^ cache )
+          : m_delegate( typeDelegate ), m_cache(cache) { }
 
         /// <summary>
         /// Returns the native <c>apache::geode::client::Serializable</c> object by invoking the
@@ -91,15 +93,17 @@ namespace Apache
               return new apache::geode::client::ManagedCacheableDeltaBytesGeneric( tempDelta, false );
           }
           else if(!SafeConvertClassGeneric::isAppDomainEnabled)
-            return new apache::geode::client::ManagedCacheableKeyGeneric( tempObj, CacheImpl::getInstance()->getSerializationRegistry().get());
+            return new apache::geode::client::ManagedCacheableKeyGeneric( tempObj, CacheRegionHelper::getCacheImpl(m_cache->GetNative().get())->getSerializationRegistry().get());
           else
-            return new apache::geode::client::ManagedCacheableKeyBytesGeneric( tempObj, false, CacheImpl::getInstance()->getCache());
+            return new apache::geode::client::ManagedCacheableKeyBytesGeneric( tempObj, false, m_cache->GetNative().get());
         }
 
 
       private:
 
         TypeFactoryMethodGeneric^ m_delegate;
+
+        Cache^ m_cache;
       };
     }  // namespace Client
   }  // namespace Geode
