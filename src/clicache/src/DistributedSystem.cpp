@@ -486,7 +486,7 @@ namespace Apache
         _GF_MG_EXCEPTION_TRY2
 
           return Apache::Geode::Client::SystemProperties::Create(
-          &native::CacheImpl::getInstance()->getDistributedSystem().getSystemProperties());
+          &(m_nativeptr->get()->getSystemProperties()));
 
         _GF_MG_EXCEPTION_CATCH_ALL2
       }

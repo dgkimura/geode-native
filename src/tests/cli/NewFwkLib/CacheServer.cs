@@ -1338,7 +1338,7 @@ namespace Apache.Geode.Client.FwkLib
           FwkInfo("Sleeping for " + sleepTime + " millis");
           Thread.Sleep(sleepTime);
           region.GetSubscriptionService().RegisterAllKeys(isDurable, keys, isGetInitialValues, isReceiveValues);
-          String durableClientId = DistributedSystem.SystemProperties.DurableClientId;
+          String durableClientId = CacheHelper<TKey, TVal>.DCache.DistributedSystem.SystemProperties.DurableClientId;
           if (durableClientId.Length > 0)
           {
               CacheHelper<TKey, TVal>.DCache.ReadyForEvents();
@@ -2962,7 +2962,7 @@ namespace Apache.Geode.Client.FwkLib
               FwkInfo("Sleeping for " + sleepTime + " millis");
               Thread.Sleep(sleepTime);
               region.GetSubscriptionService().RegisterKeys(m_KeysA, isDurable, isGetInitialValues, isReceiveValues);
-              String durableClientId = DistributedSystem.SystemProperties.DurableClientId;
+              String durableClientId = CacheHelper<TKey, TVal>.DCache.DistributedSystem.SystemProperties.DurableClientId;
               if (durableClientId.Length > 0)
               {
                   CacheHelper<TKey, TVal>.DCache.ReadyForEvents();
@@ -3018,7 +3018,7 @@ namespace Apache.Geode.Client.FwkLib
                      verifyEntry(m_KeysA[i], expected);
                   templist.Clear();
               }
-              String durableClientId = DistributedSystem.SystemProperties.DurableClientId;
+              String durableClientId = CacheHelper<TKey, TVal>.DCache.DistributedSystem.SystemProperties.DurableClientId;
               if (durableClientId.Length > 0)
               {
                   CacheHelper<TKey, TVal>.DCache.ReadyForEvents();

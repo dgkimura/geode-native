@@ -82,7 +82,7 @@ namespace Apache
 					pdxIgnoreUnreadFields = nativeCache->getPdxIgnoreUnreadFields();
           pdxReadSerialized = nativeCache->getPdxReadSerialized();
 
-          appDomainEnable = DistributedSystem::SystemProperties->AppDomainEnabled;
+          appDomainEnable = cache->DistributedSystem->SystemProperties->AppDomainEnabled;
           Log::SetLogLevel(static_cast<LogLevel>(native::Log::logLevel( )));
 					//TODO::split
           SafeConvertClassGeneric::SetAppDomainEnabled(appDomainEnable);

@@ -94,9 +94,9 @@ namespace Apache
         /// <c>DistributedSystem</c>.
         /// </summary>
         /// <returns>the SystemProperties</returns>
-        static property Apache::Geode::Client::SystemProperties^ SystemProperties
+        property Apache::Geode::Client::SystemProperties^ SystemProperties
         {
-          static Apache::Geode::Client::SystemProperties^ get();
+          Apache::Geode::Client::SystemProperties^ get();
         }
 
         /// <summary>
