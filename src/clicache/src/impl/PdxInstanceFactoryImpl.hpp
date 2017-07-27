@@ -17,7 +17,7 @@
 
 #pragma once
 #include "begin_native.hpp"
-#include "CachePerfStats.hpp"
+#include <geode/Cache.hpp>
 #include "end_native.hpp"
 
 #include "../IPdxInstanceFactory.hpp"
@@ -34,15 +34,18 @@ namespace Apache
 
         namespace Internal
         {
+
+        namespace native = apache::geode::client;
+
         ref class PdxInstanceFactoryImpl : IPdxInstanceFactory
 				{
         private:
           bool                          m_created;
           PdxType^                      m_pdxType;
           Dictionary<String^, Object^>^ m_FieldVsValues;
-          CachePerfStats*                m_cachePerfStats;
+          native::Cache*                m_cache;
         internal:
-          PdxInstanceFactoryImpl(String^ className, CachePerfStats* cachePerfStats);
+          PdxInstanceFactoryImpl(String^ className, native::Cache* cache);
           void isFieldAdded(String^ fieldName);
          
 

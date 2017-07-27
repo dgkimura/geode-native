@@ -17,6 +17,7 @@
 
 #pragma once
 #include "begin_native.hpp"
+#include "CacheRegionHelper.hpp"
 #include "CacheImpl.hpp"
 #include "end_native.hpp"
 #include "PdxInstanceFactoryImpl.hpp"
@@ -33,7 +34,7 @@ namespace Apache
 
       namespace Internal
       {
-        PdxInstanceFactoryImpl::PdxInstanceFactoryImpl(String^ className, CachePerfStats* cachePerfStats)
+        PdxInstanceFactoryImpl::PdxInstanceFactoryImpl(String^ className, native::Cache* cache)
         {
           if (className == nullptr)
             throw gcnew IllegalStateException(
@@ -41,7 +42,7 @@ namespace Apache
           m_pdxType = gcnew PdxType(className, false);
           m_FieldVsValues = gcnew Dictionary<String^, Object^>();
           m_created = false;
-          m_cachePerfStats = cachePerfStats;
+          m_cache = cache;
         }
 
         IPdxInstance^ PdxInstanceFactoryImpl::Create()
@@ -52,7 +53,7 @@ namespace Apache
               "The IPdxInstanceFactory.Create() method can only be called once.");
           }
           //need to get typeid;
-          IPdxInstance^ pi = gcnew PdxInstanceImpl(m_FieldVsValues, m_pdxType, m_cachePerfStats, CacheImpl::getInstance()->getCache());
+          IPdxInstance^ pi = gcnew PdxInstanceImpl(m_FieldVsValues, m_pdxType, &CacheRegionHelper::getCacheImpl(m_cache)->getCachePerfStats(), m_cache);
           m_created = true;
           return pi;
         }

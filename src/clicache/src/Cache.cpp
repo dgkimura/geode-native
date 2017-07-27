@@ -346,7 +346,7 @@ namespace Apache
        IPdxInstanceFactory^ Cache::CreatePdxInstanceFactory(String^ className)
        {
     
-         return gcnew Internal::PdxInstanceFactoryImpl(className, &(native::CacheRegionHelper::getCacheImpl(m_nativeptr->get())->getCachePerfStats()));
+         return gcnew Internal::PdxInstanceFactoryImpl(className, (m_nativeptr->get()));
 
        }
 
