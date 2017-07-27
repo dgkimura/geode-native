@@ -94,9 +94,8 @@ bool TcrConnection::InitTcrConnection(
 
   GF_DEV_ASSERT(m_conn != nullptr);
 
-  DataOutput handShakeMsg(*m_poolDM->getConnectionManager()
-                               .getCacheImpl()
-                               ->getSerializationRegistry());
+  DataOutput handShakeMsg(
+      m_poolDM->getConnectionManager().getCacheImpl()->getCache());
   bool isNotificationChannel = false;
   // Send byte Acceptor.CLIENT_TO_SERVER = (byte) 100;
   // Send byte Acceptor.SERVER_TO_CLIENT = (byte) 101;
@@ -355,9 +354,8 @@ bool TcrConnection::InitTcrConnection(
       LOGDEBUG("Handshake: Got challengeSize %d", challengeBytes->length());
 
       // encrypt the credentials and challenge bytes
-      DataOutput cleartext(*m_poolDM->getConnectionManager()
-                                .getCacheImpl()
-                                ->getSerializationRegistry());
+      DataOutput cleartext(
+          m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       if (isClientNotification) {  //:only for backward connection
         credentials->toData(cleartext);
       }
@@ -365,9 +363,8 @@ bool TcrConnection::InitTcrConnection(
       CacheableBytesPtr ciphertext =
           m_dh->encrypt(cleartext.getBuffer(), cleartext.getBufferLength());
 
-      DataOutput sendCreds(*m_poolDM->getConnectionManager()
-                                .getCacheImpl()
-                                ->getSerializationRegistry());
+      DataOutput sendCreds(
+          m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       ciphertext->toData(sendCreds);
       uint32_t credLen;
       char* credData = (char*)sendCreds.getBuffer(&credLen);
@@ -407,9 +404,8 @@ bool TcrConnection::InitTcrConnection(
       m_hasServerQueue = NON_REDUNDANT_SERVER;
     }
     CacheableBytesPtr queueSizeMsg = readHandshakeData(4, connectTimeout);
-    DataInput dI(
-        queueSizeMsg->value(), queueSizeMsg->length(),
-        *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+    DataInput dI(queueSizeMsg->value(), queueSizeMsg->length(),
+                 m_connectionManager->getCacheImpl()->getCache());
     int32_t queueSize = 0;
     dI.readInt(&queueSize);
     m_queueSize = queueSize > 0 ? queueSize : 0;
@@ -440,27 +436,24 @@ bool TcrConnection::InitTcrConnection(
       if (static_cast<int8_t>((*arrayLenHeader)[0]) == -2) {
         CacheableBytesPtr recvMsgLenBytes =
             readHandshakeData(2, connectTimeout);
-        DataInput dI2(
-            recvMsgLenBytes->value(), recvMsgLenBytes->length(),
-            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+        DataInput dI2(recvMsgLenBytes->value(), recvMsgLenBytes->length(),
+                      m_connectionManager->getCacheImpl()->getCache());
         int16_t recvMsgLenShort = 0;
         dI2.readInt(&recvMsgLenShort);
         recvMsgLen = recvMsgLenShort;
       } else if (static_cast<int8_t>((*arrayLenHeader)[0]) == -3) {
         CacheableBytesPtr recvMsgLenBytes =
             readHandshakeData(4, connectTimeout);
-        DataInput dI2(
-            recvMsgLenBytes->value(), recvMsgLenBytes->length(),
-            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+        DataInput dI2(recvMsgLenBytes->value(), recvMsgLenBytes->length(),
+                      m_connectionManager->getCacheImpl()->getCache());
         dI2.readInt(&recvMsgLen);
       }
       auto recvMessage = readHandshakeData(recvMsgLen, connectTimeout);
       // If the distributed member has not been set yet, set it.
       if (getEndpointObject()->getDistributedMemberID() == 0) {
         LOGDEBUG("Deserializing distributed member Id");
-        DataInput diForClient(
-            recvMessage->value(), recvMessage->length(),
-            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+        DataInput diForClient(recvMessage->value(), recvMessage->length(),
+                              m_connectionManager->getCacheImpl()->getCache());
         ClientProxyMembershipIDPtr member;
         diForClient.readObject(member);
         auto memId = m_poolDM->getConnectionManager()
@@ -473,9 +466,8 @@ bool TcrConnection::InitTcrConnection(
     }
 
     CacheableBytesPtr recvMsgLenBytes = readHandshakeData(2, connectTimeout);
-    DataInput dI3(
-        recvMsgLenBytes->value(), recvMsgLenBytes->length(),
-        *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+    DataInput dI3(recvMsgLenBytes->value(), recvMsgLenBytes->length(),
+                  m_connectionManager->getCacheImpl()->getCache());
     uint16_t recvMsgLen2 = 0;
     dI3.readInt(&recvMsgLen2);
     CacheableBytesPtr recvMessage =
@@ -483,9 +475,8 @@ bool TcrConnection::InitTcrConnection(
 
     if (!isClientNotification) {
       CacheableBytesPtr deltaEnabledMsg = readHandshakeData(1, connectTimeout);
-      DataInput di(
-          deltaEnabledMsg->value(), 1,
-          *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+      DataInput di(deltaEnabledMsg->value(), 1,
+                   m_connectionManager->getCacheImpl()->getCache());
       bool isDeltaEnabledOnServer;
       di.readBoolean(&isDeltaEnabledOnServer);
       ThinClientBaseDM::setDeltaEnabledOnServer(isDeltaEnabledOnServer);
@@ -966,9 +957,8 @@ char* TcrConnection::readMessage(size_t* recvLen, uint32_t receiveTimeoutSec,
       m_endpoint,
       Utils::convertBytesToString(msg_header, HEADER_LENGTH)->asChar());
 
-  DataInput input(
-      reinterpret_cast<uint8_t*>(msg_header), HEADER_LENGTH,
-      *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+  DataInput input(reinterpret_cast<uint8_t*>(msg_header), HEADER_LENGTH,
+                  m_connectionManager->getCacheImpl()->getCache());
   input.readInt(&msgType);
   input.readInt(&msgLen);
   //  check that message length is valid.
@@ -1077,9 +1067,8 @@ void TcrConnection::readMessageChunked(TcrMessageReply& reply,
       m_endpoint,
       Utils::convertBytesToString(msg_header, HDR_LEN_12)->asChar());
 
-  DataInput input(
-      msg_header, HDR_LEN_12,
-      *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+  DataInput input(msg_header, HDR_LEN_12,
+                  m_connectionManager->getCacheImpl()->getCache());
   int32_t msgType;
   input.readInt(&msgType);
   reply.setMessageType(msgType);
@@ -1145,9 +1134,8 @@ void TcrConnection::readMessageChunked(TcrMessageReply& reply,
         Utils::convertBytesToString((msg_header + HDR_LEN_12), HDR_LEN)
             ->asChar());
 
-    DataInput inp(
-        (msg_header + HDR_LEN_12), HDR_LEN,
-        *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+    DataInput inp((msg_header + HDR_LEN_12), HDR_LEN,
+                  m_connectionManager->getCacheImpl()->getCache());
     int32_t chunkLen;
     inp.readInt(&chunkLen);
     //  check that chunk length is valid.
@@ -1309,9 +1297,8 @@ CacheableBytesPtr TcrConnection::readHandshakeByteArray(
 // read a byte array
 uint32_t TcrConnection::readHandshakeArraySize(uint32_t connectTimeout) {
   CacheableBytesPtr codeBytes = readHandshakeData(1, connectTimeout);
-  DataInput codeDI(
-      codeBytes->value(), codeBytes->length(),
-      *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+  DataInput codeDI(codeBytes->value(), codeBytes->length(),
+                   m_connectionManager->getCacheImpl()->getCache());
   uint8_t code = 0;
   codeDI.read(&code);
   uint32_t arraySize = 0;
@@ -1322,17 +1309,15 @@ uint32_t TcrConnection::readHandshakeArraySize(uint32_t connectTimeout) {
     if (tempLen > 252) {  // 252 is java's ((byte)-4 && 0xFF)
       if (code == 0xFE) {
         CacheableBytesPtr lenBytes = readHandshakeData(2, connectTimeout);
-        DataInput lenDI(
-            lenBytes->value(), lenBytes->length(),
-            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+        DataInput lenDI(lenBytes->value(), lenBytes->length(),
+                        m_connectionManager->getCacheImpl()->getCache());
         uint16_t val;
         lenDI.readInt(&val);
         tempLen = val;
       } else if (code == 0xFD) {
         CacheableBytesPtr lenBytes = readHandshakeData(4, connectTimeout);
-        DataInput lenDI(
-            lenBytes->value(), lenBytes->length(),
-            *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+        DataInput lenDI(lenBytes->value(), lenBytes->length(),
+                        m_connectionManager->getCacheImpl()->getCache());
         uint32_t val;
         lenDI.readInt(&val);
         tempLen = val;
@@ -1423,9 +1408,7 @@ int32_t TcrConnection::readHandShakeInt(uint32_t connectTimeout) {
     }
   }
 
-  DataInput di(
-      recvMessage, 4,
-      *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+  DataInput di(recvMessage, 4, m_connectionManager->getCacheImpl()->getCache());
   int32_t val;
   di.readInt(&val);
 
@@ -1463,9 +1446,8 @@ CacheableStringPtr TcrConnection::readHandshakeString(uint32_t connectTimeout) {
     case GF_STRING: {
       uint16_t shortLen = 0;
       CacheableBytesPtr lenBytes = readHandshakeData(2, connectTimeout);
-      DataInput lenDI(
-          lenBytes->value(), lenBytes->length(),
-          *(m_connectionManager->getCacheImpl()->getSerializationRegistry()));
+      DataInput lenDI(lenBytes->value(), lenBytes->length(),
+                      m_connectionManager->getCacheImpl()->getCache());
       lenDI.readInt(&shortLen);
       length = shortLen;
       break;

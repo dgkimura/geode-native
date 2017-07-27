@@ -17,6 +17,8 @@
 
 #include "begin_native.hpp"
 #include <GeodeTypeIdsImpl.hpp>
+#include "CacheRegionHelper.hpp"
+#include "CacheImpl.hpp"
 #include "end_native.hpp"
 
 #include <vcclr.h>
@@ -454,7 +456,7 @@ namespace Apache
         if (m_ispdxSerialization && obj->GetType()->IsEnum)
         {
           //need to set             
-          int enumVal = Internal::PdxHelper::GetEnumValue(obj->GetType()->FullName, Enum::GetName(obj->GetType(), obj), obj->GetHashCode(), m_serializationRegistry);
+          int enumVal = Internal::PdxHelper::GetEnumValue(obj->GetType()->FullName, Enum::GetName(obj->GetType(), obj), obj->GetHashCode(), CacheRegionHelper::getCacheImpl(m_nativeptr->get()->getCache())->getSerializationRegistry().get());
           WriteByte(GeodeClassIds::PDX_ENUM);
           WriteByte(enumVal >> 24);
           WriteArrayLen(enumVal & 0xFFFFFF);
@@ -637,7 +639,7 @@ namespace Apache
           if (pdxObj != nullptr)
           {
             WriteByte(GeodeClassIds::PDX);
-            Internal::PdxHelper::SerializePdx(this, pdxObj, m_serializationRegistry);
+            Internal::PdxHelper::SerializePdx(this, pdxObj, CacheRegionHelper::getCacheImpl(m_nativeptr->get()->getCache())->getSerializationRegistry().get());
             return;
           }
           else
@@ -660,7 +662,7 @@ namespace Apache
             {
               pdxObj = gcnew PdxWrapper(obj);
               WriteByte(GeodeClassIds::PDX);
-              Internal::PdxHelper::SerializePdx(this, pdxObj, m_serializationRegistry);
+              Internal::PdxHelper::SerializePdx(this, pdxObj, CacheRegionHelper::getCacheImpl(m_nativeptr->get()->getCache())->getSerializationRegistry().get());
               return;
             }
           }

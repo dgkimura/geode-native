@@ -25,7 +25,7 @@ using namespace apache::geode::client;
 const char* host_name = "Suds";
 DUNIT_TASK(s1p1, CreateRegionOne)
   {
-    auto dsys = DistributedSystem::create(host_name);
+    auto dsys = DistributedSystem::create(host_name, nullptr);
     try {
       dsys->disconnect();
       FAIL("Expected an exception.");

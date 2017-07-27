@@ -618,7 +618,7 @@ int TcrEndpoint::receiveNotification(volatile bool& isRunning) {
       }
 
       if (data) {
-        msg = new TcrMessageReply(true, nullptr);
+        msg = new TcrMessageReply(true, m_baseDM);
         msg->initCqMap();
         msg->setData(data, static_cast<int32_t>(dataLen),
                      this->getDistributedMemberID(),

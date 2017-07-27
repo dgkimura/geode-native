@@ -63,7 +63,7 @@ typedef std::vector<std::pair<std::string, int64_t> > g_fileInfo;
 
 using namespace apache::geode::statistics::globals;
 
-//extern "C" {
+// extern "C" {
 
 int selector(const dirent* d) {
   std::string inputname(d->d_name);
@@ -129,18 +129,19 @@ using std::chrono::nanoseconds;
 const char* HostStatSampler::NC_HSS_Thread = "NC HSS Thread";
 
 HostStatSampler::HostStatSampler(const char* filePath, int64_t sampleIntervalMs,
-                                 StatisticsManager* statMngr,
+                                 StatisticsManager* statMngr, Cache* cache,
                                  const char* durableClientId,
                                  const uint32_t durableTimeout,
                                  int64_t statFileLimit,
-                                 int64_t statDiskSpaceLimit) {
+                                 int64_t statDiskSpaceLimit)
+    : m_cache(cache) {
   m_isStatDiskSpaceEnabled = false;
   m_adminError = false;
   m_running = false;
   m_stopRequested = false;
   m_archiver = nullptr;
   m_samplerStats = new StatSamplerStats(statMngr->getStatisticsFactory());
-   m_startTime = system_clock::now();
+  m_startTime = system_clock::now();
   m_pid = ACE_OS::getpid();
   m_statMngr = statMngr;
   m_archiveFileName = filePath;
@@ -390,7 +391,7 @@ void HostStatSampler::changeArchive(std::string filename) {
     m_archiver = nullptr;
   }
 
-  m_archiver = new StatArchiveWriter(filename, this);
+  m_archiver = new StatArchiveWriter(filename, this, m_cache);
 }
 
 std::string HostStatSampler::chkForGFSExt(std::string filename) {

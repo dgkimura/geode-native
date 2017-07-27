@@ -806,8 +806,7 @@ bool QueryHelper::compareTwoPositionObjects(SerializablePtr pos1,
     return false;
   }
 
-  SerializationRegistry serializationRegistry;
-  DataOutput o1(serializationRegistry), o2(serializationRegistry);
+  DataOutput o1, o2;
   p1->toData(o1);
   p2->toData(o2);
 

@@ -169,8 +169,7 @@ PdxInstanceFactoryPtr ProxyCache::createPdxInstanceFactory(
     const char* className) {
   return std::make_shared<PdxInstanceFactoryImpl>(
       className, &(m_cacheImpl->getCachePerfStats()),
-      m_cacheImpl->getPdxTypeRegistry(),
-      *m_cacheImpl->getSerializationRegistry(),
+      m_cacheImpl->getPdxTypeRegistry(), m_cacheImpl->getCache(),
       m_cacheImpl->getDistributedSystem()
           .getSystemProperties()
           .getEnableTimeStatistics());

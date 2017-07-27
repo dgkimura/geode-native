@@ -67,7 +67,7 @@ class StatisticsManager {
 
  public:
   StatisticsManager(const char* filePath, int64_t sampleIntervalMs,
-                    bool enabled, const char* durableClientId,
+                    bool enabled, Cache* cache, const char* durableClientId,
                     const uint32_t durableTimeout, int64_t statFileLimit = 0,
                     int64_t statDiskSpaceLimit = 0);
 

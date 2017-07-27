@@ -45,7 +45,7 @@ namespace Apache
       namespace Internal
       {
         //this is for PdxInstanceFactory
-        PdxInstanceImpl::PdxInstanceImpl(Dictionary<String^, Object^>^ fieldVsValue, PdxType^ pdxType, CachePerfStats* cachePerfStats, native::SerializationRegistry* serializationRegistry)
+        PdxInstanceImpl::PdxInstanceImpl(Dictionary<String^, Object^>^ fieldVsValue, PdxType^ pdxType, CachePerfStats* cachePerfStats, native::Cache* cache)
         {
           m_updatedFields = fieldVsValue;
           m_typeId = 0;
@@ -53,17 +53,17 @@ namespace Apache
           m_buffer = NULL;
           m_bufferLength = 0;
           m_pdxType = pdxType;
-          m_serializationRegistry = serializationRegistry;
+          m_cache = cache;
           m_cachePerfStats = cachePerfStats;
           m_pdxType->InitializeType();//to generate static position map
 
           //need to initiailize stream. this will call todata and in toData we will have stream
-          apache::geode::client::DataOutput* output = new apache::geode::client::DataOutput(*m_serializationRegistry);
+          apache::geode::client::DataOutput* output = new apache::geode::client::DataOutput(m_cache);
 
           try
           {
             Apache::Geode::Client::DataOutput mg_output(&(*output), true);
-            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, this, serializationRegistry);
+            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, this, CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry().get());
           }
           finally
           {
@@ -85,10 +85,10 @@ namespace Apache
         }
         Object^ PdxInstanceImpl::GetObject()
         {
-          DataInput^ dataInput = gcnew DataInput(m_buffer, m_bufferLength, m_serializationRegistry);
+          DataInput^ dataInput = gcnew DataInput(m_buffer, m_bufferLength, m_cache);
           dataInput->setRootObjectPdx(true);
           System::Int64 sampleStartNanos = Utils::startStatOpTime();
-          Object^ ret = Internal::PdxHelper::DeserializePdx(dataInput, true, m_typeId, m_bufferLength, m_serializationRegistry);
+          Object^ ret = Internal::PdxHelper::DeserializePdx(dataInput, true, m_typeId, m_bufferLength, CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry().get());
           //dataInput->ResetPdx(0);
 
           if(m_cachePerfStats)
@@ -144,7 +144,7 @@ namespace Apache
           }
 
           {
-            DataInput^ dataInput = gcnew DataInput(m_buffer, m_bufferLength, m_serializationRegistry);
+            DataInput^ dataInput = gcnew DataInput(m_buffer, m_bufferLength, m_cache);
             dataInput->setPdxdeserialization(true);
 
             int pos = getOffset(dataInput, pt, pft->SequenceId);
@@ -238,9 +238,9 @@ namespace Apache
           equatePdxFields(myPdxIdentityFieldList, otherPdxIdentityFieldList);
           equatePdxFields(otherPdxIdentityFieldList, myPdxIdentityFieldList);
 
-          DataInput^ myDataInput = gcnew DataInput(m_buffer, m_bufferLength, m_serializationRegistry);
+          DataInput^ myDataInput = gcnew DataInput(m_buffer, m_bufferLength, m_cache);
           myDataInput->setPdxdeserialization(true);
-          DataInput^ otherDataInput = gcnew DataInput(otherPdx->m_buffer, otherPdx->m_bufferLength, m_serializationRegistry);
+          DataInput^ otherDataInput = gcnew DataInput(otherPdx->m_buffer, otherPdx->m_bufferLength, m_cache);
           otherDataInput->setPdxdeserialization(true);
 
           bool isEqual = false;
@@ -570,7 +570,7 @@ namespace Apache
 
           IList<PdxFieldType^>^ pdxIdentityFieldList = getIdentityPdxFields(pt);
 
-          DataInput^ dataInput = gcnew DataInput(m_buffer, m_bufferLength, m_serializationRegistry);
+          DataInput^ dataInput = gcnew DataInput(m_buffer, m_bufferLength, m_cache);
           dataInput->setPdxdeserialization(true);
 
           for (int i = 0; i < pdxIdentityFieldList->Count; i++)
@@ -956,7 +956,7 @@ namespace Apache
           IWritablePdxInstance^ PdxInstanceImpl::CreateWriter()
           {
             //dataInput->ResetPdx(0);
-            return gcnew PdxInstanceImpl(m_buffer, m_bufferLength, m_typeId, false, m_serializationRegistry);//need to create duplicate byte stream
+            return gcnew PdxInstanceImpl(m_buffer, m_bufferLength, m_typeId, false, m_cache);//need to create duplicate byte stream
           }
 
           void PdxInstanceImpl::SetField(String^ fieldName, Object^ value)
@@ -993,7 +993,7 @@ namespace Apache
               if (!m_own)
                 copy = apache::geode::client::DataInput::getBufferCopy(m_buffer, m_bufferLength);
 
-              DataInput^ dataInput = gcnew DataInput(copy, m_bufferLength, m_serializationRegistry);//this will delete buffer
+              DataInput^ dataInput = gcnew DataInput(copy, m_bufferLength, m_cache);//this will delete buffer
               dataInput->setPdxdeserialization(true);
               //but new stream is set for this from pdxHelper::serialize function
 

@@ -39,7 +39,7 @@ using namespace apache::geode::statistics;
 
 StatisticsManager::StatisticsManager(const char* filePath,
                                      int64_t sampleInterval, bool enabled,
-                                     const char* durableClientId,
+                                     Cache* cache, const char* durableClientId,
                                      const uint32_t durableTimeout,
                                      int64_t statFileLimit,
                                      int64_t statDiskSpaceLimit)
@@ -52,7 +52,7 @@ StatisticsManager::StatisticsManager(const char* filePath,
 
   try {
     if (m_sampler == nullptr && enabled) {
-      m_sampler = new HostStatSampler(filePath, m_sampleIntervalMs, this,
+      m_sampler = new HostStatSampler(filePath, m_sampleIntervalMs, this, cache,
                                       durableClientId, durableTimeout,
                                       statFileLimit, statDiskSpaceLimit);
       m_sampler->start();

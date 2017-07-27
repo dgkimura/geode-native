@@ -196,11 +196,7 @@ char* CacheableString::getASCIIString(const wchar_t* value, int32_t& len,
     }
     len -= clen;
   } else {
-    SerializationRegistry bogusSerializationRegistry;
-
-    // CAREFUL: Doing a transform will use this registry which is bogus...
-    // if you need to do a transform, get a real serialization registry.
-    DataOutput out(bogusSerializationRegistry);
+    DataOutput out;
     const wchar_t* pvalue = value;
     while ((currentChar = *pvalue) != 0) {
       c = getASCIIChar(currentChar, isASCII, encodedLen);

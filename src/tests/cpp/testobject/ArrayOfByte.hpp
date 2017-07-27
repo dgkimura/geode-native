@@ -48,8 +48,7 @@ class TESTOBJECT_EXPORT ArrayOfByte {
   static CacheableBytesPtr init(int size, bool encodeKey,
                                 bool encodeTimestamp) {
     if (encodeKey) {
-      SerializationRegistry serializationRegistry;
-      DataOutput dos(serializationRegistry);
+      DataOutput dos;
       try {
         int32_t index = 1234;
         dos.writeInt(index);
@@ -85,7 +84,7 @@ class TESTOBJECT_EXPORT ArrayOfByte {
       throw apache::geode::client::IllegalArgumentException(
           "the bytes arg was null");
     }
-    DataInput di(bytes->value(), bytes->length(), serializationRegistry);
+    DataInput di(bytes->value(), bytes->length(), nullptr);
     try {
       int32_t index;
       di.readInt(&index);
@@ -102,7 +101,7 @@ class TESTOBJECT_EXPORT ArrayOfByte {
 
   static void resetTimestamp(CacheableBytesPtr bytes,
                              SerializationRegistry &serializationRegistry) {
-    DataInput di(bytes->value(), bytes->length(), serializationRegistry);
+    DataInput di(bytes->value(), bytes->length(), nullptr);
     int32_t index;
     try {
       di.readInt(&index);
@@ -114,7 +113,7 @@ class TESTOBJECT_EXPORT ArrayOfByte {
     } catch (Exception &e) {
       FWKEXCEPTION("Unable to read from stream " << e.getMessage());
     }
-    DataOutput dos(serializationRegistry);
+    DataOutput dos;
     try {
       dos.writeInt(index);
       ACE_Time_Value startTime;

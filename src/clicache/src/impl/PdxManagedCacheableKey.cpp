@@ -20,6 +20,7 @@
 
 #include "begin_native.hpp"
 #include <GeodeTypeIdsImpl.hpp>
+#include "CacheRegionHelper.hpp"
 #include "end_native.hpp"
 
 #include "PdxManagedCacheableKey.hpp"
@@ -43,7 +44,7 @@ namespace apache
         try {
           System::UInt32 pos = (int)output.getBufferLength();
           Apache::Geode::Client::DataOutput mg_output(&output, true);
-          Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, m_managedptr, m_serializationRegistry);
+          Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, m_managedptr, CacheRegionHelper::getCacheImpl(output.getCache())->getSerializationRegistry().get());
           //m_managedptr->ToData( %mg_output );
           //this will move the cursor in c++ layer
           mg_output.WriteBytesToUMDataOutput();
@@ -62,9 +63,9 @@ namespace apache
       {
         try {
           int pos = input.getBytesRead();
-          Apache::Geode::Client::DataInput mg_input(&input, true, m_serializationRegistry);
+          Apache::Geode::Client::DataInput mg_input(&input, true, input.getCache());
           //m_managedptr = m_managedptr->FromData( %mg_input );
-          Apache::Geode::Client::IPdxSerializable^ tmp = Apache::Geode::Client::Internal::PdxHelper::DeserializePdx(%mg_input, false, m_serializationRegistry);
+          Apache::Geode::Client::IPdxSerializable^ tmp = Apache::Geode::Client::Internal::PdxHelper::DeserializePdx(%mg_input, false,  CacheRegionHelper::getCacheImpl(input.getCache())->getSerializationRegistry().get());
           m_managedptr = tmp;
           m_managedDeltaptr = dynamic_cast<Apache::Geode::Client::IGeodeDelta^>(tmp);
 
@@ -259,10 +260,10 @@ namespace apache
         }
       }
 
-      void PdxManagedCacheableKey::fromDelta(DataInput& input)
+      void PdxManagedCacheableKey::fromDelta(native::DataInput& input)
       {
         try {
-          Apache::Geode::Client::DataInput mg_input(&input, true, m_serializationRegistry);
+          Apache::Geode::Client::DataInput mg_input(&input, true, input.getCache());
           m_managedDeltaptr->FromDelta(%mg_input);
 
           //this will move the cursor in c++ layer

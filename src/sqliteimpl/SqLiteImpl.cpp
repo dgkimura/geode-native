@@ -111,11 +111,8 @@ void SqLiteImpl::init(const RegionPtr& region, PropertiesPtr& diskProperties) {
 void SqLiteImpl::write(const CacheableKeyPtr& key, const CacheablePtr& value,
                        void*& dbHandle) {
   // Serialize key and value.
-  auto& serializationRegistry =
-      *CacheRegionHelper::getCacheImpl(m_regionPtr->getCache().get())
-           ->getSerializationRegistry();
-  DataOutput keyDataBuffer(serializationRegistry),
-      valueDataBuffer(serializationRegistry);
+  auto* cache = m_regionPtr->getCache().get();
+  DataOutput keyDataBuffer(cache), valueDataBuffer(cache);
   uint32_t keyBufferSize, valueBufferSize;
 
   keyDataBuffer.writeObject(key);
@@ -134,9 +131,7 @@ bool SqLiteImpl::writeAll() { return true; }
 
 CacheablePtr SqLiteImpl::read(const CacheableKeyPtr& key, void*& dbHandle) {
   // Serialize key.
-  DataOutput keyDataBuffer(
-      *CacheRegionHelper::getCacheImpl(m_regionPtr->getCache().get())
-           ->getSerializationRegistry());
+  DataOutput keyDataBuffer(m_regionPtr->getCache().get());
   uint32_t keyBufferSize;
   keyDataBuffer.writeObject(key);
   void* keyData = const_cast<uint8_t*>(keyDataBuffer.getBuffer(&keyBufferSize));
@@ -149,10 +144,8 @@ CacheablePtr SqLiteImpl::read(const CacheableKeyPtr& key, void*& dbHandle) {
   }
 
   // Deserialize object and return value.
-  DataInput valueDataBuffer(
-      reinterpret_cast<uint8_t*>(valueData), valueBufferSize,
-      *(CacheRegionHelper::getCacheImpl(m_regionPtr->getCache().get())
-            ->getSerializationRegistry()));
+  DataInput valueDataBuffer(reinterpret_cast<uint8_t*>(valueData),
+                            valueBufferSize, m_regionPtr->getCache().get());
   CacheablePtr retValue;
   valueDataBuffer.readObject(retValue);
 
@@ -181,9 +174,7 @@ void SqLiteImpl::destroyRegion() {
 
 void SqLiteImpl::destroy(const CacheableKeyPtr& key, void*& dbHandle) {
   // Serialize key and value.
-  DataOutput keyDataBuffer(
-      *CacheRegionHelper::getCacheImpl(m_regionPtr->getCache().get())
-           ->getSerializationRegistry());
+  DataOutput keyDataBuffer(m_regionPtr->getCache().get());
   uint32_t keyBufferSize;
   keyDataBuffer.writeObject(key);
   void* keyData = const_cast<uint8_t*>(keyDataBuffer.getBuffer(&keyBufferSize));

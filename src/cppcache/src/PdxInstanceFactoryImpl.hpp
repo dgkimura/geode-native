@@ -450,8 +450,7 @@ class CPPCACHE_EXPORT PdxInstanceFactoryImpl
 
   PdxInstanceFactoryImpl(const char* className, CachePerfStats* cachePerfStats,
                          PdxTypeRegistryPtr m_pdxTypeRegistry,
-                         SerializationRegistry& serializationRegistry,
-                         bool enableTimeStatistics);
+                         const Cache* cache, bool enableTimeStatistics);
 
  private:
   bool m_created;
@@ -459,7 +458,7 @@ class CPPCACHE_EXPORT PdxInstanceFactoryImpl
   FieldVsValues m_FieldVsValues;
   CachePerfStats* m_cachePerfStats;
   PdxTypeRegistryPtr m_pdxTypeRegistry;
-  SerializationRegistry& m_serializationRegistry;
+  const Cache* m_cache;
   bool m_enableTimeStatistics;
   void isFieldAdded(const char* fieldName);
 };

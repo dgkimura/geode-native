@@ -371,9 +371,7 @@ int64_t TcrMessage::getConnectionId(TcrConnection* conn) {
   if (m_connectionIDBytes != nullptr) {
     CacheableBytesPtr tmp = conn->decryptBytes(m_connectionIDBytes);
     DataInput di(tmp->value(), tmp->length(),
-                 *(m_tcdm->getConnectionManager()
-                       .getCacheImpl()
-                       ->getSerializationRegistry()));
+                 m_tcdm->getConnectionManager().getCacheImpl()->getCache());
     int64_t connid;
     di.readInt(&connid);
     return connid;
@@ -390,9 +388,7 @@ int64_t TcrMessage::getUniqueId(TcrConnection* conn) {
     CacheableBytesPtr tmp = conn->decryptBytes(encryptBytes);
 
     DataInput di(tmp->value(), tmp->length(),
-                 *(m_tcdm->getConnectionManager()
-                       .getCacheImpl()
-                       ->getSerializationRegistry()));
+                 m_tcdm->getConnectionManager().getCacheImpl()->getCache());
     int64_t uniqueid;
     di.readInt(&uniqueid);
 
@@ -850,9 +846,7 @@ void TcrMessage::processChunk(const uint8_t* bytes, int32_t len,
                  m_msgTypeRequest == TcrMessage::PUT_ALL_WITH_CALLBACK) {
         TcrChunkedContext* chunk = new TcrChunkedContext(
             bytes, len, m_chunkedResult, isLastChunkAndisSecurityHeader,
-            *m_tcdm->getConnectionManager()
-                 .getCacheImpl()
-                 ->getSerializationRegistry());
+            m_tcdm->getConnectionManager().getCacheImpl()->getCache());
         m_chunkedResult->setEndpointMemId(endpointmemId);
         m_tcdm->queueChunk(chunk);
         if (bytes == nullptr) {
@@ -876,9 +870,7 @@ void TcrMessage::processChunk(const uint8_t* bytes, int32_t len,
         LOGDEBUG("tcrmessage in case22 ");
         TcrChunkedContext* chunk = new TcrChunkedContext(
             bytes, len, m_chunkedResult, isLastChunkAndisSecurityHeader,
-            *m_tcdm->getConnectionManager()
-                 .getCacheImpl()
-                 ->getSerializationRegistry());
+            m_tcdm->getConnectionManager().getCacheImpl()->getCache());
         m_chunkedResult->setEndpointMemId(endpointmemId);
         m_tcdm->queueChunk(chunk);
         if (bytes == nullptr) {
@@ -926,10 +918,9 @@ void TcrMessage::processChunk(const uint8_t* bytes, int32_t len,
     case TcrMessage::EXCEPTION: {
       if (bytes != nullptr) {
         DeleteArray<const uint8_t> delChunk(bytes);
-        DataInput input(bytes, len,
-                        *(m_tcdm->getConnectionManager()
-                              .getCacheImpl()
-                              ->getSerializationRegistry()));
+        DataInput input(
+            bytes, len,
+            m_tcdm->getConnectionManager().getCacheImpl()->getCache());
         readExceptionPart(input, isLastChunkAndisSecurityHeader);
         readSecureObjectPart(input, false, true,
                              isLastChunkAndisSecurityHeader);
@@ -995,9 +986,7 @@ void TcrMessage::chunkSecurityHeader(int skipPart, const uint8_t* bytes,
   LOGDEBUG("TcrMessage::chunkSecurityHeader:: skipParts = %d", skipPart);
   if ((isLastChunkAndSecurityHeader & 0x3) == 0x3) {
     DataInput di(bytes, len,
-                 *(m_tcdm->getConnectionManager()
-                       .getCacheImpl()
-                       ->getSerializationRegistry()));
+                 m_tcdm->getConnectionManager().getCacheImpl()->getCache());
     skipParts(di, skipPart);
     readSecureObjectPart(di, false, true, isLastChunkAndSecurityHeader);
   }
@@ -1007,7 +996,8 @@ void TcrMessage::handleByteArrayResponse(
     const char* bytearray, int32_t len, uint16_t endpointMemId,
     const SerializationRegistry& serializationRegistry,
     MemberListForVersionStamp& memberListForVersionStamp) {
-  DataInput input((uint8_t*)bytearray, len, serializationRegistry);
+  DataInput input((uint8_t*)bytearray, len,
+                  m_tcdm->getConnectionManager().getCacheImpl()->getCache());
   // TODO:: this need to make sure that pool is there
   //  if(m_tcdm == nullptr)
   //  throw IllegalArgumentException("Pool is nullptr in TcrMessage");
@@ -1277,8 +1267,9 @@ void TcrMessage::handleByteArrayResponse(
         input.read(&isObj);
         m_deltaBytes = new uint8_t[m_deltaBytesLen];
         input.readBytesOnly(m_deltaBytes, m_deltaBytesLen);
-        m_delta =
-            new DataInput(m_deltaBytes, m_deltaBytesLen, serializationRegistry);
+        m_delta = new DataInput(
+            m_deltaBytes, m_deltaBytesLen,
+            m_tcdm->getConnectionManager().getCacheImpl()->getCache());
       } else {
         readObjectPart(input);
       }
@@ -2660,8 +2651,7 @@ void TcrMessage::createUserCredentialMessage(TcrConnection* conn) {
   m_isSecurityHeaderAdded = false;
   writeHeader(m_msgType, 1);
 
-  DataOutput dOut(
-      *conn->getConnectionManager().getCacheImpl()->getSerializationRegistry());
+  DataOutput dOut(m_tcdm->getConnectionManager().getCacheImpl()->getCache());
 
   if (m_creds != nullptr) m_creds->toData(dOut);
 
@@ -2689,8 +2679,7 @@ void TcrMessage::addSecurityPart(int64_t connectionId, int64_t unique_id,
   }
   m_isSecurityHeaderAdded = true;
   LOGDEBUG("addSecurityPart( , ) ");
-  DataOutput dOutput(
-      *conn->getConnectionManager().getCacheImpl()->getSerializationRegistry());
+  DataOutput dOutput(m_tcdm->getConnectionManager().getCacheImpl()->getCache());
 
   dOutput.writeInt(connectionId);
   dOutput.writeInt(unique_id);
@@ -2720,8 +2709,7 @@ void TcrMessage::addSecurityPart(int64_t connectionId, TcrConnection* conn) {
   }
   m_isSecurityHeaderAdded = true;
   LOGDEBUG("TcrMessage::addSecurityPart only connid");
-  DataOutput dOutput(
-      *conn->getConnectionManager().getCacheImpl()->getSerializationRegistry());
+  DataOutput dOutput(m_tcdm->getConnectionManager().getCacheImpl()->getCache());
 
   dOutput.writeInt(connectionId);
 
@@ -2888,8 +2876,8 @@ void TcrMessage::setData(const char* bytearray, int32_t len, uint16_t memId,
                          const SerializationRegistry& serializationRegistry,
                          MemberListForVersionStamp& memberListForVersionStamp) {
   if (m_request == nullptr) {
-    m_request =
-        std::unique_ptr<DataOutput>(new DataOutput(serializationRegistry));
+    m_request = std::unique_ptr<DataOutput>(new DataOutput(
+        m_tcdm->getConnectionManager().getCacheImpl()->getCache()));
   }
   if (bytearray) {
     DeleteArray<const char> delByteArr(bytearray);

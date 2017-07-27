@@ -352,18 +352,18 @@ namespace Apache
 
        DataInput^ Cache::CreateDataInput(array<Byte>^ buffer, System::Int32 len)
        {
-         return gcnew DataInput(buffer, len, native::CacheRegionHelper::getCacheImpl(m_nativeptr->get())->getSerializationRegistry().get());
+         return gcnew DataInput(buffer, len,  m_nativeptr->get());
        }
 
        
        DataInput^ Cache::CreateDataInput(array<Byte>^ buffer)
        {
-         return gcnew DataInput(buffer, native::CacheRegionHelper::getCacheImpl(m_nativeptr->get())->getSerializationRegistry().get());
+         return gcnew DataInput(buffer, m_nativeptr->get());
        }
 
         DataOutput^ Cache::CreateDataOutput()
        {
-         return gcnew DataOutput(*native::CacheRegionHelper::getCacheImpl(m_nativeptr->get())->getSerializationRegistry());
+         return gcnew DataOutput( m_nativeptr->get());
        }
     }  // namespace Client
   }  // namespace Geode

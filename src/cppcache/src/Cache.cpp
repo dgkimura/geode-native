@@ -33,6 +33,8 @@
 extern bool Cache_CreatedFromCacheFactory;
 extern ACE_Recursive_Thread_Mutex* g_disconnectLock;
 
+#define DEFAULT_DS_NAME "default_GeodeDS"
+
 namespace apache {
 namespace geode {
 namespace client {
@@ -152,10 +154,12 @@ CacheTransactionManagerPtr Cache::getCacheTransactionManager() {
 
 TypeRegistry& Cache::getTypeRegistry() { return *(m_typeRegistry.get()); }
 
-Cache::Cache(const std::string& name, std::unique_ptr<DistributedSystem> sys,
+Cache::Cache(const std::string& name, PropertiesPtr dsProp,
              bool ignorePdxUnreadFields, bool readPdxSerialized) {
+  auto dsPtr = DistributedSystem::create(DEFAULT_DS_NAME, this, dsProp);
+  dsPtr->connect();
   m_cacheImpl = std::unique_ptr<CacheImpl>(new CacheImpl(
-      this, name, std::move(sys), ignorePdxUnreadFields, readPdxSerialized));
+      this, name, std::move(dsPtr), ignorePdxUnreadFields, readPdxSerialized));
   m_typeRegistry = std::unique_ptr<TypeRegistry>(new TypeRegistry(*this));
 }
 
@@ -209,7 +213,7 @@ bool Cache::getPdxReadSerialized() {
 PdxInstanceFactoryPtr Cache::createPdxInstanceFactory(const char* className) {
   return std::make_shared<PdxInstanceFactoryImpl>(
       className, m_cacheImpl->m_cacheStats, m_cacheImpl->getPdxTypeRegistry(),
-      *(m_cacheImpl->getSerializationRegistry().get()),
+      this,
       m_cacheImpl->getDistributedSystem()
           .getSystemProperties()
           .getEnableTimeStatistics());
@@ -253,13 +257,11 @@ StatisticsFactory* Cache::getStatisticsFactory() const {
 
 std::unique_ptr<DataInput> Cache::createDataInput(const uint8_t* m_buffer,
                                                   int32_t len) {
-  return std::unique_ptr<DataInput>(
-      new DataInput(m_buffer, len, *m_cacheImpl->getSerializationRegistry()));
+  return std::unique_ptr<DataInput>(new DataInput(m_buffer, len, this));
 }
 
 std::unique_ptr<DataOutput> Cache::createDataOutput() const {
-  return std::unique_ptr<DataOutput>(
-      new DataOutput(*m_cacheImpl->getSerializationRegistry()));
+  return std::unique_ptr<DataOutput>(new DataOutput(this));
 }
 
 }  // namespace client

@@ -74,7 +74,7 @@ namespace Apache
           int m_typeId;
           bool m_own;
           PdxType^ m_pdxType;
-          native::SerializationRegistry* m_serializationRegistry;
+          native::Cache* m_cache;
         internal:
           Dictionary<String^, Object^>^ m_updatedFields;
 
@@ -125,7 +125,7 @@ namespace Apache
           void updatePdxStream(System::Byte* newPdxStream, int len);
 
         public:
-          PdxInstanceImpl(System::Byte* buffer, int length, int typeId, bool own, native::SerializationRegistry* serializationRegistry)
+          PdxInstanceImpl(System::Byte* buffer, int length, int typeId, bool own, native::Cache* cache)
           {
             //m_dataInput = dataInput;
             m_buffer = buffer;
@@ -134,11 +134,11 @@ namespace Apache
             m_updatedFields = nullptr;
             m_own = own;
             m_pdxType = nullptr;
-            m_serializationRegistry = serializationRegistry;
+            m_cache = cache;
           }
 
           //for pdxInstance factory
-          PdxInstanceImpl(Dictionary<String^, Object^>^ fieldVsValue, PdxType^ pdxType, CachePerfStats* cachePerfStats, native::SerializationRegistry* serializationRegistry);
+          PdxInstanceImpl(Dictionary<String^, Object^>^ fieldVsValue, PdxType^ pdxType, CachePerfStats* cachePerfStats, native::Cache* cache);
 
           ~PdxInstanceImpl()
           {

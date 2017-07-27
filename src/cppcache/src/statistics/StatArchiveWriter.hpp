@@ -79,11 +79,10 @@ using std::chrono::steady_clock;
 
 class CPPCACHE_EXPORT StatDataOutput {
  public:
-  StatDataOutput() : bytesWritten(0), m_fp(nullptr), closed(false) {
-    SerializationRegistry serializationRegistry;
-    dataBuffer = std::unique_ptr<DataOutput>(new DataOutput(serializationRegistry));
+  StatDataOutput(Cache *cache) : bytesWritten(0), m_fp(nullptr), closed(false) {
+    dataBuffer = std::unique_ptr<DataOutput>(new DataOutput(cache));
   }
-  StatDataOutput( std::string);
+  StatDataOutput(std::string, Cache *cache);
   ~StatDataOutput();
   /**
    * Returns the number of bytes written into the buffer so far.
@@ -208,6 +207,7 @@ class CPPCACHE_EXPORT StatArchiveWriter {
  private:
   HostStatSampler *sampler;
   StatDataOutput *dataBuffer;
+  Cache *cache;
   steady_clock::time_point previousTimeStamp;
   int32_t resourceTypeId;
   int32_t resourceInstId;
@@ -229,7 +229,8 @@ class CPPCACHE_EXPORT StatArchiveWriter {
   bool resourceInstMapHas(Statistics *sp);
 
  public:
-  StatArchiveWriter(std::string archiveName, HostStatSampler *sampler);
+  StatArchiveWriter(std::string archiveName, HostStatSampler *sampler,
+                    Cache *cache);
   ~StatArchiveWriter();
   /**
    * Returns the number of bytes written so far to this archive.

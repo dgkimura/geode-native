@@ -150,18 +150,14 @@ inline uint32_t crc32(const uint8_t* buffer, uint32_t bufLen) {
 
 template <typename TPRIM>
 inline uint32_t crc32(TPRIM value) {
-  DataOutput output(*CacheRegionHelper::getCacheImpl(
-                         CacheHelper::getHelper().getCache().get())
-                         ->getSerializationRegistry());
+  DataOutput output(CacheHelper::getHelper().getCache().get());
   apache::geode::client::serializer::writeObject(output, value);
   return crc32(output.getBuffer(), output.getBufferLength());
 }
 
 template <typename TPRIM>
 inline uint32_t crc32Array(const TPRIM* arr, uint32_t len) {
-  DataOutput output(*CacheRegionHelper::getCacheImpl(
-                         CacheHelper::getHelper().getCache().get())
-                         ->getSerializationRegistry());
+  DataOutput output(CacheHelper::getHelper().getCache().get());
   for (uint32_t index = 0; index < len; index++) {
     apache::geode::client::serializer::writeObject(output, arr[index]);
   }

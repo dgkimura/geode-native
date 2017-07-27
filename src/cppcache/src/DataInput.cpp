@@ -17,6 +17,7 @@
 
 #include <geode/DataInput.hpp>
 
+#include "CacheRegionHelper.hpp"
 #include <SerializationRegistry.hpp>
 #include "CacheImpl.hpp"
 
@@ -25,8 +26,12 @@ namespace geode {
 namespace client {
 
 void DataInput::readObjectInternal(SerializablePtr& ptr, int8_t typeId) {
-  ptr = m_serializationRegistry.deserialize(*this, typeId);
+  ptr = CacheRegionHelper::getCacheImpl(m_cache)
+            ->getSerializationRegistry()
+            ->deserialize(*this, typeId);
 }
+
+const Cache* DataInput::getCache() { return m_cache; }
 }  // namespace client
 }  // namespace geode
 }  // namespace apache

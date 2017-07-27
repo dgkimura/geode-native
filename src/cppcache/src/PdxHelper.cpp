@@ -59,7 +59,7 @@ void PdxHelper::serializePdx(DataOutput& output,
   const char* pdxClassname = nullptr;
 
   auto pdxII = std::dynamic_pointer_cast<PdxInstanceImpl>(pdxObject);
-  auto cacheImpl = PdxHelper::getCacheImpl();
+  auto cacheImpl = CacheRegionHelper::getCacheImpl(output.getCache());
   auto pdxTypeRegistry = cacheImpl->getPdxTypeRegistry();
   auto& cachePerfStats = cacheImpl->getCachePerfStats();
 
@@ -158,7 +158,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
   PdxSerializablePtr pdxObjectptr = nullptr;
   PdxTypePtr pdxLocalType = nullptr;
 
-  auto cacheImpl = PdxHelper::getCacheImpl();
+  auto cacheImpl = CacheRegionHelper::getCacheImpl(dataInput.getCache());
   auto pdxTypeRegistry = cacheImpl->getPdxTypeRegistry();
   auto serializationRegistry = cacheImpl->getSerializationRegistry();
 
@@ -288,7 +288,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
 
 PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
                                              bool forceDeserialize) {
-  auto cacheImpl = PdxHelper::getCacheImpl();
+  auto cacheImpl = CacheRegionHelper::getCacheImpl(dataInput.getCache());
   auto pdxTypeRegistry = cacheImpl->getPdxTypeRegistry();
   auto serializationRegistry = cacheImpl->getSerializationRegistry();
   auto& cachePerfStats = cacheImpl->getCachePerfStats();
@@ -331,7 +331,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
     // TODO::Enable it once the PdxInstanceImple is CheckedIn.
     auto pdxObject = std::make_shared<PdxInstanceImpl>(
         const_cast<uint8_t*>(dataInput.currentBufferPosition()), len, typeId,
-        &cachePerfStats, pdxTypeRegistry, *serializationRegistry,
+        &cachePerfStats, pdxTypeRegistry, dataInput.getCache(),
         cacheImpl->getDistributedSystem()
             .getSystemProperties()
             .getEnableTimeStatistics());
@@ -345,7 +345,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
 void PdxHelper::createMergedType(PdxTypePtr localType, PdxTypePtr remoteType,
                                  DataInput& dataInput) {
   PdxTypePtr mergedVersion = localType->mergeVersion(remoteType);
-  auto cacheImpl = PdxHelper::getCacheImpl();
+  auto cacheImpl = CacheRegionHelper::getCacheImpl(dataInput.getCache());
   auto pdxTypeRegistry = cacheImpl->getPdxTypeRegistry();
   auto serializaionRegistry = cacheImpl->getSerializationRegistry();
 

@@ -150,7 +150,7 @@ void DistributedSystem::logSystemInformation() {
 }
 
 std::unique_ptr<DistributedSystem> DistributedSystem::create(
-    const std::string& _name, const PropertiesPtr& configPtr) {
+    const std::string& _name, Cache* cache, const PropertiesPtr& configPtr) {
   // TODO global - Refactory out the static initialization
   // Trigger other library initialization.
   CppCacheLibrary::initLib();
@@ -201,7 +201,7 @@ std::unique_ptr<DistributedSystem> DistributedSystem::create(
   try {
     statMngr = std::unique_ptr<StatisticsManager>(new StatisticsManager(
         sysProps->statisticsArchiveFile(), sysProps->statisticsSampleInterval(),
-        sysProps->statisticsEnabled(), sysProps->durableClientId(),
+        sysProps->statisticsEnabled(), cache, sysProps->durableClientId(),
         sysProps->durableTimeout(), sysProps->statsFileSizeLimit(),
         sysProps->statsDiskSpaceLimit()));
   } catch (const NullPointerException&) {

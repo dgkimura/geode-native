@@ -93,7 +93,7 @@ namespace Apache
           else if(!SafeConvertClassGeneric::isAppDomainEnabled)
             return new apache::geode::client::ManagedCacheableKeyGeneric( tempObj, CacheImpl::getInstance()->getSerializationRegistry().get());
           else
-            return new apache::geode::client::ManagedCacheableKeyBytesGeneric( tempObj, false, CacheImpl::getInstance()->getSerializationRegistry().get());
+            return new apache::geode::client::ManagedCacheableKeyBytesGeneric( tempObj, false, CacheImpl::getInstance()->getCache());
         }
 
 

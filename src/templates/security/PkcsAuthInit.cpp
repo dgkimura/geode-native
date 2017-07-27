@@ -157,8 +157,7 @@ PropertiesPtr PKCSAuthInit::getCredentials(const PropertiesPtr& securityprops,
 
   fclose(keyStoreFP);
 
-  SerializationRegistry defaultSerializationRegistry;
-  DataOutput additionalMsg(defaultSerializationRegistry);
+  DataOutput additionalMsg;
 
   additionalMsg.writeUTF(alias);
 

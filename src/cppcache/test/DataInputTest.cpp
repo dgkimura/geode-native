@@ -33,19 +33,15 @@ using namespace apache::geode::client;
 
 class TestDataInput {
  public:
-  explicit TestDataInput(const char *str,
-                         SerializationRegistry &serializationRegistry)
+  explicit TestDataInput(const char *str, Cache *cache)
       : m_byteArray(ByteArray::fromString(str)),
-        m_dataInput(m_byteArray.get(), m_byteArray.size(),
-                    serializationRegistry) {
+        m_dataInput(m_byteArray.get(), m_byteArray.size(), cache) {
     // NOP
   }
 
-  explicit TestDataInput(const wchar_t *str,
-                         SerializationRegistry &serializationRegistry)
+  explicit TestDataInput(const wchar_t *str, Cache *cache)
       : m_byteArray(ByteArray::fromString(str)),
-        m_dataInput(m_byteArray.get(), m_byteArray.size(),
-                    serializationRegistry) {
+        m_dataInput(m_byteArray.get(), m_byteArray.size(), cache) {
     // NOP
   }
 
@@ -206,8 +202,7 @@ class DataInputTest : public ::testing::Test, protected ByteArrayFixture {
 };
 
 TEST_F(DataInputTest, ThrowsWhenReadingInputWithSizeZero) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("", serializationRegistry);
+  TestDataInput dataInput("", nullptr);
 
   uint8_t aByte = 0U;
   ASSERT_THROW(dataInput.read(&aByte),
@@ -215,8 +210,7 @@ TEST_F(DataInputTest, ThrowsWhenReadingInputWithSizeZero) {
 }
 
 TEST_F(DataInputTest, ThrowsWhenReadingMoreBytesThanSizePassedToConstructor) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("01", serializationRegistry);
+  TestDataInput dataInput("01", nullptr);
 
   uint8_t aByte = 0U;
   dataInput.read(&aByte);
@@ -228,8 +222,7 @@ TEST_F(DataInputTest, ThrowsWhenReadingMoreBytesThanSizePassedToConstructor) {
 }
 
 TEST_F(DataInputTest, CanReadUnsignedBytesFromInput) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("FF00", serializationRegistry);
+  TestDataInput dataInput("FF00", nullptr);
 
   uint8_t aByte = 0U;
   dataInput.read(&aByte);
@@ -241,8 +234,7 @@ TEST_F(DataInputTest, CanReadUnsignedBytesFromInput) {
 }
 
 TEST_F(DataInputTest, CanReadSignedBytesFromInput) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("807F", serializationRegistry);
+  TestDataInput dataInput("807F", nullptr);
 
   int8_t aByte = 0U;
   dataInput.read(&aByte);
@@ -255,9 +247,7 @@ TEST_F(DataInputTest, CanReadSignedBytesFromInput) {
 
 TEST_F(DataInputTest, CanReadABooleanFromInput) {
   bool boolArray[2] = {true, false};
-  SerializationRegistry serializationRegistry;
-  DataInput dataInput(reinterpret_cast<uint8_t *>(boolArray), 2,
-                      serializationRegistry);
+  DataInput dataInput(reinterpret_cast<uint8_t *>(boolArray), 2, nullptr);
 
   bool aBool = false;
   dataInput.readBoolean(&aBool);
@@ -269,8 +259,7 @@ TEST_F(DataInputTest, CanReadABooleanFromInput) {
 }
 
 TEST_F(DataInputTest, CanReadAnArrayOfBytesFromInput) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("010203", serializationRegistry);
+  TestDataInput dataInput("010203", nullptr);
 
   uint8_t byteArrayCopy[4];
   dataInput.readBytesOnly(byteArrayCopy, 3);
@@ -281,9 +270,7 @@ TEST_F(DataInputTest, CanReadAnArrayOfBytesFromInput) {
 
 TEST_F(DataInputTest,
        ThrowsWhenReadingMoreContinuousBytesThanSizePassedToConstructor) {
-  SerializationRegistry serializationRegistry;
-
-  TestDataInput dataInput("010203", serializationRegistry);
+  TestDataInput dataInput("010203", nullptr);
 
   // fails to read 4 bytes from 3 byte buffer
   uint8_t byteArrayCopy[4];
@@ -293,10 +280,8 @@ TEST_F(DataInputTest,
 
 TEST_F(DataInputTest, CanReadIntWithAMaxSizeUnsigned64BitIntInput) {
   uint64_t intArray[1] = {std::numeric_limits<uint64_t>::max()};
-  SerializationRegistry serializationRegistry;
-
   DataInput dataInput(reinterpret_cast<uint8_t *>(intArray), sizeof(intArray),
-                      serializationRegistry);
+                      nullptr);
 
   uint64_t aInt = 0UL;
   dataInput.readInt(&aInt);
@@ -306,13 +291,12 @@ TEST_F(DataInputTest, CanReadIntWithAMaxSizeUnsigned64BitIntInput) {
 TEST_F(DataInputTest, CanReadASCIIWithAnASCIIStringInput) {
   char *actualString;
   const char *expectedString = "foobar";
-  SerializationRegistry serializationRegistry;
-  DataOutput stream(serializationRegistry);
+  DataOutput stream(nullptr);
 
   stream.writeASCII(expectedString);
 
   DataInput dataInput(stream.getBufferCopy(), stream.getBufferLength(),
-                      serializationRegistry);
+                      nullptr);
   dataInput.readASCII(&actualString);
 
   EXPECT_TRUE(std::string(expectedString) == std::string(actualString));
@@ -321,12 +305,11 @@ TEST_F(DataInputTest, CanReadASCIIWithAnASCIIStringInput) {
 TEST_F(DataInputTest, ThrowsWhenCallingReadStringWithAnASCIIStringInput) {
   char *actualString;
   const char *expectedString = "foobar";
-  SerializationRegistry serializationRegistry;
-  DataOutput stream(serializationRegistry);
+  DataOutput stream(nullptr);
   stream.writeASCII(expectedString);
 
   DataInput dataInput(stream.getBufferCopy(), stream.getBufferLength(),
-                      serializationRegistry);
+                      nullptr);
 
   // ASCII and non-ASCII: consider matching exception string
   ASSERT_THROW(dataInput.readString(&actualString),
@@ -336,12 +319,11 @@ TEST_F(DataInputTest, ThrowsWhenCallingReadStringWithAnASCIIStringInput) {
 TEST_F(DataInputTest, CanReadASCIIWithAnUTFStringInput) {
   char *actualString;
   const char *expectedString = "foobar";
-  SerializationRegistry serializationRegistry;
-  DataOutput stream(serializationRegistry);
+  DataOutput stream(nullptr);
   stream.writeUTF(expectedString);
 
   DataInput dataInput(stream.getBufferCopy(), stream.getBufferLength(),
-                      serializationRegistry);
+                      nullptr);
   dataInput.readASCII(&actualString);
 
   EXPECT_TRUE(std::string(expectedString) == std::string(actualString));
@@ -350,12 +332,11 @@ TEST_F(DataInputTest, CanReadASCIIWithAnUTFStringInput) {
 TEST_F(DataInputTest, ThrowsWhenCallingReadStringWithAnUTFStringInput) {
   char *actualString;
   const char *expectedString = "foobar";
-  SerializationRegistry serializationRegistry;
-  DataOutput stream(serializationRegistry);
+  DataOutput stream(nullptr);
   stream.writeUTF(expectedString);
 
   DataInput dataInput(stream.getBufferCopy(), stream.getBufferLength(),
-                      serializationRegistry);
+                      nullptr);
 
   // UTF and non-UTF: consider matching exception string
   ASSERT_THROW(dataInput.readString(&actualString),
@@ -365,12 +346,11 @@ TEST_F(DataInputTest, ThrowsWhenCallingReadStringWithAnUTFStringInput) {
 TEST_F(DataInputTest, CanReadUTFWithAnUTFStringInput) {
   char *actualString;
   const char *expectedString = "foobar";
-  SerializationRegistry serializationRegistry;
-  DataOutput stream(serializationRegistry);
+  DataOutput stream(nullptr);
   stream.writeUTF(expectedString);
 
   DataInput dataInput(stream.getBufferCopy(), stream.getBufferLength(),
-                      serializationRegistry);
+                      nullptr);
   dataInput.readUTF(&actualString);
 
   EXPECT_TRUE(std::string(expectedString) == std::string(actualString));
@@ -379,20 +359,18 @@ TEST_F(DataInputTest, CanReadUTFWithAnUTFStringInput) {
 TEST_F(DataInputTest, CanReadUTFWithAnASCIIStringInput) {
   char *actualString;
   const char *expectedString = "foobar";
-  SerializationRegistry serializationRegistry;
-  DataOutput stream(serializationRegistry);
+  DataOutput stream(nullptr);
   stream.writeASCII(expectedString);
 
   DataInput dataInput(stream.getBufferCopy(), stream.getBufferLength(),
-                      serializationRegistry);
+                      nullptr);
   dataInput.readUTF(&actualString);
 
   EXPECT_TRUE(std::string(expectedString) == std::string(actualString));
 }
 
 TEST_F(DataInputTest, InputResetCausesPristineRead) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("010203", serializationRegistry);
+  TestDataInput dataInput("010203", nullptr);
 
   // 1) read byte off buffer
   // 2) then reset buffer back
@@ -407,8 +385,7 @@ TEST_F(DataInputTest, InputResetCausesPristineRead) {
 }
 
 TEST_F(DataInputTest, InputRewindCausesReplayedRead) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("010203", serializationRegistry);
+  TestDataInput dataInput("010203", nullptr);
 
   uint8_t aByte = 0U;
   dataInput.read(&aByte);
@@ -422,32 +399,28 @@ TEST_F(DataInputTest, InputRewindCausesReplayedRead) {
 }
 
 TEST_F(DataInputTest, TestReadUint8) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("37", serializationRegistry);
+  TestDataInput dataInput("37", nullptr);
   uint8_t value = 0U;
   dataInput.read(&value);
   EXPECT_EQ((uint8_t)55U, value) << "Correct uint8_t";
 }
 
 TEST_F(DataInputTest, TestReadInt8) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("37", serializationRegistry);
+  TestDataInput dataInput("37", nullptr);
   int8_t value = 0;
   dataInput.read(&value);
   EXPECT_EQ((int8_t)55, value) << "Correct int8_t";
 }
 
 TEST_F(DataInputTest, TestReadBoolean) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("01", serializationRegistry);
+  TestDataInput dataInput("01", nullptr);
   bool value = false;
   dataInput.readBoolean(&value);
   EXPECT_EQ(true, value) << "Correct bool";
 }
 
 TEST_F(DataInputTest, TestReadUint8_tBytesOnly) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("BABEFACE", serializationRegistry);
+  TestDataInput dataInput("BABEFACE", nullptr);
   uint8_t buffer[4];
   ::memset(buffer, 0U, 4 * sizeof(uint8_t));
   dataInput.readBytesOnly(buffer, 4);
@@ -458,8 +431,7 @@ TEST_F(DataInputTest, TestReadUint8_tBytesOnly) {
 }
 
 TEST_F(DataInputTest, TestReadInt8_tBytesOnly) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("DEADBEEF", serializationRegistry);
+  TestDataInput dataInput("DEADBEEF", nullptr);
   int8_t buffer[4];
   ::memset(buffer, 0, 4 * sizeof(int8_t));
   dataInput.readBytesOnly(buffer, 4);
@@ -470,8 +442,7 @@ TEST_F(DataInputTest, TestReadInt8_tBytesOnly) {
 }
 
 TEST_F(DataInputTest, TestReadUint8_tBytes) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("04BABEFACE", serializationRegistry);
+  TestDataInput dataInput("04BABEFACE", nullptr);
   uint8_t *buffer = nullptr;
   int32_t len = 0;
   dataInput.readBytes(&buffer, &len);
@@ -485,8 +456,7 @@ TEST_F(DataInputTest, TestReadUint8_tBytes) {
 }
 
 TEST_F(DataInputTest, TestReadInt8_tBytes) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("04DEADBEEF", serializationRegistry);
+  TestDataInput dataInput("04DEADBEEF", nullptr);
   int8_t *buffer = nullptr;
   int32_t len = 0;
   dataInput.readBytes(&buffer, &len);
@@ -500,48 +470,42 @@ TEST_F(DataInputTest, TestReadInt8_tBytes) {
 }
 
 TEST_F(DataInputTest, TestReadIntUint16) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   uint16_t value = 0U;
   dataInput.readInt(&value);
   EXPECT_EQ((uint16_t)4660U, value) << "Correct uint16_t";
 }
 
 TEST_F(DataInputTest, TestReadIntInt16) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   int16_t value = 0;
   dataInput.readInt(&value);
   EXPECT_EQ((int16_t)4660, value) << "Correct int16_t";
 }
 
 TEST_F(DataInputTest, TestReadIntUint32) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   uint32_t value = 0U;
   dataInput.readInt(&value);
   EXPECT_EQ((uint32_t)305419896U, value) << "Correct uint32_t";
 }
 
 TEST_F(DataInputTest, TestReadIntInt32) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   int32_t value = 0;
   dataInput.readInt(&value);
   EXPECT_EQ((int32_t)305419896, value) << "Correct int32_t";
 }
 
 TEST_F(DataInputTest, TestReadIntUint64) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   uint64_t value = 0U;
   dataInput.readInt(&value);
   EXPECT_EQ((uint64_t)1311768467463790320U, value) << "Correct uint64_t";
 }
 
 TEST_F(DataInputTest, TestReadIntInt64) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   int64_t value = 0;
   dataInput.readInt(&value);
   EXPECT_EQ((int64_t)1311768467463790320, value) << "Correct int64_t";
@@ -549,21 +513,20 @@ TEST_F(DataInputTest, TestReadIntInt64) {
 
 TEST_F(DataInputTest, TestReadArrayLen) {
   int32_t len = 0;
-  SerializationRegistry serializationRegistry;
 
-  TestDataInput dataInput0("FF12345678", serializationRegistry);
+  TestDataInput dataInput0("FF12345678", nullptr);
   dataInput0.readArrayLen(&len);
   EXPECT_EQ(-1, len) << "Correct length for 0xFF";
 
-  TestDataInput dataInput1("FE12345678", serializationRegistry);
+  TestDataInput dataInput1("FE12345678", nullptr);
   dataInput1.readArrayLen(&len);
   EXPECT_EQ(4660, len) << "Correct length for 0xFE";
 
-  TestDataInput dataInput2("FD12345678", serializationRegistry);
+  TestDataInput dataInput2("FD12345678", nullptr);
   dataInput2.readArrayLen(&len);
   EXPECT_EQ(305419896, len) << "Correct length for 0xFD";
 
-  TestDataInput dataInput3("FC12345678", serializationRegistry);
+  TestDataInput dataInput3("FC12345678", nullptr);
   dataInput3.readArrayLen(&len);
   EXPECT_EQ(252, len) << "Correct length for 0xFC";
 }
@@ -581,34 +544,30 @@ TEST_F(DataInputTest, TestReadUnsignedVL) {
   //  1110000
   // 00    12       1A       15       4F       09       55       73       3D 70
   // 00    92       9A       95       CF       89       D5       F3       BD F0
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("F0BDF3D589CF959A9200", serializationRegistry);
+
+  TestDataInput dataInput("F0BDF3D589CF959A9200", nullptr);
   int64_t value = 0;
   dataInput.readUnsignedVL(&value);
   EXPECT_EQ((int64_t)1311768467463790320, value) << "Correct int64_t";
 }
 
 TEST_F(DataInputTest, TestReadFloat) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   float value = 0.F;
   dataInput.readFloat(&value);
   EXPECT_FLOAT_EQ(5.6904566e-28F, value) << "Correct float";
 }
 
 TEST_F(DataInputTest, TestReadDouble) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   double value = 0.;
   dataInput.readDouble(&value);
   EXPECT_DOUBLE_EQ(5.626349274901198e-221, value) << "Correct double";
 }
 
 TEST_F(DataInputTest, TestReadASCII) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   char *value = nullptr;
   uint16_t len = 0U;
   dataInput.readASCII(&value, &len);
@@ -618,10 +577,9 @@ TEST_F(DataInputTest, TestReadASCII) {
 }
 
 TEST_F(DataInputTest, TestReadASCIIHuge) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
       "0000001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      nullptr);
   char *value = nullptr;
   uint32_t len = 0U;
   dataInput.readASCIIHuge(&value, &len);
@@ -631,10 +589,8 @@ TEST_F(DataInputTest, TestReadASCIIHuge) {
 }
 
 TEST_F(DataInputTest, TestReadUTFNarrow) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   char *value = nullptr;
   uint16_t len = 0U;
   dataInput.readUTF(&value, &len);
@@ -644,11 +600,10 @@ TEST_F(DataInputTest, TestReadUTFNarrow) {
 }
 
 TEST_F(DataInputTest, TestReadUTFHugeNarrow) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
       "0000001B0059006F007500200068006100640020006D00650020006100740020006D0065"
       "0061007400200074006F0072006E00610064006F002E",
-      serializationRegistry);
+      nullptr);
   char *value = nullptr;
   uint32_t len = 0U;
   dataInput.readUTFHuge(&value, &len);
@@ -658,10 +613,8 @@ TEST_F(DataInputTest, TestReadUTFHugeNarrow) {
 }
 
 TEST_F(DataInputTest, TestReadUTFNoLen) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   wchar_t *value = nullptr;
   dataInput.readUTFNoLen(&value, static_cast<uint16_t>(27U));
   EXPECT_STREQ(L"You had me at meat tornado.", value) << "Correct wchar_t *";
@@ -669,10 +622,8 @@ TEST_F(DataInputTest, TestReadUTFNoLen) {
 }
 
 TEST_F(DataInputTest, TestReadUTFWide) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   wchar_t *value = nullptr;
   uint16_t len = 0U;
   dataInput.readUTF(&value, &len);
@@ -682,11 +633,10 @@ TEST_F(DataInputTest, TestReadUTFWide) {
 }
 
 TEST_F(DataInputTest, TestReadUTFHugeWide) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
       "0000001B0059006F007500200068006100640020006D00650020006100740020006D0065"
       "0061007400200074006F0072006E00610064006F002E",
-      serializationRegistry);
+      nullptr);
   wchar_t *value = nullptr;
   uint32_t len = 0U;
   dataInput.readUTFHuge(&value, &len);
@@ -696,10 +646,8 @@ TEST_F(DataInputTest, TestReadUTFHugeWide) {
 }
 
 TEST_F(DataInputTest, TestReadObjectSharedPtr) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   CacheableStringPtr objptr;
   dataInput.readObject(objptr);
   EXPECT_STREQ((const char *)"You had me at meat tornado.",
@@ -708,24 +656,20 @@ TEST_F(DataInputTest, TestReadObjectSharedPtr) {
 }
 
 TEST_F(DataInputTest, TestReadNativeBool) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("0001", serializationRegistry);
+  TestDataInput dataInput("0001", nullptr);
   const bool value = dataInput.readNativeBool();
   EXPECT_EQ(true, value) << "Correct bool";
 }
 
 TEST_F(DataInputTest, TestReadNativeInt32) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("0012345678", serializationRegistry);
+  TestDataInput dataInput("0012345678", nullptr);
   const int32_t value = dataInput.readNativeInt32();
   EXPECT_EQ((int32_t)305419896, value) << "Correct int32_t";
 }
 
 TEST_F(DataInputTest, TestReadNativeString) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   CacheableStringPtr objptr;
   ASSERT_EQ(true, dataInput.readNativeString(objptr)) << "Successful read";
   EXPECT_STREQ((const char *)"You had me at meat tornado.",
@@ -734,10 +678,8 @@ TEST_F(DataInputTest, TestReadNativeString) {
 }
 
 TEST_F(DataInputTest, TestReadDirectObject) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   SerializablePtr objptr;
   dataInput.readDirectObject(objptr);
   EXPECT_STREQ(
@@ -748,10 +690,8 @@ TEST_F(DataInputTest, TestReadDirectObject) {
 }
 
 TEST_F(DataInputTest, TestReadObjectSerializablePtr) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   SerializablePtr objptr;
   dataInput.readObject(objptr);
   EXPECT_STREQ(
@@ -762,11 +702,10 @@ TEST_F(DataInputTest, TestReadObjectSerializablePtr) {
 }
 
 TEST_F(DataInputTest, TestReadCharArray) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
       "1C0059006F007500200068006100640020006D00650020006100740020006D0065006100"
       "7400200074006F0072006E00610064006F002E0000",
-      serializationRegistry);
+      nullptr);
   char *value = nullptr;
   int32_t length = 0;
   dataInput.readCharArray(&value, length);
@@ -776,10 +715,8 @@ TEST_F(DataInputTest, TestReadCharArray) {
 }
 
 TEST_F(DataInputTest, TestReadString) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   char *value = nullptr;
   dataInput.readString(&value);
   EXPECT_STREQ("You had me at meat tornado.", value) << "Correct char *";
@@ -787,10 +724,8 @@ TEST_F(DataInputTest, TestReadString) {
 }
 
 TEST_F(DataInputTest, TestReadWideString) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
-      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      "57001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
   wchar_t *value = nullptr;
   dataInput.readWideString(&value);
   EXPECT_STREQ(L"You had me at meat tornado.", value) << "Correct wchar_t *";
@@ -798,10 +733,9 @@ TEST_F(DataInputTest, TestReadWideString) {
 }
 
 TEST_F(DataInputTest, TestReadStringArray) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
       "0157001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      nullptr);
   char **value = nullptr;
   int32_t length = 0;
   dataInput.readStringArray(&value, length);
@@ -812,10 +746,9 @@ TEST_F(DataInputTest, TestReadStringArray) {
 }
 
 TEST_F(DataInputTest, TestReadWideStringArray) {
-  SerializationRegistry serializationRegistry;
   TestDataInput dataInput(
       "0157001B596F7520686164206D65206174206D65617420746F726E61646F2E",
-      serializationRegistry);
+      nullptr);
   wchar_t **value = nullptr;
   int32_t length = 0;
   dataInput.readWideStringArray(&value, length);
@@ -826,8 +759,7 @@ TEST_F(DataInputTest, TestReadWideStringArray) {
 }
 
 TEST_F(DataInputTest, TestReadArrayOfByteArrays) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("0104DEADBEEF", serializationRegistry);
+  TestDataInput dataInput("0104DEADBEEF", nullptr);
   int8_t **arrayOfByteArrays = nullptr;
   int32_t arrayLength = 0;
   int32_t *elementLength = nullptr;
@@ -848,8 +780,7 @@ TEST_F(DataInputTest, TestReadArrayOfByteArrays) {
 }
 
 TEST_F(DataInputTest, TestGetBytesRead) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   EXPECT_EQ((int32_t)0, dataInput.getBytesRead())
       << "Correct bytes read before any reads";
   uint8_t value = 0U;
@@ -868,8 +799,7 @@ TEST_F(DataInputTest, TestGetBytesRead) {
 }
 
 TEST_F(DataInputTest, TestGetBytesRemaining) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   EXPECT_EQ((int32_t)8, dataInput.getBytesRemaining())
       << "Correct bytes remaining before any reads";
   uint8_t value = 0U;
@@ -888,8 +818,7 @@ TEST_F(DataInputTest, TestGetBytesRemaining) {
 }
 
 TEST_F(DataInputTest, TestAdvanceCursor) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   EXPECT_EQ((int32_t)0, dataInput.getBytesRead())
       << "Correct bytes read before any advancement";
   EXPECT_EQ((int32_t)8, dataInput.getBytesRemaining())
@@ -907,8 +836,7 @@ TEST_F(DataInputTest, TestAdvanceCursor) {
 }
 
 TEST_F(DataInputTest, TestRewindCursor) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   EXPECT_EQ((int32_t)0, dataInput.getBytesRead())
       << "Correct bytes read before any rewinding";
   EXPECT_EQ((int32_t)8, dataInput.getBytesRemaining())
@@ -926,8 +854,7 @@ TEST_F(DataInputTest, TestRewindCursor) {
 }
 
 TEST_F(DataInputTest, TestReset) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   EXPECT_EQ((int32_t)0, dataInput.getBytesRead())
       << "Correct bytes read before any reads";
   EXPECT_EQ((int32_t)8, dataInput.getBytesRemaining())
@@ -949,8 +876,7 @@ TEST_F(DataInputTest, TestReset) {
 }
 
 TEST_F(DataInputTest, TestSetBuffer) {
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   EXPECT_EQ((int32_t)0, dataInput.getBytesRead())
       << "Correct bytes read before any reads";
   EXPECT_EQ((int32_t)8, dataInput.getBytesRemaining())
@@ -973,8 +899,8 @@ TEST_F(DataInputTest, TestSetBuffer) {
 
 TEST_F(DataInputTest, TestSetPoolName) {
   static const char *poolName = "Das Schwimmbad";
-  SerializationRegistry serializationRegistry;
-  TestDataInput dataInput("123456789ABCDEF0", serializationRegistry);
+
+  TestDataInput dataInput("123456789ABCDEF0", nullptr);
   EXPECT_EQ((const char *)nullptr, dataInput.getPoolName())
       << "Null pool name before setting";
   dataInput.setPoolName(poolName);

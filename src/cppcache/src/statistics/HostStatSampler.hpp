@@ -82,9 +82,9 @@ class CPPCACHE_EXPORT HostStatSampler : public ACE_Task_Base,
    * Constructor:
    */
   HostStatSampler(const char* filePath, int64_t sampleIntervalMs,
-                  StatisticsManager* statMngr, const char* durableClientId,
-                  const uint32_t durableTimeout, int64_t statFileLimit = 0,
-                  int64_t statDiskSpaceLimit = 0);
+                  StatisticsManager* statMngr, Cache* cache,
+                  const char* durableClientId, const uint32_t durableTimeout,
+                  int64_t statFileLimit = 0, int64_t statDiskSpaceLimit = 0);
 
   /**
    * Adds the pid to the archive file passed to it.
@@ -216,6 +216,7 @@ class CPPCACHE_EXPORT HostStatSampler : public ACE_Task_Base,
   int64_t m_archiveDiskSpaceLimit;
   int64_t m_sampleRate;
   StatisticsManager* m_statMngr;
+  Cache* m_cache;
 
   int64_t m_pid;
   system_clock::time_point m_startTime;

@@ -39,14 +39,14 @@ using std::chrono::nanoseconds;
 
 // Constructor and Member functions of StatDataOutput class
 
-StatDataOutput::StatDataOutput(std::string filename) {
+StatDataOutput::StatDataOutput(std::string filename, Cache *cache) {
   if (filename.length() == 0) {
     std::string s("undefined archive file name");
     throw IllegalArgumentException(s.c_str());
   }
 
   SerializationRegistry serializationRegistry;
-  dataBuffer = std::unique_ptr<DataOutput>(new DataOutput(serializationRegistry));
+  dataBuffer = std::unique_ptr<DataOutput>(new DataOutput(cache));
   outFile = filename;
   closed = false;
   bytesWritten = 0;
@@ -314,7 +314,8 @@ void ResourceInst::writeResourceInst(StatDataOutput *dataOutArg,
 
 // Constructor and Member functions of StatArchiveWriter class
 StatArchiveWriter::StatArchiveWriter(std::string outfile,
-                                     HostStatSampler *samplerArg) {
+                                     HostStatSampler *samplerArg, Cache *cache)
+    : cache(cache) {
   resourceTypeId = 0;
   resourceInstId = 0;
   statResourcesModCount = 0;
@@ -326,7 +327,7 @@ StatArchiveWriter::StatArchiveWriter(std::string outfile,
    */
   m_samplesize = 0;
 
-  dataBuffer = new StatDataOutput(archiveFile);
+  dataBuffer = new StatDataOutput(archiveFile, cache);
   this->sampler = samplerArg;
 
   // write the time, system property etc.
@@ -429,7 +430,7 @@ void StatArchiveWriter::closeFile() { this->dataBuffer->close(); }
 void StatArchiveWriter::openFile(std::string filename) {
   // this->dataBuffer->openFile(filename, m_samplesize);
 
-  StatDataOutput *p_dataBuffer = new StatDataOutput(filename);
+  StatDataOutput *p_dataBuffer = new StatDataOutput(filename, cache);
 
   const uint8_t *buffBegin = dataBuffer->dataBuffer->getBuffer();
   if (buffBegin == nullptr) {

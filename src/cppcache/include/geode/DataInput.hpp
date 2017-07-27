@@ -893,13 +893,12 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   /** constructor given a pre-allocated byte array with size */
-  DataInput(const uint8_t* m_buffer, int32_t len,
-            const SerializationRegistry& serializationRegistry)
+  DataInput(const uint8_t* m_buffer, int32_t len, const Cache* cache)
       : m_buf(m_buffer),
         m_bufHead(m_buffer),
         m_bufLength(len),
         m_poolName(nullptr),
-        m_serializationRegistry(serializationRegistry) {}
+        m_cache(cache) {}
 
   /** destructor */
   ~DataInput() {}
@@ -967,12 +966,14 @@ class CPPCACHE_EXPORT DataInput {
    */
   void setPoolName(const char* poolName) { m_poolName = poolName; }
 
+  const Cache* getCache();
+
  private:
   const uint8_t* m_buf;
   const uint8_t* m_bufHead;
   int32_t m_bufLength;
   const char* m_poolName;
-  const SerializationRegistry& m_serializationRegistry;
+  const Cache* m_cache;
 
   void readObjectInternal(SerializablePtr& ptr, int8_t typeId = -1);
 

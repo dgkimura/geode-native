@@ -62,7 +62,7 @@ namespace apache
         try {
           int pos = input.getBytesRead();
           //Apache::Geode::Client::Log::Debug("ManagedCacheableKeyGeneric::fromData");      
-          Apache::Geode::Client::DataInput mg_input(&input, true, m_serializationRegistry);
+          Apache::Geode::Client::DataInput mg_input(&input, true, input.getCache());
           m_managedptr = m_managedptr->FromData(%mg_input);
 
           //this will move the cursor in c++ layer

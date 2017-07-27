@@ -22,12 +22,14 @@
 #include <geode/FixedPartitionResolver.hpp>
 #include <geode/CacheWriter.hpp>
 #include <geode/GeodeTypeIds.hpp>
+#include <geode/Cache.hpp>
 #include <CacheImpl.hpp>
 #include <CacheXmlParser.hpp>
 #include <DistributedSystemImpl.hpp>
 #include <ace/Process.h> // Added to get rid of unresolved token warning
 #include "end_native.hpp"
 
+#include "Cache.hpp"
 #include "Serializable.hpp"
 #include "DistributedSystem.hpp"
 #include "SystemProperties.hpp"
@@ -146,7 +148,7 @@ namespace Apache
 
         // this we are calling after all .NET initialization required in
         // each AppDomain
-        auto nativeptr = native::DistributedSystem::create(mg_name.CharPtr,
+        auto nativeptr = native::DistributedSystem::create(mg_name.CharPtr, cache->GetNative().get(),
                                                             config->GetNative());
         nativeptr->connect();
 

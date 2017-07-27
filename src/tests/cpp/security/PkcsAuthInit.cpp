@@ -175,8 +175,7 @@ PropertiesPtr PKCSAuthInitInternal::getCredentials(
   }
 
   fclose(keyStoreFP);
-  SerializationRegistry serializationRegistry;
-  DataOutput additionalMsg(serializationRegistry);
+  DataOutput additionalMsg;
 
   additionalMsg.writeUTF(alias);
 

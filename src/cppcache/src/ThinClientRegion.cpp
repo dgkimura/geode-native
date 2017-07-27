@@ -3417,10 +3417,11 @@ void ChunkedInterestResponse::reset() {
   }
 }
 
-void ChunkedInterestResponse::handleChunk(
-    const uint8_t* chunk, int32_t chunkLen, uint8_t isLastChunkWithSecurity,
-    const SerializationRegistry& serializationRegistry) {
-  DataInput input(chunk, chunkLen, serializationRegistry);
+void ChunkedInterestResponse::handleChunk(const uint8_t* chunk,
+                                          int32_t chunkLen,
+                                          uint8_t isLastChunkWithSecurity,
+                                          const Cache* cache) {
+  DataInput input(chunk, chunkLen, cache);
 
   input.setPoolName(m_replyMsg.getPoolName());
 
@@ -3448,10 +3449,10 @@ void ChunkedKeySetResponse::reset() {
   }
 }
 
-void ChunkedKeySetResponse::handleChunk(
-    const uint8_t* chunk, int32_t chunkLen, uint8_t isLastChunkWithSecurity,
-    const SerializationRegistry& serializationRegistry) {
-  DataInput input(chunk, chunkLen, serializationRegistry);
+void ChunkedKeySetResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
+                                        uint8_t isLastChunkWithSecurity,
+                                        const Cache* cache) {
+  DataInput input(chunk, chunkLen, cache);
 
   input.setPoolName(m_replyMsg.getPoolName());
 
@@ -3534,11 +3535,11 @@ void ChunkedQueryResponse::readObjectPartList(DataInput& input,
   }
 }
 
-void ChunkedQueryResponse::handleChunk(
-    const uint8_t* chunk, int32_t chunkLen, uint8_t isLastChunkWithSecurity,
-    const SerializationRegistry& serializationRegistry) {
+void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
+                                       uint8_t isLastChunkWithSecurity,
+                                       const Cache* cache) {
   LOGDEBUG("ChunkedQueryResponse::handleChunk..");
-  DataInput input(chunk, chunkLen, serializationRegistry);
+  DataInput input(chunk, chunkLen, cache);
   input.setPoolName(m_msg.getPoolName());
   uint32_t partLen;
   int8_t isObj;
@@ -3695,9 +3696,9 @@ void ChunkedFunctionExecutionResponse::reset() {
 
 void ChunkedFunctionExecutionResponse::handleChunk(
     const uint8_t* chunk, int32_t chunkLen, uint8_t isLastChunkWithSecurity,
-    const SerializationRegistry& serializationRegistry) {
+    const Cache* cache) {
   LOGDEBUG("ChunkedFunctionExecutionResponse::handleChunk");
-  DataInput input(chunk, chunkLen, serializationRegistry);
+  DataInput input(chunk, chunkLen, cache);
   input.setPoolName(m_msg.getPoolName());
   uint32_t partLen;
 
@@ -3835,10 +3836,10 @@ void ChunkedGetAllResponse::reset() {
 }
 
 // process a GET_ALL response chunk
-void ChunkedGetAllResponse::handleChunk(
-    const uint8_t* chunk, int32_t chunkLen, uint8_t isLastChunkWithSecurity,
-    const SerializationRegistry& serializationRegistry) {
-  DataInput input(chunk, chunkLen, serializationRegistry);
+void ChunkedGetAllResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
+                                        uint8_t isLastChunkWithSecurity,
+                                        const Cache* cache) {
+  DataInput input(chunk, chunkLen, cache);
   input.setPoolName(m_msg.getPoolName());
   uint32_t partLen;
   if (TcrMessageHelper::readChunkPartHeader(
@@ -3889,10 +3890,10 @@ void ChunkedPutAllResponse::reset() {
 }
 
 // process a PUT_ALL response chunk
-void ChunkedPutAllResponse::handleChunk(
-    const uint8_t* chunk, int32_t chunkLen, uint8_t isLastChunkWithSecurity,
-    const SerializationRegistry& serializationRegistry) {
-  DataInput input(chunk, chunkLen, serializationRegistry);
+void ChunkedPutAllResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
+                                        uint8_t isLastChunkWithSecurity,
+                                        const Cache* cache) {
+  DataInput input(chunk, chunkLen, cache);
   input.setPoolName(m_msg.getPoolName());
   uint32_t partLen;
   int8_t chunkType;
@@ -3952,10 +3953,11 @@ void ChunkedRemoveAllResponse::reset() {
 }
 
 // process a REMOVE_ALL response chunk
-void ChunkedRemoveAllResponse::handleChunk(
-    const uint8_t* chunk, int32_t chunkLen, uint8_t isLastChunkWithSecurity,
-    const SerializationRegistry& serializationRegistry) {
-  DataInput input(chunk, chunkLen, serializationRegistry);
+void ChunkedRemoveAllResponse::handleChunk(const uint8_t* chunk,
+                                           int32_t chunkLen,
+                                           uint8_t isLastChunkWithSecurity,
+                                           const Cache* cache) {
+  DataInput input(chunk, chunkLen, cache);
   input.setPoolName(m_msg.getPoolName());
   uint32_t partLen;
   int8_t chunkType;
@@ -4016,10 +4018,11 @@ void ChunkedDurableCQListResponse::reset() {
 }
 
 // handles the chunk response for GETDURABLECQS_MSG_TYPE
-void ChunkedDurableCQListResponse::handleChunk(
-    const uint8_t* chunk, int32_t chunkLen, uint8_t isLastChunkWithSecurity,
-    const SerializationRegistry& serializationRegistry) {
-  DataInput input(chunk, chunkLen, serializationRegistry);
+void ChunkedDurableCQListResponse::handleChunk(const uint8_t* chunk,
+                                               int32_t chunkLen,
+                                               uint8_t isLastChunkWithSecurity,
+                                               const Cache* cache) {
+  DataInput input(chunk, chunkLen, cache);
   input.setPoolName(m_msg.getPoolName());
 
   // read part length

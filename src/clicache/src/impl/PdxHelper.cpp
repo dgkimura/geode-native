@@ -333,7 +333,7 @@ namespace Apache
             }
 
            // pdxObject = gcnew PdxInstanceImpl(gcnew DataInput(dataInput->GetBytes(dataInput->GetCursor(), len  + 8 ), len  + 8));
-             pdxObject = gcnew PdxInstanceImpl(dataInput->GetBytes(dataInput->GetCursor(), len ), len, typeId, true, CacheImpl::getInstance()->getSerializationRegistry().get());
+             pdxObject = gcnew PdxInstanceImpl(dataInput->GetBytes(dataInput->GetCursor(), len ), len, typeId, true, CacheImpl::getInstance()->getCache());
 
             dataInput->AdvanceCursorPdx(len );
             

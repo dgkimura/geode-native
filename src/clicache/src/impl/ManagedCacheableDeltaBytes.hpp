@@ -86,8 +86,7 @@ namespace apache
             Apache::Geode::Client::Log::Finer("ManagedCacheableDeltaBytes::Constructor: class ID " + managedptr->ClassId + " : " + managedptr->ToString() + " storeBytes:" + storeBytes);
             if (storeBytes)
             {
-              apache::geode::client::SerializationRegistry defaultSerializationRegistry;
-              apache::geode::client::DataOutput dataOut(defaultSerializationRegistry);
+              apache::geode::client::DataOutput dataOut(m_cache);
               Apache::Geode::Client::DataOutput mg_output(&dataOut, true);
               managedptr->ToData(%mg_output);
 

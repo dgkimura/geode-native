@@ -104,9 +104,8 @@ GfErrType ThinClientLocatorHelper::getAllServers(
       createConnection(conn, loc.getServerName().c_str(), loc.getPort(),
                        sysProps.connectTimeout(), buffSize);
       GetAllServersRequest request(serverGrp);
-      DataOutput data(*m_poolDM->getConnectionManager()
-                           .getCacheImpl()
-                           ->getSerializationRegistry());
+      DataOutput data(
+          m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       data.writeInt((int32_t)1001);  // GOSSIPVERSION
       data.writeObject(&request);
       int sentLength = conn->send(
@@ -131,9 +130,7 @@ GfErrType ThinClientLocatorHelper::getAllServers(
       }
 
       DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength,
-                   *(m_poolDM->getConnectionManager()
-                         .getCacheImpl()
-                         ->getSerializationRegistry()));
+                   m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       GetAllServersResponsePtr response(nullptr);
 
       /* adongre
@@ -206,9 +203,8 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewCallBackConn(
                        sysProps.connectTimeout(), buffSize);
       QueueConnectionRequest request(memId, exclEndPts, redundancy, false,
                                      serverGrp);
-      DataOutput data(*m_poolDM->getConnectionManager()
-                           .getCacheImpl()
-                           ->getSerializationRegistry());
+      DataOutput data(
+          m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       data.writeInt((int32_t)1001);  // GOSSIPVERSION
       data.writeObject(&request);
       int sentLength = conn->send(
@@ -232,9 +228,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewCallBackConn(
         continue;
       }
       DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength,
-                   *(m_poolDM->getConnectionManager()
-                         .getCacheImpl()
-                         ->getSerializationRegistry()));
+                   m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       QueueConnectionResponsePtr response(nullptr);
 
       /* adongre
@@ -303,9 +297,8 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
       ConnectionWrapper cw(conn);
       createConnection(conn, serLoc.getServerName().c_str(), serLoc.getPort(),
                        sysProps.connectTimeout(), buffSize);
-      DataOutput data(*m_poolDM->getConnectionManager()
-                           .getCacheImpl()
-                           ->getSerializationRegistry());
+      DataOutput data(
+          m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       data.writeInt(1001);  // GOSSIPVERSION
       if (currentServer == nullptr) {
         LOGDEBUG("Creating ClientConnectionRequest");
@@ -340,9 +333,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
         continue;  // return GF_EUNDEF;
       }
       DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength,
-                   *(m_poolDM->getConnectionManager()
-                         .getCacheImpl()
-                         ->getSerializationRegistry()));
+                   m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       ClientConnectionResponsePtr response;
 
       /* adongre
@@ -408,9 +399,8 @@ GfErrType ThinClientLocatorHelper::updateLocators(
       createConnection(conn, serLoc.getServerName().c_str(), serLoc.getPort(),
                        sysProps.connectTimeout(), buffSize);
       LocatorListRequest request(serverGrp);
-      DataOutput data(*m_poolDM->getConnectionManager()
-                           .getCacheImpl()
-                           ->getSerializationRegistry());
+      DataOutput data(
+          m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       data.writeInt((int32_t)1001);  // GOSSIPVERSION
       data.writeObject(&request);
       int sentLength = conn->send(
@@ -436,9 +426,7 @@ GfErrType ThinClientLocatorHelper::updateLocators(
         continue;
       }
       DataInput di(reinterpret_cast<uint8_t*>(buff), receivedLength,
-                   *(m_poolDM->getConnectionManager()
-                         .getCacheImpl()
-                         ->getSerializationRegistry()));
+                   m_poolDM->getConnectionManager().getCacheImpl()->getCache());
       auto response = std::make_shared<LocatorListResponse>();
 
       /* adongre

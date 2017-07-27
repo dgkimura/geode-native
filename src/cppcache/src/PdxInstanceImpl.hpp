@@ -1053,8 +1053,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
 
   PdxInstanceImpl(uint8_t* buffer, int length, int typeId,
                   CachePerfStats* cacheStats,
-                  PdxTypeRegistryPtr pdxTypeRegistry,
-                  SerializationRegistry& serializationRegistry,
+                  PdxTypeRegistryPtr pdxTypeRegistry, const Cache* cache,
                   bool enableTimeStatistics)
       : m_buffer(DataInput::getBufferCopy(buffer, length)),
         m_bufferLength(length),
@@ -1062,15 +1061,14 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
         m_pdxType(nullptr),
         m_cacheStats(cacheStats),
         m_pdxTypeRegistry(pdxTypeRegistry),
-        m_serializationRegistry(serializationRegistry),
+        m_cache(cache),
         m_enableTimeStatistics(enableTimeStatistics) {
     LOGDEBUG("PdxInstanceImpl::m_bufferLength = %d ", m_bufferLength);
   }
 
   PdxInstanceImpl(FieldVsValues fieldVsValue, PdxTypePtr pdxType,
                   CachePerfStats* cacheStats,
-                  PdxTypeRegistryPtr pdxTypeRegistry,
-                  SerializationRegistry& serializationRegistry,
+                  PdxTypeRegistryPtr pdxTypeRegistry, const Cache* cache,
                   bool enableTimeStatistics);
 
   PdxInstanceImpl(const PdxInstanceImpl& other) = delete;
@@ -1090,7 +1088,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
   CachePerfStats* m_cacheStats;
 
   PdxTypeRegistryPtr m_pdxTypeRegistry;
-  SerializationRegistry& m_serializationRegistry;
+  const Cache* m_cache;
   bool m_enableTimeStatistics;
 
   std::vector<PdxFieldTypePtr> getIdentityPdxFields(PdxTypePtr pt) const;

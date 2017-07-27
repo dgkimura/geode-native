@@ -38,7 +38,6 @@
 #include <functional>
 #include "version.h"
 
-#define DEFAULT_DS_NAME "default_GeodeDS"
 #define DEFAULT_CACHE_NAME "default_GeodeCache"
 #define DEFAULT_SERVER_PORT 40404
 #define DEFAULT_SERVER_HOST "localhost"
@@ -93,8 +92,7 @@ void CacheFactory::init() {
   }
 }
 
-void CacheFactory::create_(const char* name,
-                           std::unique_ptr<DistributedSystem> system,
+void CacheFactory::create_(const char* name, PropertiesPtr dsProp,
                            const char* id_data, CachePtr& cptr,
                            bool ignorePdxUnreadFields, bool readPdxSerialized) {
   CppCacheLibrary::initLib();
@@ -111,7 +109,7 @@ void CacheFactory::create_(const char* name,
     name = "NativeCache";
   }
 
-  cptr = std::make_shared<Cache>(name, std::move(system), ignorePdxUnreadFields,
+  cptr = std::make_shared<Cache>(name, dsProp, ignorePdxUnreadFields,
                                  readPdxSerialized);
 }  // namespace client
 
@@ -139,15 +137,11 @@ CacheFactory::CacheFactory(const PropertiesPtr dsProps) {
 CachePtr CacheFactory::create() {
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
 
-  auto dsPtr = DistributedSystem::create(DEFAULT_DS_NAME, dsProp);
-  dsPtr->connect();
   LOGFINE("CacheFactory called DistributedSystem::connect");
 
   default_CacheFactory = new CacheFactoryPtr(shared_from_this());
   Cache_CreatedFromCacheFactory = true;
-  auto cacheXmlFile = dsPtr->getSystemProperties().cacheXMLFile();
-  auto cache =
-      create(DEFAULT_CACHE_NAME, std::move(dsPtr), cacheXmlFile, nullptr);
+  auto cache = create(DEFAULT_CACHE_NAME, dsProp, nullptr);
 
   cache->m_cacheImpl->getSerializationRegistry()->addType2(std::bind(
       TXCommitMessage::create,
@@ -179,17 +173,17 @@ CachePtr CacheFactory::create() {
   return cache;
 }
 
-CachePtr CacheFactory::create(const char* name,
-                              std::unique_ptr<DistributedSystem> system,
-                              const char* cacheXml,
+CachePtr CacheFactory::create(const char* name, PropertiesPtr dsProp,
                               const CacheAttributesPtr& attrs /*= nullptr*/) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
 
   CachePtr cptr;
-  CacheFactory::create_(name, std::move(system), "", cptr,
-                        ignorePdxUnreadFields, pdxReadSerialized);
+  CacheFactory::create_(name, dsProp, "", cptr, ignorePdxUnreadFields,
+                        pdxReadSerialized);
   cptr->m_cacheImpl->setAttributes(attrs);
   try {
+    const char* cacheXml =
+        cptr->getDistributedSystem().getSystemProperties().cacheXMLFile();
     if (cacheXml != 0 && strlen(cacheXml) > 0) {
       cptr->initializeDeclarativeCache(cacheXml);
     } else {

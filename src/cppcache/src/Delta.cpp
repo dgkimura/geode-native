@@ -25,15 +25,13 @@
 
 using namespace apache::geode::client;
 
-Delta::Delta(SerializationRegistry* serializationRegistry)
-    : m_serializationRegistry(serializationRegistry) {}
+Delta::Delta(Cache* cache) : m_cache(cache) {}
 
 DeltaPtr Delta::clone() {
-  DataOutput out(*m_serializationRegistry);
+  DataOutput out(m_cache);
   Cacheable* ptr = dynamic_cast<Cacheable*>(this);
   out.writeObject(ptr);
-  DataInput in(out.getBuffer(), out.getBufferLength(),
-               *m_serializationRegistry);
+  DataInput in(out.getBuffer(), out.getBufferLength(), m_cache);
   CacheablePtr theClonePtr;
   in.readObject(theClonePtr);
   return std::dynamic_pointer_cast<Delta>(theClonePtr);

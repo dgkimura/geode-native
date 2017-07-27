@@ -366,8 +366,7 @@ class ChunkedInterestResponse : public TcrChunkedResult {
   }
 
   virtual void handleChunk(const uint8_t* chunk, int32_t chunkLen,
-                           uint8_t isLastChunkWithSecurity,
-                           const SerializationRegistry& serializationRegistry);
+                           uint8_t isLastChunkWithSecurity, const Cache* cache);
   virtual void reset();
 };
 
@@ -405,8 +404,7 @@ class ChunkedQueryResponse : public TcrChunkedResult {
   }
 
   virtual void handleChunk(const uint8_t* chunk, int32_t chunkLen,
-                           uint8_t isLastChunkWithSecurity,
-                           const SerializationRegistry& serializationRegistry);
+                           uint8_t isLastChunkWithSecurity, const Cache* cache);
   virtual void reset();
 
   void readObjectPartList(DataInput& input, bool isResultSet);
@@ -457,8 +455,7 @@ class ChunkedFunctionExecutionResponse : public TcrChunkedResult {
   inline bool getResult() const { return m_getResult; }
 
   virtual void handleChunk(const uint8_t* chunk, int32_t chunkLen,
-                           uint8_t isLastChunkWithSecurity,
-                           const SerializationRegistry& serializationRegistry);
+                           uint8_t isLastChunkWithSecurity, const Cache* cache);
   virtual void reset();
 };
 typedef std::shared_ptr<ChunkedFunctionExecutionResponse>
@@ -509,8 +506,7 @@ class ChunkedGetAllResponse : public TcrChunkedResult {
         m_responseLock(responseLock) {}
 
   virtual void handleChunk(const uint8_t* chunk, int32_t chunkLen,
-                           uint8_t isLastChunkWithSecurity,
-                           const SerializationRegistry& serializationRegistry);
+                           uint8_t isLastChunkWithSecurity, const Cache* cache);
   virtual void reset();
 
   void add(const ChunkedGetAllResponse* other);
@@ -548,8 +544,7 @@ class ChunkedPutAllResponse : public TcrChunkedResult {
         m_list(list) {}
 
   virtual void handleChunk(const uint8_t* chunk, int32_t chunkLen,
-                           uint8_t isLastChunkWithSecurity,
-                           const SerializationRegistry& serializationRegistry);
+                           uint8_t isLastChunkWithSecurity, const Cache* cache);
   virtual void reset();
   VersionedCacheableObjectPartListPtr getList() { return m_list; }
   ACE_Recursive_Thread_Mutex& getResponseLock() { return m_responseLock; }
@@ -581,8 +576,7 @@ class ChunkedRemoveAllResponse : public TcrChunkedResult {
         m_list(list) {}
 
   virtual void handleChunk(const uint8_t* chunk, int32_t chunkLen,
-                           uint8_t isLastChunkWithSecurity,
-                           const SerializationRegistry& serializationRegistry);
+                           uint8_t isLastChunkWithSecurity, const Cache* cache);
   virtual void reset();
   VersionedCacheableObjectPartListPtr getList() { return m_list; }
   ACE_Recursive_Thread_Mutex& getResponseLock() { return m_responseLock; }
@@ -615,8 +609,7 @@ class ChunkedKeySetResponse : public TcrChunkedResult {
         m_resultKeys(resultKeys) {}
 
   virtual void handleChunk(const uint8_t* chunk, int32_t chunkLen,
-                           uint8_t isLastChunkWithSecurity,
-                           const SerializationRegistry& serializationRegistry);
+                           uint8_t isLastChunkWithSecurity, const Cache* cache);
   virtual void reset();
 };
 
@@ -639,8 +632,7 @@ class ChunkedDurableCQListResponse : public TcrChunkedResult {
   inline CacheableArrayListPtr getResults() { return m_resultList; }
 
   virtual void handleChunk(const uint8_t* chunk, int32_t chunkLen,
-                           uint8_t isLastChunkWithSecurity,
-                           const SerializationRegistry& serializationRegistry);
+                           uint8_t isLastChunkWithSecurity, const Cache* cache);
   virtual void reset();
 };
 

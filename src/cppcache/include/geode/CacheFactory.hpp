@@ -45,7 +45,8 @@ class CppCacheLibrary;
  * For the default values for the pool attributes see {@link PoolFactory}.
  * To create additional {@link Pool}s see {@link PoolManager}
  */
-class CPPCACHE_EXPORT CacheFactory : public std::enable_shared_from_this<CacheFactory> {
+class CPPCACHE_EXPORT CacheFactory
+    : public std::enable_shared_from_this<CacheFactory> {
  public:
   /**
    * To create the instance of {@link CacheFactory}
@@ -433,12 +434,10 @@ class CPPCACHE_EXPORT CacheFactory : public std::enable_shared_from_this<CacheFa
 
   PoolFactoryPtr getPoolFactory();
 
-  CachePtr create(const char* name, std::unique_ptr<DistributedSystem> system,
-                  const char* cacheXml = 0,
+  CachePtr create(const char* name, PropertiesPtr dsProp,
                   const CacheAttributesPtr& attrs = nullptr);
 
-  static void create_(const char* name,
-                      std::unique_ptr<DistributedSystem> system,
+  static void create_(const char* name, PropertiesPtr dsProp,
                       const char* id_data, CachePtr& cptr,
                       bool ignorePdxUnreadFields, bool readPdxSerialized);
 

@@ -195,7 +195,9 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT1, Client1_Init)
   {
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
 
       serializationRegistry->addType(DeltaEx::create);
     } catch (IllegalStateException&) {
@@ -207,7 +209,9 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT2, Client2_Init)
   {
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
 
       serializationRegistry->addType(DeltaEx::create);
     } catch (IllegalStateException&) {

@@ -22,6 +22,8 @@
 #include "begin_native.hpp"
 #include <geode/CacheableKey.hpp>
 #include <geode/Delta.hpp>
+#include "CacheRegionHelper.hpp"
+#include "CacheImpl.hpp"
 #include "end_native.hpp"
 
 #include "../Log.hpp"
@@ -67,11 +69,11 @@ namespace apache
     /// The managed object.
     /// </param>
     inline PdxManagedCacheableKeyBytes(
-      Apache::Geode::Client::IPdxSerializable^ managedptr, bool storeBytes, SerializationRegistry * serializationRegistry)
-      : Delta(serializationRegistry), m_domainId(System::Threading::Thread::GetDomainID()),
+      Apache::Geode::Client::IPdxSerializable^ managedptr, bool storeBytes, Cache* cache)
+      : Delta(cache), m_domainId(System::Threading::Thread::GetDomainID()),
         m_bytes(NULL),
         m_size(0),
-        m_serializationRegistry(serializationRegistry),
+        m_cache(cache),
         m_hashCode(0)
     {
       m_hasDelta = false;
@@ -86,9 +88,9 @@ namespace apache
       {
         if(storeBytes)//if value is from app 
         {
-          apache::geode::client::DataOutput dataOut(*serializationRegistry);
+          apache::geode::client::DataOutput dataOut(m_cache);
           Apache::Geode::Client::DataOutput mg_output( &dataOut, true);
-					 Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr, m_serializationRegistry);
+					Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr, CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry().get());
         //  managedptr->ToData( %mg_output );
           
           //move cursor
@@ -228,7 +230,7 @@ namespace apache
     UInt32 m_classId;
     System::Byte * m_bytes;
     System::UInt32 m_size;
-    SerializationRegistry * m_serializationRegistry;
+    Cache* m_cache;
     bool m_hasDelta;
     System::Int32 m_hashCode;
     // Disable the copy and assignment constructors

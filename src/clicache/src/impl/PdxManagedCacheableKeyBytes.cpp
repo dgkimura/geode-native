@@ -55,10 +55,10 @@ namespace apache
       {
         try {
 
-          Apache::Geode::Client::DataInput mg_input(&input, true, m_serializationRegistry);
+          Apache::Geode::Client::DataInput mg_input(&input, true, input.getCache());
           const System::Byte* objStartPos = input.currentBufferPosition();
 
-          Apache::Geode::Client::IPdxSerializable^ obj = Apache::Geode::Client::Internal::PdxHelper::DeserializePdx(%mg_input, false, m_serializationRegistry);
+          Apache::Geode::Client::IPdxSerializable^ obj = Apache::Geode::Client::Internal::PdxHelper::DeserializePdx(%mg_input, false, CacheRegionHelper::getCacheImpl(input.getCache())->getSerializationRegistry().get());
           input.advanceCursor(mg_input.BytesReadInternally);
 
           m_hashCode = obj->GetHashCode();
@@ -202,9 +202,9 @@ namespace apache
       Apache::Geode::Client::IPdxSerializable^
         PdxManagedCacheableKeyBytes::getManagedObject() const
       {
-        apache::geode::client::DataInput dinp(m_bytes, m_size, *m_serializationRegistry);
-        Apache::Geode::Client::DataInput mg_dinp(&dinp, true, m_serializationRegistry);
-        return  Apache::Geode::Client::Internal::PdxHelper::DeserializePdx(%mg_dinp, false, m_serializationRegistry);
+        apache::geode::client::DataInput dinp(m_bytes, m_size, m_cache);
+        Apache::Geode::Client::DataInput mg_dinp(&dinp, true, m_cache);
+        return  Apache::Geode::Client::Internal::PdxHelper::DeserializePdx(%mg_dinp, false, CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry().get());
       }
 
       bool PdxManagedCacheableKeyBytes::hasDelta()
@@ -234,16 +234,16 @@ namespace apache
         try {
           Apache::Geode::Client::Log::Debug("PdxManagedCacheableKeyBytes::fromDelta:");
           Apache::Geode::Client::IGeodeDelta^ deltaObj = dynamic_cast<Apache::Geode::Client::IGeodeDelta^>(this->getManagedObject());
-          Apache::Geode::Client::DataInput mg_input(&input, true, m_serializationRegistry);
+          Apache::Geode::Client::DataInput mg_input(&input, true, input.getCache());
           deltaObj->FromDelta(%mg_input);
 
           Apache::Geode::Client::IPdxSerializable^ managedptr =
             dynamic_cast <Apache::Geode::Client::IPdxSerializable^> (deltaObj);
           {
             Apache::Geode::Client::Log::Debug("PdxManagedCacheableKeyBytes::fromDelta: current domain ID: " + System::Threading::Thread::GetDomainID() + " for object: " + System::Convert::ToString((uint64_t) this) + " with its domain ID: " + m_domainId);
-            apache::geode::client::DataOutput dataOut(*m_serializationRegistry);
+            apache::geode::client::DataOutput dataOut(m_cache);
             Apache::Geode::Client::DataOutput mg_output(&dataOut, true);
-            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr, m_serializationRegistry);
+            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr, CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry().get());
             mg_output.WriteBytesToUMDataOutput();
 
              GF_SAFE_DELETE(m_bytes);

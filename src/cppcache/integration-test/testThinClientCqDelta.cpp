@@ -61,10 +61,8 @@ class CqDeltaListener : public CqListener {
   virtual void onEvent(const CqEvent& aCqEvent) {
     CacheableBytesPtr deltaValue = aCqEvent.getDeltaValue();
     DeltaTestImpl newValue;
-    DataInput input(
-        deltaValue->value(), deltaValue->length(),
-        *CacheRegionHelper::getCacheImpl(getHelper()->getCache().get())
-             ->getSerializationRegistry());
+    DataInput input(deltaValue->value(), deltaValue->length(),
+                    getHelper()->getCache().get());
     newValue.fromDelta(input);
     if (newValue.getIntVar() == 5) {
       m_deltaCount++;
@@ -154,7 +152,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, CreateClient1)
     createPooledRegion(regionNames[0], USE_ACK, locatorsG, "__TESTPOOL1_",
                        true);
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
 
       serializationRegistry->addType(DeltaTestImpl::create);
     } catch (IllegalStateException&) {
@@ -169,7 +169,9 @@ DUNIT_TASK_DEFINITION(CLIENT2, CreateClient2)
     createPooledRegion(regionNames[0], USE_ACK, locatorsG, "__TESTPOOL1_",
                        true);
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
 
       serializationRegistry->addType(DeltaTestImpl::create);
     } catch (IllegalStateException&) {
@@ -197,7 +199,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, CreateClient1_NoPools)
     initClientNoPools();
     createRegion(regionNames[0], USE_ACK, true);
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
 
       serializationRegistry->addType(DeltaTestImpl::create);
     } catch (IllegalStateException&) {
@@ -211,7 +215,9 @@ DUNIT_TASK_DEFINITION(CLIENT2, CreateClient2_NoPools)
     initClientNoPools();
     createRegion(regionNames[0], USE_ACK, true);
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
 
       serializationRegistry->addType(DeltaTestImpl::create);
     } catch (IllegalStateException&) {

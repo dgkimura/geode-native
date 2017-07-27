@@ -93,8 +93,8 @@ class Delta {
   virtual ~Delta() {}
 
  protected:
-  Delta(SerializationRegistry* serializationRegistry);
-  SerializationRegistry* m_serializationRegistry;
+  Delta(Cache* cache);
+  Cache* m_cache;
 };
 }  // namespace client
 }  // namespace geode

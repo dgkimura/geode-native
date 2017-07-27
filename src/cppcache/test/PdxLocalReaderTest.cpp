@@ -74,8 +74,7 @@ class PdxLocalReaderTest : public ::testing::Test {
 
 TEST_F(PdxLocalReaderTest, testSerializationOfPdxType) {
   MyPdxClass expected, actual;
-  DataOutput stream(*(CacheRegionHelper::getCacheImpl(cache.get())
-                          ->getSerializationRegistry()));
+  DataOutput stream(cache.get());
   int length = 0;
 
   expected.setAString("the_expected_string");
@@ -100,9 +99,7 @@ TEST_F(PdxLocalReaderTest, testSerializationOfPdxType) {
   writer->endObjectWriting();
   uint8_t *raw_stream = writer->getPdxStream(length);
 
-  DataInput input(raw_stream, length,
-                  *(CacheRegionHelper::getCacheImpl(cache.get())
-                        ->getSerializationRegistry()));
+  DataInput input(raw_stream, length, cache.get());
   auto reader = std::make_shared<PdxLocalReader>(input, pdx_type_ptr, length,
                                                  pdxTypeRegistry);
 

@@ -52,7 +52,7 @@ namespace Apache
               "The IPdxInstanceFactory.Create() method can only be called once.");
           }
           //need to get typeid;
-          IPdxInstance^ pi = gcnew PdxInstanceImpl(m_FieldVsValues, m_pdxType, m_cachePerfStats, CacheImpl::getInstance()->getSerializationRegistry().get());
+          IPdxInstance^ pi = gcnew PdxInstanceImpl(m_FieldVsValues, m_pdxType, m_cachePerfStats, CacheImpl::getInstance()->getCache());
           m_created = true;
           return pi;
         }

@@ -60,16 +60,15 @@ namespace Apache
         System::Int32 m_remainingBufferLength;
         bool m_ispdxSerialization;
         native_conditional_unique_ptr<native::DataOutput>^ m_nativeptr;
-        const native::SerializationRegistry* m_serializationRegistry;
 
       public:
 
         /// <summary>
         /// Default constructor.
         /// </summary>
-        inline DataOutput(native::SerializationRegistry & serializationRegistry)
+        inline DataOutput(native::Cache* cache)
         { 
-          m_nativeptr = gcnew native_conditional_unique_ptr<native::DataOutput>(std::make_unique<native::DataOutput>(serializationRegistry));
+          m_nativeptr = gcnew native_conditional_unique_ptr<native::DataOutput>(std::make_unique<native::DataOutput>(cache));
           m_isManagedObject = true;
           m_cursor = 0;
           try
@@ -82,7 +81,6 @@ namespace Apache
             GC::KeepAlive(m_nativeptr);
           }
           m_ispdxSerialization = false;
-          m_serializationRegistry = &serializationRegistry;
         }
 
         /// <summary>
@@ -532,10 +530,6 @@ namespace Apache
         void WriteObject(UInt32% obj);       
 
         void WriteObject(UInt64% obj);
-        
-       // void WriteObject(array<UInt16>^ objArray);
-        //void WriteObject(array<UInt32>^ objArray);
-        //void WriteObject(array<UInt64>^ objArray);
 
         
         template <typename mType>
@@ -558,7 +552,6 @@ namespace Apache
 
         bool IsManagedObject()
         {
-          //TODO::
           return m_isManagedObject;
         }
 
@@ -654,7 +647,6 @@ namespace Apache
           m_bytes = const_cast<System::Byte *>(nativeptr->getCursor());
           m_remainingBufferLength = (System::Int32)nativeptr->getRemainingBufferLength();
           m_ispdxSerialization = false;
-          m_serializationRegistry = &nativeptr->getSerializationRegistry();
         }
       };
     }  // namespace Client
