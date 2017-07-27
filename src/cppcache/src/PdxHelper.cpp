@@ -44,8 +44,6 @@ PdxHelper::PdxHelper() {}
 
 PdxHelper::~PdxHelper() {}
 
-CacheImpl* PdxHelper::getCacheImpl() { return CacheImpl::getInstance(); }
-
 void PdxHelper::serializePdx(DataOutput& output,
                              const PdxSerializable& pdxObject) {
   serializePdx(
@@ -422,17 +420,14 @@ int32_t PdxHelper::readInt(uint8_t* offsetPosition, int size) {
 }
 
 int32_t PdxHelper::getEnumValue(const char* enumClassName, const char* enumName,
-                                int hashcode) {
-  const auto& cacheImpl = PdxHelper::getCacheImpl();
-  const auto pdxTypeRegistry = cacheImpl->getPdxTypeRegistry();
+                                int hashcode,
+                                PdxTypeRegistryPtr pdxTypeRegistry) {
   const auto& ei =
       std::make_shared<EnumInfo>(enumClassName, enumName, hashcode);
   return pdxTypeRegistry->getEnumValue(ei);
 }
 
-EnumInfoPtr PdxHelper::getEnum(int enumId) {
-  const auto& cacheImpl = PdxHelper::getCacheImpl();
-  const auto pdxTypeRegistry = cacheImpl->getPdxTypeRegistry();
+EnumInfoPtr PdxHelper::getEnum(int enumId, PdxTypeRegistryPtr pdxTypeRegistry) {
   const auto& ei = pdxTypeRegistry->getEnum(enumId);
   return ei;
 }
