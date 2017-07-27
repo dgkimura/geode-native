@@ -45,7 +45,7 @@ namespace Apache
       namespace Internal
       {
         //this is for PdxInstanceFactory
-        PdxInstanceImpl::PdxInstanceImpl(Dictionary<String^, Object^>^ fieldVsValue, PdxType^ pdxType, CachePerfStats* cachePerfStats, native::Cache* cache)
+        PdxInstanceImpl::PdxInstanceImpl(Dictionary<String^, Object^>^ fieldVsValue, PdxType^ pdxType, CachePerfStats* cachePerfStats, const native::Cache* cache)
         {
           m_updatedFields = fieldVsValue;
           m_typeId = 0;

@@ -45,11 +45,6 @@ namespace Apache
 
       namespace Internal
       {
-
-        CacheImpl* getCacheImpl()
-        {
-          return CacheImpl::getInstance();
-        }
         
         void PdxHelper::SerializePdx(DataOutput^ dataOutput, IPdxSerializable^ pdxObject, const native::SerializationRegistry* serializationRegistry)
         {          
@@ -115,13 +110,11 @@ namespace Apache
 
             PdxTypeRegistry::AddLocalPdxType(pdxClassname, nType);//add classname VS pdxType
             PdxTypeRegistry::AddPdxType(nTypeId, nType);//add typeid vs pdxtype
-			//This is for pdx Statistics
-            CacheImpl* cacheImpl = getCacheImpl();
-            if (cacheImpl != NULL) {
-              System::Byte* stPos = dataOutput->GetStartBufferPosition() + ptc->getStartPositionOffset();
-              int pdxLen = PdxHelper::ReadInt32(stPos);       
-              cacheImpl->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
-            }
+
+            //This is for pdx Statistics
+            System::Byte* stPos = dataOutput->GetStartBufferPosition() + ptc->getStartPositionOffset();
+            int pdxLen = PdxHelper::ReadInt32(stPos);       
+            CacheRegionHelper::getCacheImpl(dataOutput->GetNative()->getCache())->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
           }
           else//we know locasl type, need to see preerved data
           {
@@ -145,13 +138,11 @@ namespace Apache
             pdxObject->ToData(prw);
 
             prw->EndObjectWriting();
-			//This is for pdx Statistics
-            CacheImpl* cacheImpl = getCacheImpl();
-            if (cacheImpl != NULL) {
-              System::Byte* stPos = dataOutput->GetStartBufferPosition() + prw->getStartPositionOffset();
-              int pdxLen = PdxHelper::ReadInt32(stPos);       
-              cacheImpl->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
-            }
+
+		        //This is for pdx Statistics
+            System::Byte* stPos = dataOutput->GetStartBufferPosition() + prw->getStartPositionOffset();
+            int pdxLen = PdxHelper::ReadInt32(stPos);       
+            CacheRegionHelper::getCacheImpl(dataOutput->GetNative()->getCache())->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
           }
         }
 
@@ -304,11 +295,8 @@ namespace Apache
             int len = dataInput->ReadInt32();
             int typeId= dataInput->ReadInt32();
 
-			//This is for pdx Statistics
-            CacheImpl* cacheImpl = getCacheImpl();
-            if (cacheImpl != NULL) {        
-              cacheImpl->getCachePerfStats().incPdxDeSerialization(len + 9);//pdxLen + 1 + 2*4
-            }
+		        //This is for pdx Statistics       
+            CacheRegionHelper::getCacheImpl(dataInput->GetNative()->getCache())->getCachePerfStats().incPdxDeSerialization(len + 9);//pdxLen + 1 + 2*4
 
             return DeserializePdx(dataInput, forceDeserialize, typeId, len, serializationRegistry);
           }//create PdxInstance
@@ -333,7 +321,7 @@ namespace Apache
             }
 
            // pdxObject = gcnew PdxInstanceImpl(gcnew DataInput(dataInput->GetBytes(dataInput->GetCursor(), len  + 8 ), len  + 8));
-             pdxObject = gcnew PdxInstanceImpl(dataInput->GetBytes(dataInput->GetCursor(), len ), len, typeId, true, CacheImpl::getInstance()->getCache());
+             pdxObject = gcnew PdxInstanceImpl(dataInput->GetBytes(dataInput->GetCursor(), len ), len, typeId, true, dataInput->GetNative()->getCache());
 
             dataInput->AdvanceCursorPdx(len );
             
@@ -342,10 +330,7 @@ namespace Apache
             dataInput->SetBuffer();
 
             //This is for pdxinstance Statistics            
-            CacheImpl* cacheImpl = getCacheImpl();
-            if (cacheImpl != NULL) {
-              cacheImpl->getCachePerfStats().incPdxInstanceCreations();		
-            }
+            CacheRegionHelper::getCacheImpl(dataInput->GetNative()->getCache())->getCachePerfStats().incPdxInstanceCreations();		
             return pdxObject;
           }
           }finally
