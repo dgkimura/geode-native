@@ -52,6 +52,7 @@ namespace apache
   {
     namespace client
     {
+      namespace native = apache::geode::client;
 
   /// <summary>
   /// Wraps the managed <see cref="Apache.Geode.Client.IGeodeSerializable" />
@@ -107,10 +108,11 @@ namespace apache
       }
     }
 
-		inline PdxManagedCacheableKeyBytes( )
-      : Delta(nullptr), m_domainId(System::Threading::Thread::GetDomainID()),
+		inline PdxManagedCacheableKeyBytes(Cache* cache)
+      : Delta(cache), m_domainId(System::Threading::Thread::GetDomainID()),
         m_bytes(NULL),
         m_size(0),
+        m_cache(cache),
         m_hashCode(0)
     {
       m_hasDelta = false;
@@ -201,9 +203,9 @@ namespace apache
       return getManagedObject();
     }
     
-		static Serializable* CreateDeserializable()
+		static Serializable* CreateDeserializable(Cache* cache)
     {
-      return new PdxManagedCacheableKeyBytes();
+      return new PdxManagedCacheableKeyBytes(cache);
     }
 
     inline ~PdxManagedCacheableKeyBytes()

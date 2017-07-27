@@ -162,7 +162,7 @@ namespace Apache
               return new ManagedWrapper(mg_obj, mg_obj->GetHashCode(), mg_obj->ClassId, nullptr);
             else
               return new native::ManagedCacheableKeyBytesGeneric(mg_obj, true,
-                nullptr);
+                CacheImpl::getInstance()->getCache());
           }
         }
          //if (mg_obj == nullptr) return NULL;
@@ -260,7 +260,7 @@ namespace Apache
 						return new native::PdxManagedCacheableKey(pdxType);
 					else
 						return new native::PdxManagedCacheableKeyBytes(pdxType, true,
-              nullptr);
+              CacheImpl::getInstance()->getCache());
         }
       
 				Apache::Geode::Client::IGeodeDelta^ sDelta =
@@ -285,7 +285,7 @@ namespace Apache
 							else
 							{
 								return new native::ManagedCacheableKeyBytesGeneric( tmpIGFS, true,
-                  nullptr);
+                  CacheImpl::getInstance()->getCache());
 							}
 						}
             
@@ -296,7 +296,7 @@ namespace Apache
 					    	return new native::PdxManagedCacheableKey(gcnew PdxWrapper(mg_obj));
 					    else
 						    return new native::PdxManagedCacheableKeyBytes(gcnew PdxWrapper(mg_obj), true,
-                  nullptr);
+                  CacheImpl::getInstance()->getCache());
             }
             throw gcnew Apache::Geode::Client::IllegalStateException(String::Format("Unable to map object type {0}. Possible Object type may not be registered or PdxSerializer is not registered. ", mg_obj->GetType()));
           }	

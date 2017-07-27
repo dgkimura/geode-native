@@ -526,7 +526,7 @@ namespace Apache
         else
         {
           cacheImpl->getSerializationRegistry()->addType(native::GeodeTypeIdsImpl::PDX,
-                                                                &native::PdxManagedCacheableKeyBytes::CreateDeserializable);
+                                                         std::bind(native::PdxManagedCacheableKeyBytes::CreateDeserializable, cache->GetNative().get()));
         }
       }
 
