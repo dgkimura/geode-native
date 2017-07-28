@@ -68,11 +68,11 @@ int ThreadPoolWorker::shutDown(void) {
 
 ACE_thread_t ThreadPoolWorker::threadId(void) { return threadId_; }
 
-ThreadPool::ThreadPool()
-    : shutdown_(0), workersLock_(), workersCond_(workersLock_) {
-  const auto& sysProp =
-      CacheImpl::getInstance()->getDistributedSystem().getSystemProperties();
-  poolSize_ = sysProp.threadPoolSize();
+ThreadPool::ThreadPool(uint32_t threadPoolSize)
+    : shutdown_(0),
+      workersLock_(),
+      workersCond_(workersLock_),
+      poolSize_(threadPoolSize) {
   activate();
 }
 

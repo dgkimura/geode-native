@@ -631,7 +631,7 @@ GfErrType ThinClientPoolDM::sendRequestToAllServers(
 
   int feIndex = 0;
   FunctionExecution* fePtrList = new FunctionExecution[csArray->length()];
-  ThreadPool* threadPool = TPSingleton::instance();
+  auto* threadPool = m_connManager.getCacheImpl()->getThreadPool();
   UserAttributesPtr userAttr =
       TSSUserAttributesWrapper::s_geodeTSSUserAttributes->getUserAttributes();
   for (int i = 0; i < csArray->length(); i++) {
@@ -1293,7 +1293,7 @@ GfErrType ThinClientPoolDM::sendSyncRequest(TcrMessage& request,
                              nullptr);
     }
     std::vector<GetAllWork*> getAllWorkers;
-    ThreadPool* threadPool = TPSingleton::instance();
+    auto* threadPool = m_connManager.getCacheImpl()->getThreadPool();
     ChunkedGetAllResponse* responseHandler =
         static_cast<ChunkedGetAllResponse*>(reply.getChunkedResultHandler());
 

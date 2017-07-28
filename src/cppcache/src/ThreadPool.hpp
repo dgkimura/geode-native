@@ -123,15 +123,14 @@ class ThreadPool : public ACE_Task_Base, IThreadPool {
   friend class ACE_Singleton<ThreadPool, ACE_Recursive_Thread_Mutex>;
 
  public:
+  ThreadPool(uint32_t threadPoolSize);
+  virtual ~ThreadPool();
   int perform(ACE_Method_Request* req);
   int svc(void);
   int shutDown(void);
   virtual int returnToWork(ThreadPoolWorker* worker);
 
  private:
-  ThreadPool();
-  virtual ~ThreadPool();
-
   ThreadPoolWorker* chooseWorker(void);
   int createWorkerPool(void);
   int done(void);
@@ -146,8 +145,6 @@ class ThreadPool : public ACE_Task_Base, IThreadPool {
   ACE_Activation_Queue queue_;
   static const char* NC_Pool_Thread;
 };
-
-typedef ACE_Singleton<ThreadPool, ACE_Recursive_Thread_Mutex> TPSingleton;
 }  // namespace client
 }  // namespace geode
 }  // namespace apache

@@ -60,6 +60,7 @@ namespace apache {
 namespace geode {
 namespace client {
 
+class ThreadPool;
 class CacheFactory;
 class ExpiryTaskManager;
 class PdxTypeRegistry;
@@ -283,6 +284,8 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   SerializationRegistryPtr getSerializationRegistry() const;
   inline CachePerfStats& getCachePerfStats() { return *m_cacheStats; };
 
+  ThreadPool* getThreadPool();
+
  private:
   std::atomic<bool> m_networkhop;
   std::atomic<int> m_blacklistBucketTimeout;
@@ -342,6 +345,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   MemberListForVersionStamp& m_memberListForVersionStamp;
   SerializationRegistryPtr m_serializationRegistry;
   PdxTypeRegistryPtr m_pdxTypeRegistry;
+  ThreadPool* m_threadPool;
 
   friend class CacheFactory;
   friend class Cache;

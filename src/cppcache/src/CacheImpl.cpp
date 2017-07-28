@@ -14,33 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <string>
+#include <string>
+
+#include <ace/OS.h>
+#include <geode/CacheStatistics.hpp>
+#include <geode/PoolManager.hpp>
+#include <geode/SystemProperties.hpp>
+#include <geode/PoolManager.hpp>
+#include <geode/RegionAttributes.hpp>
+#include <geode/PersistenceManager.hpp>
 
 #include "CacheImpl.hpp"
-#include <string>
-#include <geode/CacheStatistics.hpp>
 #include "Utils.hpp"
 #include "LocalRegion.hpp"
 #include "ExpiryTaskManager.hpp"
-#include <geode/PersistenceManager.hpp>
 #include "RegionExpiryHandler.hpp"
 #include "TcrMessage.hpp"
 #include "ThinClientRegion.hpp"
 #include "ThinClientHARegion.hpp"
 #include "ThinClientPoolRegion.hpp"
 #include "ThinClientPoolDM.hpp"
-#include <geode/PoolManager.hpp>
-#include <geode/SystemProperties.hpp>
 #include "Version.hpp"
 #include "ClientProxyMembershipID.hpp"
 #include "AutoDelete.hpp"
-#include <string>
-#include "ace/OS.h"
-#include <geode/PoolManager.hpp>
-#include <geode/RegionAttributes.hpp>
 #include "ThinClientPoolHADM.hpp"
 #include "InternalCacheTransactionManager2PCImpl.hpp"
 #include "PdxTypeRegistry.hpp"
 #include "SerializationRegistry.hpp"
+#include "ThreadPool.hpp"
 
 using namespace apache::geode::client;
 
@@ -72,7 +74,9 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
           std::make_shared<PdxTypeRegistry>(m_serializationRegistry)),
       m_expiryTaskManager(
           std::unique_ptr<ExpiryTaskManager>(new ExpiryTaskManager())),
-      m_clientProxyMembershipIDFactory(m_distributedSystem->getName()) {
+      m_clientProxyMembershipIDFactory(m_distributedSystem->getName()),
+      m_threadPool(new ThreadPool(
+          m_distributedSystem->getSystemProperties().threadPoolSize())) {
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(c));
 
@@ -794,6 +798,8 @@ PdxTypeRegistryPtr CacheImpl::getPdxTypeRegistry() const {
 SerializationRegistryPtr CacheImpl::getSerializationRegistry() const {
   return m_serializationRegistry;
 }
+
+ThreadPool* CacheImpl::getThreadPool() { return m_threadPool; }
 
 CacheTransactionManagerPtr CacheImpl::getCacheTransactionManager() {
   return m_cacheTXManager;

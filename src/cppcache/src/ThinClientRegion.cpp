@@ -15,24 +15,26 @@
  * limitations under the License.
  */
 
+#include <geode/SelectResultsIterator.hpp>
+#include <geode/SystemProperties.hpp>
+#include <geode/PoolManager.hpp>
+#include <geode/UserFunctionExecutionException.hpp>
+
 #include "Utils.hpp"
+#include "CacheRegionHelper.hpp"
 #include "ThinClientRegion.hpp"
 #include "TcrDistributionManager.hpp"
 #include "ThinClientPoolDM.hpp"
 #include "ThinClientBaseDM.hpp"
 #include "TcrEndpoint.hpp"
-#include <geode/SystemProperties.hpp>
 #include "CacheImpl.hpp"
 #include "RegionGlobalLocks.hpp"
 #include "ReadWriteLock.hpp"
 #include "RemoteQuery.hpp"
-#include <geode/SelectResultsIterator.hpp>
 #include <geode/Struct.hpp>
 #include "GeodeTypeIdsImpl.hpp"
 #include "AutoDelete.hpp"
-#include <geode/PoolManager.hpp>
 #include "UserAttributes.hpp"
-#include <geode/UserFunctionExecutionException.hpp>
 #include "PutAllPartialResultServerException.hpp"
 #include "VersionedCacheableObjectPartList.hpp"
 //#include "PutAllPartialResult.hpp"
@@ -1363,7 +1365,8 @@ GfErrType ThinClientRegion::singleHopPutAllNoThrow_remote(
    *  e. insert the worker into the vector.
    */
   std::vector<PutAllWork*> putAllWorkers;
-  ThreadPool* threadPool = TPSingleton::instance();
+  auto* threadPool =
+      CacheRegionHelper::getCacheImpl(getCache().get())->getThreadPool();
   int locationMapIndex = 0;
   for (const auto& locationIter : *locationMap) {
     const auto& serverLocation = locationIter.first;
@@ -1748,7 +1751,8 @@ GfErrType ThinClientRegion::singleHopRemoveAllNoThrow_remote(
    *  e. insert the worker into the vector.
    */
   std::vector<RemoveAllWork*> removeAllWorkers;
-  ThreadPool* threadPool = TPSingleton::instance();
+  auto* threadPool =
+      CacheRegionHelper::getCacheImpl(getCache().get())->getThreadPool();
   int locationMapIndex = 0;
   for (const auto& locationIter : *locationMap) {
     const auto& serverLocation = locationIter.first;
@@ -3244,7 +3248,8 @@ bool ThinClientRegion::executeFunctionSH(
   const auto& userAttr =
       TSSUserAttributesWrapper::s_geodeTSSUserAttributes->getUserAttributes();
   std::vector<OnRegionFunctionExecution*> feWorkers;
-  auto threadPool = TPSingleton::instance();
+  auto* threadPool =
+      CacheRegionHelper::getCacheImpl(getCache().get())->getThreadPool();
 
   for (const auto& locationIter : *locationMap) {
     const auto& serverLocation = locationIter.first;
