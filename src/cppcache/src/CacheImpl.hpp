@@ -257,8 +257,6 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   // Pool helpers for unit tests
   static int getPoolSize(const char* poolName);
 
-  static inline CacheImpl* getInstance() { return s_instance; };
-
   bool getCacheMode() {
     return m_attributes == nullptr ? false : m_attributes->m_cacheMode;
   }
