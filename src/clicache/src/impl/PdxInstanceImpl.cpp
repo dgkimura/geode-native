@@ -63,7 +63,7 @@ namespace Apache
           try
           {
             Apache::Geode::Client::DataOutput mg_output(&(*output), true);
-            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, this, CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry().get());
+            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, this);
           }
           finally
           {

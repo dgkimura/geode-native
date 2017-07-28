@@ -161,8 +161,7 @@ namespace Apache
             if(!SafeConvertClassGeneric::isAppDomainEnabled)
               return new ManagedWrapper(mg_obj, mg_obj->GetHashCode(), mg_obj->ClassId, nullptr);
             else
-              return new native::ManagedCacheableKeyBytesGeneric(mg_obj, true,
-                CacheImpl::getInstance()->getCache());
+              return new native::ManagedCacheableKeyBytesGeneric(mg_obj, true, nullptr);
           }
         }
          //if (mg_obj == nullptr) return NULL;
@@ -259,8 +258,7 @@ namespace Apache
 					if(!SafeConvertClassGeneric::isAppDomainEnabled)
 						return new native::PdxManagedCacheableKey(pdxType);
 					else
-						return new native::PdxManagedCacheableKeyBytes(pdxType, true,
-              CacheImpl::getInstance()->getCache());
+						return new native::PdxManagedCacheableKeyBytes(pdxType, true, nullptr);
         }
       
 				Apache::Geode::Client::IGeodeDelta^ sDelta =
@@ -284,8 +282,7 @@ namespace Apache
 							}
 							else
 							{
-								return new native::ManagedCacheableKeyBytesGeneric( tmpIGFS, true,
-                  CacheImpl::getInstance()->getCache());
+								return new native::ManagedCacheableKeyBytesGeneric( tmpIGFS, true, nullptr);
 							}
 						}
             
@@ -295,8 +292,7 @@ namespace Apache
 					    if(!SafeConvertClassGeneric::isAppDomainEnabled)
 					    	return new native::PdxManagedCacheableKey(gcnew PdxWrapper(mg_obj));
 					    else
-						    return new native::PdxManagedCacheableKeyBytes(gcnew PdxWrapper(mg_obj), true,
-                  CacheImpl::getInstance()->getCache());
+						    return new native::PdxManagedCacheableKeyBytes(gcnew PdxWrapper(mg_obj), true, nullptr);
             }
             throw gcnew Apache::Geode::Client::IllegalStateException(String::Format("Unable to map object type {0}. Possible Object type may not be registered or PdxSerializer is not registered. ", mg_obj->GetType()));
           }	
@@ -363,8 +359,7 @@ namespace Apache
           if(!SafeConvertClassGeneric::isAppDomainEnabled)
             return new native::ManagedCacheableKeyGeneric(SafeUMSerializableConvertGeneric(obj), nullptr);
           else
-            return new native::ManagedCacheableKeyBytesGeneric(SafeUMSerializableConvertGeneric(obj), true,
-              nullptr);
+            return new native::ManagedCacheableKeyBytesGeneric(SafeUMSerializableConvertGeneric(obj), true, nullptr);
         }
       }
 
@@ -378,7 +373,7 @@ namespace Apache
           if(!SafeConvertClassGeneric::isAppDomainEnabled)
             return new native::ManagedCacheableKeyGeneric( mg_obj, mg_obj->GetHashCode(), mg_obj->ClassId );
           else
-            return new native::ManagedCacheableKeyBytesGeneric( mg_obj, true );
+            return new native::ManagedCacheableKeyBytesGeneric( mg_obj, true, nullptr);
         }
       }
 

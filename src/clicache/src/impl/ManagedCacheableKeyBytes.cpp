@@ -187,8 +187,8 @@ namespace apache
           const ManagedCacheableKeyBytesGeneric* p_other =
             dynamic_cast<const ManagedCacheableKeyBytesGeneric*>(&other);
           if (p_other != NULL) {
-            apache::geode::client::DataInput di(m_bytes, m_size, m_cache);
-            Apache::Geode::Client::DataInput mg_input(&di, true, m_cache);
+            apache::geode::client::DataInput di(m_bytes, m_size, nullptr);
+            Apache::Geode::Client::DataInput mg_input(&di, true, nullptr);
             Apache::Geode::Client::IGeodeSerializable^ obj =
               Apache::Geode::Client::Serializable::GetTypeFactoryMethodGeneric(m_classId)();
             obj->FromData(%mg_input);
@@ -211,8 +211,8 @@ namespace apache
       {
         try {
           Apache::Geode::Client::Log::Debug("ManagedCacheableKeyBytesGeneric::equal. ");
-          apache::geode::client::DataInput di(m_bytes, m_size, m_cache);
-          Apache::Geode::Client::DataInput mg_input(&di, true, m_cache);
+          apache::geode::client::DataInput di(m_bytes, m_size, nullptr);
+          Apache::Geode::Client::DataInput mg_input(&di, true, nullptr);
           Apache::Geode::Client::IGeodeSerializable^ obj =
             Apache::Geode::Client::Serializable::GetTypeFactoryMethodGeneric(m_classId)();
           obj->FromData(%mg_input);
@@ -274,8 +274,8 @@ namespace apache
         //}
 
         //  Apache::Geode::Client::Log::Debug("ManagedCacheableKeyBytesGeneric::getManagedObject " + sb);
-        apache::geode::client::DataInput dinp(m_bytes, m_size, m_cache);
-        Apache::Geode::Client::DataInput mg_dinp(&dinp, true, m_cache);
+        apache::geode::client::DataInput dinp(m_bytes, m_size, nullptr);
+        Apache::Geode::Client::DataInput mg_dinp(&dinp, true, nullptr);
         Apache::Geode::Client::TypeFactoryMethodGeneric^ creationMethod =
           Apache::Geode::Client::Serializable::GetTypeFactoryMethodGeneric(m_classId);
         Apache::Geode::Client::IGeodeSerializable^ newObj = creationMethod();

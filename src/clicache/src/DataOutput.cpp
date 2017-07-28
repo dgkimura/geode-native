@@ -639,7 +639,7 @@ namespace Apache
           if (pdxObj != nullptr)
           {
             WriteByte(GeodeClassIds::PDX);
-            Internal::PdxHelper::SerializePdx(this, pdxObj, CacheRegionHelper::getCacheImpl(m_nativeptr->get()->getCache())->getSerializationRegistry().get());
+            Internal::PdxHelper::SerializePdx(this, pdxObj);
             return;
           }
           else
@@ -662,7 +662,7 @@ namespace Apache
             {
               pdxObj = gcnew PdxWrapper(obj);
               WriteByte(GeodeClassIds::PDX);
-              Internal::PdxHelper::SerializePdx(this, pdxObj, CacheRegionHelper::getCacheImpl(m_nativeptr->get()->getCache())->getSerializationRegistry().get());
+              Internal::PdxHelper::SerializePdx(this, pdxObj);
               return;
             }
           }

@@ -243,7 +243,7 @@ namespace apache
             Apache::Geode::Client::Log::Debug("PdxManagedCacheableKeyBytes::fromDelta: current domain ID: " + System::Threading::Thread::GetDomainID() + " for object: " + System::Convert::ToString((uint64_t) this) + " with its domain ID: " + m_domainId);
             apache::geode::client::DataOutput dataOut(m_cache);
             Apache::Geode::Client::DataOutput mg_output(&dataOut, true);
-            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr, CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry().get());
+            Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr);
             mg_output.WriteBytesToUMDataOutput();
 
              GF_SAFE_DELETE(m_bytes);

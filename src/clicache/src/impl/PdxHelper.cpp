@@ -46,7 +46,7 @@ namespace Apache
       namespace Internal
       {
         
-        void PdxHelper::SerializePdx(DataOutput^ dataOutput, IPdxSerializable^ pdxObject, const native::SerializationRegistry* serializationRegistry)
+        void PdxHelper::SerializePdx(DataOutput^ dataOutput, IPdxSerializable^ pdxObject)
         {          
           dataOutput->setPdxSerialization(true);
           String^ pdxClassname = nullptr;
@@ -70,7 +70,7 @@ namespace Apache
               PdxType^ piPt = pdxII->getPdxType();
               if(piPt != nullptr && piPt->TypeId == 0)//from pdxInstance factory need to get typeid from server
               {
-                int typeId = PdxTypeRegistry::GetPDXIdForType(piPt, dataOutput->GetPoolName(), serializationRegistry);
+                int typeId = PdxTypeRegistry::GetPDXIdForType(piPt, dataOutput->GetPoolName());
                 pdxII->setPdxId(typeId);
               }
               PdxLocalWriter^ plw = gcnew PdxLocalWriter(dataOutput, piPt);  
@@ -103,7 +103,7 @@ namespace Apache
 
 						//get type id from server and then set it
             int nTypeId = PdxTypeRegistry::GetPDXIdForType(pdxType, 
-																														dataOutput->GetPoolName(), nType, true, serializationRegistry);
+																														dataOutput->GetPoolName(), nType, true);
             nType->TypeId = nTypeId;
 
             ptc->EndObjectWriting();//now write typeid
@@ -113,8 +113,10 @@ namespace Apache
 
             //This is for pdx Statistics
             System::Byte* stPos = dataOutput->GetStartBufferPosition() + ptc->getStartPositionOffset();
-            int pdxLen = PdxHelper::ReadInt32(stPos);       
-            CacheRegionHelper::getCacheImpl(dataOutput->GetNative()->getCache())->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
+            int pdxLen = PdxHelper::ReadInt32(stPos);
+            // TODO global - Figure out why dataInput cache is nullptr
+            // CacheRegionHelper::getCacheImpl(dataOutput->GetNative()->getCache())->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
+            // GC::KeepAlive(dataOutput);
           }
           else//we know locasl type, need to see preerved data
           {
@@ -141,8 +143,10 @@ namespace Apache
 
 		        //This is for pdx Statistics
             System::Byte* stPos = dataOutput->GetStartBufferPosition() + prw->getStartPositionOffset();
-            int pdxLen = PdxHelper::ReadInt32(stPos);       
-            CacheRegionHelper::getCacheImpl(dataOutput->GetNative()->getCache())->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
+            int pdxLen = PdxHelper::ReadInt32(stPos);
+            // TODO global - Figure out why dataInput cache is nullptr
+            // CacheRegionHelper::getCacheImpl(dataOutput->GetNative()->getCache())->getCachePerfStats().incPdxSerialization(pdxLen + 1 + 2*4); //pdxLen + 93 DSID + len + typeID
+            // GC::KeepAlive(dataOutput);
           }
         }
 
@@ -236,7 +240,7 @@ namespace Apache
                   pdxLocalType->InitializeType();
                   pdxLocalType->TypeId = PdxTypeRegistry::GetPDXIdForType(pdxObject->GetType(), 
 																																				  dataInput->GetPoolName(), 
-																																				  pdxLocalType, true, serializationRegistry);
+																																				  pdxLocalType, true);
                   pdxLocalType->IsLocal = true;
                   PdxTypeRegistry::AddLocalPdxType(pdxClassname, pdxLocalType);//added local type
                   PdxTypeRegistry::AddPdxType(pdxLocalType->TypeId, pdxLocalType); 

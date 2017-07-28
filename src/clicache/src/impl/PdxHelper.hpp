@@ -41,7 +41,7 @@ namespace Apache
         {
         public:
 
-          static void SerializePdx(DataOutput^ dataOutput, IPdxSerializable^ pdxObject, const native::SerializationRegistry* serializationRegistry);
+          static void SerializePdx(DataOutput^ dataOutput, IPdxSerializable^ pdxObject);
 
           static IPdxSerializable^ DeserializePdx(DataInput^ dataOutput, bool forceDeserialize, const native::SerializationRegistry* serializationRegistry);
 

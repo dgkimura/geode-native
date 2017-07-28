@@ -52,7 +52,6 @@ namespace apache
   {
     namespace client
     {
-      namespace native = apache::geode::client;
 
   /// <summary>
   /// Wraps the managed <see cref="Apache.Geode.Client.IGeodeSerializable" />
@@ -91,7 +90,9 @@ namespace apache
         {
           apache::geode::client::DataOutput dataOut(m_cache);
           Apache::Geode::Client::DataOutput mg_output( &dataOut, true);
-					Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr, CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry().get());
+          SerializationRegistry defaultSerializationRegistry;
+
+					Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, managedptr);
         //  managedptr->ToData( %mg_output );
           
           //move cursor

@@ -66,9 +66,9 @@ namespace Apache
 
            void clear();
 
-           static Int32 GetPDXIdForType(Type^ type, const char* poolname, PdxType^ nType, bool checkIfThere, const native::SerializationRegistry* serializationRegistry);
+           static Int32 GetPDXIdForType(Type^ type, const char* poolname, PdxType^ nType, bool checkIfThere);
 
-           static Int32 GetPDXIdForType(PdxType^ type, const char* poolname, const native::SerializationRegistry* serializationRegistry);
+           static Int32 GetPDXIdForType(PdxType^ type, const char* poolname);
 
 					static property bool PdxIgnoreUnreadFields
 					{

@@ -44,7 +44,7 @@ namespace apache
         try {
           System::UInt32 pos = (int)output.getBufferLength();
           Apache::Geode::Client::DataOutput mg_output(&output, true);
-          Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, m_managedptr, CacheRegionHelper::getCacheImpl(output.getCache())->getSerializationRegistry().get());
+          Apache::Geode::Client::Internal::PdxHelper::SerializePdx(%mg_output, m_managedptr);
           //m_managedptr->ToData( %mg_output );
           //this will move the cursor in c++ layer
           mg_output.WriteBytesToUMDataOutput();
