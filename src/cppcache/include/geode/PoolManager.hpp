@@ -49,6 +49,8 @@ typedef std::unordered_map<std::string, PoolPtr> HashMapOfPools;
  */
 class CPPCACHE_EXPORT PoolManager {
  public:
+  PoolManager();
+
   /**
    * Creates a new {@link PoolFactory pool factory},
    * which is used to configure and create new {@link Pool}s.
@@ -96,7 +98,7 @@ class CPPCACHE_EXPORT PoolManager {
   static void close(bool keepAlive = false);
 
  private:
-  PoolManager();
+  HashMapOfPools m_connectionPools;
 };
 }  // namespace client
 }  // namespace geode

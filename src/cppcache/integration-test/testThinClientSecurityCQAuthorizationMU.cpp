@@ -161,7 +161,9 @@ void initClientCq(const bool isthinClient) {
   }
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
   try {
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     serializationRegistry->addType(Position::createDeserializable);
     serializationRegistry->addType(Portfolio::createDeserializable);
   } catch (const IllegalStateException&) {
@@ -244,7 +246,9 @@ DUNIT_TASK_DEFINITION(CLIENT2, StepOne2_PoolEP)
   }
 END_TASK_DEFINITION
 
-PoolPtr getPool(const char* name) { return PoolManager::find(name); }
+PoolPtr getPool(const char* name) {
+  return getHelper()->getCache()->getPoolManager().find(name);
+}
 
 RegionServicePtr getVirtualCache(PropertiesPtr creds, const char* name) {
   return getHelper()->getCache()->createAuthenticatedView(creds, name);

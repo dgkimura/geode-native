@@ -29,6 +29,8 @@ void removePool(const char* name) {
   connectionPools->erase(name);
 }
 
+PoolManager::PoolManager() {}
+
 PoolFactoryPtr PoolManager::createFactory() {
   if (connectionPools == nullptr) {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
@@ -78,7 +80,8 @@ PoolPtr PoolManager::find(const char* name) {
 
     return poolPtr;
   } else {
-    return nullptr;
+    return connectionPools->empty() ? nullptr
+                                    : connectionPools->begin()->second;
   }
 }
 

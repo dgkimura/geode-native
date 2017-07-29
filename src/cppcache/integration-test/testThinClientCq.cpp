@@ -83,7 +83,9 @@ void initClientCq(const bool isthinClient) {
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
 
   try {
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     serializationRegistry->addType(Position::createDeserializable);
     serializationRegistry->addType(Portfolio::createDeserializable);
 
@@ -381,7 +383,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
     uint8_t i = 0;
     QueryHelper* qh ATTR_UNUSED = &QueryHelper::getHelper();
 
-    PoolPtr pool = PoolManager::find(regionNamesCq[0]);
+    PoolPtr pool =
+        getHelper()->getCache()->getPoolManager().find(regionNamesCq[0]);
     QueryServicePtr qs;
     if (pool != nullptr) {
       // Using region name as pool name as in ThinClientCq.hpp
@@ -483,7 +486,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
   {
     QueryHelper* qh ATTR_UNUSED = &QueryHelper::getHelper();
 
-    PoolPtr pool = PoolManager::find(regionNamesCq[0]);
+    PoolPtr pool =
+        getHelper()->getCache()->getPoolManager().find(regionNamesCq[0]);
     QueryServicePtr qs;
     if (pool != nullptr) {
       // Using region name as pool name as in ThinClientCq.hpp
@@ -793,7 +797,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, createCQ)
   {
     SLEEP(10000);
     // Create CqAttributes and Install Listener
-    PoolPtr pool = PoolManager::find(regionName);
+    PoolPtr pool = getHelper()->getCache()->getPoolManager().find(regionName);
     QueryServicePtr qs = pool->getQueryService();
     CqAttributesFactory cqFac;
     auto cqLstner = std::make_shared<MyCqStatusListener>(100);
@@ -819,7 +823,8 @@ END_TASK_DEFINITION
 
 DUNIT_TASK_DEFINITION(CLIENT1, createCQ_Pool)
   {
-    PoolPtr pool = PoolManager::find("__TEST_POOL1__");
+    PoolPtr pool =
+        getHelper()->getCache()->getPoolManager().find("__TEST_POOL1__");
     QueryServicePtr qs = pool->getQueryService();
     CqAttributesFactory cqFac;
     auto cqLstner = std::make_shared<MyCqStatusListener>(100);
@@ -840,7 +845,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, createCQ_Pool)
     ASSERT(myStatusCq->getCqsConnectedCount() == 1,
            "incorrect number of CqStatus Connected count.");
 
-    PoolPtr pool2 = PoolManager::find("__TEST_POOL2__");
+    PoolPtr pool2 =
+        getHelper()->getCache()->getPoolManager().find("__TEST_POOL2__");
     QueryServicePtr qs2 = pool2->getQueryService();
     CqAttributesFactory cqFac1;
     auto cqLstner1 = std::make_shared<MyCqStatusListener>(101);
@@ -890,7 +896,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, createCQ_Pool)
 END_TASK_DEFINITION
 
 void executeCq(const char* poolName, const char* name) {
-  PoolPtr pool = PoolManager::find(poolName);
+  PoolPtr pool = getHelper()->getCache()->getPoolManager().find(poolName);
   QueryServicePtr qs;
   if (pool != nullptr) {
     qs = pool->getQueryService();
@@ -910,7 +916,7 @@ END_TASK_DEFINITION
 
 void checkCQStatusOnConnect(const char* poolName, const char* name,
                             int connect) {
-  PoolPtr pool = PoolManager::find(poolName);
+  PoolPtr pool = getHelper()->getCache()->getPoolManager().find(poolName);
   QueryServicePtr qs;
   if (pool != nullptr) {
     qs = pool->getQueryService();
@@ -954,7 +960,7 @@ END_TASK_DEFINITION
 
 void checkCQStatusOnDisConnect(const char* poolName, const char* cqName,
                                int disconnect) {
-  PoolPtr pool = PoolManager::find(poolName);
+  PoolPtr pool = getHelper()->getCache()->getPoolManager().find(poolName);
   QueryServicePtr qs;
   if (pool != nullptr) {
     qs = pool->getQueryService();
@@ -1026,7 +1032,7 @@ END_TASK_DEFINITION
 
 void checkCQStatusOnPutEvent(const char* poolName, const char* cqName,
                              int count) {
-  PoolPtr pool = PoolManager::find(poolName);
+  PoolPtr pool = getHelper()->getCache()->getPoolManager().find(poolName);
   QueryServicePtr qs;
   if (pool != nullptr) {
     qs = pool->getQueryService();
@@ -1061,7 +1067,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, ProcessCQ)
   {
     SLEEP(10000);
     // Create CqAttributes and Install Listener
-    PoolPtr pool = PoolManager::find(regionName);
+    PoolPtr pool = getHelper()->getCache()->getPoolManager().find(regionName);
     QueryServicePtr qs = pool->getQueryService();
     CqAttributesFactory cqFac;
     auto cqLstner = std::make_shared<MyCqListener>(1);

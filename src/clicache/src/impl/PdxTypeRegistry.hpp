@@ -66,9 +66,9 @@ namespace Apache
 
            void clear();
 
-           static Int32 GetPDXIdForType(Type^ type, const char* poolname, PdxType^ nType, bool checkIfThere);
+           static Int32 GetPDXIdForType(Type^ type, const char* poolname, PdxType^ nType, bool checkIfThere, const native::Cache* cache);
 
-           static Int32 GetPDXIdForType(PdxType^ type, const char* poolname);
+           static Int32 GetPDXIdForType(PdxType^ type, const char* poolname, const native::Cache* cache);
 
 					static property bool PdxIgnoreUnreadFields
 					{
@@ -82,9 +82,9 @@ namespace Apache
 						void set(bool value){pdxReadSerialized= value;}
 					}
 
-           static Int32 GetEnumValue(EnumInfo^ ei, const native::SerializationRegistry* serializationRegistry);
+           static Int32 GetEnumValue(EnumInfo^ ei, const native::Cache* cache);
 
-           static EnumInfo^ GetEnum(Int32 enumVal, const native::SerializationRegistry* serializationRegistry);
+           static EnumInfo^ GetEnum(Int32 enumVal, const native::Cache* cache);
 
         private:
             Cache^ m_cache;

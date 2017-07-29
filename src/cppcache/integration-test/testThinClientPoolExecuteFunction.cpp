@@ -632,7 +632,6 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1OpTest)
       // test data independant function
       //     test get function with result
       getResult = true;
-      //    PoolPtr pptr = PoolManager::find(poolName);
       args = routingObj;
       // ExecutionPtr exc=nullptr;
       // CacheableVectorPtr executeFunctionResult = nullptr;
@@ -694,7 +693,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1OpTest)
 
       getResult = true;
       try {
-        SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+        SerializationRegistryPtr serializationRegistry =
+            CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+                ->getSerializationRegistry();
         serializationRegistry->addPdxType(
             PdxTests::PdxTypes8::createDeserializable);
       } catch (const IllegalStateException&) {

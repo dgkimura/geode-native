@@ -517,7 +517,6 @@ void CacheXmlParser::endPdx() {}
 void CacheXmlParser::startLocator(const xmlChar** atts) {
   int attrsCount = 0;
   if (!atts) {
-
     std::string s =
         "XML:No attributes provided for <locator>. "
         "A locator requires a host and port";
@@ -554,7 +553,6 @@ void CacheXmlParser::startLocator(const xmlChar** atts) {
 void CacheXmlParser::startServer(const xmlChar** atts) {
   int attrsCount = 0;
   if (!atts) {
-
     std::string s =
         "XML:No attributes provided for <server>. A server requires a host and "
         "port";
@@ -597,7 +595,8 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
     throw CacheXmlException(s.c_str());
   }
 
-  PoolFactoryPtr factory = PoolManager::createFactory();
+  PoolManager* poolManager = new PoolManager();
+  PoolFactoryPtr factory = poolManager->createFactory();
   const char* poolName = nullptr;
 
   while (atts[attrsCount] != nullptr) {

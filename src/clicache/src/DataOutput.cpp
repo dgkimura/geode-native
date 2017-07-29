@@ -456,7 +456,7 @@ namespace Apache
         if (m_ispdxSerialization && obj->GetType()->IsEnum)
         {
           //need to set             
-          int enumVal = Internal::PdxHelper::GetEnumValue(obj->GetType()->FullName, Enum::GetName(obj->GetType(), obj), obj->GetHashCode(), CacheRegionHelper::getCacheImpl(m_nativeptr->get()->getCache())->getSerializationRegistry().get());
+          int enumVal = Internal::PdxHelper::GetEnumValue(obj->GetType()->FullName, Enum::GetName(obj->GetType(), obj), obj->GetHashCode(), m_nativeptr->get()->getCache());
           WriteByte(GeodeClassIds::PDX_ENUM);
           WriteByte(enumVal >> 24);
           WriteArrayLen(enumVal & 0xFFFFFF);

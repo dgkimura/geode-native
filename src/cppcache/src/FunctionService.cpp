@@ -47,7 +47,8 @@ ExecutionPtr FunctionService::onRegion(RegionPtr region) {
       // it is in multiuser mode
       proxyCache = pr->m_proxyCache;
       PoolPtr userAttachedPool = proxyCache->m_userAttributes->getPool();
-      PoolPtr pool = PoolManager::find(userAttachedPool->getName());
+      PoolPtr pool = region->getCache()->getPoolManager().find(
+          userAttachedPool->getName());
       if (!(pool != nullptr && pool.get() == userAttachedPool.get() &&
             !pool->isDestroyed())) {
         throw IllegalStateException(
@@ -111,7 +112,8 @@ ExecutionPtr FunctionService::onServerWithCache(const RegionServicePtr& cache) {
   LOGDEBUG("FunctionService::onServer:");
   if (pc != nullptr) {
     PoolPtr userAttachedPool = pc->m_userAttributes->getPool();
-    PoolPtr pool = PoolManager::find(userAttachedPool->getName());
+    PoolPtr pool = pc->m_cacheImpl->getCache()->getPoolManager().find(
+        userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
       return std::make_shared<ExecutionImpl>(pool, false, pc);
@@ -135,7 +137,8 @@ ExecutionPtr FunctionService::onServersWithCache(
   LOGDEBUG("FunctionService::onServers:");
   if (pc != nullptr && !cache->isClosed()) {
     auto userAttachedPool = pc->m_userAttributes->getPool();
-    auto pool = PoolManager::find(userAttachedPool->getName());
+    auto pool = pc->m_cacheImpl->getCache()->getPoolManager().find(
+        userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
       return std::make_shared<ExecutionImpl>(pool, true, pc);

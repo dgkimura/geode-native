@@ -161,6 +161,7 @@ Cache::Cache(const std::string& name, PropertiesPtr dsProp,
   m_cacheImpl = std::unique_ptr<CacheImpl>(new CacheImpl(
       this, name, std::move(dsPtr), ignorePdxUnreadFields, readPdxSerialized));
   m_typeRegistry = std::unique_ptr<TypeRegistry>(new TypeRegistry(*this));
+  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager());
 }
 
 Cache::~Cache() = default;
@@ -194,7 +195,7 @@ bool Cache::isPoolInMultiuserMode(RegionPtr regionPtr) {
   const char* poolName = regionPtr->getAttributes()->getPoolName();
 
   if (poolName != nullptr) {
-    PoolPtr poolPtr = PoolManager::find(poolName);
+    PoolPtr poolPtr = regionPtr->getCache()->getPoolManager().find(poolName);
     if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
       return poolPtr->getMultiuserAuthentication();
     }
@@ -233,7 +234,7 @@ RegionServicePtr Cache::createAuthenticatedView(
   } else {
     if (!this->isClosed()) {
       if (poolName != nullptr) {
-        PoolPtr poolPtr = PoolManager::find(poolName);
+        PoolPtr poolPtr = m_poolManager->find(poolName);
         if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
           return poolPtr->createSecureUserCache(userSecurityProperties,
                                                 m_cacheImpl.get());

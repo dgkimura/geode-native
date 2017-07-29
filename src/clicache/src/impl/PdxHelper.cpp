@@ -70,7 +70,7 @@ namespace Apache
               PdxType^ piPt = pdxII->getPdxType();
               if(piPt != nullptr && piPt->TypeId == 0)//from pdxInstance factory need to get typeid from server
               {
-                int typeId = PdxTypeRegistry::GetPDXIdForType(piPt, dataOutput->GetPoolName());
+                int typeId = PdxTypeRegistry::GetPDXIdForType(piPt, dataOutput->GetPoolName(), dataOutput->GetNative()->getCache());
                 pdxII->setPdxId(typeId);
               }
               PdxLocalWriter^ plw = gcnew PdxLocalWriter(dataOutput, piPt);  
@@ -103,7 +103,7 @@ namespace Apache
 
 						//get type id from server and then set it
             int nTypeId = PdxTypeRegistry::GetPDXIdForType(pdxType, 
-																														dataOutput->GetPoolName(), nType, true);
+																														dataOutput->GetPoolName(), nType, true, dataOutput->GetNative()->getCache());
             nType->TypeId = nTypeId;
 
             ptc->EndObjectWriting();//now write typeid
@@ -194,7 +194,7 @@ namespace Apache
             {
               if(pType == nullptr)
               {
-                pType = (PdxType^)(Serializable::GetPDXTypeById(dataInput->GetPoolName(), typeId, serializationRegistry));
+                pType = (PdxType^)(Serializable::GetPDXTypeById(dataInput->GetPoolName(), typeId, dataInput->GetNative()->getCache()));
                 pdxLocalType = PdxTypeRegistry::GetLocalPdxType(pType->PdxClassName);//this should be fine for IPdxTypeMappers
               }
               
@@ -240,7 +240,7 @@ namespace Apache
                   pdxLocalType->InitializeType();
                   pdxLocalType->TypeId = PdxTypeRegistry::GetPDXIdForType(pdxObject->GetType(), 
 																																				  dataInput->GetPoolName(), 
-																																				  pdxLocalType, true);
+																																				  pdxLocalType, true, dataInput->GetNative()->getCache());
                   pdxLocalType->IsLocal = true;
                   PdxTypeRegistry::AddLocalPdxType(pdxClassname, pdxLocalType);//added local type
                   PdxTypeRegistry::AddPdxType(pdxLocalType->TypeId, pdxLocalType); 
@@ -317,7 +317,7 @@ namespace Apache
 
             if(pType == nullptr)
             {
-              PdxType^ pType = (PdxType^)(Serializable::GetPDXTypeById(dataInput->GetPoolName(), typeId, serializationRegistry));
+              PdxType^ pType = (PdxType^)(Serializable::GetPDXTypeById(dataInput->GetPoolName(), typeId, dataInput->GetNative()->getCache()));
               //this should be fine for IPdxTypeMapper
               PdxTypeRegistry::AddLocalPdxType(pType->PdxClassName, pType);
               PdxTypeRegistry::AddPdxType(pType->TypeId, pType); 
@@ -343,17 +343,17 @@ namespace Apache
           }
         }
 
-        Int32 PdxHelper::GetEnumValue(String^ enumClassName, String^ enumName, int hashcode, const native::SerializationRegistry* serializationRegistry)
+        Int32 PdxHelper::GetEnumValue(String^ enumClassName, String^ enumName, int hashcode, const native::Cache* cache)
         {
           //in case app want different name
           enumClassName = Serializable::GetPdxTypeName(enumClassName);
           EnumInfo^ ei = gcnew EnumInfo(enumClassName, enumName, hashcode);
-          return PdxTypeRegistry::GetEnumValue(ei, serializationRegistry);        
+          return PdxTypeRegistry::GetEnumValue(ei, cache);        
         }
 
-        Object^ PdxHelper::GetEnum(int enumId, const native::SerializationRegistry* serializationRegistry)
+        Object^ PdxHelper::GetEnum(int enumId, const native::Cache* cache)
         {
-          EnumInfo^ ei = PdxTypeRegistry::GetEnum(enumId, serializationRegistry);
+          EnumInfo^ ei = PdxTypeRegistry::GetEnum(enumId, cache);
           return ei->GetEnum();
         }
 
@@ -373,7 +373,7 @@ namespace Apache
           {//need to create new version            
             mergedVersion->InitializeType();
             if(mergedVersion->TypeId == 0)
-              mergedVersion->TypeId = Serializable::GetPDXIdForType(dataInput->GetPoolName(), mergedVersion, serializationRegistry);              
+              mergedVersion->TypeId = Serializable::GetPDXIdForType(dataInput->GetPoolName(), mergedVersion, dataInput->GetNative()->getCache());              
             
            // PdxTypeRegistry::AddPdxType(remoteType->TypeId, mergedVersion);
             PdxTypeRegistry::AddPdxType(mergedVersion->TypeId, mergedVersion);  

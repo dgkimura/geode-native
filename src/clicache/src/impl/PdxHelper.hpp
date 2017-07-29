@@ -65,9 +65,9 @@ namespace Apache
 
           static Int32 ReadInt(System::Byte* offsetPosition, int size);
 
-          static Int32 GetEnumValue(String^ enumClassName, String^ enumName, int hashcode, const native::SerializationRegistry* serializationRegistry);
+          static Int32 GetEnumValue(String^ enumClassName, String^ enumName, int hashcode, const native::Cache* cache);
 
-          static Object^ GetEnum(int enumId, const native::SerializationRegistry* serializationRegistry);
+          static Object^ GetEnum(int enumId, const native::Cache* cache);
 
         private:
           static void CreateMergedType(PdxType^ localType, PdxType^ remoteType, DataInput^ dataInput, const native::SerializationRegistry* serializationRegistry);

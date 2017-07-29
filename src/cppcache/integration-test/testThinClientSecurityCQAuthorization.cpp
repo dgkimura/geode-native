@@ -161,12 +161,13 @@ void initClientCq(const bool isthinClient) {
   }
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
   try {
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
 
     serializationRegistry->addType(Position::createDeserializable);
     serializationRegistry->addType(Portfolio::createDeserializable);
-  }
-  catch (const IllegalStateException&) {
+  } catch (const IllegalStateException&) {
     // ignore exception
   }
 }
@@ -243,7 +244,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
     uint8_t i = 0;
     QueryHelper* qh ATTR_UNUSED = &QueryHelper::getHelper();
 
-    PoolPtr pool = PoolManager::find(regionNamesCq[0]);
+    PoolPtr pool =
+        getHelper()->getCache()->getPoolManager().find(regionNamesCq[0]);
     QueryServicePtr qs;
     if (pool != nullptr) {
       // Using region name as pool name as in ThinClientCq.hpp
@@ -304,7 +306,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
   {
     auto qh ATTR_UNUSED = &QueryHelper::getHelper();
 
-    auto pool = PoolManager::find(regionNamesCq[0]);
+    auto pool =
+        getHelper()->getCache()->getPoolManager().find(regionNamesCq[0]);
     QueryServicePtr qs;
     if (pool != nullptr) {
       // Using region name as pool name as in ThinClientCq.hpp

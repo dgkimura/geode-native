@@ -28,13 +28,13 @@
 
 #include <geode/utils.hpp>
 #include <geode/PdxSerializable.hpp>
+#include <geode/Cache.hpp>
 
 #include "PdxRemotePreservedData.hpp"
 #include "ReadWriteLock.hpp"
 #include "PdxType.hpp"
 #include "EnumInfo.hpp"
 #include "PreservedDataExpiryHandler.hpp"
-#include "SerializationRegistry.hpp"
 #include "ExpiryTaskManager.hpp"
 
 namespace apache {
@@ -59,7 +59,7 @@ typedef std::map<PdxTypePtr, int32_t, PdxTypeLessThan> PdxTypeToTypeIdMap;
 class CPPCACHE_EXPORT PdxTypeRegistry
     : public std::enable_shared_from_this<PdxTypeRegistry> {
  private:
-  SerializationRegistryPtr serializationRegistry;
+  Cache* cache;
 
   TypeIdVsPdxType typeIdToPdxType;
 
@@ -85,7 +85,7 @@ class CPPCACHE_EXPORT PdxTypeRegistry
   CacheableHashMapPtr intToEnum;
 
  public:
-  PdxTypeRegistry(const SerializationRegistryPtr& serializationRegistry);
+  PdxTypeRegistry(Cache* cache);
   PdxTypeRegistry(const PdxTypeRegistry& other) = delete;
 
   virtual ~PdxTypeRegistry();

@@ -971,7 +971,9 @@ int32_t ThinClientPoolDM::GetPDXIdForType(SerializablePtr pdxType) {
 
   // need to broadcast this id to all other pool
   {
-    for (const auto& iter : PoolManager::getAll()) {
+    auto& poolManager =
+        m_connManager.getCacheImpl()->getCache()->getPoolManager();
+    for (const auto& iter : poolManager.getAll()) {
       auto currPool = static_cast<ThinClientPoolDM*>(iter.second.get());
 
       if (currPool != this) {
@@ -1055,7 +1057,9 @@ int32_t ThinClientPoolDM::GetEnumValue(SerializablePtr enumInfo) {
 
   // need to broadcast this id to all other pool
   {
-    for (const auto& iter : PoolManager::getAll()) {
+    auto& poolManager =
+        m_connManager.getCacheImpl()->getCache()->getPoolManager();
+    for (const auto& iter : poolManager.getAll()) {
       const auto& currPool =
           std::dynamic_pointer_cast<ThinClientPoolDM>(iter.second);
 

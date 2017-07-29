@@ -258,19 +258,8 @@ PdxSerializerPtr SerializationRegistry::getPdxSerializer() {
   return m_pdxSerializer;
 }
 
-int32_t SerializationRegistry::GetPDXIdForType(const char* poolName,
+int32_t SerializationRegistry::GetPDXIdForType(PoolPtr pool,
                                                SerializablePtr pdxType) const {
-  PoolPtr pool = nullptr;
-
-  if (poolName == nullptr) {
-    for (const auto& iter : PoolManager::getAll()) {
-      pool = iter.second;
-      break;
-    }
-  } else {
-    pool = PoolManager::find(poolName);
-  }
-
   if (pool == nullptr) {
     throw IllegalStateException("Pool not found, Pdx operation failed");
   }
@@ -278,19 +267,8 @@ int32_t SerializationRegistry::GetPDXIdForType(const char* poolName,
   return static_cast<ThinClientPoolDM*>(pool.get())->GetPDXIdForType(pdxType);
 }
 
-SerializablePtr SerializationRegistry::GetPDXTypeById(const char* poolName,
+SerializablePtr SerializationRegistry::GetPDXTypeById(PoolPtr pool,
                                                       int32_t typeId) const {
-  PoolPtr pool = nullptr;
-
-  if (poolName == nullptr) {
-    for (const auto& iter : PoolManager::getAll()) {
-      pool = iter.second;
-      break;
-    }
-  } else {
-    pool = PoolManager::find(poolName);
-  }
-
   if (pool == nullptr) {
     throw IllegalStateException("Pool not found, Pdx operation failed");
   }
@@ -298,30 +276,21 @@ SerializablePtr SerializationRegistry::GetPDXTypeById(const char* poolName,
   return static_cast<ThinClientPoolDM*>(pool.get())->GetPDXTypeById(typeId);
 }
 
-int32_t SerializationRegistry::GetEnumValue(SerializablePtr enumInfo) const {
-  PoolPtr pool = getPool();
+int32_t SerializationRegistry::GetEnumValue(PoolPtr pool,
+                                            SerializablePtr enumInfo) const {
   if (pool == nullptr) {
     throw IllegalStateException("Pool not found, Pdx operation failed");
   }
 
   return static_cast<ThinClientPoolDM*>(pool.get())->GetEnumValue(enumInfo);
 }
-SerializablePtr SerializationRegistry::GetEnum(int32_t val) const {
-  PoolPtr pool = getPool();
+SerializablePtr SerializationRegistry::GetEnum(PoolPtr pool,
+                                               int32_t val) const {
   if (pool == nullptr) {
     throw IllegalStateException("Pool not found, Pdx operation failed");
   }
 
   return static_cast<ThinClientPoolDM*>(pool.get())->GetEnum(val);
-}
-
-PoolPtr SerializationRegistry::getPool() const {
-  PoolPtr pool = nullptr;
-  for (const auto& iter : PoolManager::getAll()) {
-    pool = iter.second;
-    break;
-  }
-  return pool;
 }
 
 void TheTypeMap::clear() {

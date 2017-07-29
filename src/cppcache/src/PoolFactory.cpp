@@ -112,24 +112,23 @@ void PoolFactory::setPRSingleHopEnabled(bool enabled) {
   m_attrs->setPRSingleHopEnabled(enabled);
 }
 
-PoolPtr PoolFactory::create(const char* name, Cache &cache) {
+PoolPtr PoolFactory::create(const char* name, Cache& cache) {
   ThinClientPoolDMPtr poolDM;
   {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
 
-    if (PoolManager::find(name) != nullptr) {
+    if (cache.getPoolManager().find(name) != nullptr) {
       throw IllegalStateException("Pool with the same name already exists");
     }
     // Create a clone of Attr;
     PoolAttributesPtr copyAttrs = m_attrs->clone();
 
-    CacheImpl *cacheImpl = CacheRegionHelper::getCacheImpl(&cache);
+    CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(&cache);
 
     if (cache.isClosed()) {
       throw CacheClosedException("Cache is closed");
     }
-    if (cacheImpl->getCacheMode() &&
-        m_isSubscriptionRedundancy) {
+    if (cacheImpl->getCacheMode() && m_isSubscriptionRedundancy) {
       LOGWARN(
           "At least one pool has been created so ignoring cache level "
           "redundancy setting");
@@ -176,9 +175,7 @@ PoolPtr PoolFactory::create(const char* name, Cache &cache) {
 
   // TODO: poolDM->init() should not throw exceptions!
   // Pool DM should only be inited once.
-  if (cache.getDistributedSystem()
-          .getSystemProperties()
-          .autoReadyForEvents()) {
+  if (cache.getDistributedSystem().getSystemProperties().autoReadyForEvents()) {
     poolDM->init();
   }
 

@@ -33,7 +33,10 @@
 #include "Utils.hpp"
 #include "PdxRemoteWriter.hpp"
 #include "CacheRegionHelper.hpp"
+#include "ThinClientPoolDM.hpp"
 #include <geode/Cache.hpp>
+#include <geode/DataInput.hpp>
+#include <geode/PoolManager.hpp>
 
 namespace apache {
 namespace geode {
@@ -96,8 +99,6 @@ void PdxHelper::serializePdx(DataOutput& output,
     PdxTypePtr nType = ptc->getPdxLocalType();
 
     nType->InitializeType();
-    //[ToDo] need to write bytes for stats
-    // SerializationRegistry::GetPDXIdForType(output.getPoolName(), nType);
     int32_t nTypeId = pdxTypeRegistry->getPDXIdForType(
         pdxType, output.getPoolName(), nType, true);
     nType->setTypeId(nTypeId);
@@ -199,8 +200,10 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
     // type not found; need to get from server
     if (pType == nullptr) {
       pType = std::static_pointer_cast<PdxType>(
-          serializationRegistry->GetPDXTypeById(dataInput.getPoolName(),
-                                                typeId));
+          serializationRegistry->GetPDXTypeById(
+              cacheImpl->getCache()->getPoolManager().find(
+                  dataInput.getPoolName()),
+              typeId));
       pdxLocalType = pdxTypeRegistry->getLocalPdxType(pType->getPdxClassName());
     }
     /* adongre  - Coverity II
@@ -318,8 +321,10 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
     if (pType == nullptr) {
       // TODO shared_ptr why redef?
       auto pType = std::static_pointer_cast<PdxType>(
-          serializationRegistry->GetPDXTypeById(dataInput.getPoolName(),
-                                                typeId));
+          serializationRegistry->GetPDXTypeById(
+              cacheImpl->getCache()->getPoolManager().find(
+                  dataInput.getPoolName()),
+              typeId));
       pdxTypeRegistry->addLocalPdxType(pType->getPdxClassName(), pType);
       pdxTypeRegistry->addPdxType(pType->getTypeId(), pType);
     }
@@ -355,7 +360,8 @@ void PdxHelper::createMergedType(PdxTypePtr localType, PdxTypePtr remoteType,
     mergedVersion->InitializeType();
     if (mergedVersion->getTypeId() == 0) {
       mergedVersion->setTypeId(serializaionRegistry->GetPDXIdForType(
-          dataInput.getPoolName(), mergedVersion));
+          dataInput.getCache()->getPoolManager().find(dataInput.getPoolName()),
+          mergedVersion));
     }
 
     // PdxTypeRegistry::AddPdxType(remoteType->TypeId, mergedVersion);

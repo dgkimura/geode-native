@@ -49,14 +49,15 @@ using namespace testData;
 const char* cqName = "MyCq";
 
 void initClientCq(const bool isthinClient) {
-
   if (cacheHelper == nullptr) {
     cacheHelper = new CacheHelper(isthinClient);
   }
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
 
   try {
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     serializationRegistry->addType(Position::createDeserializable);
     serializationRegistry->addType(Portfolio::createDeserializable);
 
@@ -159,7 +160,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, QueryData)
     auto& qh ATTR_UNUSED = QueryHelper::getHelper();
 
     // using region name as pool name
-    auto pool = PoolManager::find(regionNamesCq[0]);
+    auto pool =
+        getHelper()->getCache()->getPoolManager().find(regionNamesCq[0]);
     QueryServicePtr qs;
     if (pool != nullptr) {
       qs = pool->getQueryService();

@@ -69,7 +69,8 @@ void ProxyCache::close() {
     m_userAttributes->unSetCredentials();
     // send message to server
     PoolPtr userAttachedPool = m_userAttributes->getPool();
-    PoolPtr pool = PoolManager::find(userAttachedPool->getName());
+    PoolPtr pool = m_cacheImpl->getCache()->getPoolManager().find(
+        userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get()) {
       auto poolDM = std::static_pointer_cast<ThinClientPoolDM>(pool);
       if (!poolDM->isDestroyed()) {
@@ -93,7 +94,8 @@ RegionPtr ProxyCache::getRegion(const char* path) {
 
     if (result != nullptr) {
       PoolPtr userAttachedPool = m_userAttributes->getPool();
-      PoolPtr pool = PoolManager::find(result->getAttributes()->getPoolName());
+      PoolPtr pool = m_cacheImpl->getCache()->getPoolManager().find(
+          result->getAttributes()->getPoolName());
       if (pool != nullptr && pool.get() == userAttachedPool.get() &&
           !pool->isDestroyed()) {
         return std::make_shared<ProxyRegion>(shared_from_this(), result);

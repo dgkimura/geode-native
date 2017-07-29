@@ -85,7 +85,9 @@ void initClient() {
   }
   ASSERT(cacheHelper, "Failed to create a CacheHelper client instance.");
   try {
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
 
     serializationRegistry->addType(Portfolio::createDeserializable);
     serializationRegistry->addType(Position::createDeserializable);
@@ -199,7 +201,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
 
       QueryServicePtr qs = nullptr;
 
-      PoolPtr pool = PoolManager::find("__TESTPOOL1_");
+      PoolPtr pool =
+          getHelper()->getCache()->getPoolManager().find("__TESTPOOL1_");
       qs = pool->getQueryService();
       LOG("Got query service from pool");
 

@@ -15,15 +15,18 @@
  * limitations under the License.
  */
 
+#include <geode/PoolManager.hpp>
+
 #include "PdxTypeRegistry.hpp"
+#include "CacheRegionHelper.hpp"
+#include "ThinClientPoolDM.hpp"
 
 namespace apache {
 namespace geode {
 namespace client {
 
-PdxTypeRegistry::PdxTypeRegistry(
-    const SerializationRegistryPtr& serializationRegistry)
-    : serializationRegistry(serializationRegistry),
+PdxTypeRegistry::PdxTypeRegistry(Cache* cache)
+    : cache(cache),
       typeIdToPdxType(),
       remoteTypeIdToMergedPdxType(),
       localTypeToPdxType(),
@@ -50,7 +53,10 @@ int32_t PdxTypeRegistry::getPDXIdForType(const char* type, const char* poolname,
     }
   }
 
-  int typeId = serializationRegistry->GetPDXIdForType(poolname, nType);
+  int typeId =
+      CacheRegionHelper::getCacheImpl(cache)
+          ->getSerializationRegistry()
+          ->GetPDXIdForType(cache->getPoolManager().find(poolname), nType);
   nType->setTypeId(typeId);
 
   PdxTypeRegistry::addPdxType(typeId, nType);
@@ -81,7 +87,9 @@ int32_t PdxTypeRegistry::getPDXIdForType(PdxTypePtr nType,
     }
   }
 
-  typeId = serializationRegistry->GetPDXIdForType(poolname, nType);
+  typeId = CacheRegionHelper::getCacheImpl(cache)
+               ->getSerializationRegistry()
+               ->GetPDXIdForType(cache->getPoolManager().find(poolname), nType);
   nType->setTypeId(typeId);
   pdxTypeToTypeIdMap.insert(std::make_pair(nType, typeId));
   addPdxType(typeId, nType);
@@ -220,7 +228,11 @@ int32_t PdxTypeRegistry::getEnumValue(EnumInfoPtr ei) {
     const auto val2 = std::static_pointer_cast<CacheableInt32>(entry2->second);
     return val2->value();
   }
-  int val = serializationRegistry->GetEnumValue(ei);
+
+  int val = static_cast<ThinClientPoolDM*>(
+                cache->getPoolManager().getAll().begin()->second.get())
+                ->GetEnumValue(ei);
+
   tmp = enumToInt;
   tmp->emplace(ei, CacheableInt32::create(val));
   enumToInt = tmp;
@@ -259,7 +271,9 @@ EnumInfoPtr PdxTypeRegistry::getEnum(int32_t enumVal) {
   }
 
   ret = std::static_pointer_cast<EnumInfo>(
-      serializationRegistry->GetEnum(enumVal));
+      static_cast<ThinClientPoolDM*>(
+          cache->getPoolManager().getAll().begin()->second.get())
+          ->GetEnum(enumVal));
   tmp = intToEnum;
   (*tmp)[enumValPtr] = ret;
   intToEnum = tmp;

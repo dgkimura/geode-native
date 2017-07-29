@@ -64,7 +64,7 @@ PoolPtr CacheFactory::createOrGetDefaultPool(CacheImpl& cacheImpl) {
     return cacheImpl.getDefaultPool();
   }
 
-  PoolPtr pool = PoolManager::find(DEFAULT_POOL_NAME);
+  PoolPtr pool = cacheImpl.getCache()->getPoolManager().find(DEFAULT_POOL_NAME);
 
   // if default_poolFactory is null then we are not using latest API....
   if (pool == nullptr && Cache_CreatedFromCacheFactory) {
@@ -211,7 +211,7 @@ CachePtr CacheFactory::create(const char* name, PropertiesPtr dsProp,
 
 PoolPtr CacheFactory::determineDefaultPool(CacheImpl* cacheImpl) {
   PoolPtr pool = nullptr;
-  auto allPools = PoolManager::getAll();
+  auto allPools = cacheImpl->getCache()->getPoolManager().getAll();
   size_t currPoolSize = allPools.size();
 
   // means user has not set any pool attributes

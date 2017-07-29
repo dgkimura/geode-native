@@ -21,7 +21,6 @@
 #include "begin_native.hpp"
 #include <geode/CacheableKey.hpp>
 #include <geode/CacheableBuiltins.hpp>
-#include "SerializationRegistry.hpp"
 #include "end_native.hpp"
 
 #include "IGeodeSerializable.hpp"
@@ -303,8 +302,8 @@ namespace Apache
 
       internal:
 
-				static System::Int32 GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType, const native::SerializationRegistry* serializationRegistry);
-				static IGeodeSerializable^ GetPDXTypeById(const char* poolName, System::Int32 typeId, const native::SerializationRegistry* serializationRegistry);
+				static System::Int32 GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType, const native::Cache* cache);
+				static IGeodeSerializable^ GetPDXTypeById(const char* poolName, System::Int32 typeId, const native::Cache* cache);
 				static IPdxSerializable^ Serializable::GetPdxType(String^ className);
 				static void RegisterPDXManagedCacheableKey(bool appDomainEnable, Cache^ cache);
         static bool IsObjectAndPdxSerializerRegistered(String^ className);
@@ -316,8 +315,8 @@ namespace Apache
 
         static Type^ GetType(String^ className);
 
-        static int GetEnumValue(Internal::EnumInfo^ ei, const native::SerializationRegistry* serializationRegistry);
-        static Internal::EnumInfo^ GetEnum(int val, const native::SerializationRegistry* serializationRegistry);
+        static int GetEnumValue(Internal::EnumInfo^ ei, const native::Cache* cache);
+        static Internal::EnumInfo^ GetEnum(int val, const native::Cache* cache);
 
          static Dictionary<String^, PdxTypeFactoryMethod^>^ PdxDelegateMap =
           gcnew Dictionary<String^, PdxTypeFactoryMethod^>();

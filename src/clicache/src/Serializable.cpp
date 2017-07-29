@@ -16,8 +16,11 @@
  */
 
 #include "begin_native.hpp"
+#include <geode/Cache.hpp>
 #include <SerializationRegistry.hpp>
+#include <geode/PoolManager.hpp>
 #include <CacheImpl.hpp>
+#include "CacheRegionHelper.hpp"
 #include "end_native.hpp"
 
 #include <msclr/lock.h>
@@ -259,27 +262,27 @@ namespace Apache
         return (Apache::Geode::Client::Serializable^)CacheableStringArray::Create(value);
       }
 
-      System::Int32 Serializable::GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType, const native::SerializationRegistry* serializationRegistry)
+      System::Int32 Serializable::GetPDXIdForType(const char* poolName, IGeodeSerializable^ pdxType, const native::Cache* cache)
       {
         native::CacheablePtr kPtr(SafeMSerializableConvertGeneric(pdxType));
-        return serializationRegistry->GetPDXIdForType(poolName, kPtr);
+        return CacheRegionHelper::getCacheImpl(cache)->getSerializationRegistry()->GetPDXIdForType(cache->getPoolManager().find(poolName), kPtr);
       }
 
-      IGeodeSerializable^ Serializable::GetPDXTypeById(const char* poolName, System::Int32 typeId, const native::SerializationRegistry* serializationRegistry)
+      IGeodeSerializable^ Serializable::GetPDXTypeById(const char* poolName, System::Int32 typeId, const native::Cache* cache)
       {        
-        SerializablePtr sPtr = serializationRegistry->GetPDXTypeById(poolName, typeId);
+        SerializablePtr sPtr = CacheRegionHelper::getCacheImpl(cache)->getSerializationRegistry()->GetPDXTypeById(cache->getPoolManager().find(poolName), typeId);
         return SafeUMSerializableConvertGeneric(sPtr);
       }
 
-      int Serializable::GetEnumValue(Internal::EnumInfo^ ei, const native::SerializationRegistry* serializationRegistry)
+      int Serializable::GetEnumValue(Internal::EnumInfo^ ei, const native::Cache* cache)
       {
         native::CacheablePtr kPtr(SafeMSerializableConvertGeneric(ei));
-        return serializationRegistry->GetEnumValue(kPtr);
+        return  CacheRegionHelper::getCacheImpl(cache)->getSerializationRegistry()->GetEnumValue(cache->getPoolManager().getAll().begin()->second, kPtr);
       }
 
-      Internal::EnumInfo^ Serializable::GetEnum(int val, const native::SerializationRegistry* serializationRegistry)
+      Internal::EnumInfo^ Serializable::GetEnum(int val, const native::Cache* cache)
       {
-        SerializablePtr sPtr = serializationRegistry->GetEnum(val);
+        SerializablePtr sPtr = CacheRegionHelper::getCacheImpl(cache)->getSerializationRegistry()->GetEnum(cache->getPoolManager().getAll().begin()->second, val);
         return (Internal::EnumInfo^)SafeUMSerializableConvertGeneric(sPtr);
       }
 
