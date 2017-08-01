@@ -64,7 +64,8 @@ PoolPtr CacheFactory::createOrGetDefaultPool(CacheImpl& cacheImpl) {
     return cacheImpl.getDefaultPool();
   }
 
-  PoolPtr pool = cacheImpl.getCache()->getPoolManager().find(DEFAULT_POOL_NAME);
+  PoolPtr pool =
+      cacheImpl.getCache()->getPoolManager()->find(DEFAULT_POOL_NAME);
 
   // if default_poolFactory is null then we are not using latest API....
   if (pool == nullptr && Cache_CreatedFromCacheFactory) {
@@ -211,12 +212,12 @@ CachePtr CacheFactory::create(const char* name, PropertiesPtr dsProp,
 
 PoolPtr CacheFactory::determineDefaultPool(CacheImpl* cacheImpl) {
   PoolPtr pool = nullptr;
-  auto allPools = cacheImpl->getCache()->getPoolManager().getAll();
+  auto allPools = cacheImpl->getCache()->getPoolManager()->getAll();
   size_t currPoolSize = allPools.size();
 
   // means user has not set any pool attributes
   if (this->pf == nullptr) {
-    this->pf = getPoolFactory();
+    this->pf = cacheImpl->getCache()->getPoolFactory();
     if (currPoolSize == 0) {
       if (!this->pf->m_addedServerOrLocator) {
         this->pf->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
@@ -277,13 +278,6 @@ PoolPtr CacheFactory::determineDefaultPool(CacheImpl* cacheImpl) {
   }
 }
 
-PoolFactoryPtr CacheFactory::getPoolFactory() {
-  if (this->pf == nullptr) {
-    this->pf = PoolManager::createFactory();
-  }
-  return this->pf;
-}
-
 CacheFactory::~CacheFactory() {}
 void CacheFactory::cleanup() {
   if (m_cacheMap != nullptr) {
@@ -327,98 +321,6 @@ void CacheFactory::handleXML(CachePtr& cachePtr, const char* cachexml,
 CacheFactoryPtr CacheFactory::set(const char* name, const char* value) {
   if (this->dsProp == nullptr) this->dsProp = Properties::create();
   this->dsProp->insert(name, value);
-  return shared_from_this();
-}
-
-CacheFactoryPtr CacheFactory::setFreeConnectionTimeout(int connectionTimeout) {
-  getPoolFactory()->setFreeConnectionTimeout(connectionTimeout);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setLoadConditioningInterval(
-    int loadConditioningInterval) {
-  getPoolFactory()->setLoadConditioningInterval(loadConditioningInterval);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setSocketBufferSize(int bufferSize) {
-  getPoolFactory()->setSocketBufferSize(bufferSize);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setThreadLocalConnections(
-    bool threadLocalConnections) {
-  getPoolFactory()->setThreadLocalConnections(threadLocalConnections);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setReadTimeout(int timeout) {
-  getPoolFactory()->setReadTimeout(timeout);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setMinConnections(int minConnections) {
-  getPoolFactory()->setMinConnections(minConnections);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setMaxConnections(int maxConnections) {
-  getPoolFactory()->setMaxConnections(maxConnections);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setIdleTimeout(long idleTimeout) {
-  getPoolFactory()->setIdleTimeout(idleTimeout);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setRetryAttempts(int retryAttempts) {
-  getPoolFactory()->setRetryAttempts(retryAttempts);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setPingInterval(long pingInterval) {
-  getPoolFactory()->setPingInterval(pingInterval);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setUpdateLocatorListInterval(
-    long updateLocatorListInterval) {
-  getPoolFactory()->setUpdateLocatorListInterval(updateLocatorListInterval);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setStatisticInterval(int statisticInterval) {
-  getPoolFactory()->setStatisticInterval(statisticInterval);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setServerGroup(const char* group) {
-  getPoolFactory()->setServerGroup(group);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::addLocator(const char* host, int port) {
-  getPoolFactory()->addLocator(host, port);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::addServer(const char* host, int port) {
-  getPoolFactory()->addServer(host, port);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setSubscriptionEnabled(bool enabled) {
-  getPoolFactory()->setSubscriptionEnabled(enabled);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setSubscriptionRedundancy(int redundancy) {
-  getPoolFactory()->setSubscriptionRedundancy(redundancy);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setSubscriptionMessageTrackingTimeout(
-    int messageTrackingTimeout) {
-  getPoolFactory()->setSubscriptionMessageTrackingTimeout(
-      messageTrackingTimeout);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setSubscriptionAckInterval(int ackInterval) {
-  getPoolFactory()->setSubscriptionAckInterval(ackInterval);
-  return shared_from_this();
-}
-CacheFactoryPtr CacheFactory::setMultiuserAuthentication(
-    bool multiuserAuthentication) {
-  getPoolFactory()->setMultiuserAuthentication(multiuserAuthentication);
-  return shared_from_this();
-}
-
-CacheFactoryPtr CacheFactory::setPRSingleHopEnabled(bool enabled) {
-  getPoolFactory()->setPRSingleHopEnabled(enabled);
   return shared_from_this();
 }
 

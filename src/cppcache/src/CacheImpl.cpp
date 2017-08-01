@@ -46,8 +46,6 @@
 
 using namespace apache::geode::client;
 
-CacheImpl* CacheImpl::s_instance = nullptr;
-
 CacheImpl::CacheImpl(Cache* c, const std::string& name,
                      std::unique_ptr<DistributedSystem> sys, bool iPUF,
                      bool readPdxSerialized)
@@ -93,14 +91,16 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
                                         ->getStatisticsFactory());
   m_expiryTaskManager->begin();
 
-  s_instance = this;
   m_initialized = true;
+
+  m_poolManager = std::make_shared<PoolManager>();
+  m_poolFactory = m_poolManager->createFactory();
 }
 
 void CacheImpl::initServices() {
   m_tcrConnectionManager = new TcrConnectionManager(this);
   if (!m_initDone && m_attributes != nullptr && m_attributes->getEndpoints()) {
-    if (getCache()->getPoolManager().getAll().size() > 0 && getCacheMode()) {
+    if (getCache()->getPoolManager()->getAll().size() > 0 && getCacheMode()) {
       LOGWARN(
           "At least one pool has been created so ignoring cache level "
           "redundancy setting");
@@ -119,7 +119,7 @@ void CacheImpl::initServices() {
 void CacheImpl::netDown() {
   m_tcrConnectionManager->netDown();
 
-  for (const auto& itr : getCache()->getPoolManager().getAll()) {
+  for (const auto& itr : getCache()->getPoolManager()->getAll()) {
     auto currPool = itr.second;
     if (auto poolHADM =
             std::dynamic_pointer_cast<ThinClientPoolHADM>(currPool)) {
@@ -151,7 +151,7 @@ CacheImpl::RegionKind CacheImpl::getRegionKind(
       regionKind = THINCLIENT_REGION;
     }
   } else if (rattrs->getPoolName()) {
-    PoolPtr pPtr = getCache()->getPoolManager().find(rattrs->getPoolName());
+    PoolPtr pPtr = getCache()->getPoolManager()->find(rattrs->getPoolName());
     if ((pPtr != nullptr && (pPtr->getSubscriptionRedundancy() > 0 ||
                              pPtr->getSubscriptionEnabled())) ||
         m_tcrConnectionManager->isDurable()) {
@@ -197,7 +197,7 @@ QueryServicePtr CacheImpl::getQueryService(const char* poolName) {
   if (poolName == nullptr || strlen(poolName) == 0) {
     throw IllegalArgumentException("PoolName is nullptr or not defined..");
   }
-  PoolPtr pool = getCache()->getPoolManager().find(poolName);
+  PoolPtr pool = getCache()->getPoolManager()->find(poolName);
 
   if (pool != nullptr) {
     if (pool->isDestroyed()) {
@@ -239,7 +239,7 @@ DistributedSystem& CacheImpl::getDistributedSystem() const {
 }
 
 void CacheImpl::sendNotificationCloseMsgs() {
-  for (const auto& iter : getCache()->getPoolManager().getAll()) {
+  for (const auto& iter : getPoolManager()->getAll()) {
     if (const auto& pool =
             std::dynamic_pointer_cast<ThinClientPoolHADM>(iter.second)) {
       pool->sendNotificationCloseMsgs();
@@ -308,7 +308,7 @@ void CacheImpl::close(bool keepalive) {
     m_cacheStats->close();
   }
 
-  getCache()->getPoolManager().close(keepalive);
+  m_poolManager->close(keepalive);
 
   LOGFINE("Closed pool manager with keepalive %s",
           keepalive ? "true" : "false");
@@ -462,7 +462,7 @@ void CacheImpl::createRegion(const char* name,
     if (!props.isGridClient()) {
       const char* poolName = aRegionAttributes->getPoolName();
       if (poolName != nullptr) {
-        PoolPtr pool = getCache()->getPoolManager().find(poolName);
+        PoolPtr pool = getCache()->getPoolManager()->find(poolName);
         if (pool != nullptr && !pool->isDestroyed() &&
             pool->getPRSingleHopEnabled()) {
           ThinClientPoolDM* poolDM =
@@ -567,7 +567,7 @@ std::shared_ptr<RegionInternal> CacheImpl::createRegion_internal(
   }*/
 
   if (poolName != nullptr) {
-    PoolPtr pool = getCache()->getPoolManager().find(poolName);
+    PoolPtr pool = getCache()->getPoolManager()->find(poolName);
     if (pool != nullptr && !pool->isDestroyed()) {
       bool isMultiUserSecureMode = pool->getMultiuserAuthentication();
       if (isMultiUserSecureMode && (attrs->getCachingEnabled())) {
@@ -661,7 +661,7 @@ void CacheImpl::readyForEvents() {
     return;
   }
 
-  const auto& pools = getCache()->getPoolManager().getAll();
+  const auto& pools = getCache()->getPoolManager()->getAll();
   if (pools.empty()) throw IllegalStateException("No pools found.");
   for (const auto& itr : pools) {
     const auto& currPool = itr.second;
@@ -679,7 +679,7 @@ void CacheImpl::readyForEvents() {
 }
 
 bool CacheImpl::getEndpointStatus(const std::string& endpoint) {
-  const auto& pools = getCache()->getPoolManager().getAll();
+  const auto& pools = getCache()->getPoolManager()->getAll();
   std::string fullName = endpoint;
 
   if (pools.empty()) {
@@ -736,7 +736,7 @@ void CacheImpl::processMarker() {
 }
 
 int CacheImpl::getPoolSize(const char* poolName) {
-  if (const auto pool = getCache()->getPoolManager().find(poolName)) {
+  if (const auto pool = getCache()->getPoolManager()->find(poolName)) {
     if (const auto dm = std::dynamic_pointer_cast<ThinClientPoolDM>(pool)) {
       return dm->m_poolSize;
     }

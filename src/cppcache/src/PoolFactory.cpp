@@ -29,13 +29,13 @@
 #include "CacheRegionHelper.hpp"
 using namespace apache::geode::client;
 const char* PoolFactory::DEFAULT_SERVER_GROUP = "";
-extern HashMapOfPools* connectionPools;
 extern ACE_Recursive_Thread_Mutex connectionPoolsLock;
 
-PoolFactory::PoolFactory()
+PoolFactory::PoolFactory(HashMapOfPools& connectionPools)
     : m_attrs(new PoolAttributes),
       m_isSubscriptionRedundancy(false),
-      m_addedServerOrLocator(false) {}
+      m_addedServerOrLocator(false),
+      m_connectionPools(connectionPools) {}
 
 PoolFactory::~PoolFactory() {}
 
@@ -117,7 +117,7 @@ PoolPtr PoolFactory::create(const char* name, Cache& cache) {
   {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
 
-    if (cache.getPoolManager().find(name) != nullptr) {
+    if (cache.getPoolManager()->find(name) != nullptr) {
       throw IllegalStateException("Pool with the same name already exists");
     }
     // Create a clone of Attr;
@@ -170,7 +170,7 @@ PoolPtr PoolFactory::create(const char* name, Cache& cache) {
       }
     }
 
-    connectionPools->insert({name, std::static_pointer_cast<Pool>(poolDM)});
+    m_connectionPools.insert({name, std::static_pointer_cast<Pool>(poolDM)});
   }
 
   // TODO: poolDM->init() should not throw exceptions!

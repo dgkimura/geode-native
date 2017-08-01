@@ -25,7 +25,7 @@ ProxyRemoteQueryService::ProxyRemoteQueryService(ProxyCachePtr cptr)
 QueryPtr ProxyRemoteQueryService::newQuery(const char* querystring) {
   if (!m_proxyCache->isClosed()) {
     auto userAttachedPool = m_proxyCache->m_userAttributes->getPool();
-    auto pool = m_proxyCache->m_cacheImpl->getCache()->getPoolManager().find(
+    auto pool = m_proxyCache->m_cacheImpl->getCache()->getPoolManager()->find(
         userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
@@ -54,7 +54,7 @@ CqQueryPtr ProxyRemoteQueryService::newCq(const char* querystr,
                                           bool isDurable) {
   if (!m_proxyCache->isClosed()) {
     auto userAttachedPool = m_proxyCache->m_userAttributes->getPool();
-    auto pool = m_proxyCache->m_cacheImpl->getCache()->getPoolManager().find(
+    auto pool = m_proxyCache->m_cacheImpl->getCache()->getPoolManager()->find(
         userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
@@ -83,7 +83,7 @@ CqQueryPtr ProxyRemoteQueryService::newCq(const char* name,
                                           bool isDurable) {
   if (!m_proxyCache->isClosed()) {
     auto userAttachedPool = m_proxyCache->m_userAttributes->getPool();
-    auto pool = m_proxyCache->m_cacheImpl->getCache()->getPoolManager().find(
+    auto pool = m_proxyCache->m_cacheImpl->getCache()->getPoolManager()->find(
         userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
@@ -136,7 +136,7 @@ void ProxyRemoteQueryService::getCqs(query_container_type& vec) {
 CqQueryPtr ProxyRemoteQueryService::getCq(const char* name) {
   if (!m_proxyCache->isClosed()) {
     auto userAttachedPool = m_proxyCache->m_userAttributes->getPool();
-    auto pool = m_proxyCache->m_cacheImpl->getCache()->getPoolManager().find(
+    auto pool = m_proxyCache->m_cacheImpl->getCache()->getPoolManager()->find(
         userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {

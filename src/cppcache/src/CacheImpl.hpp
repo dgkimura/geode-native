@@ -282,6 +282,9 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   SerializationRegistryPtr getSerializationRegistry() const;
   inline CachePerfStats& getCachePerfStats() { return *m_cacheStats; };
 
+  std::shared_ptr<PoolManager> getPoolManager() { return m_poolManager; }
+  std::shared_ptr<PoolFactory> getPoolFactory() { return m_poolFactory; }
+
   ThreadPool* getThreadPool();
 
  private:
@@ -295,6 +298,10 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
 
   // CachePerfStats
   CachePerfStats* m_cacheStats;
+
+  std::shared_ptr<PoolManager> m_poolManager;
+
+  std::shared_ptr<PoolFactory> m_poolFactory;
 
   enum RegionKind {
     CPP_REGION,
@@ -335,7 +342,6 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   ACE_RW_Thread_Mutex m_destroyCacheMutex;
   volatile bool m_destroyPending;
   volatile bool m_initDone;
-  static CacheImpl* s_instance;
   ACE_Thread_Mutex m_initDoneLock;
   AdminRegionPtr m_adminRegion;
   CacheTransactionManagerPtr m_cacheTXManager;

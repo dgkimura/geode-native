@@ -56,7 +56,7 @@ int32_t PdxTypeRegistry::getPDXIdForType(const char* type, const char* poolname,
   int typeId =
       CacheRegionHelper::getCacheImpl(cache)
           ->getSerializationRegistry()
-          ->GetPDXIdForType(cache->getPoolManager().find(poolname), nType);
+          ->GetPDXIdForType(cache->getPoolManager()->find(poolname), nType);
   nType->setTypeId(typeId);
 
   PdxTypeRegistry::addPdxType(typeId, nType);
@@ -87,9 +87,10 @@ int32_t PdxTypeRegistry::getPDXIdForType(PdxTypePtr nType,
     }
   }
 
-  typeId = CacheRegionHelper::getCacheImpl(cache)
-               ->getSerializationRegistry()
-               ->GetPDXIdForType(cache->getPoolManager().find(poolname), nType);
+  typeId =
+      CacheRegionHelper::getCacheImpl(cache)
+          ->getSerializationRegistry()
+          ->GetPDXIdForType(cache->getPoolManager()->find(poolname), nType);
   nType->setTypeId(typeId);
   pdxTypeToTypeIdMap.insert(std::make_pair(nType, typeId));
   addPdxType(typeId, nType);
@@ -230,7 +231,7 @@ int32_t PdxTypeRegistry::getEnumValue(EnumInfoPtr ei) {
   }
 
   int val = static_cast<ThinClientPoolDM*>(
-                cache->getPoolManager().getAll().begin()->second.get())
+                cache->getPoolManager()->getAll().begin()->second.get())
                 ->GetEnumValue(ei);
 
   tmp = enumToInt;
@@ -272,7 +273,7 @@ EnumInfoPtr PdxTypeRegistry::getEnum(int32_t enumVal) {
 
   ret = std::static_pointer_cast<EnumInfo>(
       static_cast<ThinClientPoolDM*>(
-          cache->getPoolManager().getAll().begin()->second.get())
+          cache->getPoolManager()->getAll().begin()->second.get())
           ->GetEnum(enumVal));
   tmp = intToEnum;
   (*tmp)[enumValPtr] = ret;

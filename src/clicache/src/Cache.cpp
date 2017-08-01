@@ -23,6 +23,7 @@
 #include "Cache.hpp"
 #include "ExceptionTypes.hpp"
 #include "DistributedSystem.hpp"
+#include "PoolFactory.hpp"
 #include "Region.hpp"
 #include "RegionAttributes.hpp"
 #include "QueryService.hpp"
@@ -365,6 +366,16 @@ namespace Apache
        {
          return gcnew DataOutput( m_nativeptr->get());
        }
+
+        PoolFactory^ Cache::GetPoolFactory()
+        {
+          return PoolFactory::Create(m_nativeptr->get_shared_ptr()->getPoolFactory());
+        }
+
+        PoolManager^ Cache::GetPoolManager()
+        {
+          return gcnew PoolManager(m_nativeptr->get_shared_ptr()->getPoolManager());
+        }
     }  // namespace Client
   }  // namespace Geode
 }  // namespace Apache

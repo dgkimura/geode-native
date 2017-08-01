@@ -608,14 +608,14 @@ namespace Apache.Geode.Client.FwkLib
     public virtual void CreatePool()
     {
       CreateCache();
-      PoolFactory pf = PoolManager.CreateFactory();
+      PoolFactory pf =  CacheHelper<TKey, TVal>.DCache.GetPoolFactory();
       ResetKey("poolSpec");
       string poolRegionData = GetStringValue("poolSpec");
       FwkInfo("PoolSpec is :{0}", poolRegionData);
       string poolName = null;
       SetPoolAttributes(pf, poolRegionData, ref poolName);
       
-      if (PoolManager.Find(poolName) == null)
+      if (CacheHelper<TKey, TVal>.DCache.GetPoolManager().Find(poolName) == null)
       {
         Pool pool = pf.Create(poolName, CacheHelper<TKey, TVal>.DCache);
         FwkInfo("Pool attributes are {0}:", PoolAttributesToString(pool));
@@ -1349,7 +1349,7 @@ namespace Apache.Geode.Client.FwkLib
     private void ParseEndPoints(string ep, bool isServer, int redundancyLevel)
     {
       string poolName = "_Test_Pool";
-      PoolFactory pf = PoolManager.CreateFactory();
+      PoolFactory pf = CacheHelper<TKey, TVal>.DCache.GetPoolFactory();
       string[] eps = ep.Split(',');
       foreach (string endpoint in eps)
       {
@@ -1388,7 +1388,7 @@ namespace Apache.Geode.Client.FwkLib
 
       if (redundancyLevel > 0)
         pf.SetSubscriptionRedundancy(redundancyLevel);
-      if (PoolManager.Find(poolName) == null)
+      if (CacheHelper<TKey, TVal>.DCache.GetPoolManager().Find(poolName) == null)
       {
         Pool pool = pf.Create(poolName, CacheHelper<TKey, TVal>.DCache);
         FwkInfo("Pool attributes are {0}:", PoolAttributesToString(pool));
@@ -1506,7 +1506,7 @@ namespace Apache.Geode.Client.FwkLib
     public QueryService<TKey, object> CheckQueryService()
     {
       string mode = Util.GetEnvironmentVariable("POOLOPT");
-      Pool/*<TKey, TVal>*/ pool = PoolManager/*<TKey, TVal>*/.Find("_Test_Pool");
+      Pool/*<TKey, TVal>*/ pool = CacheHelper<TKey, TVal>.DCache.GetPoolManager().Find("_Test_Pool");
       return pool.GetQueryService<TKey, object>();
     }
 

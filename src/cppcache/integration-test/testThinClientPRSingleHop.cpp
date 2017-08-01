@@ -174,7 +174,7 @@ class putThread : public ACE_Task_Base {
     }
     LOG("releaseThreadLocalConnection PutThread");
     PoolPtr pool =
-        getHelper()->getCache()->getPoolManager().find("__TEST_POOL1__");
+        getHelper()->getCache()->getPoolManager()->find("__TEST_POOL1__");
     pool->releaseThreadLocalConnection();
     LOG("releaseThreadLocalConnection PutThread done");
     return 0;
@@ -1161,7 +1161,7 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT1, CloseCache1)
   {
     PoolPtr pool =
-        getHelper()->getCache()->getPoolManager().find("__TEST_POOL1__");
+        getHelper()->getCache()->getPoolManager()->find("__TEST_POOL1__");
     if (pool->getThreadLocalConnections()) {
       LOG("releaseThreadLocalConnection1 doing...");
       pool->releaseThreadLocalConnection();

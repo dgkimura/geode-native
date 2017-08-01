@@ -266,7 +266,7 @@ LibraryPersistenceManagerFn CacheXmlParser::managedPersistenceManagerFn =
 
 //////////////////////////////////////////////////////////////////
 
-CacheXmlParser::CacheXmlParser()
+CacheXmlParser::CacheXmlParser(Cache* cache)
     : m_cacheCreation(nullptr),
       m_nestedRegions(0),
       m_config(nullptr),
@@ -275,7 +275,7 @@ CacheXmlParser::CacheXmlParser()
       m_flagIllegalStateException(false),
       m_flagAnyOtherException(false),
       m_flagExpirationAttribute(false),
-      m_poolFactory(nullptr) {
+      m_cache(cache) {
   static xmlSAXHandler saxHandler = {
       nullptr,                  /* internalSubset */
       nullptr,                  /* isStandalone */
@@ -388,9 +388,9 @@ void CacheXmlParser::handleParserErrors(int res) {
  *         If xml file is well-flrmed but not valid
  * @throws UnknownException otherwise
  */
-CacheXmlParser* CacheXmlParser::parse(const char* cacheXml) {
+CacheXmlParser* CacheXmlParser::parse(const char* cacheXml, Cache* cache) {
   CacheXmlParser* handler;
-  GF_NEW(handler, CacheXmlParser());
+  GF_NEW(handler, CacheXmlParser(cache));
   // use RAII to delete the handler object in case of exceptions
   DeleteObject<CacheXmlParser> delHandler(handler);
 
@@ -449,17 +449,16 @@ void CacheXmlParser::startCache(void* ctx, const xmlChar** attrs) {
         throw CacheXmlException(exStr.c_str());
       }
       if (strcmp(attrName, ENDPOINTS) == 0) {
-        if (m_poolFactory) {
-          std::vector<std::pair<std::string, int>> endPoints(
-              parseEndPoints(attrValue));
-          std::vector<std::pair<std::string, int>>::iterator endPoint;
-          for (endPoint = endPoints.begin(); endPoint != endPoints.end();
-               endPoint++) {
-            m_poolFactory->addServer(endPoint->first.c_str(), endPoint->second);
-          }
+        std::vector<std::pair<std::string, int>> endPoints(
+            parseEndPoints(attrValue));
+        std::vector<std::pair<std::string, int>>::iterator endPoint;
+        for (endPoint = endPoints.begin(); endPoint != endPoints.end();
+             endPoint++) {
+          m_cache->getPoolFactory()->addServer(endPoint->first.c_str(),
+                                               endPoint->second);
         }
       } else if (strcmp(attrName, REDUNDANCY_LEVEL) == 0) {
-        m_poolFactory->setSubscriptionRedundancy(atoi(attrValue));
+        m_cache->getPoolFactory()->setSubscriptionRedundancy(atoi(attrValue));
       }
     }
   }
@@ -523,7 +522,6 @@ void CacheXmlParser::startLocator(const xmlChar** atts) {
     throw CacheXmlException(s.c_str());
   }
 
-  m_poolFactory = reinterpret_cast<PoolFactory*>(_stack.top());
   const char* host = nullptr;
   const char* port = nullptr;
 
@@ -547,7 +545,7 @@ void CacheXmlParser::startLocator(const xmlChar** atts) {
         "required");
   }
 
-  m_poolFactory->addLocator(host, atoi(port));
+  m_cache->getPoolFactory()->addLocator(host, atoi(port));
 }
 
 void CacheXmlParser::startServer(const xmlChar** atts) {
@@ -559,7 +557,6 @@ void CacheXmlParser::startServer(const xmlChar** atts) {
     throw CacheXmlException(s.c_str());
   }
 
-  PoolFactory* factory = reinterpret_cast<PoolFactory*>(_stack.top());
   const char* host = nullptr;
   const char* port = nullptr;
 
@@ -583,7 +580,7 @@ void CacheXmlParser::startServer(const xmlChar** atts) {
         "required");
   }
 
-  factory->addServer(host, atoi(port));
+  m_cache->getPoolFactory()->addServer(host, atoi(port));
 }
 
 void CacheXmlParser::startPool(const xmlChar** atts) {
@@ -595,8 +592,6 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
     throw CacheXmlException(s.c_str());
   }
 
-  PoolManager* poolManager = new PoolManager();
-  PoolFactoryPtr factory = poolManager->createFactory();
   const char* poolName = nullptr;
 
   while (atts[attrsCount] != nullptr) {
@@ -606,7 +601,7 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
     if (strcmp(name, NAME) == 0) {
       poolName = value;
     } else {
-      setPoolInfo(factory.get(), name, value);
+      setPoolInfo(m_cache->getPoolFactory().get(), name, value);
     }
     ++attrsCount;
   }
@@ -618,14 +613,13 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
     throw CacheXmlException(s.c_str());
   }
 
-  PoolXmlCreation* poolxml = new PoolXmlCreation(poolName, factory);
+  PoolXmlCreation* poolxml =
+      new PoolXmlCreation(poolName, m_cache->getPoolFactory());
 
   _stack.push(poolxml);
-  _stack.push(factory.get());
 }
 
 void CacheXmlParser::endPool() {
-  _stack.pop();  // remove factory
   PoolXmlCreation* poolxml = reinterpret_cast<PoolXmlCreation*>(_stack.top());
   _stack.pop();  // remove pool
   m_cacheCreation->addPool(poolxml);
@@ -854,14 +848,10 @@ void CacheXmlParser::startRegionAttributes(const xmlChar** atts) {
         char* client_notification_enabled = (char*)atts[i];
         if (strcmp("false", client_notification_enabled) == 0 ||
             strcmp("FALSE", client_notification_enabled) == 0) {
-          if (m_poolFactory) {
-            m_poolFactory->setSubscriptionEnabled(false);
-          }
+          m_cache->getPoolFactory()->setSubscriptionEnabled(false);
         } else if (strcmp("true", client_notification_enabled) == 0 ||
                    strcmp("TRUE", client_notification_enabled) == 0) {
-          if (m_poolFactory) {
-            m_poolFactory->setSubscriptionEnabled(true);
-          }
+          m_cache->getPoolFactory()->setSubscriptionEnabled(true);
         } else {
           char* name = (char*)atts[i];
           std::string temp(name);
@@ -929,14 +919,13 @@ void CacheXmlParser::startRegionAttributes(const xmlChar** atts) {
         }
       } else if (strcmp(ENDPOINTS, (char*)atts[i]) == 0) {
         i++;
-        if (m_poolFactory) {
-          std::vector<std::pair<std::string, int>> endPoints(
-              parseEndPoints((char*)atts[i]));
-          std::vector<std::pair<std::string, int>>::iterator endPoint;
-          for (endPoint = endPoints.begin(); endPoint != endPoints.end();
-               endPoint++) {
-            m_poolFactory->addServer(endPoint->first.c_str(), endPoint->second);
-          }
+        std::vector<std::pair<std::string, int>> endPoints(
+            parseEndPoints((char*)atts[i]));
+        std::vector<std::pair<std::string, int>>::iterator endPoint;
+        for (endPoint = endPoints.begin(); endPoint != endPoints.end();
+             endPoint++) {
+          m_cache->getPoolFactory()->addServer(endPoint->first.c_str(),
+                                               endPoint->second);
         }
         isTCR = true;
       } else if (strcmp(POOL_NAME, (char*)atts[i]) == 0) {

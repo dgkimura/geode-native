@@ -22,6 +22,7 @@
 #include "IGeodeCache.hpp"
 #include "IRegion.hpp"
 #include "RegionAttributes.hpp"
+#include "PoolManager.hpp"
 
 using namespace System;
 
@@ -256,6 +257,10 @@ namespace Apache
         virtual DataInput^ CreateDataInput(array<Byte>^ buffer);
         
         virtual DataOutput^ Cache::CreateDataOutput();
+
+        virtual PoolFactory^ GetPoolFactory();
+
+        virtual PoolManager^ GetPoolManager();
 
       internal:
 

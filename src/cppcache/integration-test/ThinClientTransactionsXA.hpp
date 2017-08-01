@@ -428,7 +428,7 @@ class SuspendTransactionThread : public ACE_Task_Base {
     getHelper()
         ->getCache()
         ->getPoolManager()
-        .find("__TESTPOOL1_")
+        ->find("__TESTPOOL1_")
         ->releaseThreadLocalConnection();
 
     return 0;
@@ -577,7 +577,7 @@ class ResumeTransactionThread : public ACE_Task_Base {
     getHelper()
         ->getCache()
         ->getPoolManager()
-        .find("__TESTPOOL1_")
+        ->find("__TESTPOOL1_")
         ->releaseThreadLocalConnection();
     sprintf(buf, " Out ResumeTransactionThread");
     LOG(buf);
@@ -1089,7 +1089,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepEight_Pool_Sticky)
     reg0->localInvalidate(createKey(keys[1]));
     reg1->localInvalidate(createKey(keys[3]));
     PoolPtr pool =
-        getHelper()->getCache()->getPoolManager().find("__TESTPOOL1_");
+        getHelper()->getCache()->getPoolManager()->find("__TESTPOOL1_");
     ASSERT(pool != nullptr, "Pool Should have been found");
     doNetsearch(regionNames[0], keys[1], nvals[1]);
     doNetsearch(regionNames[1], keys[3], nvals[3]);

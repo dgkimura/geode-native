@@ -67,8 +67,8 @@ class CPPCACHE_EXPORT CacheXmlParser : public CacheXml {
   bool m_flagAnyOtherException;
   bool m_flagExpirationAttribute;
   std::map<std::string, RegionAttributesPtr> namedRegions;
-  PoolFactory* m_poolFactory;
 
+  Cache* m_cache;
   /** Pool helper */
   void setPoolInfo(PoolFactory* poolFactory, const char* name,
                    const char* value);
@@ -76,9 +76,9 @@ class CPPCACHE_EXPORT CacheXmlParser : public CacheXml {
   void handleParserErrors(int res);
 
  public:
-  CacheXmlParser();
+  CacheXmlParser(Cache* cache);
   ~CacheXmlParser();
-  static CacheXmlParser* parse(const char* cachexml);
+  static CacheXmlParser* parse(const char* cachexml, Cache* cache);
   void parseFile(const char* filename);
   void parseMemory(const char* buffer, int size);
   void setAttributes(Cache* cache);

@@ -4260,7 +4260,7 @@ private void checkUpdatedValue(TKey key, TVal value)
 
           if (poolName != null)
           {
-            Pool pool = PoolManager.Find(poolName);
+            Pool pool = CacheHelper<TKey, TVal>.DCache.GetPoolManager().Find(poolName);
             if (pool.MultiuserAuthentication)
             {
               FwkInfo("pool is in multiuser mode and entering CreateMultiUserCacheAndRegion");

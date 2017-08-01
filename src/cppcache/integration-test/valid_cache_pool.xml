@@ -29,15 +29,15 @@
   <root-region name = "Root1" >
     <region-attributes caching-enabled="true" pool-name="test_pool_1" />
 
-    <region name="SubRegion1">
+    <!--region name="SubRegion1">
          <region-attributes caching-enabled="false" pool-name="test_pool_2" />
-    </region>
+    </region-->
 
   </root-region>
 
-  <root-region name= "Root2">
+  <!--root-region name= "Root2">
     <region-attributes caching-enabled="false" pool-name="test_pool_2" /> 
-  </root-region>
+  </root-region-->
 
   <pool
     free-connection-timeout = "12345"    
@@ -64,7 +64,7 @@
     <!--locator host="localhost" port="34757" /-->
   </pool>
   
-  <pool
+  <!--pool
     free-connection-timeout = "23456"    
     idle-timeout = "6666"
     load-conditioning-interval = "34567"
@@ -86,6 +86,6 @@
   >
     <server host="localhost" port="HOST_PORT1" />
     <server host="localhost" port="HOST_PORT2" />
-  </pool>
+  </pool-->
   
 </client-cache>

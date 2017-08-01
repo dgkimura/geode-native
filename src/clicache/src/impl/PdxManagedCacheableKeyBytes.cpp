@@ -270,7 +270,7 @@ namespace apache
             Apache::Geode::Client::IPdxSerializable^ Mclone =
               dynamic_cast<Apache::Geode::Client::IPdxSerializable^>(cloneable->Clone());
             return DeltaPtr(static_cast<PdxManagedCacheableKeyBytes*>(
-              SafeGenericM2UMConvert(Mclone)));
+              SafeGenericM2UMConvert(Mclone, m_cache)));
           }
           else {
             return Delta::clone();

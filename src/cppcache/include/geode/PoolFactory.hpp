@@ -62,7 +62,7 @@ class PoolAttributes;
  * </ul>
  *
  */
-class CPPCACHE_EXPORT PoolFactory  {
+class CPPCACHE_EXPORT PoolFactory {
  public:
   /**
    * The default amount of time, in milliseconds, which we will wait for a free
@@ -493,7 +493,7 @@ class CPPCACHE_EXPORT PoolFactory  {
    * @throws IllegalStateException if a locator or server has not been added.
    * @return the newly created pool.
    */
-  PoolPtr create(const char* name, Cache &cache);
+  PoolPtr create(const char* name, Cache& cache);
 
   /**
    * By default setPRSingleHopEnabled is true<br>
@@ -520,12 +520,13 @@ class CPPCACHE_EXPORT PoolFactory  {
   ~PoolFactory();
 
  private:
-  PoolFactory();
+  PoolFactory(std::unordered_map<std::string, PoolPtr>& connectionPools);
   PoolFactory(const PoolFactory&);
   void addCheck(const char* host, int port);
   PoolAttributesPtr m_attrs;
   bool m_isSubscriptionRedundancy;
   bool m_addedServerOrLocator;
+  std::unordered_map<std::string, PoolPtr>& m_connectionPools;
   friend class Cache;
   friend class PoolManager;
   friend class CacheFactory;

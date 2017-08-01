@@ -395,7 +395,7 @@ namespace Apache.Geode.Client.UnitTests
 
       QueryService<object, object> qs = null;
 
-      qs = PoolManager/*<object, object>*/.Find("__TESTPOOL1_").GetQueryService<object, object>();
+      qs = CacheHelper.DCache.GetPoolManager().Find("__TESTPOOL1_").GetQueryService<object, object>();
       CqAttributesFactory<object, object> cqFac = new CqAttributesFactory<object, object>();
       ICqListener<object, object> cqLstner = new MyCqListener<object, object>();
       cqFac.AddCqListener(cqLstner);
@@ -456,7 +456,7 @@ namespace Apache.Geode.Client.UnitTests
 
       QueryService<object, object> qs = null;
 
-      qs = PoolManager/*<object, object>*/.Find("__TESTPOOL1_").GetQueryService<object, object>();
+      qs = CacheHelper.DCache.GetPoolManager().Find("__TESTPOOL1_").GetQueryService<object, object>();
       CqAttributesFactory<object, object> cqFac = new CqAttributesFactory<object, object>();
       ICqListener<object, object> cqLstner = new MyCqListener<object, object>();
       cqFac.AddCqListener(cqLstner);
@@ -618,7 +618,7 @@ namespace Apache.Geode.Client.UnitTests
 
       QueryService<object, object> qs = null;
 
-      qs = PoolManager.Find("__TESTPOOL1_").GetQueryService<object, object>();
+      qs = CacheHelper.DCache.GetPoolManager().Find("__TESTPOOL1_").GetQueryService<object, object>();
       
       CqAttributesFactory<object, object> cqFac = new CqAttributesFactory<object, object>();
       ICqListener<object, object> cqLstner = new MyCqListener<object, object>();
@@ -733,7 +733,7 @@ namespace Apache.Geode.Client.UnitTests
     public void CreateAndExecuteCQ_StatusListener(string poolName, string cqName, string cqQuery, int id)
     {
       QueryService<object, object> qs = null;
-      qs = PoolManager.Find(poolName).GetQueryService<object, object>();
+      qs = CacheHelper.DCache.GetPoolManager().Find(poolName).GetQueryService<object, object>();
       CqAttributesFactory<object, object> cqFac = new CqAttributesFactory<object, object>();
       cqFac.AddCqListener(new MyCqStatusListener<object, object>(id));
       CqAttributes<object, object> cqAttr = cqFac.Create();
@@ -745,7 +745,7 @@ namespace Apache.Geode.Client.UnitTests
     public void CreateAndExecuteCQ_Listener(string poolName, string cqName, string cqQuery, int id)
     {
       QueryService<object, object> qs = null;
-      qs = PoolManager.Find(poolName).GetQueryService<object, object>();
+      qs = CacheHelper.DCache.GetPoolManager().Find(poolName).GetQueryService<object, object>();
       CqAttributesFactory<object, object> cqFac = new CqAttributesFactory<object, object>();
       cqFac.AddCqListener(new MyCqListener<object, object>(/*id*/));
       CqAttributes<object, object> cqAttr = cqFac.Create();
@@ -757,7 +757,7 @@ namespace Apache.Geode.Client.UnitTests
     public void CheckCQStatusOnConnect(string poolName, string cqName, int onCqStatusConnect)
     {      
       QueryService<object, object> qs = null;
-      qs = PoolManager.Find(poolName).GetQueryService<object, object>();
+      qs = CacheHelper.DCache.GetPoolManager().Find(poolName).GetQueryService<object, object>();
       CqQuery<object, object> query = qs.GetCq(cqName);
       CqAttributes<object, object> cqAttr = query.GetCqAttributes();
       ICqListener<object, object>[] vl = cqAttr.getCqListeners();
@@ -769,7 +769,7 @@ namespace Apache.Geode.Client.UnitTests
     public void CheckCQStatusOnDisConnect(string poolName, string cqName, int onCqStatusDisConnect)
     {
       QueryService<object, object> qs = null;
-      qs = PoolManager.Find(poolName).GetQueryService<object, object>();
+      qs = CacheHelper.DCache.GetPoolManager().Find(poolName).GetQueryService<object, object>();
       CqQuery<object, object> query = qs.GetCq(cqName);
       CqAttributes<object, object> cqAttr = query.GetCqAttributes();
       ICqListener<object, object>[] vl = cqAttr.getCqListeners();
@@ -790,7 +790,7 @@ namespace Apache.Geode.Client.UnitTests
     public void CheckCQStatusOnPutEvent(string poolName, string cqName, int onCreateCount)
     {
       QueryService<object, object> qs = null;
-      qs = PoolManager.Find(poolName).GetQueryService<object, object>();
+      qs = CacheHelper.DCache.GetPoolManager().Find(poolName).GetQueryService<object, object>();
       CqQuery<object, object> query = qs.GetCq(cqName);
       CqAttributes<object, object> cqAttr = query.GetCqAttributes();
       ICqListener<object, object>[] vl = cqAttr.getCqListeners();

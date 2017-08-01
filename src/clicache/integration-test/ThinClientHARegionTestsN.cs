@@ -674,7 +674,7 @@ namespace Apache.Geode.Client.UnitTests
       KillServerDelegate ksd = new KillServerDelegate(KillServer);
 
       QueryService<object, object> qs = null;
-      qs = PoolManager/*<object, object>*/.Find("__TESTPOOL1_").GetQueryService<object, object>();
+      qs = CacheHelper.DCache.GetPoolManager().Find("__TESTPOOL1_").GetQueryService<object, object>();
 
       for (int i = 0; i < 10000; i++)
       {

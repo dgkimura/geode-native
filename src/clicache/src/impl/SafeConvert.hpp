@@ -234,7 +234,7 @@ namespace Apache
       }
 
       generic<class TValue>
-      inline static native::Cacheable* SafeGenericM2UMConvert( TValue mg_val )
+      inline static native::Cacheable* SafeGenericM2UMConvert( TValue mg_val, native::Cache* cache )
       {
         if (mg_val == nullptr) return NULL;
 
@@ -258,7 +258,7 @@ namespace Apache
 					if(!SafeConvertClassGeneric::isAppDomainEnabled)
 						return new native::PdxManagedCacheableKey(pdxType);
 					else
-						return new native::PdxManagedCacheableKeyBytes(pdxType, true, nullptr);
+						return new native::PdxManagedCacheableKeyBytes(pdxType, true, cache);
         }
       
 				Apache::Geode::Client::IGeodeDelta^ sDelta =
@@ -299,9 +299,9 @@ namespace Apache
       }
 
       generic<class TValue>
-      inline static native::Cacheable* SafeGenericMSerializableConvert( TValue mg_obj )
+      inline static native::Cacheable* SafeGenericMSerializableConvert( TValue mg_obj, native::Cache* cache )
       {
-        return SafeGenericM2UMConvert<TValue>( mg_obj );
+        return SafeGenericM2UMConvert<TValue>( mg_obj, cache );
       }
 
 			inline static IPdxSerializable^ SafeUMSerializablePDXConvert( native::SerializablePtr obj )
@@ -349,7 +349,7 @@ namespace Apache
       inline static native::CacheableKey* SafeGenericMKeyConvert( TKey mg_obj )
       {
         if (mg_obj == nullptr) return NULL;
-        auto obj = Apache::Geode::Client::Serializable::GetUnmanagedValueGeneric<TKey>( mg_obj );
+        auto obj = Apache::Geode::Client::Serializable::GetUnmanagedValueGeneric<TKey>( mg_obj, nullptr );
         if (obj.get() != nullptr)
         {
           return obj.get();

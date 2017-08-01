@@ -201,7 +201,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
     if (pType == nullptr) {
       pType = std::static_pointer_cast<PdxType>(
           serializationRegistry->GetPDXTypeById(
-              cacheImpl->getCache()->getPoolManager().find(
+              cacheImpl->getCache()->getPoolManager()->find(
                   dataInput.getPoolName()),
               typeId));
       pdxLocalType = pdxTypeRegistry->getLocalPdxType(pType->getPdxClassName());
@@ -322,7 +322,7 @@ PdxSerializablePtr PdxHelper::deserializePdx(DataInput& dataInput,
       // TODO shared_ptr why redef?
       auto pType = std::static_pointer_cast<PdxType>(
           serializationRegistry->GetPDXTypeById(
-              cacheImpl->getCache()->getPoolManager().find(
+              cacheImpl->getCache()->getPoolManager()->find(
                   dataInput.getPoolName()),
               typeId));
       pdxTypeRegistry->addLocalPdxType(pType->getPdxClassName(), pType);
@@ -360,7 +360,7 @@ void PdxHelper::createMergedType(PdxTypePtr localType, PdxTypePtr remoteType,
     mergedVersion->InitializeType();
     if (mergedVersion->getTypeId() == 0) {
       mergedVersion->setTypeId(serializaionRegistry->GetPDXIdForType(
-          dataInput.getCache()->getPoolManager().find(dataInput.getPoolName()),
+          dataInput.getCache()->getPoolManager()->find(dataInput.getPoolName()),
           mergedVersion));
     }
 

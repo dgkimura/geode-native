@@ -35,8 +35,6 @@
 using namespace apache::geode::client;
 using namespace apache::geode::statistics;
 
-void removePool(const char*);
-
 /* adongre
  * CID 28730: Other violation (MISSING_COPY)
  * Class "GetAllWork" owns resources that are managed in its constructor and
@@ -851,7 +849,8 @@ void ThinClientPoolDM::destroy(bool keepAlive) {
       GF_SAFE_DELETE(m_clientMetadataService);
     }
 
-    removePool(m_poolName.c_str());
+    m_connManager.getCacheImpl()->getCache()->getPoolManager()->removePool(
+        m_poolName.c_str());
 
     stopChunkProcessor();
     m_manager->closeAllStickyConnections();
@@ -971,9 +970,9 @@ int32_t ThinClientPoolDM::GetPDXIdForType(SerializablePtr pdxType) {
 
   // need to broadcast this id to all other pool
   {
-    auto& poolManager =
+    auto poolManager =
         m_connManager.getCacheImpl()->getCache()->getPoolManager();
-    for (const auto& iter : poolManager.getAll()) {
+    for (const auto& iter : poolManager->getAll()) {
       auto currPool = static_cast<ThinClientPoolDM*>(iter.second.get());
 
       if (currPool != this) {
@@ -1057,9 +1056,9 @@ int32_t ThinClientPoolDM::GetEnumValue(SerializablePtr enumInfo) {
 
   // need to broadcast this id to all other pool
   {
-    auto& poolManager =
+    auto poolManager =
         m_connManager.getCacheImpl()->getCache()->getPoolManager();
-    for (const auto& iter : poolManager.getAll()) {
+    for (const auto& iter : poolManager->getAll()) {
       const auto& currPool =
           std::dynamic_pointer_cast<ThinClientPoolDM>(iter.second);
 

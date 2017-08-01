@@ -161,7 +161,6 @@ Cache::Cache(const std::string& name, PropertiesPtr dsProp,
   m_cacheImpl = std::unique_ptr<CacheImpl>(new CacheImpl(
       this, name, std::move(dsPtr), ignorePdxUnreadFields, readPdxSerialized));
   m_typeRegistry = std::unique_ptr<TypeRegistry>(new TypeRegistry(*this));
-  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager());
 }
 
 Cache::~Cache() = default;
@@ -181,7 +180,7 @@ Cache::~Cache() = default;
  * @throws UnknownException otherwise
  */
 void Cache::initializeDeclarativeCache(const char* cacheXml) {
-  CacheXmlParser* xmlParser = CacheXmlParser::parse(cacheXml);
+  CacheXmlParser* xmlParser = CacheXmlParser::parse(cacheXml, this);
   xmlParser->setAttributes(this);
   m_cacheImpl->initServices();
   xmlParser->create(this);
@@ -195,7 +194,7 @@ bool Cache::isPoolInMultiuserMode(RegionPtr regionPtr) {
   const char* poolName = regionPtr->getAttributes()->getPoolName();
 
   if (poolName != nullptr) {
-    PoolPtr poolPtr = regionPtr->getCache()->getPoolManager().find(poolName);
+    PoolPtr poolPtr = regionPtr->getCache()->getPoolManager()->find(poolName);
     if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
       return poolPtr->getMultiuserAuthentication();
     }
@@ -234,7 +233,7 @@ RegionServicePtr Cache::createAuthenticatedView(
   } else {
     if (!this->isClosed()) {
       if (poolName != nullptr) {
-        PoolPtr poolPtr = m_poolManager->find(poolName);
+        PoolPtr poolPtr = m_cacheImpl->getPoolManager()->find(poolName);
         if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
           return poolPtr->createSecureUserCache(userSecurityProperties,
                                                 m_cacheImpl.get());
@@ -256,6 +255,10 @@ StatisticsFactory* Cache::getStatisticsFactory() const {
       ->getStatisticsFactory();
 }
 
+std::shared_ptr<PoolManager> Cache::getPoolManager() const {
+  return m_cacheImpl->getPoolManager();
+}
+
 std::unique_ptr<DataInput> Cache::createDataInput(const uint8_t* m_buffer,
                                                   int32_t len) {
   return std::unique_ptr<DataInput>(new DataInput(m_buffer, len, this));
@@ -264,6 +267,8 @@ std::unique_ptr<DataInput> Cache::createDataInput(const uint8_t* m_buffer,
 std::unique_ptr<DataOutput> Cache::createDataOutput() const {
   return std::unique_ptr<DataOutput>(new DataOutput(this));
 }
+
+PoolFactoryPtr Cache::getPoolFactory() { return m_cacheImpl->getPoolFactory(); }
 
 }  // namespace client
 }  // namespace geode
