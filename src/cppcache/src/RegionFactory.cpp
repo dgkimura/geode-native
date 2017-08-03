@@ -48,27 +48,16 @@ RegionFactory::~RegionFactory() {}
 RegionPtr RegionFactory::create(const char* name) {
   RegionPtr retRegionPtr = nullptr;
   RegionAttributesPtr regAttr = m_attributeFactory->createRegionAttributes();
-
-  // assuming pool name is not DEFAULT_POOL_NAME
-  if (regAttr->getPoolName() != nullptr && strlen(regAttr->getPoolName()) > 0) {
-    // poolname is set
-
-    m_cacheImpl->createRegion(name, regAttr, retRegionPtr);
-  } else {
-    // need to look default Pool
-    ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
-    // if local region no need to create default pool
-    if (m_preDefinedRegion != LOCAL) {
-      PoolPtr pool = CacheFactory::createOrGetDefaultPool(*m_cacheImpl);
-      if (pool == nullptr) {
-        throw IllegalStateException("Pool is not defined create region.");
-      }
-      m_attributeFactory->setPoolName(pool->getName());
+  if (m_preDefinedRegion != LOCAL && (regAttr->getPoolName() == nullptr ||
+                                      strlen(regAttr->getPoolName()) == 0)) {
+    auto pool = m_cacheImpl->getPoolManager().getAnyPool();
+    if (!pool) {
+      throw IllegalStateException("No pool for non-local region.");
     }
-
+    m_attributeFactory->setPoolName(pool->getName());
     regAttr = m_attributeFactory->createRegionAttributes();
-    m_cacheImpl->createRegion(name, regAttr, retRegionPtr);
   }
+  m_cacheImpl->createRegion(name, regAttr, retRegionPtr);
 
   return retRegionPtr;
 }

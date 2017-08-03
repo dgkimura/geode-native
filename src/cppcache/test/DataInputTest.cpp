@@ -192,13 +192,6 @@ class DataInputTest : public ::testing::Test, protected ByteArrayFixture {
   virtual ~DataInputTest() {
     // NOP
   }
-  void SetUp() {
-    auto factory = CacheFactory::createCacheFactory();
-    cache = factory->create();
-  }
-
- private:
-  CachePtr cache;
 };
 
 TEST_F(DataInputTest, ThrowsWhenReadingInputWithSizeZero) {

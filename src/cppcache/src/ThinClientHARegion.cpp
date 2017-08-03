@@ -65,7 +65,7 @@ void ThinClientHARegion::initTCR() {
       m_tcrdm = dynamic_cast<ThinClientPoolHADM*>(
           m_cacheImpl->getCache()
               ->getPoolManager()
-              ->find(m_attribute->getPoolName())
+              .find(m_attribute->getPoolName())
               .get());
       if (m_tcrdm) {
         m_poolDM = true;

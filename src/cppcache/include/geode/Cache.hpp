@@ -234,9 +234,7 @@ class CPPCACHE_EXPORT Cache : public GeodeCache,
                                                      int32_t len);
   virtual std::unique_ptr<DataOutput> createDataOutput() const;
 
-  virtual std::shared_ptr<PoolManager> getPoolManager() const;
-
-  PoolFactoryPtr getPoolFactory();
+  virtual PoolManager& getPoolManager() const;
 
   /**
    * @brief destructor

@@ -202,7 +202,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
   {
     try {
       PoolPtr pool =
-          getHelper()->getCache()->getPoolManager()->find(regionNamesCq[0]);
+          getHelper()->getCache()->getPoolManager().find(regionNamesCq[0]);
       QueryServicePtr qs;
       if (pool != nullptr) {
         qs = pool->getQueryService();
@@ -301,7 +301,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree3)
   {
     // using region name as pool name
     PoolPtr pool =
-        getHelper()->getCache()->getPoolManager()->find(regionNamesCq[0]);
+        getHelper()->getCache()->getPoolManager().find(regionNamesCq[0]);
     QueryServicePtr qs;
     if (pool != nullptr) {
       qs = pool->getQueryService();
@@ -389,7 +389,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CloseCache1)
   {
     // using region name as pool name
     PoolPtr pool =
-        getHelper()->getCache()->getPoolManager()->find(regionNamesCq[0]);
+        getHelper()->getCache()->getPoolManager().find(regionNamesCq[0]);
     QueryServicePtr qs;
     if (pool != nullptr) {
       qs = pool->getQueryService();

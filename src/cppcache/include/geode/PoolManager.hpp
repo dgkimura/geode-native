@@ -34,6 +34,7 @@ namespace apache {
 namespace geode {
 namespace client {
 
+class ThinClientPoolDM;
 typedef std::unordered_map<std::string, PoolPtr> HashMapOfPools;
 
 /**
@@ -97,10 +98,21 @@ class CPPCACHE_EXPORT PoolManager {
    */
   void close(bool keepAlive = false);
 
+ private:
   void removePool(const char* name);
 
- private:
+  void addPool(const char* name, const PoolPtr& pool);
+
+  PoolPtr getAnyPool();
+
   HashMapOfPools m_connectionPools;
+
+  friend Cache;
+  friend CacheImpl;
+  friend RegionFactory;
+  friend PoolFactory;
+  friend ThinClientPoolDM;
+  friend FunctionService;
 };
 }  // namespace client
 }  // namespace geode

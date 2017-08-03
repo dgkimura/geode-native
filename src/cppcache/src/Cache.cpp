@@ -194,7 +194,7 @@ bool Cache::isPoolInMultiuserMode(RegionPtr regionPtr) {
   const char* poolName = regionPtr->getAttributes()->getPoolName();
 
   if (poolName != nullptr) {
-    PoolPtr poolPtr = regionPtr->getCache()->getPoolManager()->find(poolName);
+    PoolPtr poolPtr = regionPtr->getCache()->getPoolManager().find(poolName);
     if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
       return poolPtr->getMultiuserAuthentication();
     }
@@ -222,9 +222,10 @@ PdxInstanceFactoryPtr Cache::createPdxInstanceFactory(const char* className) {
 RegionServicePtr Cache::createAuthenticatedView(
     PropertiesPtr userSecurityProperties, const char* poolName) {
   if (poolName == nullptr) {
-    if (!this->isClosed() && m_cacheImpl->getDefaultPool() != nullptr) {
-      return m_cacheImpl->getDefaultPool()->createSecureUserCache(
-          userSecurityProperties, m_cacheImpl.get());
+    auto pool = m_cacheImpl->getPoolManager().getAnyPool();
+    if (!this->isClosed() && pool != nullptr) {
+      return pool->createSecureUserCache(userSecurityProperties,
+                                         m_cacheImpl.get());
     }
 
     throw IllegalStateException(
@@ -233,7 +234,7 @@ RegionServicePtr Cache::createAuthenticatedView(
   } else {
     if (!this->isClosed()) {
       if (poolName != nullptr) {
-        PoolPtr poolPtr = m_cacheImpl->getPoolManager()->find(poolName);
+        PoolPtr poolPtr = m_cacheImpl->getPoolManager().find(poolName);
         if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
           return poolPtr->createSecureUserCache(userSecurityProperties,
                                                 m_cacheImpl.get());
@@ -255,7 +256,7 @@ StatisticsFactory* Cache::getStatisticsFactory() const {
       ->getStatisticsFactory();
 }
 
-std::shared_ptr<PoolManager> Cache::getPoolManager() const {
+PoolManager& Cache::getPoolManager() const {
   return m_cacheImpl->getPoolManager();
 }
 
@@ -267,8 +268,6 @@ std::unique_ptr<DataInput> Cache::createDataInput(const uint8_t* m_buffer,
 std::unique_ptr<DataOutput> Cache::createDataOutput() const {
   return std::unique_ptr<DataOutput>(new DataOutput(this));
 }
-
-PoolFactoryPtr Cache::getPoolFactory() { return m_cacheImpl->getPoolFactory(); }
 
 }  // namespace client
 }  // namespace geode

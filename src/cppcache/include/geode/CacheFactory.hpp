@@ -30,8 +30,6 @@
  * @file
  */
 
-#define DEFAULT_POOL_NAME "default_geodeClientPool"
-
 namespace apache {
 namespace geode {
 namespace client {
@@ -143,12 +141,9 @@ class CPPCACHE_EXPORT CacheFactory
  private:
   ~CacheFactory();
 
-  PoolPtr determineDefaultPool(CacheImpl* cacheImpl);
-
   // Set very first time some creates cache
   // TODO shared_ptr - remove or refactor with global work
   static CacheFactoryPtr* default_CacheFactory;
-  static PoolPtr createOrGetDefaultPool(CacheImpl& cacheImpl);
   static void* m_cacheMap;
   static void init();
   static void cleanup();

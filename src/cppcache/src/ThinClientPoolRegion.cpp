@@ -42,7 +42,7 @@ void ThinClientPoolRegion::initTCR() {
     ThinClientPoolDM* poolDM = dynamic_cast<ThinClientPoolDM*>(
         getCache()
             ->getPoolManager()
-            ->find(m_regionAttributes->getPoolName())
+            .find(m_regionAttributes->getPoolName())
             .get());
     m_tcrdm = dynamic_cast<ThinClientBaseDM*>(poolDM);
     if (!m_tcrdm) {

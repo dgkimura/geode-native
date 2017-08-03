@@ -520,13 +520,13 @@ class CPPCACHE_EXPORT PoolFactory {
   ~PoolFactory();
 
  private:
-  PoolFactory(std::unordered_map<std::string, PoolPtr>& connectionPools);
+  PoolFactory();
   PoolFactory(const PoolFactory&);
   void addCheck(const char* host, int port);
   PoolAttributesPtr m_attrs;
   bool m_isSubscriptionRedundancy;
   bool m_addedServerOrLocator;
-  std::unordered_map<std::string, PoolPtr>& m_connectionPools;
+
   friend class Cache;
   friend class PoolManager;
   friend class CacheFactory;

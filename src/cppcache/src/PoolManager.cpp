@@ -31,7 +31,7 @@ void PoolManager::removePool(const char* name) {
 PoolManager::PoolManager() {}
 
 PoolFactoryPtr PoolManager::createFactory() {
-  return std::shared_ptr<PoolFactory>(new PoolFactory(m_connectionPools));
+  return std::shared_ptr<PoolFactory>(new PoolFactory());
 }
 
 void PoolManager::close(bool keepAlive) {
@@ -73,3 +73,9 @@ PoolPtr PoolManager::find(RegionPtr region) {
 }
 
 const HashMapOfPools& PoolManager::getAll() { return m_connectionPools; }
+
+void PoolManager::addPool(const char* name, const PoolPtr& pool) {
+  m_connectionPools.emplace(name, pool);
+}
+
+PoolPtr PoolManager::getAnyPool() { return m_connectionPools.begin()->second; }

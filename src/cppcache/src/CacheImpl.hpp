@@ -271,10 +271,6 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   bool getPdxReadSerialized() { return m_readPdxSerialized; }
   bool isCacheDestroyPending() const;
 
-  void setDefaultPool(PoolPtr pool);
-
-  PoolPtr getDefaultPool();
-
   static std::map<std::string, RegionAttributesPtr> getRegionShortcut();
 
   PdxTypeRegistryPtr getPdxTypeRegistry() const;
@@ -282,8 +278,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   SerializationRegistryPtr getSerializationRegistry() const;
   inline CachePerfStats& getCachePerfStats() { return *m_cacheStats; };
 
-  std::shared_ptr<PoolManager> getPoolManager() { return m_poolManager; }
-  std::shared_ptr<PoolFactory> getPoolFactory() { return m_poolFactory; }
+  PoolManager& getPoolManager() { return *m_poolManager; }
 
   ThreadPool* getThreadPool();
 
@@ -299,9 +294,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   // CachePerfStats
   CachePerfStats* m_cacheStats;
 
-  std::shared_ptr<PoolManager> m_poolManager;
-
-  std::shared_ptr<PoolFactory> m_poolFactory;
+  std::unique_ptr<PoolManager> m_poolManager;
 
   enum RegionKind {
     CPP_REGION,

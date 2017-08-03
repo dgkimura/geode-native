@@ -23,7 +23,6 @@
 #include "end_native.hpp"
 
 
-
 using namespace System;
 
 namespace Apache
@@ -81,21 +80,21 @@ namespace Apache
 
       internal:
 
-        std::shared_ptr<native::PoolManager> GetNative()
+        native::PoolManager& GetNative()
         {
-          return m_nativeptr->get_shared_ptr();
+          return m_nativeref;
         }
 
         /// <summary>
         /// Private constructor to wrap a native object pointer
         /// </summary>
         /// <param name="nativeptr">The native object pointer</param>
-        inline PoolManager(std::shared_ptr<native::PoolManager> nativeptr)
+        inline PoolManager(native::PoolManager& nativeref)
+          : m_nativeref(nativeref)
         {
-          m_nativeptr = gcnew native_shared_ptr<native::PoolManager>(nativeptr);
         }
 
-        native_shared_ptr<native::PoolManager>^ m_nativeptr;
+        native::PoolManager& m_nativeref;
       };
     }  // namespace Client
   }  // namespace Geode

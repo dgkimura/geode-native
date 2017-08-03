@@ -247,7 +247,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, StepOne2_PoolEP)
 END_TASK_DEFINITION
 
 PoolPtr getPool(const char* name) {
-  return getHelper()->getCache()->getPoolManager()->find(name);
+  return getHelper()->getCache()->getPoolManager().find(name);
 }
 
 RegionServicePtr getVirtualCache(PropertiesPtr creds, const char* name) {

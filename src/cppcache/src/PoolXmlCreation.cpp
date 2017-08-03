@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+#include <geode/Cache.hpp>
+#include <geode/PoolManager.hpp>
+
 #include "PoolXmlCreation.hpp"
 
 using namespace apache::geode::client;
@@ -34,7 +37,7 @@ void PoolXmlCreation::addServer(const char * host, const char * port)
 */
 
 PoolPtr PoolXmlCreation::create(Cache& cache) {
-  return cache.getPoolFactory()->create(poolName.c_str(), cache);
+  return poolFactory->create(poolName.c_str(), cache);
 }
 
 PoolXmlCreation::PoolXmlCreation(const char* name, PoolFactoryPtr factory) {

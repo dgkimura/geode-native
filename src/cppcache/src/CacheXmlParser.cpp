@@ -275,6 +275,7 @@ CacheXmlParser::CacheXmlParser(Cache* cache)
       m_flagIllegalStateException(false),
       m_flagAnyOtherException(false),
       m_flagExpirationAttribute(false),
+      m_poolFactory(nullptr),
       m_cache(cache) {
   static xmlSAXHandler saxHandler = {
       nullptr,                  /* internalSubset */
@@ -449,16 +450,17 @@ void CacheXmlParser::startCache(void* ctx, const xmlChar** attrs) {
         throw CacheXmlException(exStr.c_str());
       }
       if (strcmp(attrName, ENDPOINTS) == 0) {
-        std::vector<std::pair<std::string, int>> endPoints(
-            parseEndPoints(attrValue));
-        std::vector<std::pair<std::string, int>>::iterator endPoint;
-        for (endPoint = endPoints.begin(); endPoint != endPoints.end();
-             endPoint++) {
-          m_cache->getPoolFactory()->addServer(endPoint->first.c_str(),
-                                               endPoint->second);
+        if (m_poolFactory) {
+          std::vector<std::pair<std::string, int>> endPoints(
+              parseEndPoints(attrValue));
+          std::vector<std::pair<std::string, int>>::iterator endPoint;
+          for (endPoint = endPoints.begin(); endPoint != endPoints.end();
+               endPoint++) {
+            m_poolFactory->addServer(endPoint->first.c_str(), endPoint->second);
+          }
         }
       } else if (strcmp(attrName, REDUNDANCY_LEVEL) == 0) {
-        m_cache->getPoolFactory()->setSubscriptionRedundancy(atoi(attrValue));
+        m_poolFactory->setSubscriptionRedundancy(atoi(attrValue));
       }
     }
   }
@@ -521,6 +523,7 @@ void CacheXmlParser::startLocator(const xmlChar** atts) {
         "A locator requires a host and port";
     throw CacheXmlException(s.c_str());
   }
+  m_poolFactory = std::static_pointer_cast<PoolFactory>(_stack.top());
 
   const char* host = nullptr;
   const char* port = nullptr;
@@ -545,7 +548,7 @@ void CacheXmlParser::startLocator(const xmlChar** atts) {
         "required");
   }
 
-  m_cache->getPoolFactory()->addLocator(host, atoi(port));
+  m_poolFactory->addLocator(host, atoi(port));
 }
 
 void CacheXmlParser::startServer(const xmlChar** atts) {
@@ -556,6 +559,7 @@ void CacheXmlParser::startServer(const xmlChar** atts) {
         "port";
     throw CacheXmlException(s.c_str());
   }
+  auto factory = std::static_pointer_cast<PoolFactory>(_stack.top());
 
   const char* host = nullptr;
   const char* port = nullptr;
@@ -580,7 +584,7 @@ void CacheXmlParser::startServer(const xmlChar** atts) {
         "required");
   }
 
-  m_cache->getPoolFactory()->addServer(host, atoi(port));
+  factory->addServer(host, atoi(port));
 }
 
 void CacheXmlParser::startPool(const xmlChar** atts) {
@@ -591,6 +595,7 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
         "A pool cannot be created without a name";
     throw CacheXmlException(s.c_str());
   }
+  PoolFactoryPtr factory = m_cache->getPoolManager().createFactory();
 
   const char* poolName = nullptr;
 
@@ -601,7 +606,7 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
     if (strcmp(name, NAME) == 0) {
       poolName = value;
     } else {
-      setPoolInfo(m_cache->getPoolFactory().get(), name, value);
+      setPoolInfo(factory.get(), name, value);
     }
     ++attrsCount;
   }
@@ -613,14 +618,15 @@ void CacheXmlParser::startPool(const xmlChar** atts) {
     throw CacheXmlException(s.c_str());
   }
 
-  PoolXmlCreation* poolxml =
-      new PoolXmlCreation(poolName, m_cache->getPoolFactory());
+  auto poolxml = std::make_shared<PoolXmlCreation>(poolName, factory);
 
   _stack.push(poolxml);
+  _stack.push(factory);
 }
 
 void CacheXmlParser::endPool() {
-  PoolXmlCreation* poolxml = reinterpret_cast<PoolXmlCreation*>(_stack.top());
+  _stack.pop();  // remove factory
+  auto poolxml = std::static_pointer_cast<PoolXmlCreation>(_stack.top());
   _stack.pop();  // remove pool
   m_cacheCreation->addPool(poolxml);
 }
@@ -740,7 +746,7 @@ void CacheXmlParser::startRegion(const xmlChar** atts, bool isRoot) {
     throw CacheXmlException(s.c_str());
   }
 
-  RegionXmlCreation* region = new RegionXmlCreation(regionName, isRoot);
+  auto region = std::make_shared<RegionXmlCreation>(regionName, isRoot);
   if (!region) {
     throw UnknownException("CacheXmlParser::startRegion:Out of memeory");
   }
@@ -777,7 +783,7 @@ void CacheXmlParser::startRootRegion(const xmlChar** atts) {
 void CacheXmlParser::startRegionAttributes(const xmlChar** atts) {
   bool isDistributed = false;
   bool isTCR = false;
-  AttributesFactory* attrsFactory = nullptr;
+  std::shared_ptr<AttributesFactory> attrsFactory = nullptr;
   if (atts) {
     int attrsCount = 0;
     while (atts[attrsCount] != nullptr) ++attrsCount;
@@ -806,8 +812,8 @@ void CacheXmlParser::startRegionAttributes(const xmlChar** atts) {
         }
 
         if (strcmp((char*)atts[i - 1], ID) == 0) {
-          RegionXmlCreation* region =
-              reinterpret_cast<RegionXmlCreation*>(_stack.top());
+          auto region =
+              std::static_pointer_cast<RegionXmlCreation>(_stack.top());
           region->setAttrId(std::string((char*)atts[i]));
         } else if (strcmp((char*)atts[i - 1], REFID) == 0) {
           refid = (char*)atts[i];
@@ -816,14 +822,15 @@ void CacheXmlParser::startRegionAttributes(const xmlChar** atts) {
     }
 
     if (refid == nullptr) {
-      RegionXmlCreation* region =
-          reinterpret_cast<RegionXmlCreation*>(_stack.top());
-      attrsFactory = new AttributesFactory(region->getAttributes());
+      auto region = std::static_pointer_cast<RegionXmlCreation>(_stack.top());
+      attrsFactory =
+          std::make_shared<AttributesFactory>(region->getAttributes());
     } else {
       std::string refidStr(refid);
 
       if (namedRegions.find(refidStr) != namedRegions.end()) {
-        attrsFactory = new AttributesFactory(namedRegions[refidStr]);
+        attrsFactory =
+            std::make_shared<AttributesFactory>(namedRegions[refidStr]);
       } else {
         std::string s =
             "XML:referenced named attribute '" + refidStr + "' does not exist.";
@@ -848,10 +855,14 @@ void CacheXmlParser::startRegionAttributes(const xmlChar** atts) {
         char* client_notification_enabled = (char*)atts[i];
         if (strcmp("false", client_notification_enabled) == 0 ||
             strcmp("FALSE", client_notification_enabled) == 0) {
-          m_cache->getPoolFactory()->setSubscriptionEnabled(false);
+          if (m_poolFactory) {
+            m_poolFactory->setSubscriptionEnabled(false);
+          }
         } else if (strcmp("true", client_notification_enabled) == 0 ||
                    strcmp("TRUE", client_notification_enabled) == 0) {
-          m_cache->getPoolFactory()->setSubscriptionEnabled(true);
+          if (m_poolFactory) {
+            m_poolFactory->setSubscriptionEnabled(true);
+          }
         } else {
           char* name = (char*)atts[i];
           std::string temp(name);
@@ -919,13 +930,14 @@ void CacheXmlParser::startRegionAttributes(const xmlChar** atts) {
         }
       } else if (strcmp(ENDPOINTS, (char*)atts[i]) == 0) {
         i++;
-        std::vector<std::pair<std::string, int>> endPoints(
-            parseEndPoints((char*)atts[i]));
-        std::vector<std::pair<std::string, int>>::iterator endPoint;
-        for (endPoint = endPoints.begin(); endPoint != endPoints.end();
-             endPoint++) {
-          m_cache->getPoolFactory()->addServer(endPoint->first.c_str(),
-                                               endPoint->second);
+        if (m_poolFactory) {
+          std::vector<std::pair<std::string, int>> endPoints(
+              parseEndPoints((char*)atts[i]));
+          std::vector<std::pair<std::string, int>>::iterator endPoint;
+          for (endPoint = endPoints.begin(); endPoint != endPoints.end();
+               endPoint++) {
+            m_poolFactory->addServer(endPoint->first.c_str(), endPoint->second);
+          }
         }
         isTCR = true;
       } else if (strcmp(POOL_NAME, (char*)atts[i]) == 0) {
@@ -978,9 +990,8 @@ void CacheXmlParser::startRegionAttributes(const xmlChar** atts) {
     }  // for loop
   }    // atts is nullptr
   else {
-    RegionXmlCreation* region =
-        reinterpret_cast<RegionXmlCreation*>(_stack.top());
-    attrsFactory = new AttributesFactory(region->getAttributes());
+    auto region = std::static_pointer_cast<RegionXmlCreation>(_stack.top());
+    attrsFactory = std::make_shared<AttributesFactory>(region->getAttributes());
     _stack.push(attrsFactory);
   }
 
@@ -992,8 +1003,7 @@ void CacheXmlParser::startRegionAttributes(const xmlChar** atts) {
 }
 
 void CacheXmlParser::endRegionAttributes() {
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
   _stack.pop();
   if (!attrsFactory) {
     throw UnknownException(
@@ -1003,8 +1013,7 @@ void CacheXmlParser::endRegionAttributes() {
   RegionAttributesPtr regionAttributesPtr =
       attrsFactory->createRegionAttributes();
 
-  RegionXmlCreation* regionPtr =
-      reinterpret_cast<RegionXmlCreation*>(_stack.top());
+  auto regionPtr = std::static_pointer_cast<RegionXmlCreation>(_stack.top());
   if (!regionPtr) {
     throw UnknownException("CacheXmlParser::endRegion:Region is null");
   }
@@ -1058,7 +1067,8 @@ void CacheXmlParser::startExpirationAttributes(const xmlChar** atts) {
         std::string s =
             "XML:The attribute <action> of <expiration-attributes> cannot be "
             "set to empty string. It should either have a value or the "
-            "attribute should be removed. In the latter case the default value "
+            "attribute should be removed. In the latter case the default "
+            "value "
             "will be set";
         throw CacheXmlException(s.c_str());
       } else if (strcmp(INVALIDATE, action) == 0) {
@@ -1088,12 +1098,12 @@ void CacheXmlParser::startExpirationAttributes(const xmlChar** atts) {
   }
   if (timeOut == nullptr || strcmp(timeOut, "") == 0) {
     std::string s =
-        "XML:The attribute <timeout> not specified in <expiration-attributes>.";
+        "XML:The attribute <timeout> not specified in "
+        "<expiration-attributes>.";
     throw CacheXmlException(s.c_str());
   }
 
-  ExpirationAttributes* expireAttr =
-      new ExpirationAttributes(timeOutInt, expire);
+  auto expireAttr = std::make_shared<ExpirationAttributes>(timeOutInt, expire);
   if (!expireAttr) {
     throw UnknownException(
         "CacheXmlParser::startExpirationAttributes:Out of memeory");
@@ -1111,7 +1121,8 @@ void CacheXmlParser::startPersistenceManager(const xmlChar** atts) {
   while (atts[attrsCount] != nullptr) ++attrsCount;
   if (attrsCount > 4) {
     std::string s =
-        "XML:Incorrect number of attributes provided for <persistence-manager>";
+        "XML:Incorrect number of attributes provided for "
+        "<persistence-manager>";
     throw CacheXmlException(s.c_str());
   }
   char* libraryName = nullptr;
@@ -1130,9 +1141,11 @@ void CacheXmlParser::startPersistenceManager(const xmlChar** atts) {
 
       if (libraryName == nullptr) {
         std::string s =
-            "XML:The attribute <library-name> of <persistence-manager> cannot "
+            "XML:The attribute <library-name> of <persistence-manager> "
+            "cannot "
             "be set to an empty string. It should either have a value or the "
-            "attribute should be removed. In the latter case the default value "
+            "attribute should be removed. In the latter case the default "
+            "value "
             "will be set";
         throw CacheXmlException(s.c_str());
       }
@@ -1157,14 +1170,16 @@ void CacheXmlParser::startPersistenceManager(const xmlChar** atts) {
       char* name = (char*)atts[i];
       std::string temp(name);
       std::string s =
-          "XML:Incorrect attribute name specified in <persistence-manager>: " +
+          "XML:Incorrect attribute name specified in "
+          "<persistence-manager>: " +
           temp;
       throw CacheXmlException(s.c_str());
     }
   }
   if (libraryFunctionName == nullptr) {
     std::string s =
-        "XML:Library function name not specified in the <persistence-manager>";
+        "XML:Library function name not specified in the "
+        "<persistence-manager>";
     throw CacheXmlException(s.c_str());
   }
 
@@ -1180,8 +1195,8 @@ void CacheXmlParser::startPersistenceManager(const xmlChar** atts) {
     throw CacheXmlException(ex.getMessage());
   }
 
-  _stack.push(libraryName);
-  _stack.push(libraryFunctionName);
+  _stack.push(std::make_shared<std::string>(std::string(libraryName)));
+  _stack.push(std::make_shared<std::string>(std::string(libraryFunctionName)));
 }
 
 void CacheXmlParser::startPersistenceProperties(const xmlChar** atts) {
@@ -1263,9 +1278,11 @@ void CacheXmlParser::startCacheLoader(const xmlChar** atts) {
       libraryName = (char*)atts[i];
       if (libraryName == nullptr || strcmp(libraryName, "") == 0) {
         std::string s =
-            "XML:The attribute <library-name> of <cache-loader> cannot be set "
+            "XML:The attribute <library-name> of <cache-loader> cannot be "
+            "set "
             "to an empty string. It should either have a value or the "
-            "attribute should be removed. In the latter case the default value "
+            "attribute should be removed. In the latter case the default "
+            "value "
             "will be set";
         throw CacheXmlException(s.c_str());
       }
@@ -1304,8 +1321,7 @@ void CacheXmlParser::startCacheLoader(const xmlChar** atts) {
     throw CacheXmlException(ex.getMessage());
   }
 
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
   attrsFactory->setCacheLoader(libraryName, libraryFunctionName);
 }
 
@@ -1372,8 +1388,7 @@ void CacheXmlParser::startCacheListener(const xmlChar** atts) {
     throw CacheXmlException(ex.getMessage());
   }
 
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
   attrsFactory->setCacheListener(libraryName, libraryFunctionName);
 }
 
@@ -1388,7 +1403,8 @@ void CacheXmlParser::startPartitionResolver(const xmlChar** atts) {
   while (atts[attrsCount] != nullptr) ++attrsCount;
   if (attrsCount > 4) {
     std::string s =
-        "XML:Incorrect number of attributes provided for <partition-resolver>";
+        "XML:Incorrect number of attributes provided for "
+        "<partition-resolver>";
     throw CacheXmlException(s.c_str());
   }
 
@@ -1398,7 +1414,8 @@ void CacheXmlParser::startPartitionResolver(const xmlChar** atts) {
       libraryName = (char*)atts[i];
       if (libraryName == nullptr || strcmp(libraryName, "") == 0) {
         std::string s =
-            "XML:The attribute <library-name> of the <partition-resolver> tag "
+            "XML:The attribute <library-name> of the <partition-resolver> "
+            "tag "
             "cannot be set to an empty string. It should either have a value "
             "or the attribute should be removed. In the latter case the "
             "default value will be set";
@@ -1417,7 +1434,8 @@ void CacheXmlParser::startPartitionResolver(const xmlChar** atts) {
       char* name = (char*)atts[i];
       std::string temp(name);
       std::string s =
-          "XML:Incorrect attribute name specified in <partition-resolver> : " +
+          "XML:Incorrect attribute name specified in <partition-resolver> "
+          ": " +
           temp;
       throw CacheXmlException(s.c_str());
     }
@@ -1440,8 +1458,7 @@ void CacheXmlParser::startPartitionResolver(const xmlChar** atts) {
     throw CacheXmlException(ex.getMessage());
   }
 
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
   attrsFactory->setPartitionResolver(libraryName, libraryFunctionName);
 }
 
@@ -1466,9 +1483,11 @@ void CacheXmlParser::startCacheWriter(const xmlChar** atts) {
       libraryName = (char*)atts[i];
       if (libraryName == nullptr || strcmp(libraryName, "") == 0) {
         std::string s =
-            "XML:The attribute <library-name> of <cache-writer> cannot be set "
+            "XML:The attribute <library-name> of <cache-writer> cannot be "
+            "set "
             "to an empty string. It should either have a value or the "
-            "attribute should be removed. In the latter case the default value "
+            "attribute should be removed. In the latter case the default "
+            "value "
             "will be set";
         throw CacheXmlException(s.c_str());
       }
@@ -1507,8 +1526,7 @@ void CacheXmlParser::startCacheWriter(const xmlChar** atts) {
     throw CacheXmlException(ex.getMessage());
   }
 
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
   attrsFactory->setCacheWriter(libraryName, libraryFunctionName);
 }
 
@@ -1518,8 +1536,7 @@ void CacheXmlParser::startCacheWriter(const xmlChar** atts) {
  * <code>RegionXmlCreation</code>, then it is the parent region.
  */
 void CacheXmlParser::endRegion(bool isRoot) {
-  RegionXmlCreation* regionPtr =
-      reinterpret_cast<RegionXmlCreation*>(_stack.top());
+  auto regionPtr = std::static_pointer_cast<RegionXmlCreation>(_stack.top());
   _stack.pop();
   if (isRoot) {
     if (!_stack.empty()) {
@@ -1537,8 +1554,7 @@ void CacheXmlParser::endRegion(bool isRoot) {
       std::string s = "Xml file has incorrectly nested region tags";
       throw CacheXmlException(s.c_str());
     }
-    RegionXmlCreation* parent =
-        reinterpret_cast<RegionXmlCreation*>(_stack.top());
+    auto parent = std::static_pointer_cast<RegionXmlCreation>(_stack.top());
     parent->addSubregion(regionPtr);
   }
 }
@@ -1566,12 +1582,11 @@ void CacheXmlParser::endRegionTimeToLive() {
     throw CacheXmlException(s.c_str());
   }
 
-  ExpirationAttributes* expireAttr =
-      reinterpret_cast<ExpirationAttributes*>(_stack.top());
+  auto expireAttr =
+      std::static_pointer_cast<ExpirationAttributes>(_stack.top());
   _stack.pop();
 
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
   attrsFactory->setRegionTimeToLive(expireAttr->getAction(),
                                     expireAttr->getTimeout());
   m_flagExpirationAttribute = false;
@@ -1589,11 +1604,10 @@ void CacheXmlParser::endRegionIdleTime() {
         "XML: <region-idle-time> cannot be without <expiration-attributes>";
     throw CacheXmlException(s.c_str());
   }
-  ExpirationAttributes* expireAttr =
-      reinterpret_cast<ExpirationAttributes*>(_stack.top());
+  auto expireAttr =
+      std::static_pointer_cast<ExpirationAttributes>(_stack.top());
   _stack.pop();
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
 
   attrsFactory->setRegionIdleTimeout(expireAttr->getAction(),
                                      expireAttr->getTimeout());
@@ -1613,11 +1627,10 @@ void CacheXmlParser::endEntryTimeToLive() {
         "<expiration-attributes>";
     throw CacheXmlException(s.c_str());
   }
-  ExpirationAttributes* expireAttr =
-      reinterpret_cast<ExpirationAttributes*>(_stack.top());
+  auto expireAttr =
+      std::static_pointer_cast<ExpirationAttributes>(_stack.top());
   _stack.pop();
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
 
   attrsFactory->setEntryTimeToLive(expireAttr->getAction(),
                                    expireAttr->getTimeout());
@@ -1636,11 +1649,10 @@ void CacheXmlParser::endEntryIdleTime() {
         "XML: <entry-idle-time> cannot be without <expiration-attributes>";
     throw CacheXmlException(s.c_str());
   }
-  ExpirationAttributes* expireAttr =
-      reinterpret_cast<ExpirationAttributes*>(_stack.top());
+  auto expireAttr =
+      std::static_pointer_cast<ExpirationAttributes>(_stack.top());
   _stack.pop();
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
   attrsFactory->setEntryIdleTimeout(expireAttr->getAction(),
                                     expireAttr->getTimeout());
   m_flagExpirationAttribute = false;
@@ -1651,23 +1663,21 @@ void CacheXmlParser::endEntryIdleTime() {
  * factory.
  */
 void CacheXmlParser::endPersistenceManager() {
-  char* libraryFunctionName = reinterpret_cast<char*>(_stack.top());
+  std::shared_ptr<std::string> libraryFunctionName =
+      std::static_pointer_cast<std::string>(_stack.top());
   _stack.pop();
-  char* libraryName = reinterpret_cast<char*>(_stack.top());
+  std::shared_ptr<std::string> libraryName =
+      std::static_pointer_cast<std::string>(_stack.top());
   _stack.pop();
-  AttributesFactory* attrsFactory =
-      reinterpret_cast<AttributesFactory*>(_stack.top());
+  auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
   if (m_config != nullptr) {
-    attrsFactory->setPersistenceManager(libraryName, libraryFunctionName,
-                                        m_config);
+    attrsFactory->setPersistenceManager(libraryName->c_str(),
+                                        libraryFunctionName->c_str(), m_config);
     m_config = nullptr;
   } else {
-    attrsFactory->setPersistenceManager(libraryName, libraryFunctionName);
+    attrsFactory->setPersistenceManager(libraryName->c_str(),
+                                        libraryFunctionName->c_str());
   }
-  // Free memory allocated in startPersistenceManager, already checked for
-  // nullptr
-  free(libraryName);
-  free(libraryFunctionName);
 }
 
 CacheXmlParser::~CacheXmlParser() { GF_SAFE_DELETE(m_cacheCreation); }

@@ -61,7 +61,7 @@ const char *MyPdxClass::getClassName() const { return "MyPdxClass"; }
 
 PdxSerializable *MyPdxClass::CreateDeserializable() { return new MyPdxClass(); }
 
-class PdxLocalReaderTest : public ::testing::Test {
+class DISABLED_PdxLocalReaderTest : public ::testing::Test {
  public:
   void SetUp() {
     auto factory = CacheFactory::createCacheFactory();
@@ -72,7 +72,7 @@ class PdxLocalReaderTest : public ::testing::Test {
   CachePtr cache;
 };
 
-TEST_F(PdxLocalReaderTest, testSerializationOfPdxType) {
+TEST_F(DISABLED_PdxLocalReaderTest, testSerializationOfPdxType) {
   MyPdxClass expected, actual;
   DataOutput stream(cache.get());
   int length = 0;

@@ -849,7 +849,7 @@ void ThinClientPoolDM::destroy(bool keepAlive) {
       GF_SAFE_DELETE(m_clientMetadataService);
     }
 
-    m_connManager.getCacheImpl()->getCache()->getPoolManager()->removePool(
+    m_connManager.getCacheImpl()->getCache()->getPoolManager().removePool(
         m_poolName.c_str());
 
     stopChunkProcessor();
@@ -972,7 +972,7 @@ int32_t ThinClientPoolDM::GetPDXIdForType(SerializablePtr pdxType) {
   {
     auto poolManager =
         m_connManager.getCacheImpl()->getCache()->getPoolManager();
-    for (const auto& iter : poolManager->getAll()) {
+    for (const auto& iter : poolManager.getAll()) {
       auto currPool = static_cast<ThinClientPoolDM*>(iter.second.get());
 
       if (currPool != this) {
@@ -1058,7 +1058,7 @@ int32_t ThinClientPoolDM::GetEnumValue(SerializablePtr enumInfo) {
   {
     auto poolManager =
         m_connManager.getCacheImpl()->getCache()->getPoolManager();
-    for (const auto& iter : poolManager->getAll()) {
+    for (const auto& iter : poolManager.getAll()) {
       const auto& currPool =
           std::dynamic_pointer_cast<ThinClientPoolDM>(iter.second);
 

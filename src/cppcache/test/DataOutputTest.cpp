@@ -59,11 +59,6 @@ class DataOutputTest : public ::testing::Test, public ByteArrayFixture {
     // NOP
   }
 
-  void SetUp() {
-    auto factory = CacheFactory::createCacheFactory();
-    cache = factory->create();
-  }
-
  protected:
   std::random_device m_randomDevice;
   std::mt19937 m_mersennesTwister;
@@ -80,9 +75,6 @@ class DataOutputTest : public ::testing::Test, public ByteArrayFixture {
     }
     return static_cast<int32_t>(result);
   }
-
- private:
-  CachePtr cache;
 };
 
 TEST_F(DataOutputTest, TestWriteUint8) {

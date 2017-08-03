@@ -28,14 +28,16 @@
 #include <ThinClientPoolStickyHADM.hpp>
 #include "CacheRegionHelper.hpp"
 using namespace apache::geode::client;
+
 const char* PoolFactory::DEFAULT_SERVER_GROUP = "";
+#define DEFAULT_SERVER_PORT 40404
+#define DEFAULT_SERVER_HOST "localhost"
 extern ACE_Recursive_Thread_Mutex connectionPoolsLock;
 
-PoolFactory::PoolFactory(HashMapOfPools& connectionPools)
+PoolFactory::PoolFactory()
     : m_attrs(new PoolAttributes),
       m_isSubscriptionRedundancy(false),
-      m_addedServerOrLocator(false),
-      m_connectionPools(connectionPools) {}
+      m_addedServerOrLocator(false) {}
 
 PoolFactory::~PoolFactory() {}
 
@@ -117,8 +119,11 @@ PoolPtr PoolFactory::create(const char* name, Cache& cache) {
   {
     ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
 
-    if (cache.getPoolManager()->find(name) != nullptr) {
+    if (cache.getPoolManager().find(name) != nullptr) {
       throw IllegalStateException("Pool with the same name already exists");
+    }
+    if (!m_addedServerOrLocator) {
+      addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
     }
     // Create a clone of Attr;
     PoolAttributesPtr copyAttrs = m_attrs->clone();
@@ -170,7 +175,8 @@ PoolPtr PoolFactory::create(const char* name, Cache& cache) {
       }
     }
 
-    m_connectionPools.insert({name, std::static_pointer_cast<Pool>(poolDM)});
+    cacheImpl->getPoolManager().addPool(name,
+                                        std::static_pointer_cast<Pool>(poolDM));
   }
 
   // TODO: poolDM->init() should not throw exceptions!

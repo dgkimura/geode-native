@@ -55,7 +55,7 @@ typedef PersistenceManager* (*LibraryPersistenceManagerFn)(
 
 class CPPCACHE_EXPORT CacheXmlParser : public CacheXml {
  private:
-  std::stack<void*> _stack;
+  std::stack<std::shared_ptr<void>> _stack;
   xmlSAXHandler m_saxHandler;
   CacheXmlCreation* m_cacheCreation;
   std::string m_error;
@@ -67,6 +67,7 @@ class CPPCACHE_EXPORT CacheXmlParser : public CacheXml {
   bool m_flagAnyOtherException;
   bool m_flagExpirationAttribute;
   std::map<std::string, RegionAttributesPtr> namedRegions;
+  std::shared_ptr<PoolFactory> m_poolFactory;
 
   Cache* m_cache;
   /** Pool helper */

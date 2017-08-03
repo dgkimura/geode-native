@@ -72,7 +72,7 @@ class putThread : public ACE_Task_Base {
 
 void doAttrTestingAndCreatePool(const char* poolName) {
   PoolFactoryPtr poolFacPtr =
-      getHelper()->getCache()->getPoolManager()->createFactory();
+      getHelper()->getCache()->getPoolManager().createFactory();
   poolFacPtr->setFreeConnectionTimeout(10000);
   poolFacPtr->setLoadConditioningInterval(60000);
   poolFacPtr->setSocketBufferSize(1024);
@@ -131,7 +131,7 @@ void doAttrTestingAndCreatePool(const char* poolName) {
 
 void doAttrTesting(const char* poolName1) {
   // PoolFactoryPtr poolFacPtr = cachePtr->getPoolFactory();
-  PoolPtr pptr = getHelper()->getCache()->getPoolManager()->find(poolName1);
+  PoolPtr pptr = getHelper()->getCache()->getPoolManager().find(poolName1);
   // PoolPtr pptr = poolFacPtr->find(poolName1);
 
   ASSERT(strcmp(pptr->getName(), "clientPool") == 0,
@@ -198,7 +198,7 @@ DUNIT_TASK(CLIENT1, StartC1)
 
     // Do PoolCreation testing , create another pool with same name
     PoolFactoryPtr poolFacPtr =
-        getHelper()->getCache()->getPoolManager()->createFactory();
+        getHelper()->getCache()->getPoolManager().createFactory();
     try {
       PoolPtr pptr = poolFacPtr->create(poolName, *cachePtr.get());
       FAIL("Pool creation with same name should fail");
@@ -229,7 +229,7 @@ DUNIT_TASK(CLIENT2, StartC2)
       ASSERT(getHelper()
                      ->getCache()
                      ->getPoolManager()
-                     ->find("clientPoolMultiUser")
+                     .find("clientPoolMultiUser")
                      ->getMultiuserAuthentication() == true,
              "MultiUser secure mode should be true for Pool");
     } catch (const Exception& excp) {
@@ -255,7 +255,7 @@ DUNIT_TASK(CLIENT1, ClientOp)
     int min = getHelper()
                   ->getCache()
                   ->getPoolManager()
-                  ->find(poolName.c_str())
+                  .find(poolName.c_str())
                   ->getMinConnections();
     char logmsg[100] = {0};
     sprintf(logmsg, "Pool level not equal to min level. Expected %d, actual %d",
@@ -276,7 +276,7 @@ DUNIT_TASK(CLIENT1, ClientOp)
     int max = getHelper()
                   ->getCache()
                   ->getPoolManager()
-                  ->find(poolName.c_str())
+                  .find(poolName.c_str())
                   ->getMaxConnections();
     sprintf(logmsg, "Pool level not equal to max level. Expected %d, actual %d",
             max, level);
@@ -296,7 +296,7 @@ DUNIT_TASK(CLIENT1, ClientOp)
     min = getHelper()
               ->getCache()
               ->getPoolManager()
-              ->find(poolName.c_str())
+              .find(poolName.c_str())
               ->getMinConnections();
     sprintf(logmsg,
             "Pool level not equal to min level after idle timeout. "

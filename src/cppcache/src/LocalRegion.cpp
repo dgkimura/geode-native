@@ -91,7 +91,7 @@ LocalRegion::LocalRegion(const std::string& name, CacheImpl* cache,
                                       ->getStatisticsFactory(),
                                   m_fullPath);
   PoolPtr p =
-      cache->getCache()->getPoolManager()->find(getAttributes()->getPoolName());
+      cache->getCache()->getPoolManager().find(getAttributes()->getPoolName());
   // m_attachedPool = p;
   setPool(p);
 }

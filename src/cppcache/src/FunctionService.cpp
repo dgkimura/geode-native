@@ -47,7 +47,7 @@ ExecutionPtr FunctionService::onRegion(RegionPtr region) {
       // it is in multiuser mode
       proxyCache = pr->m_proxyCache;
       PoolPtr userAttachedPool = proxyCache->m_userAttributes->getPool();
-      PoolPtr pool = region->getCache()->getPoolManager()->find(
+      PoolPtr pool = region->getCache()->getPoolManager().find(
           userAttachedPool->getName());
       if (!(pool != nullptr && pool.get() == userAttachedPool.get() &&
             !pool->isDestroyed())) {
@@ -112,8 +112,8 @@ ExecutionPtr FunctionService::onServerWithCache(const RegionServicePtr& cache) {
   LOGDEBUG("FunctionService::onServer:");
   if (pc != nullptr) {
     PoolPtr userAttachedPool = pc->m_userAttributes->getPool();
-    PoolPtr pool = pc->m_cacheImpl->getCache()->getPoolManager()->find(
-        userAttachedPool->getName());
+    PoolPtr pool =
+        pc->m_cacheImpl->getPoolManager().find(userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
       return std::make_shared<ExecutionImpl>(pool, false, pc);
@@ -122,7 +122,8 @@ ExecutionPtr FunctionService::onServerWithCache(const RegionServicePtr& cache) {
         "Pool has been close to execute function on server");
   } else {
     CachePtr realcache = std::static_pointer_cast<Cache>(cache);
-    return FunctionService::onServer(realcache->m_cacheImpl->getDefaultPool());
+    return FunctionService::onServer(
+        realcache->m_cacheImpl->getPoolManager().getAnyPool());
   }
 }
 
@@ -137,7 +138,7 @@ ExecutionPtr FunctionService::onServersWithCache(
   LOGDEBUG("FunctionService::onServers:");
   if (pc != nullptr && !cache->isClosed()) {
     auto userAttachedPool = pc->m_userAttributes->getPool();
-    auto pool = pc->m_cacheImpl->getCache()->getPoolManager()->find(
+    auto pool = pc->m_cacheImpl->getCache()->getPoolManager().find(
         userAttachedPool->getName());
     if (pool != nullptr && pool.get() == userAttachedPool.get() &&
         !pool->isDestroyed()) {
@@ -147,6 +148,7 @@ ExecutionPtr FunctionService::onServersWithCache(
         "Pool has been close to execute function on server");
   } else {
     auto realcache = std::static_pointer_cast<Cache>(cache);
-    return FunctionService::onServers(realcache->m_cacheImpl->getDefaultPool());
+    return FunctionService::onServers(
+        realcache->m_cacheImpl->getPoolManager().getAnyPool());
   }
 }

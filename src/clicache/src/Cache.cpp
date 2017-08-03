@@ -369,7 +369,7 @@ namespace Apache
 
         PoolFactory^ Cache::GetPoolFactory()
         {
-          return PoolFactory::Create(m_nativeptr->get_shared_ptr()->getPoolFactory());
+          return PoolFactory::Create(m_nativeptr->get_shared_ptr()->getPoolManager().createFactory());
         }
 
         PoolManager^ Cache::GetPoolManager()
