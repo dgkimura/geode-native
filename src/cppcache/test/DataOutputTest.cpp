@@ -25,11 +25,15 @@
 #include <geode/CacheFactory.hpp>
 #include "ByteArrayFixture.hpp"
 #include "SerializationRegistry.hpp"
+
+namespace {
+
 using namespace apache::geode::client;
 
 class TestDataOutput : public DataOutput {
  public:
-  TestDataOutput(Cache* cache) : DataOutput(cache), m_byteArray(nullptr) {
+  TestDataOutput(Cache* cache)
+      : DataOutput(cache), m_byteArray(nullptr), m_serializationRegistry() {
     // NOP
   }
 
@@ -45,8 +49,15 @@ class TestDataOutput : public DataOutput {
     return *m_byteArray;
   }
 
+ protected:
+  virtual const SerializationRegistry& getSerializationRegistry()
+      const override {
+    return m_serializationRegistry;
+  }
+
  private:
   mutable ByteArray* m_byteArray;
+  SerializationRegistry m_serializationRegistry;
 };
 
 class DataOutputTest : public ::testing::Test, public ByteArrayFixture {
@@ -324,3 +335,5 @@ TEST_F(DataOutputTest, TestCursorNegativeAdvance) {
   EXPECT_EQ((originalLength - 2), dataOutput.getBufferLength())
       << "Correct length after negative advance";
 }
+
+}  // namespace

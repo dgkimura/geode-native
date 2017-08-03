@@ -26,9 +26,11 @@ namespace geode {
 namespace client {
 
 void DataInput::readObjectInternal(SerializablePtr& ptr, int8_t typeId) {
-  ptr = CacheRegionHelper::getCacheImpl(m_cache)
-            ->getSerializationRegistry()
-            ->deserialize(*this, typeId);
+  ptr = getSerializationRegistry().deserialize(*this, typeId);
+}
+
+const SerializationRegistry& DataInput::getSerializationRegistry() const {
+  return *CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry();
 }
 
 const Cache* DataInput::getCache() { return m_cache; }

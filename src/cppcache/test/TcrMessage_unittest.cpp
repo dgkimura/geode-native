@@ -24,7 +24,23 @@
 #include <TcrMessage.hpp>
 #include "ByteArrayFixture.hpp"
 
+namespace {
+
 using namespace apache::geode::client;
+
+class DataOutputUnderTest : public DataOutput {
+ public:
+  using DataOutput::DataOutput;
+
+ protected:
+  virtual const SerializationRegistry &getSerializationRegistry()
+      const override {
+    return m_serializationRegistry;
+  }
+
+ private:
+  SerializationRegistry m_serializationRegistry;
+};
 
 #define EXPECT_MESSAGE_EQ(e, a) EXPECT_PRED_FORMAT2(assertMessageEqual, e, a)
 
@@ -53,9 +69,9 @@ TEST_F(TcrMessageTest, testConstructor1MessageDataContentWithDESTROY_REGION) {
   int messageResponseTimeout = 1000;
   ThinClientBaseDM *connectionDM = nullptr;
 
-  TcrMessageDestroyRegion message(std::unique_ptr<DataOutput>(new DataOutput()),
-                                  region, aCallbackArgument,
-                                  messageResponseTimeout, connectionDM);
+  TcrMessageDestroyRegion message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()), region,
+      aCallbackArgument, messageResponseTimeout, connectionDM);
 
   EXPECT_EQ(TcrMessage::DESTROY_REGION, message.getMessageType());
 
@@ -72,9 +88,9 @@ TEST_F(TcrMessageTest, testConstructor1MessageDataContentWithCLEAR_REGION) {
   int messageResponseTimeout = 1000;
   ThinClientBaseDM *connectionDM = nullptr;
 
-  TcrMessageClearRegion message(std::unique_ptr<DataOutput>(new DataOutput()),
-                                region, aCallbackArgument,
-                                messageResponseTimeout, connectionDM);
+  TcrMessageClearRegion message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()), region,
+      aCallbackArgument, messageResponseTimeout, connectionDM);
 
   EXPECT_MESSAGE_EQ(
       "000000240000003800000003\\h{8}"
@@ -87,9 +103,9 @@ TEST_F(TcrMessageTest, testQueryConstructorMessageDataCotent) {
   int messageResponseTimeout = 1000;
   ThinClientBaseDM *connectionDM = nullptr;
 
-  TcrMessageCloseCQ message(std::unique_ptr<DataOutput>(new DataOutput()),
-                            "myRegionName", messageResponseTimeout,
-                            connectionDM);
+  TcrMessageCloseCQ message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "myRegionName", messageResponseTimeout, connectionDM);
 
   EXPECT_EQ(TcrMessage::CLOSECQ_MSG_TYPE, message.getMessageType());
 
@@ -103,8 +119,9 @@ TEST_F(TcrMessageTest, testQueryConstructorWithQUERY) {
   int messageResponseTimeout = 1000;
   ThinClientBaseDM *connectionDM = nullptr;
 
-  TcrMessageQuery message(std::unique_ptr<DataOutput>(new DataOutput()),
-                          "aRegionName", messageResponseTimeout, connectionDM);
+  TcrMessageQuery message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "aRegionName", messageResponseTimeout, connectionDM);
 
   EXPECT_EQ(TcrMessage::QUERY, message.getMessageType());
 
@@ -118,8 +135,9 @@ TEST_F(TcrMessageTest, testQueryConstructorWithSTOPCQ_MSG_TYPE) {
   int messageResponseTimeout = 1000;
   ThinClientBaseDM *connectionDM = nullptr;
 
-  TcrMessageStopCQ message(std::unique_ptr<DataOutput>(new DataOutput()),
-                           "aRegionName", messageResponseTimeout, connectionDM);
+  TcrMessageStopCQ message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "aRegionName", messageResponseTimeout, connectionDM);
 
   EXPECT_EQ(TcrMessage::STOPCQ_MSG_TYPE, message.getMessageType());
 
@@ -133,9 +151,9 @@ TEST_F(TcrMessageTest, testQueryConstructorWithCLOSECQ_MSG_TYPE) {
   int messageResponseTimeout = 1000;
   ThinClientBaseDM *connectionDM = nullptr;
 
-  TcrMessageCloseCQ message(std::unique_ptr<DataOutput>(new DataOutput()),
-                            "aRegionName", messageResponseTimeout,
-                            connectionDM);
+  TcrMessageCloseCQ message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "aRegionName", messageResponseTimeout, connectionDM);
 
   EXPECT_EQ(TcrMessage::CLOSECQ_MSG_TYPE, message.getMessageType());
 
@@ -153,8 +171,9 @@ TEST_F(TcrMessageTest,
   CacheableVectorPtr paramList = CacheableVector::create();
 
   TcrMessageQueryWithParameters message(
-      std::unique_ptr<DataOutput>(new DataOutput()), "aRegionName",
-      aCallbackArgument, paramList, messageResponseTimeout, connectionDM);
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "aRegionName", aCallbackArgument, paramList, messageResponseTimeout,
+      connectionDM);
 
   EXPECT_EQ(TcrMessage::QUERY_WITH_PARAMETERS, message.getMessageType());
 
@@ -166,7 +185,7 @@ TEST_F(TcrMessageTest,
 
 TEST_F(TcrMessageTest, testConstructorWithCONTAINS_KEY) {
   TcrMessageContainsKey message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       static_cast<const Region *>(nullptr),
       CacheableString::create(
           "mykey"),  // static_cast<const CacheableKeyPtr>(nullptr),
@@ -182,8 +201,9 @@ TEST_F(TcrMessageTest, testConstructorWithCONTAINS_KEY) {
 }
 
 TEST_F(TcrMessageTest, testConstructorWithGETDURABLECQS_MSG_TYPE) {
-  TcrMessageGetDurableCqs message(std::unique_ptr<DataOutput>(new DataOutput()),
-                                  static_cast<ThinClientBaseDM *>(nullptr));
+  TcrMessageGetDurableCqs message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::GETDURABLECQS_MSG_TYPE, message.getMessageType());
 
@@ -192,7 +212,7 @@ TEST_F(TcrMessageTest, testConstructorWithGETDURABLECQS_MSG_TYPE) {
 
 TEST_F(TcrMessageTest, testConstructor2WithREQUEST) {
   TcrMessageRequest message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       static_cast<const Region *>(nullptr),
       CacheableString::create(
           "mykey"),  // static_cast<const CacheableKeyPtr>(nullptr),
@@ -208,12 +228,12 @@ TEST_F(TcrMessageTest, testConstructor2WithREQUEST) {
 }
 
 TEST_F(TcrMessageTest, testConstructor2WithDESTROY) {
-  TcrMessageDestroy message(std::unique_ptr<DataOutput>(new DataOutput()),
-                            static_cast<const Region *>(nullptr),
-                            CacheableString::create("mykey"),
-                            static_cast<const CacheableKeyPtr>(nullptr),
-                            static_cast<const UserDataPtr>(nullptr),
-                            static_cast<ThinClientBaseDM *>(nullptr));
+  TcrMessageDestroy message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      static_cast<const Region *>(nullptr), CacheableString::create("mykey"),
+      static_cast<const CacheableKeyPtr>(nullptr),
+      static_cast<const UserDataPtr>(nullptr),
+      static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::DESTROY, message.getMessageType());
 
@@ -226,7 +246,7 @@ TEST_F(TcrMessageTest, testConstructor2WithDESTROY) {
 
 TEST_F(TcrMessageTest, testConstructor2WithINVALIDATE) {
   TcrMessageInvalidate message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       static_cast<const Region *>(nullptr),
       CacheableString::create(
           "mykey"),  // static_cast<const CacheableKeyPtr>(nullptr),
@@ -243,16 +263,16 @@ TEST_F(TcrMessageTest, testConstructor2WithINVALIDATE) {
 }
 
 TEST_F(TcrMessageTest, testConstructor3WithPUT) {
-  TcrMessagePut message(std::unique_ptr<DataOutput>(new DataOutput()),
-                        static_cast<const Region *>(nullptr),
-                        CacheableString::create("mykey"),
-                        CacheableString::create("myvalue"),
-                        static_cast<const UserDataPtr>(nullptr),
-                        false,  // isDelta
-                        static_cast<ThinClientBaseDM *>(nullptr),
-                        false,  // isMetaRegion
-                        false,  // fullValueAfterDeltaFail
-                        "myRegionName");
+  TcrMessagePut message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      static_cast<const Region *>(nullptr), CacheableString::create("mykey"),
+      CacheableString::create("myvalue"),
+      static_cast<const UserDataPtr>(nullptr),
+      false,  // isDelta
+      static_cast<ThinClientBaseDM *>(nullptr),
+      false,  // isMetaRegion
+      false,  // fullValueAfterDeltaFail
+      "myRegionName");
 
   EXPECT_EQ(TcrMessage::PUT, message.getMessageType());
 
@@ -276,7 +296,7 @@ TEST_F(TcrMessageTest, testConstructor5WithREGISTER_INTERST_LIST) {
   keys.push_back(CacheableString::create("mykey"));
 
   TcrMessageRegisterInterestList message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       static_cast<const Region *>(nullptr), keys,
       false,  // isDurable
       false,  // isCacheingEnabled
@@ -297,7 +317,7 @@ TEST_F(TcrMessageTest, testConstructor5WithUNREGISTER_INTERST_LIST) {
   keys.push_back(CacheableString::create("mykey"));
 
   TcrMessageUnregisterInterestList message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       static_cast<const Region *>(nullptr), keys,
       false,  // isDurable
       false,  // isCacheingEnabled
@@ -315,8 +335,8 @@ TEST_F(TcrMessageTest, testConstructor5WithUNREGISTER_INTERST_LIST) {
 
 TEST_F(TcrMessageTest, testConstructorGET_FUNCTION_ATTRIBUTES) {
   TcrMessageGetFunctionAttributes message(
-      std::unique_ptr<DataOutput>(new DataOutput()), std::string("myFunction"),
-      static_cast<ThinClientBaseDM *>(nullptr));
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      std::string("myFunction"), static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::GET_FUNCTION_ATTRIBUTES, message.getMessageType());
 
@@ -326,9 +346,10 @@ TEST_F(TcrMessageTest, testConstructorGET_FUNCTION_ATTRIBUTES) {
 }
 
 TEST_F(TcrMessageTest, testConstructorKEY_SET) {
-  TcrMessageKeySet message(std::unique_ptr<DataOutput>(new DataOutput()),
-                           std::string("myFunctionKeySet"),
-                           static_cast<ThinClientBaseDM *>(nullptr));
+  TcrMessageKeySet message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      std::string("myFunctionKeySet"),
+      static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::KEY_SET, message.getMessageType());
 
@@ -339,14 +360,15 @@ TEST_F(TcrMessageTest, testConstructorKEY_SET) {
 }
 
 TEST_F(TcrMessageTest, testConstructor6WithCREATE_REGION) {
-  TcrMessageCreateRegion message(std::unique_ptr<DataOutput>(new DataOutput()),
-                                 "str1",  // TODO: what does this parameter do?!
-                                 "str2",  // TODO: what does this parameter do?!
-                                 InterestResultPolicy::NONE,
-                                 false,  // isDurable
-                                 false,  // isCacheingEnabled
-                                 false,  // receiveValues
-                                 static_cast<ThinClientBaseDM *>(nullptr));
+  TcrMessageCreateRegion message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "str1",  // TODO: what does this parameter do?!
+      "str2",  // TODO: what does this parameter do?!
+      InterestResultPolicy::NONE,
+      false,  // isDurable
+      false,  // isCacheingEnabled
+      false,  // receiveValues
+      static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::CREATE_REGION, message.getMessageType());
 
@@ -357,7 +379,7 @@ TEST_F(TcrMessageTest, testConstructor6WithCREATE_REGION) {
 
 TEST_F(TcrMessageTest, testConstructor6WithREGISTER_INTEREST) {
   TcrMessageRegisterInterest message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       "str1",  // TODO: what does this parameter do?!
       "str2",  // TODO: what does this parameter do?!
       InterestResultPolicy::NONE,
@@ -376,7 +398,7 @@ TEST_F(TcrMessageTest, testConstructor6WithREGISTER_INTEREST) {
 
 TEST_F(TcrMessageTest, testConstructor6WithUNREGISTER_INTEREST) {
   TcrMessageUnregisterInterest message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       "str1",  // TODO: what does this parameter do?!
       "str2",  // TODO: what does this parameter do?!
       InterestResultPolicy::NONE,
@@ -395,7 +417,7 @@ TEST_F(TcrMessageTest, testConstructor6WithUNREGISTER_INTEREST) {
 
 TEST_F(TcrMessageTest, testConstructorGET_PDX_TYPE_BY_ID) {
   TcrMessageGetPdxTypeById message(
-      std::unique_ptr<DataOutput>(new DataOutput()), 42,
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()), 42,
       static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::GET_PDX_TYPE_BY_ID, message.getMessageType());
@@ -406,7 +428,7 @@ TEST_F(TcrMessageTest, testConstructorGET_PDX_TYPE_BY_ID) {
 
 TEST_F(TcrMessageTest, testConstructorGET_PDX_ENUM_BY_ID) {
   TcrMessageGetPdxEnumById message(
-      std::unique_ptr<DataOutput>(new DataOutput()), 42,
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()), 42,
       static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::GET_PDX_ENUM_BY_ID, message.getMessageType());
@@ -418,7 +440,7 @@ TEST_F(TcrMessageTest, testConstructorGET_PDX_ENUM_BY_ID) {
 TEST_F(TcrMessageTest, testConstructorGET_PDX_ID_FOR_TYPE) {
   CacheablePtr myPtr(CacheableString::createDeserializable());
   TcrMessageGetPdxIdForType message(
-      std::unique_ptr<DataOutput>(new DataOutput()), myPtr,
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()), myPtr,
       static_cast<ThinClientBaseDM *>(nullptr), 42);
 
   EXPECT_EQ(TcrMessage::GET_PDX_ID_FOR_TYPE, message.getMessageType());
@@ -429,9 +451,9 @@ TEST_F(TcrMessageTest, testConstructorGET_PDX_ID_FOR_TYPE) {
 
 TEST_F(TcrMessageTest, testConstructorADD_PDX_TYPE) {
   CacheablePtr myPtr(CacheableString::createDeserializable());
-  TcrMessageAddPdxType message(std::unique_ptr<DataOutput>(new DataOutput()),
-                               myPtr, static_cast<ThinClientBaseDM *>(nullptr),
-                               42);
+  TcrMessageAddPdxType message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()), myPtr,
+      static_cast<ThinClientBaseDM *>(nullptr), 42);
 
   EXPECT_EQ(TcrMessage::ADD_PDX_TYPE, message.getMessageType());
 
@@ -442,7 +464,7 @@ TEST_F(TcrMessageTest, testConstructorADD_PDX_TYPE) {
 
 TEST_F(TcrMessageTest, testConstructorGET_PDX_ID_FOR_ENUM) {
   TcrMessageGetPdxIdForEnum message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       static_cast<CacheablePtr>(nullptr),
       static_cast<ThinClientBaseDM *>(nullptr), 42);
 
@@ -454,9 +476,10 @@ TEST_F(TcrMessageTest, testConstructorGET_PDX_ID_FOR_ENUM) {
 TEST_F(TcrMessageTest, testConstructorADD_PDX_ENUM) {
   CacheablePtr myPtr(CacheableString::createDeserializable());
 
-  TcrMessageAddPdxEnum message(std::unique_ptr<DataOutput>(new DataOutput()),
-                               static_cast<CacheablePtr>(nullptr),
-                               static_cast<ThinClientBaseDM *>(nullptr), 42);
+  TcrMessageAddPdxEnum message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      static_cast<CacheablePtr>(nullptr),
+      static_cast<ThinClientBaseDM *>(nullptr), 42);
 
   EXPECT_EQ(TcrMessage::ADD_PDX_ENUM, message.getMessageType());
 
@@ -467,7 +490,7 @@ TEST_F(TcrMessageTest, testConstructorADD_PDX_ENUM) {
 
 TEST_F(TcrMessageTest, testConstructorEventId) {
   TcrMessageRequestEventValue message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       static_cast<EventIdPtr>(nullptr));
 
   EXPECT_EQ(TcrMessage::REQUEST_EVENT_VALUE, message.getMessageType());
@@ -477,7 +500,7 @@ TEST_F(TcrMessageTest, testConstructorEventId) {
 
 TEST_F(TcrMessageTest, testConstructorREMOVE_USER_AUTH) {
   TcrMessageRemoveUserAuth message(
-      std::unique_ptr<DataOutput>(new DataOutput()), true,
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()), true,
       static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::REMOVE_USER_AUTH, message.getMessageType());
@@ -485,7 +508,7 @@ TEST_F(TcrMessageTest, testConstructorREMOVE_USER_AUTH) {
   EXPECT_MESSAGE_EQ("0000004E0000000600000001FFFFFFFF00000000010001", message);
 
   TcrMessageRemoveUserAuth message2(
-      std::unique_ptr<DataOutput>(new DataOutput()), false,
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()), false,
       static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::REMOVE_USER_AUTH, message2.getMessageType());
@@ -495,7 +518,7 @@ TEST_F(TcrMessageTest, testConstructorREMOVE_USER_AUTH) {
 
 TEST_F(TcrMessageTest, testConstructorUSER_CREDENTIAL_MESSAGE) {
   TcrMessageUserCredential message(
-      std::unique_ptr<DataOutput>(new DataOutput()),
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
       static_cast<PropertiesPtr>(nullptr),
       static_cast<ThinClientBaseDM *>(nullptr));
 
@@ -507,7 +530,8 @@ TEST_F(TcrMessageTest, testConstructorUSER_CREDENTIAL_MESSAGE) {
 
 TEST_F(TcrMessageTest, testConstructorGET_CLIENT_PARTITION_ATTRIBUTES) {
   TcrMessageGetClientPartitionAttributes message(
-      std::unique_ptr<DataOutput>(new DataOutput()), "testClientRegion");
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "testClientRegion");
 
   EXPECT_EQ(TcrMessage::GET_CLIENT_PARTITION_ATTRIBUTES,
             message.getMessageType());
@@ -520,7 +544,8 @@ TEST_F(TcrMessageTest, testConstructorGET_CLIENT_PARTITION_ATTRIBUTES) {
 
 TEST_F(TcrMessageTest, testConstructorGET_CLIENT_PR_METADATA) {
   TcrMessageGetClientPrMetadata message(
-      std::unique_ptr<DataOutput>(new DataOutput()), "testClientRegionPRMETA");
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "testClientRegionPRMETA");
 
   EXPECT_EQ(TcrMessage::GET_CLIENT_PR_METADATA, message.getMessageType());
 
@@ -530,8 +555,9 @@ TEST_F(TcrMessageTest, testConstructorGET_CLIENT_PR_METADATA) {
       message);
 }
 TEST_F(TcrMessageTest, testConstructorSIZE) {
-  TcrMessageSize message(std::unique_ptr<DataOutput>(new DataOutput()),
-                         "testClientRegionSIZE");
+  TcrMessageSize message(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "testClientRegionSIZE");
 
   EXPECT_EQ(TcrMessage::SIZE, message.getMessageType());
 
@@ -549,8 +575,8 @@ TEST_F(TcrMessageTest, testConstructorEXECUTE_REGION_FUNCTION_SINGLE_HOP) {
   CacheablePtr myPtr(CacheableString::createDeserializable());
 
   TcrMessageExecuteRegionFunctionSingleHop message(
-      std::unique_ptr<DataOutput>(new DataOutput()), "myFuncName", region,
-      myPtr, myHashCachePtr, 2, myHashCachePtr,
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "myFuncName", region, myPtr, myHashCachePtr, 2, myHashCachePtr,
       false,  // allBuckets
       1, static_cast<ThinClientBaseDM *>(nullptr));
 
@@ -575,8 +601,8 @@ TEST_F(TcrMessageTest, testConstructorEXECUTE_REGION_FUNCTION) {
   CacheableVectorPtr myVectPtr = CacheableVector::create();
 
   TcrMessageExecuteRegionFunction testMessage(
-      std::unique_ptr<DataOutput>(new DataOutput()), "ExecuteRegion", region,
-      myCacheablePtr, myVectPtr, 2, myHashCachePtr, 10,
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "ExecuteRegion", region, myCacheablePtr, myVectPtr, 2, myHashCachePtr, 10,
       static_cast<ThinClientBaseDM *>(nullptr), 10);
 
   EXPECT_EQ(TcrMessage::EXECUTE_REGION_FUNCTION, testMessage.getMessageType());
@@ -597,8 +623,9 @@ TEST_F(TcrMessageTest, DISABLED_testConstructorEXECUTE_FUNCTION) {
   CacheablePtr myCacheablePtr(CacheableString::createDeserializable());
 
   TcrMessageExecuteFunction testMessage(
-      std::unique_ptr<DataOutput>(new DataOutput()), "ExecuteFunction",
-      myCacheablePtr, 1, static_cast<ThinClientBaseDM *>(nullptr), 10);
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "ExecuteFunction", myCacheablePtr, 1,
+      static_cast<ThinClientBaseDM *>(nullptr), 10);
 
   EXPECT_EQ(TcrMessage::EXECUTE_FUNCTION, testMessage.getMessageType());
 
@@ -613,10 +640,10 @@ TEST_F(TcrMessageTest, DISABLED_testConstructorEXECUTE_FUNCTION) {
 TEST_F(TcrMessageTest, testConstructorEXECUTECQ_MSG_TYPE) {
   CacheablePtr myCacheablePtr(CacheableString::createDeserializable());
 
-  TcrMessageExecuteCq testMessage(std::unique_ptr<DataOutput>(new DataOutput()),
-                                  "ExecuteCQ", "select * from /somewhere",
-                                  CqState::RUNNING, false,
-                                  static_cast<ThinClientBaseDM *>(nullptr));
+  TcrMessageExecuteCq testMessage(
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "ExecuteCQ", "select * from /somewhere", CqState::RUNNING, false,
+      static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::EXECUTECQ_MSG_TYPE, testMessage.getMessageType());
 
@@ -647,8 +674,9 @@ TEST_F(TcrMessageTest, testConstructorWithGinormousQueryEXECUTECQ_MSG_TYPE) {
   oss << ") and s.type in SET('AAA','BBB','CCC','DDD') limit 60000";
 
   TcrMessageExecuteCq testMessage(
-      std::unique_ptr<DataOutput>(new DataOutput()), "ExecuteCQ", oss.str(),
-      CqState::RUNNING, false, static_cast<ThinClientBaseDM *>(nullptr));
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "ExecuteCQ", oss.str(), CqState::RUNNING, false,
+      static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::EXECUTECQ_MSG_TYPE, testMessage.getMessageType());
 
@@ -662,8 +690,8 @@ TEST_F(TcrMessageTest, testConstructorEXECUTECQ_WITH_IR_MSG_TYPE) {
   CacheablePtr myCacheablePtr(CacheableString::createDeserializable());
 
   TcrMessageExecuteCqWithIr testMessage(
-      std::unique_ptr<DataOutput>(new DataOutput()), "ExecuteCQWithIr",
-      "select * from /somewhere", CqState::RUNNING, false,
+      std::unique_ptr<DataOutputUnderTest>(new DataOutputUnderTest()),
+      "ExecuteCQWithIr", "select * from /somewhere", CqState::RUNNING, false,
       static_cast<ThinClientBaseDM *>(nullptr));
 
   EXPECT_EQ(TcrMessage::EXECUTECQ_WITH_IR_MSG_TYPE,
@@ -675,3 +703,5 @@ TEST_F(TcrMessageTest, testConstructorEXECUTECQ_WITH_IR_MSG_TYPE) {
       "000001000000010000000000010001",
       testMessage);
 }
+
+}  // namespace

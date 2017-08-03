@@ -128,7 +128,7 @@ void DataOutput::acquireLock() { g_bigBufferLock.acquire(); }
 
 void DataOutput::releaseLock() { g_bigBufferLock.release(); }
 
-const SerializationRegistry& DataOutput::getSerializationRegistry() {
+const SerializationRegistry& DataOutput::getSerializationRegistry() const {
   return *CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry();
 }
 

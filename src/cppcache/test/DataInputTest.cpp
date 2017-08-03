@@ -29,7 +29,23 @@
 #include <memory>
 #include "ByteArrayFixture.hpp"
 #include "SerializationRegistry.hpp"
+
+namespace {
+
 using namespace apache::geode::client;
+
+class DataInputUnderTest : public DataInput {
+ public:
+  using DataInput::DataInput;
+
+  virtual const SerializationRegistry &getSerializationRegistry()
+      const override {
+    return m_serializationRegistry;
+  }
+
+ private:
+  SerializationRegistry m_serializationRegistry;
+};
 
 class TestDataInput {
  public:
@@ -184,7 +200,7 @@ class TestDataInput {
  private:
   ByteArray m_byteArray;
 
-  DataInput m_dataInput;
+  DataInputUnderTest m_dataInput;
 };
 
 class DataInputTest : public ::testing::Test, protected ByteArrayFixture {
@@ -902,3 +918,5 @@ TEST_F(DataInputTest, TestSetPoolName) {
   EXPECT_STREQ(poolName, dataInput.getPoolName())
       << "Correct pool name after setting";
 }
+
+}  // namespace

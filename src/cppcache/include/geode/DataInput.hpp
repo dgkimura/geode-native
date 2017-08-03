@@ -47,6 +47,7 @@ namespace client {
 extern int gf_sprintf(char* buffer, const char* fmt, ...);
 
 class SerializationRegistry;
+
 /**
  * Provide operations for reading primitive data values, byte arrays,
  * strings, <code>Serializable</code> objects from a byte stream.
@@ -967,6 +968,9 @@ class CPPCACHE_EXPORT DataInput {
   void setPoolName(const char* poolName) { m_poolName = poolName; }
 
   const Cache* getCache();
+
+ protected:
+  virtual const SerializationRegistry& getSerializationRegistry() const;
 
  private:
   const uint8_t* m_buf;
