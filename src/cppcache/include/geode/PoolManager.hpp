@@ -103,9 +103,10 @@ class CPPCACHE_EXPORT PoolManager {
 
   void addPool(const char* name, const PoolPtr& pool);
 
-  PoolPtr getAnyPool();
+  PoolPtr getDefaultPool();
 
   HashMapOfPools m_connectionPools;
+  PoolPtr m_defaultPool;
 
   friend Cache;
   friend CacheImpl;

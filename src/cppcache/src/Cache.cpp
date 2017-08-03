@@ -222,7 +222,7 @@ PdxInstanceFactoryPtr Cache::createPdxInstanceFactory(const char* className) {
 RegionServicePtr Cache::createAuthenticatedView(
     PropertiesPtr userSecurityProperties, const char* poolName) {
   if (poolName == nullptr) {
-    auto pool = m_cacheImpl->getPoolManager().getAnyPool();
+    auto pool = m_cacheImpl->getPoolManager().getDefaultPool();
     if (!this->isClosed() && pool != nullptr) {
       return pool->createSecureUserCache(userSecurityProperties,
                                          m_cacheImpl.get());

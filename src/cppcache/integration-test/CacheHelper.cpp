@@ -125,8 +125,9 @@ CacheHelper::CacheHelper(const PropertiesPtr& configPtr,
   }
 
   cachePtr = CacheFactory::createCacheFactory(pp)->create();
+
   auto poolFactory = cachePtr->getPoolManager().createFactory();
-  poolFactory->create("default", *cachePtr);
+  poolFactory->create("__CACHE_HELPER_POOL__", *cachePtr);
 
   m_doDisconnect = false;
 
@@ -228,7 +229,7 @@ CacheHelper::CacheHelper(const bool isthinClient, const char* poolName,
       poolFactory->setSubscriptionAckInterval(subscriptionAckInterval);
     }
 
-    poolFactory->create("default", *cachePtr);
+    poolFactory->create(poolName, *cachePtr);
 
   } catch (const Exception& excp) {
     LOG("Geode exception while creating cache, logged in following line");

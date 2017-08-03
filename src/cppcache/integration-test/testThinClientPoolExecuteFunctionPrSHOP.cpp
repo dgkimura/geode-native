@@ -239,8 +239,8 @@ END_TASK_DEFINITION
 
 DUNIT_TASK_DEFINITION(CLIENT1, StartC1)
   {
-    initClientWithPool(true, nullptr, locHostPort, serverGroup, nullptr, 0,
-                       true, -1, -1, 60000, /*singlehop*/ true,
+    initClientWithPool(true, poolRegNames[0], locHostPort, serverGroup, nullptr,
+                       0, true, -1, -1, 60000, /*singlehop*/ true,
                        /*threadLocal*/ true);
 
     auto regPtr0 = createRegionAndAttachPool(poolRegNames[0], USE_ACK, nullptr);

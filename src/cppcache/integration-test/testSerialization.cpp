@@ -50,7 +50,7 @@ std::shared_ptr<T> duplicate(const std::shared_ptr<T>& orig) {
 
   uint32_t length = 0;
   const uint8_t* buffer = dout->getBuffer(&length);
-  auto din =  getHelper()->getCache()->createDataInput(buffer, length);
+  auto din = getHelper()->getCache()->createDataInput(buffer, length);
   din->readObject(result);
 
   return result;
@@ -161,9 +161,11 @@ ENDTASK
 
 DUNIT_TASK(Sender, SetupAndPutInts)
   {
-    initClientWithPool(true, "__TEST_POOL1__", locatorsG, "ServerGroup1",
-                       nullptr, 0, true);
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    initClientWithPool(true, "__TEST_POOL1__", locatorsG, nullptr, nullptr, 0,
+                       true);
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     serializationRegistry->addType(OtherType::createDeserializable);
     serializationRegistry->addType(OtherType::createDeserializable2);
     serializationRegistry->addType(OtherType::createDeserializable4);

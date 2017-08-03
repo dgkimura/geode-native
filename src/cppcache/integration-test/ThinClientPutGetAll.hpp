@@ -49,7 +49,7 @@ static int numberOfLocators = 0;
 
 const char* locatorsG =
     CacheHelper::getLocatorHostPort(isLocator, isLocalServer, numberOfLocators);
-const char* poolName = "__TESTPOOL1_";
+const char* poolName = "__TEST_POOL1__";
 
 const char* _keys[] = {"Key-1", "Key-2", "Key-3", "Key-4"};
 const char* _vals[] = {"Value-1", "Value-2", "Value-3", "Value-4"};
@@ -118,22 +118,12 @@ void createPooledRegion(const char* name, bool ackMode, const char* locators,
   LOG("Pooled Region created.");
 }
 
-DUNIT_TASK_DEFINITION(SERVER1, CreateServer1)
-  {
-    // start one server
-    if (isLocalServer) {
-      CacheHelper::initServer(1, "cacheserver_notify_subscription.xml");
-      LOG("SERVER1 started");
-    }
-  }
-END_TASK_DEFINITION
-
 DUNIT_TASK_DEFINITION(CLIENT1, StepOne_Pooled_Locator)
   {
     // waitForDebugger();
     // start 1st client with caching enable true and client notification true
-    initClientWithPool(true, "__TEST_POOL1__", locatorsG, "ServerGroup1",
-                       nullptr, 0, true);
+    initClientWithPool(true, "__TEST_POOL1__", locatorsG, nullptr, nullptr, 0,
+                       true);
     createPooledRegion(_regionNames[0], USE_ACK, locatorsG, poolName, true,
                        true);
     LOG("StepOne_Pooled_Locator complete.");
@@ -143,8 +133,8 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT2, StepTwo_Pooled_Locator)
   {
     // start 1st client with caching enable true and client notification true
-    initClientWithPool(true, "__TEST_POOL1__", locatorsG, "ServerGroup1",
-                       nullptr, 0, true);
+    initClientWithPool(true, "__TEST_POOL1__", locatorsG, nullptr, nullptr, 0,
+                       true);
     createPooledRegion(_regionNames[0], USE_ACK, locatorsG, poolName, true,
                        true);
     LOG("StepTwo_Pooled_Locator complete.");
@@ -236,7 +226,9 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT1, putallAndGetallPdxWithCallBackArg)
   {
     LOG("putallAndGetallPdxWithCallBackArg started.");
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     try {
       serializationRegistry->addPdxType(PdxTypes1::createDeserializable);
     } catch (const IllegalStateException&) {
@@ -413,7 +405,9 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT1, putallAndGetallPdx)
   {
     LOG("putallAndGetallPdx started.");
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     try {
       serializationRegistry->addPdxType(PdxTypes1::createDeserializable);
     } catch (const IllegalStateException&) {
@@ -497,6 +491,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, putallAndGetallPdx)
     map0.emplace(CacheableInt32::create(29), p9);
     map0.emplace(CacheableInt32::create(30), p10);
     RegionPtr regPtr0 = getHelper()->getRegion(_regionNames[0]);
+    regPtr0->put(CacheableInt32::create(30), p10);
     regPtr0->putAll(map0);
     LOG("putAll on Pdx objects completed.");
 
@@ -608,12 +603,12 @@ void runPutGetAll() {
   CALL_TASK(StepOne_Pooled_Locator);
   CALL_TASK(StepTwo_Pooled_Locator);
 
-  CALL_TASK(PutAllInitialValuesFromClientOne);
-  CALL_TASK(GetAllInitialValuesFromClientTwo);
-  CALL_TASK(PutAllUpdatedValuesFromClientOne);
-  CALL_TASK(GetAllUpdatedValuesFromClientTwo);
+  // CALL_TASK(PutAllInitialValuesFromClientOne);
+  // CALL_TASK(GetAllInitialValuesFromClientTwo);
+  // CALL_TASK(PutAllUpdatedValuesFromClientOne);
+  // CALL_TASK(GetAllUpdatedValuesFromClientTwo);
 
-  CALL_TASK(GetAllAfterLocalDestroyRegionOnClientTwo_Pool);
+  // CALL_TASK(GetAllAfterLocalDestroyRegionOnClientTwo_Pool);
   CALL_TASK(putallAndGetallPdx);
 
   // TODO: Does this task add value? Is it same code path as

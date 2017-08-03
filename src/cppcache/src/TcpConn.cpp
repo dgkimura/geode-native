@@ -113,13 +113,13 @@ void TcpConn::init() {
   readSize = maxSize(sock, SO_SNDBUF, readSize);
   if (originalReadSize != readSize) {
     // This should get logged once at startup and again only if it changes
-    LOGINFO("Using socket send buffer size of %d.", readSize);
+    LOGFINEST("Using socket send buffer size of %d.", readSize);
   }
   int32_t originalWriteSize = writeSize;
   writeSize = maxSize(sock, SO_RCVBUF, writeSize);
   if (originalWriteSize != writeSize) {
     // This should get logged once at startup and again only if it changes
-    LOGINFO("Using socket receive buffer size of %d.", writeSize);
+    LOGFINEST("Using socket receive buffer size of %d.", writeSize);
   }
 
   createSocket(sock);
@@ -131,7 +131,7 @@ TcpConn::TcpConn(const char *ipaddr, uint32_t waitSeconds,
                  int32_t maxBuffSizePool)
     : m_io(nullptr),
       m_addr(ipaddr),
-      m_waitMilliSeconds(waitSeconds),
+      m_waitMilliSeconds(waitSeconds * 1000),
       m_maxBuffSizePool(maxBuffSizePool),
       m_chunkSize(getDefaultChunkSize()) {}
 
@@ -139,7 +139,7 @@ TcpConn::TcpConn(const char *hostname, int32_t port, uint32_t waitSeconds,
                  int32_t maxBuffSizePool)
     : m_io(nullptr),
       m_addr(port, hostname),
-      m_waitMilliSeconds(waitSeconds),
+      m_waitMilliSeconds(waitSeconds * 1000),
       m_maxBuffSizePool(maxBuffSizePool),
       m_chunkSize(getDefaultChunkSize()) {}
 
@@ -241,7 +241,7 @@ void TcpConn::connect() {
     ACE_OS::snprintf(msg, 256, "TcpConn::connect failed with errno: %d: %s",
                      lastError, ACE_OS::strerror(lastError));
     //  this is only called by constructor, so we must delete m_io
-	close();
+    close();
     throw GeodeIOException(msg);
   }
   int rc = this->m_io->enable(ACE_NONBLOCK);

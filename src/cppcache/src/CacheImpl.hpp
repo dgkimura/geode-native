@@ -71,7 +71,7 @@ typedef std::shared_ptr<SerializationRegistry> SerializationRegistryPtr;
  * @class Cache Cache.hpp
  * Geode's implementation of a distributed C++ Cache.
  *
- * Caches are obtained from static methods on the {@link CacheFactory} class.
+ * Caches are obtained from methods on the {@link CacheFactory} class.
  * <p>
  * When a cache is created a {@link DistributedSystem} must be specified.
  * This system tells the cache where to find other caches on the network

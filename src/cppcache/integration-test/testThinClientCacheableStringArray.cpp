@@ -37,7 +37,6 @@
 #include "CacheRegionHelper.hpp"
 #include "CacheImpl.hpp"
 
-
 using namespace apache::geode::client;
 using namespace test;
 using namespace testobject;
@@ -68,9 +67,11 @@ END_TASK(CreateServer1)
 
 DUNIT_TASK(CLIENT1, StepOne)
   {
-    initClientWithPool(true, "__TEST_POOL1__", locHostPort, "ServerGroup1",
-                       nullptr, 0, true);
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    initClientWithPool(true, "__TEST_POOL1__", locHostPort, nullptr, nullptr, 0,
+                       true);
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
 
     serializationRegistry->addType(Position::createDeserializable);
     serializationRegistry->addType(Portfolio::createDeserializable);

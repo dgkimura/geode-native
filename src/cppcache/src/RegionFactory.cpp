@@ -50,7 +50,7 @@ RegionPtr RegionFactory::create(const char* name) {
   RegionAttributesPtr regAttr = m_attributeFactory->createRegionAttributes();
   if (m_preDefinedRegion != LOCAL && (regAttr->getPoolName() == nullptr ||
                                       strlen(regAttr->getPoolName()) == 0)) {
-    auto pool = m_cacheImpl->getPoolManager().getAnyPool();
+    auto pool = m_cacheImpl->getPoolManager().getDefaultPool();
     if (!pool) {
       throw IllegalStateException("No pool for non-local region.");
     }

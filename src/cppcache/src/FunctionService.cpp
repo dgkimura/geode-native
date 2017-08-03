@@ -123,7 +123,7 @@ ExecutionPtr FunctionService::onServerWithCache(const RegionServicePtr& cache) {
   } else {
     CachePtr realcache = std::static_pointer_cast<Cache>(cache);
     return FunctionService::onServer(
-        realcache->m_cacheImpl->getPoolManager().getAnyPool());
+        realcache->m_cacheImpl->getPoolManager().getDefaultPool());
   }
 }
 
@@ -149,6 +149,6 @@ ExecutionPtr FunctionService::onServersWithCache(
   } else {
     auto realcache = std::static_pointer_cast<Cache>(cache);
     return FunctionService::onServers(
-        realcache->m_cacheImpl->getPoolManager().getAnyPool());
+        realcache->m_cacheImpl->getPoolManager().getDefaultPool());
   }
 }

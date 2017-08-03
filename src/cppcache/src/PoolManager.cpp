@@ -75,7 +75,13 @@ PoolPtr PoolManager::find(RegionPtr region) {
 const HashMapOfPools& PoolManager::getAll() { return m_connectionPools; }
 
 void PoolManager::addPool(const char* name, const PoolPtr& pool) {
+  ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
+
+  if (!m_defaultPool) {
+    m_defaultPool = pool;
+  }
+
   m_connectionPools.emplace(name, pool);
 }
 
-PoolPtr PoolManager::getAnyPool() { return m_connectionPools.begin()->second; }
+PoolPtr PoolManager::getDefaultPool() { return m_defaultPool; }
