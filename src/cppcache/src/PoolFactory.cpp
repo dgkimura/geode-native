@@ -32,7 +32,6 @@ using namespace apache::geode::client;
 const char* PoolFactory::DEFAULT_SERVER_GROUP = "";
 #define DEFAULT_SERVER_PORT 40404
 #define DEFAULT_SERVER_HOST "localhost"
-extern ACE_Recursive_Thread_Mutex connectionPoolsLock;
 
 PoolFactory::PoolFactory()
     : m_attrs(new PoolAttributes),
@@ -117,8 +116,6 @@ void PoolFactory::setPRSingleHopEnabled(bool enabled) {
 PoolPtr PoolFactory::create(const char* name, Cache& cache) {
   ThinClientPoolDMPtr poolDM;
   {
-    ACE_Guard<ACE_Recursive_Thread_Mutex> guard(connectionPoolsLock);
-
     if (cache.getPoolManager().find(name) != nullptr) {
       throw IllegalStateException("Pool with the same name already exists");
     }

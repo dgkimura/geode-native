@@ -40,8 +40,6 @@
 #include "version.h"
 
 #define DEFAULT_CACHE_NAME "default_GeodeCache"
-#define DEFAULT_SERVER_PORT 40404
-#define DEFAULT_SERVER_HOST "localhost"
 
 extern ACE_Recursive_Thread_Mutex* g_disconnectLock;
 

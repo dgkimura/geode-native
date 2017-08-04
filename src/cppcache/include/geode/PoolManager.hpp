@@ -105,8 +105,8 @@ class CPPCACHE_EXPORT PoolManager {
 
   PoolPtr getDefaultPool();
 
-  HashMapOfPools m_connectionPools;
-  PoolPtr m_defaultPool;
+  class Impl;
+  std::unique_ptr<Impl, void (*)(Impl*)> m_pimpl;
 
   friend Cache;
   friend CacheImpl;
