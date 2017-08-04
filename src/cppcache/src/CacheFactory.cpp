@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include "config.h"
 #include <geode/CacheFactory.hpp>
 #include <CppCacheLibrary.hpp>
 #include <geode/Cache.hpp>
@@ -44,31 +45,13 @@
 
 extern ACE_Recursive_Thread_Mutex* g_disconnectLock;
 
-bool Cache_CreatedFromCacheFactory = false;
-
 namespace apache {
 namespace geode {
 namespace client {
-ACE_Recursive_Thread_Mutex g_cfLock;
-
-typedef std::map<std::string, CachePtr> StringToCachePtrMap;
-
-void* CacheFactory::m_cacheMap = (void*)nullptr;
-
-CacheFactoryPtr* CacheFactory::default_CacheFactory = nullptr;
 
 CacheFactoryPtr CacheFactory::createCacheFactory(
     const PropertiesPtr& configPtr) {
   return std::make_shared<CacheFactory>(configPtr);
-}
-
-void CacheFactory::init() {
-  if (m_cacheMap == (void*)nullptr) {
-    m_cacheMap = (void*)new StringToCachePtrMap();
-  }
-  if (!reinterpret_cast<StringToCachePtrMap*>(m_cacheMap)) {
-    throw OutOfMemoryException("CacheFactory::create: ");
-  }
 }
 
 void CacheFactory::create_(const char* name, PropertiesPtr dsProp,
@@ -77,10 +60,6 @@ void CacheFactory::create_(const char* name, PropertiesPtr dsProp,
   CppCacheLibrary::initLib();
 
   cptr = nullptr;
-  if (!reinterpret_cast<StringToCachePtrMap*>(m_cacheMap)) {
-    throw IllegalArgumentException(
-        "CacheFactory::create: cache map is not initialized");
-  }
   if (name == nullptr) {
     throw IllegalArgumentException("CacheFactory::create: name is nullptr");
   }
@@ -117,9 +96,6 @@ CachePtr CacheFactory::create() {
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
 
   LOGFINE("CacheFactory called DistributedSystem::connect");
-
-  default_CacheFactory = new CacheFactoryPtr(shared_from_this());
-  Cache_CreatedFromCacheFactory = true;
   auto cache = create(DEFAULT_CACHE_NAME, dsProp, nullptr);
 
   cache->m_cacheImpl->getSerializationRegistry()->addType2(std::bind(
@@ -189,15 +165,6 @@ CachePtr CacheFactory::create(const char* name, PropertiesPtr dsProp,
 }
 
 CacheFactory::~CacheFactory() {}
-void CacheFactory::cleanup() {
-  if (m_cacheMap != nullptr) {
-    if ((reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->empty() == true) {
-      (reinterpret_cast<StringToCachePtrMap*>(m_cacheMap))->clear();
-    }
-    delete (reinterpret_cast<StringToCachePtrMap*>(m_cacheMap));
-    m_cacheMap = nullptr;
-  }
-}
 
 void CacheFactory::handleXML(CachePtr& cachePtr, const char* cachexml,
                              DistributedSystem& system) {

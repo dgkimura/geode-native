@@ -30,7 +30,6 @@
 #include <geode/PoolManager.hpp>
 #include <PdxInstanceFactoryImpl.hpp>
 
-extern bool Cache_CreatedFromCacheFactory;
 extern ACE_Recursive_Thread_Mutex* g_disconnectLock;
 
 #define DEFAULT_DS_NAME "default_GeodeDS"
@@ -81,10 +80,7 @@ void Cache::close(bool keepalive) {
   m_cacheImpl->close(keepalive);
 
   try {
-    if (Cache_CreatedFromCacheFactory) {
-      Cache_CreatedFromCacheFactory = false;
-      getDistributedSystem().disconnect();
-    }
+    getDistributedSystem().disconnect();
   } catch (const apache::geode::client::NotConnectedException&) {
   } catch (const apache::geode::client::Exception&) {
   } catch (...) {

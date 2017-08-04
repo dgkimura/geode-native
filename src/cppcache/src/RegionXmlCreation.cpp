@@ -20,7 +20,6 @@
 #include "RegionXmlCreation.hpp"
 #include "CacheImpl.hpp"
 using namespace apache::geode::client;
-extern bool Cache_CreatedFromCacheFactory;
 
 void RegionXmlCreation::addSubregion(
     std::shared_ptr<RegionXmlCreation> regionPtr) {

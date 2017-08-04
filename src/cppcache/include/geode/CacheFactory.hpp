@@ -140,11 +140,6 @@ class CPPCACHE_EXPORT CacheFactory
 
  private:
   ~CacheFactory();
-
-  // Set very first time some creates cache
-  // TODO shared_ptr - remove or refactor with global work
-  static CacheFactoryPtr* default_CacheFactory;
-  static void* m_cacheMap;
   static void init();
   static void cleanup();
   static void handleXML(CachePtr& cachePtr, const char* cachexml,
