@@ -122,7 +122,6 @@ class CPPCACHE_EXPORT CacheFactory
   CacheFactoryPtr set(const char* name, const char* value);
 
  private:
-  PoolFactoryPtr pf;
   PropertiesPtr dsProp;
   bool ignorePdxUnreadFields;
   bool pdxReadSerialized;
@@ -130,9 +129,9 @@ class CPPCACHE_EXPORT CacheFactory
   CachePtr create(const char* name, PropertiesPtr dsProp,
                   const CacheAttributesPtr& attrs = nullptr);
 
-  static void create_(const char* name, PropertiesPtr dsProp,
-                      const char* id_data, CachePtr& cptr,
-                      bool ignorePdxUnreadFields, bool readPdxSerialized);
+  void create_(const char* name, PropertiesPtr dsProp, const char* id_data,
+               CachePtr& cptr, bool ignorePdxUnreadFields,
+               bool readPdxSerialized);
 
   // no instances allowed
   CacheFactory();
@@ -140,10 +139,7 @@ class CPPCACHE_EXPORT CacheFactory
 
  private:
   ~CacheFactory();
-  static void init();
-  static void cleanup();
-  static void handleXML(CachePtr& cachePtr, const char* cachexml,
-                        DistributedSystem& system);
+
   friend class CppCacheLibrary;
   friend class RegionFactory;
   friend class RegionXmlCreation;

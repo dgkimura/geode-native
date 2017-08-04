@@ -29,12 +29,11 @@
 #include "CacheRegionHelper.hpp"
 using namespace apache::geode::client;
 
-const char* PoolFactory::DEFAULT_SERVER_GROUP = "";
 #define DEFAULT_SERVER_PORT 40404
 #define DEFAULT_SERVER_HOST "localhost"
 
 PoolFactory::PoolFactory()
-    : m_attrs(new PoolAttributes),
+    : m_attrs(std::make_shared<PoolAttributes>()),
       m_isSubscriptionRedundancy(false),
       m_addedServerOrLocator(false) {}
 

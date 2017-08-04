@@ -80,14 +80,12 @@ CacheFactory::CacheFactory() {
   ignorePdxUnreadFields = false;
   pdxReadSerialized = false;
   dsProp = nullptr;
-  pf = nullptr;
 }
 
 CacheFactory::CacheFactory(const PropertiesPtr dsProps) {
   ignorePdxUnreadFields = false;
   pdxReadSerialized = false;
   this->dsProp = dsProps;
-  this->pf = nullptr;
 }
 
 CachePtr CacheFactory::create() {
@@ -131,8 +129,7 @@ CachePtr CacheFactory::create(const char* name, PropertiesPtr dsProp,
   ACE_Guard<ACE_Recursive_Thread_Mutex> connectGuard(*g_disconnectLock);
 
   CachePtr cptr;
-  CacheFactory::create_(name, dsProp, "", cptr, ignorePdxUnreadFields,
-                        pdxReadSerialized);
+  create_(name, dsProp, "", cptr, ignorePdxUnreadFields, pdxReadSerialized);
   cptr->m_cacheImpl->setAttributes(attrs);
   try {
     const char* cacheXml =
@@ -164,37 +161,10 @@ CachePtr CacheFactory::create(const char* name, PropertiesPtr dsProp,
 
 CacheFactory::~CacheFactory() {}
 
-void CacheFactory::handleXML(CachePtr& cachePtr, const char* cachexml,
-                             DistributedSystem& system) {
-  CacheConfig config(cachexml);
-
-  RegionConfigMapT regionMap = config.getRegionList();
-  RegionConfigMapT::const_iterator iter = regionMap.begin();
-  while (iter != regionMap.end()) {
-    std::string regionName = (*iter).first;
-    RegionConfigPtr regConfPtr = (*iter).second;
-
-    AttributesFactory af;
-    af.setLruEntriesLimit(regConfPtr->getLruEntriesLimit());
-    af.setConcurrencyLevel(regConfPtr->getConcurrency());
-    af.setInitialCapacity(regConfPtr->entries());
-    af.setCachingEnabled(regConfPtr->getCaching());
-
-    RegionAttributesPtr regAttrsPtr;
-    regAttrsPtr = af.createRegionAttributes();
-
-    const RegionShortcut regionShortcut =
-        (regAttrsPtr->getCachingEnabled() ? RegionShortcut::CACHING_PROXY
-                                          : RegionShortcut::PROXY);
-    RegionFactoryPtr regionFactoryPtr =
-        cachePtr->createRegionFactory(regionShortcut);
-    regionFactoryPtr->create(regionName.c_str());
-    ++iter;
-  }
-}
-
 CacheFactoryPtr CacheFactory::set(const char* name, const char* value) {
-  if (this->dsProp == nullptr) this->dsProp = Properties::create();
+  if (this->dsProp == nullptr) {
+    this->dsProp = Properties::create();
+  }
   this->dsProp->insert(name, value);
   return shared_from_this();
 }

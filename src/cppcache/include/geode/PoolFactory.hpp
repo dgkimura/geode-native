@@ -180,7 +180,7 @@ class CPPCACHE_EXPORT PoolFactory {
    * The default server group.
    * <p>Current value: <code>""</code>.
    */
-  static const char* DEFAULT_SERVER_GROUP;
+  constexpr static const char* DEFAULT_SERVER_GROUP = "";
   /**
    * Whether thread local connection is enabled.
    * <p>Current value: <code>"false"</code>.
