@@ -242,17 +242,18 @@ class CPPCACHE_EXPORT Cache : public GeodeCache,
   virtual ~Cache();
 
  private:
+
+  std::unique_ptr<CacheImpl> m_cacheImpl;
+  std::unique_ptr<TypeRegistry> m_typeRegistry;
+
+ protected:
   /**
    * @brief constructors
    */
   Cache(const std::string& name, PropertiesPtr dsProp,
         bool ignorePdxUnreadFields, bool readPdxSerialized);
 
-  std::unique_ptr<CacheImpl> m_cacheImpl;
-  std::unique_ptr<TypeRegistry> m_typeRegistry;
-
- protected:
-  Cache() = delete;
+  Cache();
 
   static bool isPoolInMultiuserMode(RegionPtr regionPtr);
 

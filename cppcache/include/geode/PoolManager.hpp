@@ -58,7 +58,7 @@ class CPPCACHE_EXPORT PoolManager {
    * which is used to configure and create new {@link Pool}s.
    * @return the new pool factory
    */
-  PoolFactoryPtr createFactory();
+  virtual PoolFactoryPtr createFactory();
 
   /**
    * Returns a map containing all the pools in this manager.
@@ -70,7 +70,7 @@ class CPPCACHE_EXPORT PoolManager {
    * @return a Map that is a snapshot of all the pools currently known to this
    * manager.
    */
-  const HashMapOfPools& getAll();
+  virtual const HashMapOfPools& getAll();
 
   /**
    * Find by name an existing connection pool returning
@@ -79,7 +79,7 @@ class CPPCACHE_EXPORT PoolManager {
    * @return the existing connection pool or <code>nullptr</code> if it does not
    * exist.
    */
-  PoolPtr find(const char* name);
+  virtual PoolPtr find(const char* name);
 
   /**
    * Find the pool used by the given region.
@@ -88,7 +88,7 @@ class CPPCACHE_EXPORT PoolManager {
    * region does
    * not have a pool.
    */
-  PoolPtr find(RegionPtr region);
+  virtual PoolPtr find(RegionPtr region);
 
   /**
    * Unconditionally destroys all created pools that are in this manager.
@@ -97,7 +97,7 @@ class CPPCACHE_EXPORT PoolManager {
    * @see DistributedSystem#connect for a description of
    * <code>durable-client-timeout</code>.
    */
-  void close(bool keepAlive = false);
+  virtual void close(bool keepAlive = false);
 
  private:
   void removePool(const char* name);

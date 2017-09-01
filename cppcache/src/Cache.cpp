@@ -159,6 +159,8 @@ Cache::Cache(const std::string& name, PropertiesPtr dsProp,
   m_typeRegistry = std::unique_ptr<TypeRegistry>(new TypeRegistry(*this));
 }
 
+Cache::Cache() {}
+
 Cache::~Cache() = default;
 
 /** Initialize the cache by the contents of an xml file

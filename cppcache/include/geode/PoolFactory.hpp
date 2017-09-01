@@ -519,8 +519,8 @@ class CPPCACHE_EXPORT PoolFactory {
 
   ~PoolFactory();
 
- private:
   PoolFactory(const Cache& cache);
+ private:
   PoolFactory(const PoolFactory&);
   void addCheck(const char* host, int port);
   PoolAttributesPtr m_attrs;
