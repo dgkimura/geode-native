@@ -66,6 +66,9 @@ extern ClientCleanup gClientCleanup;
 #define RANDOM_NUMBER_OFFSET 14000
 #define RANDOM_NUMBER_DIVIDER 15000
 
+#define DEFAULT_SERVER_PORT 40404
+#define DEFAULT_SERVER_HOST "localhost"
+
 CachePtr CacheHelper::getCache() { return cachePtr; }
 
 CacheHelper& CacheHelper::getHelper() {
@@ -127,6 +130,7 @@ CacheHelper::CacheHelper(const PropertiesPtr& configPtr,
   cachePtr = CacheFactory::createCacheFactory(pp)->create();
 
   auto poolFactory = cachePtr->getPoolManager().createFactory();
+  poolFactory->addServer(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
   poolFactory->create("__CACHE_HELPER_POOL__");
 
   m_doDisconnect = false;
