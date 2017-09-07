@@ -41,8 +41,8 @@ BEGIN_TEST(CacheFunction)
   }
   std::cout << "create Cache with name=" << host_name
             << " and unitialized system" << std::endl;
-  CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
-  cptr = cacheFactoryPtr->create();
+  CacheFactory cacheFactoryPtr = CacheFactory::createCacheFactory();
+  cptr = cacheFactoryPtr.create();
   AttributesFactory attrFac;
   RegionAttributesPtr rAttr;
   std::cout << "create RegionAttributes" << std::endl;

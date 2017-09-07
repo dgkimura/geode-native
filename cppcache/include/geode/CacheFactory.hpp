@@ -51,7 +51,7 @@ class CPPCACHE_EXPORT CacheFactory
    * @param dsProps
    *        Properties which are applicable at client level.
    */
-  static CacheFactoryPtr createCacheFactory(
+  static CacheFactory createCacheFactory(
       const PropertiesPtr& dsProps = nullptr);
 
   /**
@@ -90,7 +90,7 @@ class CPPCACHE_EXPORT CacheFactory
    * @return this CacheFactory
    * @since 3.6
    */
-  CacheFactoryPtr setPdxIgnoreUnreadFields(bool ignore);
+  CacheFactory setPdxIgnoreUnreadFields(bool ignore);
 
   /** Sets the object preference to PdxInstance type.
    * When a cached object that was serialized as a PDX is read
@@ -110,7 +110,7 @@ class CPPCACHE_EXPORT CacheFactory
    *  @param pdxReadSerialized true to prefer PdxInstance
    *  @return this ClientCacheFactory
    */
-  CacheFactoryPtr setPdxReadSerialized(bool pdxReadSerialized);
+  CacheFactory setPdxReadSerialized(bool pdxReadSerialized);
 
   /**
    * Sets a geode property that will be used when creating the {link @Cache}.
@@ -119,7 +119,11 @@ class CPPCACHE_EXPORT CacheFactory
    * @return a reference to <code>this</code>
    * @since 3.5
    */
-  CacheFactoryPtr set(const char* name, const char* value);
+  CacheFactory set(const char* name, const char* value);
+
+  CacheFactory(const CacheFactory&& rhs);
+
+  CacheFactory& operator=(const CacheFactory&& rhs);
 
  private:
   PropertiesPtr dsProp;
@@ -137,8 +141,7 @@ class CPPCACHE_EXPORT CacheFactory
   CacheFactory();
   CacheFactory(const PropertiesPtr dsProps);
 
- private:
-  ~CacheFactory();
+  CacheFactory(const CacheFactory& rhs) = delete;
 
   friend class CppCacheLibrary;
   friend class RegionFactory;

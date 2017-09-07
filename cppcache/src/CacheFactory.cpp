@@ -47,9 +47,9 @@ namespace apache {
 namespace geode {
 namespace client {
 
-CacheFactoryPtr CacheFactory::createCacheFactory(
+CacheFactory CacheFactory::createCacheFactory(
     const PropertiesPtr& configPtr) {
-  return std::make_shared<CacheFactory>(configPtr);
+  return CacheFactory(configPtr);
 }
 
 void CacheFactory::create_(const char* name,
@@ -72,6 +72,19 @@ const char* CacheFactory::getVersion() { return PRODUCT_VERSION; }
 const char* CacheFactory::getProductDescription() {
   return PRODUCT_VENDOR " " PRODUCT_NAME " " PRODUCT_VERSION " (" PRODUCT_BITS
                         ") " PRODUCT_BUILDDATE;
+}
+
+CacheFactory::CacheFactory(const CacheFactory&& rhs) {
+  ignorePdxUnreadFields = rhs.ignorePdxUnreadFields;
+  pdxReadSerialized = rhs.pdxReadSerialized;
+  dsProp = rhs.dsProp;
+}
+CacheFactory& CacheFactory::operator=(const CacheFactory&& rhs)
+{
+  ignorePdxUnreadFields = rhs.ignorePdxUnreadFields;
+  pdxReadSerialized = rhs.pdxReadSerialized;
+  dsProp = rhs.dsProp;
+  return *this;
 }
 
 CacheFactory::CacheFactory() {
@@ -157,24 +170,22 @@ CachePtr CacheFactory::create(const char* name,
   return cptr;
 }
 
-CacheFactory::~CacheFactory() {}
-
-CacheFactoryPtr CacheFactory::set(const char* name, const char* value) {
-  if (this->dsProp == nullptr) {
-    this->dsProp = Properties::create();
+CacheFactory CacheFactory::set(const char* name, const char* value) {
+  if (dsProp == nullptr) {
+    dsProp = Properties::create();
   }
-  this->dsProp->insert(name, value);
-  return shared_from_this();
+  dsProp->insert(name, value);
+  return std::move(*this);
 }
 
-CacheFactoryPtr CacheFactory::setPdxIgnoreUnreadFields(bool ignore) {
+CacheFactory CacheFactory::setPdxIgnoreUnreadFields(bool ignore) {
   ignorePdxUnreadFields = ignore;
-  return shared_from_this();
+  return std::move(*this);
 }
 
-CacheFactoryPtr CacheFactory::setPdxReadSerialized(bool prs) {
+CacheFactory CacheFactory::setPdxReadSerialized(bool prs) {
   pdxReadSerialized = prs;
-  return shared_from_this();
+  return std::move(*this);
 }
 }  // namespace client
 }  // namespace geode

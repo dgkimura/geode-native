@@ -37,8 +37,8 @@ size_t getNumOfEntries(RegionPtr& R1) {
 
 void startDSandCreateCache(CachePtr& cache) {
   PropertiesPtr pp = Properties::create();
-  CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory(pp);
-  cache = cacheFactoryPtr->create();
+  CacheFactory cacheFactory = CacheFactory::createCacheFactory(pp);
+  cache = cacheFactory.create();
   ASSERT(cache != nullptr, "cache not equal to null expected");
 }
 

@@ -45,8 +45,8 @@ using namespace apache::geode::client;
 /* testing with exceed boundry condition */ /*see bug no #865 */
 BEGIN_TEST(REGION_FACTORY)
   {
-    CacheFactoryPtr cf = CacheFactory::createCacheFactory();
-    CachePtr m_cache = cf->create();
+    CacheFactory cf = CacheFactory::createCacheFactory();
+    CachePtr m_cache = cf.create();
 
     RegionFactoryPtr rf = m_cache->createRegionFactory(LOCAL);
     /*see bug no #865 */
@@ -72,8 +72,8 @@ BEGIN_TEST(REGION_FACTORY)
     m_cache = nullptr;
     m_region = nullptr;
 
-    CacheFactoryPtr cf1 = CacheFactory::createCacheFactory();
-    CachePtr m_cache1 = cf1->create();
+    CacheFactory cf1 = CacheFactory::createCacheFactory();
+    CachePtr m_cache1 = cf1.create();
 
     RegionFactoryPtr rf1 = m_cache1->createRegionFactory(LOCAL);
     /*see bug no #865 */

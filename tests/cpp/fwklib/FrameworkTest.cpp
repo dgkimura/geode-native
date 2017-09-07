@@ -230,35 +230,29 @@ const FwkPool* FrameworkTest::getPoolSnippet(const std::string& name) const {
 
 void FrameworkTest::cacheInitialize(PropertiesPtr& props,
                                     const CacheAttributesPtr& cAttrs) {
-  CacheFactoryPtr cacheFactory;
-  try {
-    std::string name = getStringValue("systemName");
-    bool isPdxSerialized = getBoolValue("PdxReadSerialized");
-    if (name.empty()) {
-      name = "TestDS";
-    }
-    bool isSslEnable = getBoolValue("sslEnable");
-    if (isSslEnable) {
-      props->insert("ssl-enabled", "true");
-      std::string keystore =
-          std::string(ACE_OS::getenv("BUILDDIR")) + "/framework/data/keystore";
-      std::string pubkey = keystore + "/client_truststore.pem";
-      std::string privkey = keystore + "/client_keystore.pem";
-      props->insert("ssl-keystore", privkey.c_str());
-      props->insert("ssl-truststore", pubkey.c_str());
-    }
-    cacheFactory = CacheFactory::createCacheFactory(props);
+  std::string name = getStringValue("systemName");
+  bool isPdxSerialized = getBoolValue("PdxReadSerialized");
+  if (name.empty()) {
+    name = "TestDS";
+  }
+  bool isSslEnable = getBoolValue("sslEnable");
+  if (isSslEnable) {
+    props->insert("ssl-enabled", "true");
+    std::string keystore =
+        std::string(ACE_OS::getenv("BUILDDIR")) + "/framework/data/keystore";
+    std::string pubkey = keystore + "/client_truststore.pem";
+    std::string privkey = keystore + "/client_keystore.pem";
+    props->insert("ssl-keystore", privkey.c_str());
+    props->insert("ssl-truststore", pubkey.c_str());
+  }
+  CacheFactory cacheFactory = CacheFactory::createCacheFactory(props);
 
-    if (isPdxSerialized) {
-      cacheFactory->setPdxReadSerialized(isPdxSerialized);
-    }
-  } catch (Exception& e) {
-    FWKEXCEPTION(
-        "DistributedSystem::connect encountered Exception: " << e.getMessage());
+  if (isPdxSerialized) {
+    cacheFactory.setPdxReadSerialized(isPdxSerialized);
   }
 
   try {
-    m_cache = cacheFactory->create();
+    m_cache = cacheFactory.create();
     bool m_istransaction = getBoolValue("useTransactions");
     if (m_istransaction) {
       txManager = m_cache->getCacheTransactionManager();

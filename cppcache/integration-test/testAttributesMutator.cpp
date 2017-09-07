@@ -38,8 +38,8 @@ class TestData {
 /* setup recipient */
 DUNIT_TASK(A, Init)
   {
-    CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
-    Test.m_cache = cacheFactoryPtr->create();
+    auto cacheFactoryPtr = CacheFactory::createCacheFactory();
+    Test.m_cache = cacheFactoryPtr.create();
 
     AttributesFactory af;
     af.setEntryTimeToLive(ExpirationAction::LOCAL_INVALIDATE, 5);

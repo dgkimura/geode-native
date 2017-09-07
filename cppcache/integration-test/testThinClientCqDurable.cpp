@@ -191,8 +191,8 @@ void RunDurableCqClient() {
   pp->insert("durable-timeout", 3600);
 
   // Create a Geode Cache Programmatically.
-  CacheFactoryPtr cacheFactory = CacheFactory::createCacheFactory(pp);
-  CachePtr cachePtr = cacheFactory->create();
+  auto cacheFactory = CacheFactory::createCacheFactory(pp);
+  CachePtr cachePtr = cacheFactory.create();
   auto poolFactory = cachePtr->getPoolManager().createFactory();
   poolFactory->setSubscriptionEnabled(true);
   poolFactory->setSubscriptionAckInterval(5000);
@@ -251,10 +251,10 @@ void RunDurableCqClient() {
 }
 
 void RunFeederClient() {
-  CacheFactoryPtr cacheFactory = CacheFactory::createCacheFactory();
+  auto cacheFactory = CacheFactory::createCacheFactory();
   LOGINFO("Feeder connected to the Geode Distributed System");
 
-  CachePtr cachePtr = cacheFactory->create();
+  CachePtr cachePtr = cacheFactory.create();
 
   LOGINFO("Created the Geode Cache");
 
@@ -284,10 +284,10 @@ void RunFeederClient() {
 }
 
 void RunFeederClient1() {
-  CacheFactoryPtr cacheFactory = CacheFactory::createCacheFactory();
+  auto cacheFactory = CacheFactory::createCacheFactory();
   LOGINFO("Feeder connected to the Geode Distributed System");
 
-  CachePtr cachePtr = cacheFactory->create();
+  CachePtr cachePtr = cacheFactory.create();
 
   LOGINFO("Created the Geode Cache");
 

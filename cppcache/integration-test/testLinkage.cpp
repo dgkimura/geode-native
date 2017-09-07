@@ -78,8 +78,8 @@ BEGIN_TEST(LinkageTest)
   }
 
   CachePtr cachePtr;
-  CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
-  cachePtr = cacheFactoryPtr->create();
+  auto cacheFactory = CacheFactory::createCacheFactory();
+  cachePtr = cacheFactory.create();
   // Cache cache;
   ASSERT((!cachePtr->isClosed()), "cache shouldn't be closed.");
   RegionPtr rptr;

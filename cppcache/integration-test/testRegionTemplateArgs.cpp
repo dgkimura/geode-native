@@ -35,8 +35,8 @@ bool CheckBytesEqual(CacheableBytesPtr result, CacheablePtr expected) {
 
 BEGIN_TEST(CheckTemplates)
   {
-    CacheFactoryPtr cacheFactoryPtr = CacheFactory::createCacheFactory();
-    CachePtr cache = cacheFactoryPtr->create();
+    auto cacheFactory = CacheFactory::createCacheFactory();
+    CachePtr cache = cacheFactory.create();
     AttributesFactory afact;
     RegionAttributesPtr attrs = afact.createRegionAttributes();
     RegionPtr regPtr;
