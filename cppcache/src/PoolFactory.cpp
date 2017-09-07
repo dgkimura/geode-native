@@ -42,6 +42,12 @@ PoolFactory::PoolFactory(const Cache& cache)
 
 PoolFactory::~PoolFactory() {}
 
+PoolFactory::PoolFactory(const PoolFactory&& rhs)
+    : m_attrs(rhs.m_attrs),
+      m_isSubscriptionRedundancy(rhs.m_isSubscriptionRedundancy),
+      m_addedServerOrLocator(rhs.m_addedServerOrLocator),
+      m_cache(std::move(rhs.m_cache)) {}
+
 void PoolFactory::setFreeConnectionTimeout(int connectionTimeout) {
   m_attrs->setFreeConnectionTimeout(connectionTimeout);
 }

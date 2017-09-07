@@ -25,7 +25,7 @@ class PoolManager::Impl {
   Impl(const Cache& cache) : m_cache(cache) {}
   void removePool(const char* name);
 
-  PoolFactoryPtr createFactory();
+  PoolFactory createFactory();
 
   void close(bool keepAlive);
 
@@ -51,8 +51,8 @@ void PoolManager::Impl::removePool(const char* name) {
   m_connectionPools.erase(name);
 }
 
-PoolFactoryPtr PoolManager::Impl::createFactory() {
-  return std::shared_ptr<PoolFactory>(new PoolFactory(m_cache));
+PoolFactory PoolManager::Impl::createFactory() {
+  return PoolFactory(m_cache);
 }
 
 void PoolManager::Impl::close(bool keepAlive) {
@@ -112,7 +112,7 @@ PoolManager::PoolManager(const Cache& cache)
 
 void PoolManager::removePool(const char* name) { m_pimpl->removePool(name); }
 
-PoolFactoryPtr PoolManager::createFactory() { return m_pimpl->createFactory(); }
+PoolFactory PoolManager::createFactory() { return m_pimpl->createFactory(); }
 
 void PoolManager::close(bool keepAlive) { m_pimpl->close(keepAlive); }
 

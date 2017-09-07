@@ -58,7 +58,7 @@ class CPPCACHE_EXPORT PoolManager {
    * which is used to configure and create new {@link Pool}s.
    * @return the new pool factory
    */
-  PoolFactoryPtr createFactory();
+  PoolFactory createFactory();
 
   /**
    * Returns a map containing all the pools in this manager.

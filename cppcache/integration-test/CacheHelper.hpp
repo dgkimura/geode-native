@@ -156,7 +156,7 @@ class CacheHelper {
       int ettl = 0, int eit = 0, int rttl = 0, int rit = 0, int lel = 0,
       ExpirationAction::Action action = ExpirationAction::DESTROY);
 
-  void addServerLocatorEPs(const char* epList, PoolFactoryPtr pfPtr,
+  void addServerLocatorEPs(const char* epList, PoolFactory& pf,
                            bool poolLocators = true);
 
   void addServerLocatorEPs(const char* epList, CacheFactoryPtr cacheFac,

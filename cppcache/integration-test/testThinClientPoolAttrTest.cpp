@@ -71,29 +71,28 @@ class putThread : public ACE_Task_Base {
 };
 
 void doAttrTestingAndCreatePool(const char* poolName) {
-  PoolFactoryPtr poolFacPtr =
-      getHelper()->getCache()->getPoolManager().createFactory();
-  poolFacPtr->setFreeConnectionTimeout(10000);
-  poolFacPtr->setLoadConditioningInterval(60000);
-  poolFacPtr->setSocketBufferSize(1024);
-  poolFacPtr->setReadTimeout(10000);
-  poolFacPtr->setMinConnections(4);
-  poolFacPtr->setMaxConnections(8);
-  poolFacPtr->setIdleTimeout(5000);
-  poolFacPtr->setRetryAttempts(5);
-  poolFacPtr->setPingInterval(120000);
-  poolFacPtr->setUpdateLocatorListInterval(122000);
-  poolFacPtr->setStatisticInterval(120000);
-  poolFacPtr->setServerGroup(serverGroup);
-  poolFacPtr->setSubscriptionEnabled(true);
-  poolFacPtr->setSubscriptionRedundancy(1);
-  poolFacPtr->setSubscriptionMessageTrackingTimeout(500000);
-  poolFacPtr->setSubscriptionAckInterval(120000);
-  poolFacPtr->addLocator("localhost", CacheHelper::staticLocatorHostPort1);
-  // poolFacPtr->setMultiuserSecurityMode(true);
-  poolFacPtr->setPRSingleHopEnabled(false);
+  auto poolFac = getHelper()->getCache()->getPoolManager().createFactory();
+  poolFac.setFreeConnectionTimeout(10000);
+  poolFac.setLoadConditioningInterval(60000);
+  poolFac.setSocketBufferSize(1024);
+  poolFac.setReadTimeout(10000);
+  poolFac.setMinConnections(4);
+  poolFac.setMaxConnections(8);
+  poolFac.setIdleTimeout(5000);
+  poolFac.setRetryAttempts(5);
+  poolFac.setPingInterval(120000);
+  poolFac.setUpdateLocatorListInterval(122000);
+  poolFac.setStatisticInterval(120000);
+  poolFac.setServerGroup(serverGroup);
+  poolFac.setSubscriptionEnabled(true);
+  poolFac.setSubscriptionRedundancy(1);
+  poolFac.setSubscriptionMessageTrackingTimeout(500000);
+  poolFac.setSubscriptionAckInterval(120000);
+  poolFac.addLocator("localhost", CacheHelper::staticLocatorHostPort1);
+  // poolFac.setMultiuserSecurityMode(true);
+  poolFac.setPRSingleHopEnabled(false);
 
-  PoolPtr pptr = poolFacPtr->create(poolName);
+  PoolPtr pptr = poolFac.create(poolName);
 
   // Validate the attributes
   ASSERT(pptr->getFreeConnectionTimeout() == 10000,
@@ -130,9 +129,7 @@ void doAttrTestingAndCreatePool(const char* poolName) {
 }
 
 void doAttrTesting(const char* poolName1) {
-  // PoolFactoryPtr poolFacPtr = cachePtr->getPoolFactory();
   PoolPtr pptr = getHelper()->getCache()->getPoolManager().find(poolName1);
-  // PoolPtr pptr = poolFacPtr->find(poolName1);
 
   ASSERT(strcmp(pptr->getName(), "clientPool") == 0,
          "Pool name should have been clientPool");
@@ -197,10 +194,10 @@ DUNIT_TASK(CLIENT1, StartC1)
     doAttrTestingAndCreatePool(poolName);
 
     // Do PoolCreation testing , create another pool with same name
-    PoolFactoryPtr poolFacPtr =
+    auto poolFac =
         getHelper()->getCache()->getPoolManager().createFactory();
     try {
-      PoolPtr pptr = poolFacPtr->create(poolName);
+      PoolPtr pptr = poolFac.create(poolName);
       FAIL("Pool creation with same name should fail");
     } catch (IllegalStateException&) {
       LOG("OK:Pool creation with same name should fail");

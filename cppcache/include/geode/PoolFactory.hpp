@@ -519,9 +519,11 @@ class CPPCACHE_EXPORT PoolFactory {
 
   ~PoolFactory();
 
+  PoolFactory(const PoolFactory&&);
+
  private:
   PoolFactory(const Cache& cache);
-  PoolFactory(const PoolFactory&);
+  PoolFactory(const PoolFactory&) = delete;
   void addCheck(const char* host, int port);
   PoolAttributesPtr m_attrs;
   bool m_isSubscriptionRedundancy;

@@ -579,7 +579,7 @@ FwkPool::FwkPool(const DOMNode* node) : m_locators(false), m_servers(false) {
   auto cacheFactory = CacheFactory::createCacheFactory();
   m_cache = cacheFactory.create();
   m_poolManager = new PoolManager(*m_cache);
-  m_poolFactory = m_poolManager->createFactory();
+  m_poolFactory = std::make_shared<PoolFactory>(m_poolManager->createFactory());
   // Set Attrs to Pool
   setAttributesToFactory(node);
 
