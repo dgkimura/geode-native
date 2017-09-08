@@ -26,7 +26,7 @@ const char* host_name = "Suds";
 DUNIT_TASK(s1p1, CreateRegionOne)
   {
     auto factory = CacheFactory::createCacheFactory();
-    CachePtr cache = factory.create();
+    CachePtr cache = std::make_shared<Cache>(factory.create());
     try {
       cache->getDistributedSystem().connect();
       FAIL("Expected an exception.");

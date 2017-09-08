@@ -27,6 +27,10 @@ CacheImpl* CacheRegionHelper::getCacheImpl(const Cache* cache) {
   return cache->m_cacheImpl.get();
 }
 
+CacheImpl* CacheRegionHelper::getCacheImpl(const Cache& cache) {
+  return cache.m_cacheImpl.get();
+}
+
 CacheImpl* CacheRegionHelper::getCacheImpl(const ProxyCache* proxyCache) {
   return proxyCache->m_cacheImpl;
 }

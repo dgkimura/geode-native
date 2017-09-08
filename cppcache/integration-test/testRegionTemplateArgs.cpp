@@ -36,7 +36,7 @@ bool CheckBytesEqual(CacheableBytesPtr result, CacheablePtr expected) {
 BEGIN_TEST(CheckTemplates)
   {
     auto cacheFactory = CacheFactory::createCacheFactory();
-    CachePtr cache = cacheFactory.create();
+    CachePtr cache = std::make_shared<Cache>(cacheFactory.create());
     AttributesFactory afact;
     RegionAttributesPtr attrs = afact.createRegionAttributes();
     RegionPtr regPtr;

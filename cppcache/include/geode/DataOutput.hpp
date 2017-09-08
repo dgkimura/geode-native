@@ -720,7 +720,7 @@ class CPPCACHE_EXPORT DataOutput {
 
   static void safeDelete(uint8_t* src) { GF_SAFE_DELETE(src); }
 
-  virtual const Cache* getCache();
+  virtual const Cache& getCache();
 
  protected:
   /**

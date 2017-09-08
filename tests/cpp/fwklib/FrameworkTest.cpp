@@ -252,7 +252,7 @@ void FrameworkTest::cacheInitialize(PropertiesPtr& props,
   }
 
   try {
-    m_cache = cacheFactory.create();
+    m_cache = std::make_shared<Cache>(cacheFactory.create());
     bool m_istransaction = getBoolValue("useTransactions");
     if (m_istransaction) {
       txManager = m_cache->getCacheTransactionManager();

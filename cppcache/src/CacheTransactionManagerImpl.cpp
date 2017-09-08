@@ -40,7 +40,7 @@ namespace apache {
 namespace geode {
 namespace client {
 
-CacheTransactionManagerImpl::CacheTransactionManagerImpl(Cache* cache)
+CacheTransactionManagerImpl::CacheTransactionManagerImpl(Cache& cache)
     : m_cache(cache), m_txCond(m_suspendedTxLock) {}
 
 CacheTransactionManagerImpl::~CacheTransactionManagerImpl() {}
@@ -50,7 +50,7 @@ void CacheTransactionManagerImpl::begin() {
     GfErrTypeThrowException("Transaction already in progress",
                             GF_CACHE_ILLEGAL_STATE_EXCEPTION);
   }
-  TXState* txState = new TXState(m_cache);
+  TXState* txState = new TXState(&m_cache);
   TSSTXStateWrapper::s_geodeTSSTXState->setTXState(txState);
   addTx(txState->getTransactionId()->getId());
 }
@@ -327,7 +327,7 @@ ThinClientPoolDM* CacheTransactionManagerImpl::getDM() {
   return nullptr;
 }
 
-Cache* CacheTransactionManagerImpl::getCache() { return m_cache; }
+Cache& CacheTransactionManagerImpl::getCache() { return m_cache; }
 
 TransactionIdPtr CacheTransactionManagerImpl::suspend() {
   // get the current state of the thread

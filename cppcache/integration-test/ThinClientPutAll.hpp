@@ -592,12 +592,12 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT1, StepTen)
   {
     RegionPtr regPtr0 = getHelper()->getRegion(regionNames[0]);
-    RegionServicePtr rsp = regPtr0->getRegionService();
-    RegionPtr regPtr = rsp->getRegion(regionNames[0]);
+    auto& rsp = regPtr0->getRegionService();
+    RegionPtr regPtr = rsp.getRegion(regionNames[0]);
     ASSERT(regPtr != nullptr, "Failed to get region.");
 
-    RegionServicePtr rsp1 = regPtr0->getRegionService();
-    RegionPtr regPtr1 = rsp1->getRegion("NOT_CREATED_REGION");
+    auto& rsp1 = regPtr0->getRegionService();
+    RegionPtr regPtr1 = rsp1.getRegion("NOT_CREATED_REGION");
     ASSERT(regPtr1 == nullptr, "Unknown Region Returned");
 
     LOG("StepTen complete.");

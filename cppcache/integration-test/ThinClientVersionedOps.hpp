@@ -125,6 +125,8 @@ END_TASK_DEFINITION
 
 DUNIT_TASK_DEFINITION(CLIENT1, StartClient1)
   {
+    dunit::sleep(10000);
+
     // TOOD::check for poolwithendpoints or locators
 
     // By default poolwithendpoints

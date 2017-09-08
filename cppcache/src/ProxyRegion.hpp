@@ -1037,8 +1037,8 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
     unSupportedOperation("Region.entries()");
   }
 
-  virtual RegionServicePtr getRegionService() const {
-    return RegionServicePtr(m_proxyCache);
+  virtual RegionService& getRegionService() const {
+    return *m_proxyCache;
   }
 
   virtual bool isDestroyed() const { return m_realRegion->isDestroyed(); }

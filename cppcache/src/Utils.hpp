@@ -170,7 +170,7 @@ class CPPCACHE_EXPORT Utils {
     return objectSize;
   }
 
-  static void updateStatOpTime(statistics::Statistics* m_regionStats,
+  static void updateStatOpTime(apache::geode::statistics::Statistics* m_regionStats,
                                int32_t statId, int64_t start);
 
   static void parseEndpointNamesString(

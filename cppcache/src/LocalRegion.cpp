@@ -43,7 +43,7 @@ LocalRegion::LocalRegion(const std::string& name, CacheImpl* cache,
                          const RegionAttributesPtr& attributes,
                          const CacheStatisticsPtr& stats, bool shared,
                          bool enableTimeStatistics)
-    : RegionInternal(cache->getCache()->shared_from_this(), attributes),
+    : RegionInternal(cache->getCache(), attributes),
       m_name(name),
       m_parentRegion(rPtr),
       m_cacheImpl(cache),
@@ -571,9 +571,9 @@ uint32_t LocalRegion::size() {
   return LocalRegion::size_remote();
 }
 
-RegionServicePtr LocalRegion::getRegionService() const {
+RegionService& LocalRegion::getRegionService() const {
   CHECK_DESTROY_PENDING(TryReadGuard, LocalRegion::getRegionService);
-  return m_cacheImpl->getCache()->shared_from_this();
+  return m_cacheImpl->getCache();
 }
 
 CacheImpl* LocalRegion::getCacheImpl() const {

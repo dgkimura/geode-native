@@ -37,6 +37,7 @@ class CPPCACHE_EXPORT CacheRegionHelper {
    */
  public:
   static CacheImpl* getCacheImpl(const Cache* cache);
+  static CacheImpl* getCacheImpl(const Cache& cache);
   static CacheImpl* getCacheImpl(const ProxyCache* cache);
   static CacheImpl* getCacheImpl(const RegionService* cache);
 };

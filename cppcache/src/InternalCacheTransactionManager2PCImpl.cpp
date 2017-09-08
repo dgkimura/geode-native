@@ -37,7 +37,7 @@ namespace geode {
 namespace client {
 
 InternalCacheTransactionManager2PCImpl::InternalCacheTransactionManager2PCImpl(
-    Cache* cache)
+    Cache& cache)
     : CacheTransactionManagerImpl(cache) {}
 
 InternalCacheTransactionManager2PCImpl::

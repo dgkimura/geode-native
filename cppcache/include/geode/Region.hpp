@@ -39,6 +39,7 @@
 #include "RegionEntry.hpp"
 #include "CacheListener.hpp"
 #include "PartitionResolver.hpp"
+//#include "Cache.hpp"
 #include "CacheWriter.hpp"
 #include "CacheLoader.hpp"
 #include "RegionAttributes.hpp"
@@ -51,6 +52,8 @@
 namespace apache {
 namespace geode {
 namespace client {
+
+class Cache;
 /**
 * @class Region Region.hpp
 *
@@ -994,7 +997,7 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    * Returns the <code>cache</code> associated with this region.
    * @return the cache
    */
-  virtual RegionServicePtr getRegionService() const = 0;
+  virtual RegionService& getRegionService() const = 0;
 
   virtual bool isDestroyed() const = 0;
 
@@ -1437,16 +1440,16 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
 
   virtual const PoolPtr& getPool() = 0;
 
-  inline CachePtr& getCache() { return m_cache; }
+  inline Cache getCache() { return m_cache; }
 
   Region(const Region&) = delete;
   Region& operator=(const Region&) = delete;
 
  protected:
-  Region(const CachePtr& cache);
+  Region(const Cache&& cache);
   virtual ~Region();
 
-  mutable CachePtr m_cache;
+  Cache m_cache;
 
   FRIEND_STD_SHARED_PTR(Region)
 };

@@ -30,9 +30,9 @@ namespace apache {
 namespace geode {
 namespace client {
 
-using statistics::StatisticDescriptor;
-using statistics::StatisticsType;
-using statistics::Statistics;
+using apache::geode::statistics::StatisticDescriptor;
+using apache::geode::statistics::StatisticsType;
+using apache::geode::statistics::Statistics;
 
 class CPPCACHE_EXPORT RegionStats {
  public:

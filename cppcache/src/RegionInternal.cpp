@@ -37,7 +37,7 @@ const CacheEventFlags CacheEventFlags::CACHE_CLOSE(
 const CacheEventFlags CacheEventFlags::NOCACHEWRITER(
     CacheEventFlags::GF_NOCACHEWRITER);
 
-RegionInternal::RegionInternal(const CachePtr& cache,
+RegionInternal::RegionInternal(const Cache&& cache,
                                const RegionAttributesPtr& attributes)
     : Region(cache), m_regionAttributes(attributes) {}
 

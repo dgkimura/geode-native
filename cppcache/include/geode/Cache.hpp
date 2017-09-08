@@ -25,24 +25,27 @@
 #include "geode_globals.hpp"
 #include "geode_types.hpp"
 #include "GeodeCache.hpp"
-#include "geode_types.hpp"
-#include "Region.hpp"
-#include "DistributedSystem.hpp"
-#include "QueryService.hpp"
-#include "PoolFactory.hpp"
+//#include "Region.hpp"
+//#include "DistributedSystem.hpp"
+//#include "QueryService.hpp"
+//#include "PoolFactory.hpp"
 #include "RegionShortcut.hpp"
-#include "RegionFactory.hpp"
-#include "InternalCacheTransactionManager2PC.hpp"
-#include "statistics/StatisticsFactory.hpp"
-#include "geode/TypeRegistry.hpp"
+//#include "RegionFactory.hpp"
+//#include "InternalCacheTransactionManager2PC.hpp"
+//#include "statistics/StatisticsFactory.hpp"
+//#include "geode/TypeRegistry.hpp"
 /**
  * @file
  */
 
 namespace apache {
 namespace geode {
+namespace statistics {
+  class StatisticsFactory;
+}
 namespace client {
 
+class TypeRegistry;
 class PoolManager;
 class CacheFactory;
 class CacheRegionHelper;
@@ -62,8 +65,7 @@ class CacheImpl;
  * <p>A cache can have multiple root regions, each with a different name.
  *
  */
-class CPPCACHE_EXPORT Cache : public GeodeCache,
-                              public std::enable_shared_from_this<Cache> {
+class CPPCACHE_EXPORT Cache : public GeodeCache {
   /**
    * @brief public methods
    */
@@ -228,7 +230,7 @@ class CPPCACHE_EXPORT Cache : public GeodeCache,
    */
   virtual PdxInstanceFactoryPtr createPdxInstanceFactory(const char* className);
 
-  virtual statistics::StatisticsFactory* getStatisticsFactory() const;
+  virtual apache::geode::statistics::StatisticsFactory* getStatisticsFactory() const;
 
   virtual std::unique_ptr<DataInput> createDataInput(const uint8_t* m_buffer,
                                                      int32_t len) const;
@@ -241,6 +243,12 @@ class CPPCACHE_EXPORT Cache : public GeodeCache,
    */
   virtual ~Cache();
 
+  Cache(Cache& rhs) = default;
+
+  Cache(Cache&& rhs) = default;
+
+  Cache& operator=(Cache&& rhs) = default;
+
  private:
   /**
    * @brief constructors
@@ -248,8 +256,8 @@ class CPPCACHE_EXPORT Cache : public GeodeCache,
   Cache(const std::string& name, PropertiesPtr dsProp,
         bool ignorePdxUnreadFields, bool readPdxSerialized);
 
-  std::unique_ptr<CacheImpl> m_cacheImpl;
-  std::unique_ptr<TypeRegistry> m_typeRegistry;
+  std::shared_ptr<CacheImpl> m_cacheImpl;
+  std::shared_ptr<TypeRegistry> m_typeRegistry;
 
  protected:
   Cache() = delete;

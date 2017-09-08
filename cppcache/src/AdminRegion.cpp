@@ -78,7 +78,7 @@ GfErrType AdminRegion::putNoThrow(const CacheableKeyPtr& keyPtr,
   GfErrType err = GF_NOERR;
 
   TcrMessagePut request(
-      m_connectionMgr->getCacheImpl()->getCache()->createDataOutput(), nullptr,
+      m_connectionMgr->getCacheImpl()->getCache().createDataOutput(), nullptr,
       keyPtr, valuePtr, nullptr, false, m_distMngr, true, false,
       m_fullPath.c_str());
   request.setMetaRegion(true);

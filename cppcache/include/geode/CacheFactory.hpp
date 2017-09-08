@@ -43,8 +43,7 @@ class CppCacheLibrary;
  * For the default values for the pool attributes see {@link PoolFactory}.
  * To create additional {@link Pool}s see {@link PoolManager}
  */
-class CPPCACHE_EXPORT CacheFactory
-    : public std::enable_shared_from_this<CacheFactory> {
+class CPPCACHE_EXPORT CacheFactory {
  public:
   /**
    * To create the instance of {@link CacheFactory}
@@ -57,7 +56,7 @@ class CPPCACHE_EXPORT CacheFactory
   /**
    * To create the instance of {@link Cache}.
    */
-  CachePtr create();
+  Cache create();
 
   /** Returns the version of the cache implementation.
    * For the 1.0 release of Geode, the string returned is <code>1.0</code>.
@@ -130,12 +129,7 @@ class CPPCACHE_EXPORT CacheFactory
   bool ignorePdxUnreadFields;
   bool pdxReadSerialized;
 
-  CachePtr create(const char* name,
-                  const CacheAttributesPtr& attrs = nullptr);
-
-  void create_(const char* name, const char* id_data,
-               CachePtr& cptr,
-               bool readPdxSerialized);
+  Cache create_();
 
   // no instances allowed
   CacheFactory();
@@ -147,8 +141,6 @@ class CPPCACHE_EXPORT CacheFactory
   friend class RegionFactory;
   friend class RegionXmlCreation;
   friend class CacheXmlCreation;
-
-  FRIEND_STD_SHARED_PTR(CacheFactory)
 };
 }  // namespace client
 }  // namespace geode

@@ -107,7 +107,7 @@ TSSDataOutput::~TSSDataOutput() {
 
 ACE_TSS<TSSDataOutput> TSSDataOutput::s_tssDataOutput;
 
-DataOutput::DataOutput(const Cache* cache)
+DataOutput::DataOutput(const Cache& cache)
     : m_cache(cache), m_poolName(nullptr), m_size(0), m_haveBigBuffer(false) {
   m_buf = m_bytes = DataOutput::checkoutBuffer(&m_size);
 }
@@ -132,7 +132,7 @@ const SerializationRegistry& DataOutput::getSerializationRegistry() const {
   return *CacheRegionHelper::getCacheImpl(m_cache)->getSerializationRegistry();
 }
 
-const Cache* DataOutput::getCache() { return m_cache; }
+const Cache& DataOutput::getCache() { return *m_cache; }
 }  // namespace client
 }  // namespace geode
 }  // namespace apache

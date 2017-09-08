@@ -214,7 +214,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   /**
    * @brief constructors
    */
-  CacheImpl(Cache* c, const std::string& name,
+  CacheImpl(Cache& c, const std::string& name,
             std::unique_ptr<DistributedSystem> sys, bool ignorePdxUnreadFields,
             bool readPdxSerialized);
 
@@ -227,7 +227,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
     return m_clientProxyMembershipIDFactory;
   }
 
-  Cache* getCache() const { return m_implementee; }
+  Cache& getCache() { return m_implementee; }
   TcrConnectionManager& tcrConnectionManager() {
     return *m_tcrConnectionManager;
   }
@@ -325,7 +325,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
   std::unique_ptr<DistributedSystem> m_distributedSystem;
   ClientProxyMembershipIDFactory m_clientProxyMembershipIDFactory;
   MapOfRegionWithLock* m_regions;
-  Cache* m_implementee;
+  Cache m_implementee;
   ACE_Recursive_Thread_Mutex m_mutex;
   Condition m_cond;
   CacheAttributesPtr m_attributes;

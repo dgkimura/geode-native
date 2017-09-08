@@ -46,7 +46,7 @@
 
 using namespace apache::geode::client;
 
-CacheImpl::CacheImpl(Cache* c, const std::string& name,
+CacheImpl::CacheImpl(Cache& c, const std::string& name,
                      std::unique_ptr<DistributedSystem> sys, bool iPUF,
                      bool readPdxSerialized)
     : m_name(name),

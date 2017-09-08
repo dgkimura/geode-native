@@ -23,6 +23,7 @@
 #include <CacheXmlParser.hpp>
 #include <CacheRegionHelper.hpp>
 #include <geode/Cache.hpp>
+#include <geode/TypeRegistry.hpp>
 #include <CacheImpl.hpp>
 #include <UserAttributes.hpp>
 #include <ProxyRegion.hpp>
@@ -154,12 +155,23 @@ Cache::Cache(const std::string& name, PropertiesPtr dsProp,
              bool ignorePdxUnreadFields, bool readPdxSerialized) {
   auto dsPtr = DistributedSystem::create(DEFAULT_DS_NAME, this, dsProp);
   dsPtr->connect();
-  m_cacheImpl = std::unique_ptr<CacheImpl>(new CacheImpl(
-      this, name, std::move(dsPtr), ignorePdxUnreadFields, readPdxSerialized));
-  m_typeRegistry = std::unique_ptr<TypeRegistry>(new TypeRegistry(*this));
+  m_cacheImpl = std::make_shared<CacheImpl>(
+      *this, name, std::move(dsPtr), ignorePdxUnreadFields, readPdxSerialized);
+  m_typeRegistry = std::make_shared<TypeRegistry>(*this);
 }
 
 Cache::~Cache() = default;
+
+//Cache::Cache(Cache&& rhs) {
+//  m_cacheImpl = rhs.m_cacheImpl;
+//  m_typeRegistry = rhs.m_typeRegistry;
+//}
+//
+//Cache& Cache::operator=(Cache&& rhs) {
+//  m_cacheImpl = rhs.m_cacheImpl;
+//  m_typeRegistry = rhs.m_typeRegistry;
+//  return *this;
+//}
 
 /** Initialize the cache by the contents of an xml file
  * @param  cacheXml
@@ -190,7 +202,7 @@ bool Cache::isPoolInMultiuserMode(RegionPtr regionPtr) {
   const char* poolName = regionPtr->getAttributes()->getPoolName();
 
   if (poolName != nullptr) {
-    PoolPtr poolPtr = regionPtr->getCache()->getPoolManager().find(poolName);
+    PoolPtr poolPtr = regionPtr->getCache().getPoolManager().find(poolName);
     if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
       return poolPtr->getMultiuserAuthentication();
     }

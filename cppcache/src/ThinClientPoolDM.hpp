@@ -420,7 +420,7 @@ class ThinClientPoolDM
   void cleanStaleConnections(volatile bool& isRunning);
   void restoreMinConnections(volatile bool& isRunning);
   std::atomic<int32_t> m_clientOps;  // Actual Size of Pool
-  statistics::PoolStatsSampler* m_PoolStatsSampler;
+  apache::geode::statistics::PoolStatsSampler* m_PoolStatsSampler;
   ClientMetadataService* m_clientMetadataService;
   friend class CacheImpl;
   friend class ThinClientStickyManager;
@@ -492,7 +492,7 @@ class FunctionExecution : public PooledWork<GfErrType> {
     TcrMessageExecuteFunction request(m_poolDM->getConnectionManager()
                                           .getCacheImpl()
                                           ->getCache()
-                                          ->createDataOutput(),
+                                          .createDataOutput(),
                                       funcName, m_args, m_getResult, m_poolDM,
                                       m_timeout);
     TcrMessageReply reply(true, m_poolDM);
@@ -587,7 +587,7 @@ class OnRegionFunctionExecution : public PooledWork<GfErrType> {
         m_poolDM->getConnectionManager()
             .getCacheImpl()
             ->getCache()
-            ->createDataOutput(),
+            .createDataOutput(),
         funcName, m_region, m_args, m_routingObj, m_getResult, nullptr,
         m_allBuckets, timeout, m_poolDM);
     m_reply = new TcrMessageReply(true, m_poolDM);

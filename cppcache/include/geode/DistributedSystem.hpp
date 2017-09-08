@@ -92,7 +92,7 @@ class CPPCACHE_EXPORT DistributedSystem {
    */
   virtual const std::string& getName() const;
 
-  statistics::StatisticsManager* getStatisticsManager() {
+  apache::geode::statistics::StatisticsManager* getStatisticsManager() {
     return m_statisticsManager.get();
   }
 
@@ -106,14 +106,14 @@ class CPPCACHE_EXPORT DistributedSystem {
    * @brief constructors
    */
   DistributedSystem(const std::string& name,
-                    std::unique_ptr<statistics::StatisticsManager> statMngr,
+                    std::unique_ptr<apache::geode::statistics::StatisticsManager> statMngr,
                     std::unique_ptr<SystemProperties> sysProps);
 
  private:
   std::string m_name;
   bool m_connected;
 
-  std::unique_ptr<statistics::StatisticsManager> m_statisticsManager;
+  std::unique_ptr<apache::geode::statistics::StatisticsManager> m_statisticsManager;
 
   std::unique_ptr<SystemProperties> m_sysProps;
 

@@ -39,7 +39,7 @@ class TestData {
 DUNIT_TASK(A, Init)
   {
     auto cacheFactoryPtr = CacheFactory::createCacheFactory();
-    Test.m_cache = cacheFactoryPtr.create();
+    Test.m_cache = std::make_shared<Cache>(cacheFactoryPtr.create());
 
     AttributesFactory af;
     af.setEntryTimeToLive(ExpirationAction::LOCAL_INVALIDATE, 5);

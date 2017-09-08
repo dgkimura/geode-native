@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <chrono>
 #include <cstdlib>
 #include <ace/OS.h>
 #include <ace/INET_Addr.h>
@@ -82,7 +83,7 @@ CacheHelper::CacheHelper(const char* member_id, const PropertiesPtr& configPtr,
     pp = Properties::create();
   }
 
-  cachePtr = CacheFactory::createCacheFactory(pp).create();
+  cachePtr = std::make_shared<Cache>(CacheFactory::createCacheFactory(pp).create());
 
   m_doDisconnect = false;
 
@@ -112,7 +113,7 @@ CacheHelper::CacheHelper(const char* member_id, const char* cachexml,
     CacheHelper::createDuplicateXMLFile(newFile, tmpXmlFile);
     pp->insert("cache-xml-file", newFile.c_str());
   }
-  cachePtr = CacheFactory::createCacheFactory(pp).create();
+  cachePtr = std::make_shared<Cache>(CacheFactory::createCacheFactory(pp).create());
 
   m_doDisconnect = false;
 }
@@ -124,7 +125,7 @@ CacheHelper::CacheHelper(const PropertiesPtr& configPtr,
     pp = Properties::create();
   }
 
-  cachePtr = CacheFactory::createCacheFactory(pp).create();
+  cachePtr = std::make_shared<Cache>(CacheFactory::createCacheFactory(pp).create());
 
   auto poolFactory = cachePtr->getPoolManager().createFactory();
   poolFactory.create("__CACHE_HELPER_POOL__");
@@ -153,7 +154,9 @@ CacheHelper::CacheHelper(const bool isThinclient,
   }
   try {
     LOG(" in cachehelper before createCacheFactory");
-    cachePtr = CacheFactory::createCacheFactory(pp).create();
+    cachePtr = std::make_shared<Cache>(CacheFactory::createCacheFactory(pp).create());
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+    LOG(" in cachehelper before createCacheFactory");
     m_doDisconnect = false;
   } catch (const Exception& excp) {
     LOG("Geode exception while creating cache, logged in following line");
@@ -176,7 +179,7 @@ CacheHelper::CacheHelper(const bool isThinclient, bool pdxIgnoreUnreadFields,
     LOGINFO("pdxIgnoreUnreadFields = %d ", pdxIgnoreUnreadFields);
     cf.setPdxReadSerialized(pdxReadSerialized);
     cf.setPdxIgnoreUnreadFields(pdxIgnoreUnreadFields);
-    cachePtr = cf.create();
+    cachePtr = std::make_shared<Cache>(cf.create());
     m_doDisconnect = false;
   } catch (const Exception& excp) {
     LOG("Geode exception while creating cache, logged in following line");
@@ -200,7 +203,7 @@ CacheHelper::CacheHelper(const bool isthinClient, const char* poolName,
 
   try {
     auto cacheFac = CacheFactory::createCacheFactory(pp);
-    cachePtr = cacheFac.create();
+    cachePtr = std::make_shared<Cache>(cacheFac.create());
 
     auto poolFactory = cachePtr->getPoolManager().createFactory();
 
@@ -247,7 +250,7 @@ CacheHelper::CacheHelper(const int redundancyLevel,
   }
 
   auto cacheFac = CacheFactory::createCacheFactory(pp);
-  cachePtr = cacheFac.create();
+  cachePtr = std::make_shared<Cache>(cacheFac.create());
   m_doDisconnect = false;
 }
 

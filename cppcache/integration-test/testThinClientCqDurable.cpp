@@ -192,7 +192,7 @@ void RunDurableCqClient() {
 
   // Create a Geode Cache Programmatically.
   auto cacheFactory = CacheFactory::createCacheFactory(pp);
-  CachePtr cachePtr = cacheFactory.create();
+  CachePtr cachePtr = std::make_shared<Cache>(cacheFactory.create());
   auto poolFactory = cachePtr->getPoolManager().createFactory();
   poolFactory.setSubscriptionEnabled(true);
   poolFactory.setSubscriptionAckInterval(5000);
@@ -254,7 +254,7 @@ void RunFeederClient() {
   auto cacheFactory = CacheFactory::createCacheFactory();
   LOGINFO("Feeder connected to the Geode Distributed System");
 
-  CachePtr cachePtr = cacheFactory.create();
+  CachePtr cachePtr = std::make_shared<Cache>(cacheFactory.create());
 
   LOGINFO("Created the Geode Cache");
 
@@ -287,7 +287,7 @@ void RunFeederClient1() {
   auto cacheFactory = CacheFactory::createCacheFactory();
   LOGINFO("Feeder connected to the Geode Distributed System");
 
-  CachePtr cachePtr = cacheFactory.create();
+  CachePtr cachePtr = std::make_shared<Cache>(cacheFactory.create());
 
   LOGINFO("Created the Geode Cache");
 

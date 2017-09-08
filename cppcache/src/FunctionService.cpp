@@ -47,7 +47,7 @@ ExecutionPtr FunctionService::onRegion(RegionPtr region) {
       // it is in multiuser mode
       proxyCache = pr->m_proxyCache;
       PoolPtr userAttachedPool = proxyCache->m_userAttributes->getPool();
-      PoolPtr pool = region->getCache()->getPoolManager().find(
+      PoolPtr pool = region->getCache().getPoolManager().find(
           userAttachedPool->getName());
       if (!(pool != nullptr && pool.get() == userAttachedPool.get() &&
             !pool->isDestroyed())) {
@@ -57,8 +57,8 @@ ExecutionPtr FunctionService::onRegion(RegionPtr region) {
       RegionPtr tmpRegion;
       tmpRegion = nullptr;
       // getting real region to execute function on region
-      if (!region->getCache()->isClosed()) {
-        region->getCache()->m_cacheImpl->getRegion(region->getName(),
+      if (!region->getCache().isClosed()) {
+        region->getCache().m_cacheImpl->getRegion(region->getName(),
                                                    tmpRegion);
       } else {
         throw IllegalStateException("Cache has been closed");

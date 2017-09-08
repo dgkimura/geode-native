@@ -20,7 +20,7 @@
 namespace apache {
 namespace geode {
 namespace client {
-Region::Region(const CachePtr& cache) : m_cache(cache) {}
+Region::Region(const Cache&& cache) : m_cache(std::move(cache)) {}
 Region::~Region() {}
 }  // namespace client
 }  // namespace geode

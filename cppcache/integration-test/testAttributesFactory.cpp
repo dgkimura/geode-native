@@ -46,7 +46,7 @@ using namespace apache::geode::client;
 BEGIN_TEST(REGION_FACTORY)
   {
     CacheFactory cf = CacheFactory::createCacheFactory();
-    CachePtr m_cache = cf.create();
+    CachePtr m_cache = std::make_shared<Cache>(cf.create());
 
     RegionFactoryPtr rf = m_cache->createRegionFactory(LOCAL);
     /*see bug no #865 */
@@ -73,7 +73,7 @@ BEGIN_TEST(REGION_FACTORY)
     m_region = nullptr;
 
     CacheFactory cf1 = CacheFactory::createCacheFactory();
-    CachePtr m_cache1 = cf1.create();
+    CachePtr m_cache1 = std::make_shared<Cache>(cf1.create());
 
     RegionFactoryPtr rf1 = m_cache1->createRegionFactory(LOCAL);
     /*see bug no #865 */

@@ -42,7 +42,7 @@ enum commitOp { BEFORE_COMMIT, AFTER_COMMIT };
 class CacheTransactionManagerImpl
     : public virtual apache::geode::client::CacheTransactionManager {
  public:
-  CacheTransactionManagerImpl(Cache* cache);
+  CacheTransactionManagerImpl(Cache& cache);
   virtual ~CacheTransactionManagerImpl();
 
   virtual void begin();
@@ -64,10 +64,10 @@ class CacheTransactionManagerImpl
 
  protected:
   ThinClientPoolDM* getDM();
-  Cache* getCache();
+  Cache& getCache();
 
  private:
-  Cache* m_cache;
+  Cache& m_cache;
 
   void resumeTxUsingTxState(TXState* txState, bool cancelExpiryTask = true);
   GfErrType rollback(TXState* txState, bool callListener);

@@ -201,7 +201,7 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
                  const UserDataPtr& aCallbackArgument = nullptr);
   uint32_t size();
   virtual uint32_t size_remote();
-  RegionServicePtr getRegionService() const;
+  RegionService& getRegionService() const;
   virtual bool containsValueForKey_remote(const CacheableKeyPtr& keyPtr) const;
   bool containsValueForKey(const CacheableKeyPtr& keyPtr) const;
   bool containsKey(const CacheableKeyPtr& keyPtr) const;

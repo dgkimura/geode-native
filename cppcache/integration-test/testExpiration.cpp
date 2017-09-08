@@ -38,7 +38,7 @@ size_t getNumOfEntries(RegionPtr& R1) {
 void startDSandCreateCache(CachePtr& cache) {
   PropertiesPtr pp = Properties::create();
   CacheFactory cacheFactory = CacheFactory::createCacheFactory(pp);
-  cache = cacheFactory.create();
+  cache = std::make_shared<Cache>(cacheFactory.create());
   ASSERT(cache != nullptr, "cache not equal to null expected");
 }
 
