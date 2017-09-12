@@ -382,8 +382,8 @@ DUNIT_TASK_DEFINITION(CLIENT2, RegisterEmptyNullAndNonExistentRegex)
       LOG("Unregistering non-existent regex");
       regPtr1->unregisterRegex("Non*Existent*Regex");
       FAIL("Did not get expected exception!");
-    } catch (Exception& excp) {
-      LOG(excp.getMessage());
+    } catch (const IllegalStateException& excp) {
+      LOG(excp.what());
     }
 
     LOG("RegisterEmptyNullAndNonExistentRegex complete.");

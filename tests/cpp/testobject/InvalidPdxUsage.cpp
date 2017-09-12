@@ -87,370 +87,370 @@ void InvalidPdxUsage::toData(PdxWriterPtr pw) /*const*/ {
 
   try {
     pw->writeArrayOfByteArrays("", m_byteByteArray, 2, lengthArr);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeArrayOfByteArrays():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeWideChar("", m_char);
     pw->markIdentityField("m_char");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeWideChar():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeBoolean("", m_bool);  // 1
     pw->markIdentityField("m_bool");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeBoolean():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeBooleanArray("", m_boolArray, 3);
     pw->markIdentityField("m_boolArray");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeBooleanArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeByte("", m_byte);
     pw->markIdentityField("m_byte");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeByte():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeByte():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeByteArray("", m_byteArray, 2);
     pw->markIdentityField("m_byteArray");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeWideCharArray("", m_charArray, 2);
     pw->markIdentityField("m_charArray");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeWideCharArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeObject("", m_arraylist);
     pw->markIdentityField("m_arraylist");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeObject() for ArrayList:: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeObject("", m_map);
     pw->markIdentityField("m_map");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeObject() for Map:: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeObject("", m_hashtable);
     pw->markIdentityField("m_hashtable");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeObject() for HashTable:: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeObject("", m_vector);
     pw->markIdentityField("m_vector");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeObject() for Vector:: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeObject("", m_chs);
     pw->markIdentityField("m_chs");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO(
         "writeObject() for CacheableHashSet:: Got expected Exception :: %s ",
-        excpt.getMessage());
+        excpt.what());
   }
 
   try {
     pw->writeObject("", m_clhs);
     pw->markIdentityField("m_clhs");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO(
         "writeObject() for CacheableLinkedHashSet:: Got expected Exception :: "
         "%s ",
-        excpt.getMessage());
+        excpt.what());
   }
 
   try {
     pw->writeString("", m_string);
     pw->markIdentityField("m_string");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeString():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeDate("", m_date);
     pw->markIdentityField("m_dateTime");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeDate():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeDate():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeDouble("", m_double);
     pw->markIdentityField("m_double");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeDouble():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeDoubleArray("", m_doubleArray, 2);
     pw->markIdentityField("m_doubleArray");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeDoubleArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeFloat("", m_float);
     pw->markIdentityField("m_float");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeFloat():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeFloat():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeFloatArray("", m_floatArray, 2);
     pw->markIdentityField("m_floatArray");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeFloatArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeShort("", m_int16);
     pw->markIdentityField("m_int16");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeShort():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeShort():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeInt("", m_int32);
     pw->markIdentityField("m_int32");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeInt():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeInt():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeLong("", m_long);
     pw->markIdentityField("m_long");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeLong():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeLong():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeIntArray("", m_int32Array, 4);
     pw->markIdentityField("m_int32Array");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeIntArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeLongArray("", m_longArray, 2);
     pw->markIdentityField("m_longArray");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeLongArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeShortArray("", m_int16Array, 2);
     pw->markIdentityField("m_int16Array");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeShortArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeByte("", m_sbyte);
     pw->markIdentityField("m_sbyte");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeByte():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeByte():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeByteArray("", m_sbyteArray, 2);
     pw->markIdentityField("m_sbyteArray");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeStringArray("", m_stringArray, 2);
     pw->markIdentityField("m_stringArray");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeStringArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeShort("", m_uint16);
     pw->markIdentityField("m_uint16");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeShort():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeShort():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeInt("", m_uint32);
     pw->markIdentityField("m_uint32");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeInt():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeInt():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeLong("", m_ulong);
     pw->markIdentityField("m_ulong");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
-    LOGINFO("writeLong():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("writeLong():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     pw->writeIntArray("", m_uint32Array, 4);
     pw->markIdentityField("m_uint32Array");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeIntArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeLongArray("", m_ulongArray, 2);
     pw->markIdentityField("m_ulongArray");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeLongArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeShortArray("", m_uint16Array, 2);
     pw->markIdentityField("m_uint16Array");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeShortArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeByteArray("", m_byte252, 252);
     pw->markIdentityField("m_byte252");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeByteArray("", m_byte253, 253);
     pw->markIdentityField("m_byte253");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeByteArray("", m_byte65535, 65535);
     pw->markIdentityField("m_byte65535");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeByteArray("", m_byte65536, 65536);
     pw->markIdentityField("m_byte65536");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeObject("", m_pdxEnum);
     pw->markIdentityField("m_pdxEnum");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeObject() for Enum:: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeObject("", m_objectArray);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO(
         "writeObject() for Custom Object Address:: Got expected Exception :: "
         "%s ",
-        excpt.getMessage());
+        excpt.what());
   }
 
   try {
     pw->writeObjectArray("", m_objectArray);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     toDataexceptionCounter++;
     LOGINFO("writeObjectArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     pw->writeInt("toDataexceptionCounter", toDataexceptionCounter);
     pw->writeInt("fromDataexceptionCounter", fromDataexceptionCounter);
-  } catch (IllegalStateException& excpt) {
-    LOGINFO("writeInt():: Got expected Exception :: %s ", excpt.getMessage());
+  } catch (const IllegalStateException& excpt) {
+    LOGINFO("writeInt():: Got expected Exception :: %s ", excpt.what());
   }
 
   LOGDEBUG("PdxObject::toData() Done......");
@@ -469,320 +469,320 @@ void InvalidPdxUsage::fromData(PdxReaderPtr pr) {
   int exceptionCounter = 0;
   try {
     m_byteByteArray = pr->readArrayOfByteArrays("", arrLen, &Lengtharr);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readArrayOfByteArrays():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_char = pr->readWideChar("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readWideChar():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_bool = pr->readBoolean("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readBoolean():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_boolArray = pr->readBooleanArray("", boolArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readBooleanArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_byte = pr->readByte("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readByte():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readByte():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_byteArray = pr->readByteArray("", byteArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_charArray = pr->readWideCharArray("", charArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readWideCharArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_arraylist =
         std::dynamic_pointer_cast<CacheableArrayList>(pr->readObject(""));
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_map = std::dynamic_pointer_cast<CacheableHashMap>(pr->readObject(""));
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_hashtable =
         std::dynamic_pointer_cast<CacheableHashTable>(pr->readObject(""));
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_vector = std::dynamic_pointer_cast<CacheableVector>(pr->readObject(""));
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_chs = std::dynamic_pointer_cast<CacheableHashSet>(pr->readObject(""));
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_clhs =
         std::dynamic_pointer_cast<CacheableLinkedHashSet>(pr->readObject(""));
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_string = pr->readString("");  // GenericValCompare
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readString():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readString():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_date = std::dynamic_pointer_cast<CacheableDate>(pr->readDate(""));
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readDate():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readDate():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_double = pr->readDouble("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readDouble():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readDouble():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_doubleArray = pr->readDoubleArray("", doubleArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readDoubleArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_float = pr->readFloat("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readFloat():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readFloat():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_floatArray = pr->readFloatArray("", floatArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readFloatArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_int16 = pr->readShort("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readShort():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readShort():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_int32 = pr->readInt("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readInt():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readInt():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_long = pr->readLong("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readLong():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readLong():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_int32Array = pr->readIntArray("", intArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readIntArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_longArray = pr->readLongArray("", longArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readLongArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_int16Array = pr->readShortArray("", shortArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readShortArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_sbyte = pr->readByte("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readByte():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readByte():: Got expected Exception :: %s ", excpt.what());
   }
   try {
     m_sbyteArray = pr->readByteArray("", byteArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_stringArray = pr->readStringArray("", strLenArray);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readStringArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_uint16 = pr->readShort("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readShort():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readShort():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_uint32 = pr->readInt("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readInt():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readInt():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_ulong = pr->readLong("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readLong():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readLong():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_uint32Array = pr->readIntArray("", intArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readIntArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_ulongArray = pr->readLongArray("", longArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readLongArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_uint16Array = pr->readShortArray("", shortArrayLen);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readShortArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_byte252 = pr->readByteArray("", m_byte252Len);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
   try {
     m_byte253 = pr->readByteArray("", m_byte253Len);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_byte65535 = pr->readByteArray("", m_byte65535Len);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_byte65536 = pr->readByteArray("", m_byte65536Len);
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readByteArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     m_pdxEnum = std::static_pointer_cast<CacheableEnum>(pr->readObject(""));
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_address = pr->readObject("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
-    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.getMessage());
+    LOGINFO("readObject():: Got expected Exception :: %s ", excpt.what());
   }
 
   try {
     m_objectArray = pr->readObjectArray("");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readObjectArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   try {
     toDataexceptionCounter = pr->readInt("toDataexceptionCounter");
     fromDataexceptionCounter = pr->readInt("fromDataexceptionCounter");
-  } catch (IllegalStateException& excpt) {
+  } catch (const IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readObjectArray():: Got expected Exception :: %s ",
-            excpt.getMessage());
+            excpt.what());
   }
 
   this->fromDataexceptionCounter = exceptionCounter;

@@ -407,10 +407,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
       try {
         cqy->execute();
       } catch (IllegalStateException& excp) {
-        std::string failmsg = "";
-        failmsg += excp.getName();
+        std::string failmsg = "IllegalStateException";
         failmsg += ": ";
-        failmsg += excp.getMessage();
+        failmsg += excp.what();
         LOG(failmsg.c_str());
         got_exception = true;
       }

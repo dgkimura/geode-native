@@ -72,8 +72,7 @@ void GfErrTypeThrowException(const char* str, GfErrType err) {
       throw ex;
     }
     case GF_CACHE_REGION_NOT_GLOBAL: {
-      IllegalStateException ex(
-          str, (exMsg != nullptr ? exMsg : ": region not global"));
+      IllegalStateException ex(str + std::string(": region not global"));
       setTSSExceptionMessage(nullptr);
       throw ex;
     }
@@ -83,8 +82,7 @@ void GfErrTypeThrowException(const char* str, GfErrType err) {
       throw ex;
     }
     case GF_CACHE_ILLEGAL_STATE_EXCEPTION: {
-      IllegalStateException ex(str,
-                               (exMsg != nullptr ? exMsg : ": illegal State"));
+      IllegalStateException ex(str + std::string(": illegal State"));
       setTSSExceptionMessage(nullptr);
       throw ex;
     }

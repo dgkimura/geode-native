@@ -258,7 +258,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
     } catch (IllegalStateException& ise) {
       char isemsg[500] = {0};
       ACE_OS::snprintf(isemsg, 499, "IllegalStateException: %s",
-                       ise.getMessage());
+                       ise.what());
       LOG(isemsg);
       FAIL(isemsg);
     } catch (Exception& excp) {

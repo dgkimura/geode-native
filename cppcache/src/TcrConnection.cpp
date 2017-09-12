@@ -1317,7 +1317,7 @@ uint32_t TcrConnection::readHandshakeArraySize(uint32_t connectTimeout) {
         tempLen = val;
       } else {
         GF_SAFE_DELETE_CON(m_conn);
-        throwException(IllegalStateException("unexpected array length code"));
+        throw IllegalStateException("unexpected array length code");
       }
     }
     arraySize = tempLen;

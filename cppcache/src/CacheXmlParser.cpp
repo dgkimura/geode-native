@@ -132,7 +132,7 @@ extern "C" void startElementSAX2Function(void* ctx, const xmlChar* name,
       parser->setError(s);
     } catch (const IllegalStateException& ex) {
       parser->setIllegalStateException();
-      std::string s = ex.getMessage();
+      std::string s = ex.what();
       parser->setError(s);
     } catch (const Exception& ex) {
       parser->setAnyOtherException();
@@ -203,7 +203,7 @@ extern "C" void endElementSAX2Function(void* ctx, const xmlChar* name) {
       parser->setError(s);
     } catch (IllegalStateException& ex) {
       parser->setIllegalStateException();
-      std::string s = ex.getMessage();
+      std::string s = ex.what();
       parser->setError(s);
     } catch (Exception& ex) {
       parser->setAnyOtherException();
@@ -361,7 +361,7 @@ void CacheXmlParser::handleParserErrors(int res) {
     if (this->m_flagCacheXmlException) {
       throw CacheXmlException(temp.c_str());
     } else if (this->m_flagIllegalStateException) {
-      throw IllegalStateException(temp.c_str());
+      throw IllegalStateException(temp);
     } else if (this->m_flagAnyOtherException) {
       throw UnknownException(temp.c_str());
     }

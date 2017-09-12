@@ -83,7 +83,11 @@ public:
 /**
  *@brief Thrown when the state of cache is manipulated to be illegal.
  **/
-_GF_EXCEPTION_DEF(IllegalStateException);
+class IllegalStateException : public std::invalid_argument
+{
+public:
+  using std::invalid_argument::invalid_argument;
+};
 
 /**
  *@brief Thrown when an attempt is made to create an existing cache.
