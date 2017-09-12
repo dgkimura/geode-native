@@ -53,9 +53,8 @@ int testXmlCacheCreationWithOverflow() {
     std::string filePath = directory + "/non-existent.xml";
     cptr = cacheFactory->set("cache-xml-file", filePath.c_str())->create();
     return -1;
-  } catch (CacheXmlException& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+  } catch (const CacheXmlException& ex) {
+    LOGINFO("Caught expected CacheXmlException");
   } catch (...) {
     LOGINFO("Unknown exception");
     return -1;
@@ -270,10 +269,8 @@ int testXmlCacheCreationWithOverflow() {
     std::string filePath = directory + "/invalid_overflowAttr2.xml";
     cptr = cacheFactory->set("cache-xml-file", filePath.c_str())->create();
     return -1;
-  } catch (CacheXmlException& ex) {
-    std::cout << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+  } catch (const CacheXmlException& ex) {
+    LOGINFO("Caught expected CacheXmlException");
   }
 
   ///////////////testing of invalid_cache2.xml completed///////////////////
@@ -290,10 +287,8 @@ int testXmlCacheCreationWithOverflow() {
     std::string filePath = directory + "/invalid_overflowAttr3.xml";
     cptr = cacheFactory->set("cache-xml-file", filePath.c_str())->create();
     return -1;
-  } catch (Exception& ex) {
-    std::cout << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+  } catch (CacheXmlException& ex) {
+    LOGINFO("Caught expected CacheXmlException");
   }
 
   ///////////////testing of invalid_cache3.xml completed///////////////////

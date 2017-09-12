@@ -145,6 +145,12 @@ CachePtr CacheFactory::create(const char* name,
       cptr = nullptr;
     }
     throw;
+  } catch (const apache::geode::client::CacheXmlException&) {
+    if (!cptr->isClosed()) {
+      cptr->close();
+      cptr = nullptr;
+    }
+    throw;
   } catch (...) {
     if (!cptr->isClosed()) {
       cptr->close();

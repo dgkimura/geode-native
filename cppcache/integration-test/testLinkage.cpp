@@ -46,7 +46,6 @@ BEGIN_TEST(LinkageTest)
     IllegalArgumentException aIllegalArgumentException(
         "IllegalArgumentException");
     IllegalStateException aIllegalStateException("IllegalStateException");
-    CacheExistsException aCacheExistsException("CacheExistsException");
     CacheXmlException aCacheXmlException("CacheXmlException");
     TimeoutException aTimeoutException("TimeoutException");
     CacheWriterException aCacheWriterException("CacheWriterException");

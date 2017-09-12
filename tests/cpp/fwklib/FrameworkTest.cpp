@@ -263,8 +263,6 @@ void FrameworkTest::cacheInitialize(PropertiesPtr& props,
     if (m_istransaction) {
       txManager = m_cache->getCacheTransactionManager();
     }
-  } catch (CacheExistsException& ignore) {
-    m_cache = nullptr;
   } catch (Exception& e) {
     FWKEXCEPTION(
         "CacheFactory::create encountered Exception: " << e.getMessage());

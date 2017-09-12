@@ -90,14 +90,14 @@ public:
 };
 
 /**
- *@brief Thrown when an attempt is made to create an existing cache.
- **/
-_GF_EXCEPTION_DEF(CacheExistsException);
-
-/**
  *@brief Thrown when the cache xml is incorrect.
  **/
-_GF_EXCEPTION_DEF(CacheXmlException);
+class CacheXmlException : public std::invalid_argument
+{
+public:
+  using std::invalid_argument::invalid_argument;
+};
+
 /**
  *@brief Thrown when a timout occurs.
  **/
