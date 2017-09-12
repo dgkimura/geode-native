@@ -78,8 +78,7 @@ void GfErrTypeThrowException(const char* str, GfErrType err) {
       throw ex;
     }
     case GF_CACHE_ILLEGAL_ARGUMENT_EXCEPTION: {
-      IllegalArgumentException ex(
-          str, (exMsg != nullptr ? exMsg : ": illegal argument"));
+      IllegalArgumentException ex(str + std::string(": illegal argument"));
       setTSSExceptionMessage(nullptr);
       throw ex;
     }
@@ -141,16 +140,13 @@ void GfErrTypeThrowException(const char* str, GfErrType err) {
     }
     case GF_CACHE_REGION_KEYS_NOT_STRINGS: {
       IllegalArgumentException ex(
-          str, (exMsg != nullptr ? exMsg
-                                 : ": region entries do not support C access"));
+          str + std::string(": region entries do not support C access"));
       setTSSExceptionMessage(nullptr);
       throw ex;
     }
     case GF_CACHE_REGION_ENTRY_NOT_BYTES: {
       IllegalArgumentException ex(
-          str, (exMsg != nullptr
-                    ? exMsg
-                    : ": existing non-null values was not a byte array"));
+          str + std::string(": existing non-null values was not a byte array"));
       setTSSExceptionMessage(nullptr);
       throw ex;
     }

@@ -1281,45 +1281,45 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepTwelve)
       regPtr0->localCreate(x, 1);
       LOG("Entry with null key and value locally created successfully");
       FAIL("Expected IllegalArgumentException here");
-    } catch (IllegalArgumentException ex) {
-      LOGINFO("Expected IllegalArgumentException : %s", ex.getMessage());
+    } catch (const IllegalArgumentException& ex) {
+      LOGINFO("Expected IllegalArgumentException : %s", ex.what());
     }
 
     try {
       regPtr0->localPut(x, 1);
       LOG("Entry with null key and value locally put successfully");
       FAIL("Expected IllegalArgumentException here");
-    } catch (IllegalArgumentException ex) {
-      LOGINFO("Expected IllegalArgumentException : %s", ex.getMessage());
+    } catch (const IllegalArgumentException& ex) {
+      LOGINFO("Expected IllegalArgumentException : %s", ex.what());
     }
 
     try {
       regPtr0->localDestroy(x);
       LOG("Entry with null key locally deleted successfully");
       FAIL("Expected IllegalArgumentException here");
-    } catch (IllegalArgumentException ex) {
-      LOGINFO("Expected IllegalArgumentException : %s", ex.getMessage());
+    } catch (const IllegalArgumentException& ex) {
+      LOGINFO("Expected IllegalArgumentException : %s", ex.what());
     }
     try {
       regPtr0->localInvalidate(x);
       LOG("Entry with null key locally invalidated successfully");
       FAIL("Expected IllegalArgumentException here");
-    } catch (IllegalArgumentException ex) {
-      LOGINFO("Expected IllegalArgumentException : %s", ex.getMessage());
+    } catch (const IllegalArgumentException& ex) {
+      LOGINFO("Expected IllegalArgumentException : %s", ex.what());
     }
     try {
       regPtr0->localRemove(x, 1);
       LOG("Entry with null key and value locally removed successfully");
       FAIL("Expected IllegalArgumentException here");
-    } catch (IllegalArgumentException ex) {
-      LOGINFO("Expected IllegalArgumentException : %s", ex.getMessage());
+    } catch (const IllegalArgumentException& ex) {
+      LOGINFO("Expected IllegalArgumentException : %s", ex.what());
     }
     try {
       regPtr0->localRemoveEx(x);
       LOG("Entry with null key locally removed if value exist successfully");
       FAIL("Expected IllegalArgumentException here");
-    } catch (IllegalArgumentException ex) {
-      LOGINFO("Expected IllegalArgumentException : %s", ex.getMessage());
+    } catch (const IllegalArgumentException& ex) {
+      LOGINFO("Expected IllegalArgumentException : %s", ex.what());
     }
 
     auto keyObject1 = std::make_shared<PdxTests::PdxType>();
@@ -1355,8 +1355,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepTwelve)
 
     try {
       regPtr0->localPut(keyObject1, x);
-    } catch (IllegalArgumentException ex) {
-      LOGINFO("Expected IllegalArgumentException : %s", ex.getMessage());
+    } catch (const IllegalArgumentException& ex) {
+      LOGINFO("Expected IllegalArgumentException : %s", ex.what());
     }
     retVal = regPtr0->get(keyObject1);
     ASSERT(retVal == x, "retVal and x should match.");

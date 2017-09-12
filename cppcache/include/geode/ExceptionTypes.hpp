@@ -3,6 +3,8 @@
 #ifndef GEODE_EXCEPTIONTYPES_H_
 #define GEODE_EXCEPTIONTYPES_H_
 
+#include <stdexcept>
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -72,7 +74,11 @@ _GF_EXCEPTION_DEF(AssertionException);
 /**
  *@brief Thrown when an argument to a method is illegal.
  **/
-_GF_EXCEPTION_DEF(IllegalArgumentException);
+class IllegalArgumentException : public std::invalid_argument
+{
+public:
+  using std::invalid_argument::invalid_argument;
+};
 
 /**
  *@brief Thrown when the state of cache is manipulated to be illegal.

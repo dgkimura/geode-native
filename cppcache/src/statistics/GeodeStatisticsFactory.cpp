@@ -163,8 +163,8 @@ StatisticsTypeImpl* GeodeStatisticsFactory::addType(StatisticsTypeImpl* st) {
   } else if (status == -1) {
     throw IllegalArgumentException(
         "GeodeStatisticsFactory::addType: failed "
-        "to add new type %s",
-        temp.c_str());
+        "to add new type " +
+        temp);
   }
   return st;
 }

@@ -366,16 +366,16 @@ DUNIT_TASK_DEFINITION(CLIENT2, RegisterEmptyNullAndNonExistentRegex)
       LOG("Registering empty regex");
       regPtr0->registerRegex("");
       FAIL("Did not get expected exception!");
-    } catch (Exception& excp) {
-      LOG(excp.getMessage());
+    } catch (IllegalArgumentException& excp) {
+      LOG(excp.what());
     }
 
     try {
       LOG("Registering null regex");
       regPtr1->registerRegex(nullptr);
       FAIL("Did not get expected exception!");
-    } catch (Exception& excp) {
-      LOG(excp.getMessage());
+    } catch (IllegalArgumentException& excp) {
+      LOG(excp.what());
     }
 
     try {

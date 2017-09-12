@@ -301,16 +301,16 @@ void createAndVerifyEntry(const char* name) {
     regPtr->create(x, 1);
     LOG("Entry with null key and value created successfully");
     FAIL("Expected IllegalArgumentException here");
-  } catch (IllegalArgumentException& ex) {
-    LOGINFO("Expected IllegalArgumentException : %s", ex.getMessage());
+  } catch (const IllegalArgumentException& ex) {
+    LOGINFO("Expected IllegalArgumentException : %s", ex.what());
   }
 
   /*4.create new with entry nullptr key and string value*/
   try {
     regPtr->create(x, "testvalue");
     FAIL("Expected IllegalArgumentException here");
-  } catch (IllegalArgumentException& ex) {
-    LOGINFO("Expected IllegalArgumentException : %s", ex.getMessage());
+  } catch (const IllegalArgumentException& ex) {
+    LOGINFO("Expected IllegalArgumentException : %s", ex.what());
   }
 
   /*5.create new with entry userobject cantain all cacheable type ( like

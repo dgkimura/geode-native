@@ -539,8 +539,8 @@ void LocalRegion::getAll(const VectorOfCacheableKey& keys,
         "Region::getAll: either output \"values\""
         " parameter should be non-null, or \"addToLocalCache\" should be "
         "true "
-        "and caching should be enabled for the region [%s]",
-        getFullPath());
+        "and caching should be enabled for the region [" +
+        std::string(getFullPath()) + "]");
   }
 
   int64_t sampleStartNanos = startStatOpTime();

@@ -792,11 +792,11 @@ RegionPtr Security::getRegionPtr(const char *reg) {
         "In Security::getRegionPtr()  CacheFactory::getInstance encountered "
         "EntryNotFoundException: "
         << e.getMessage());
-  } catch (IllegalArgumentException &e) {
+  } catch (const IllegalArgumentException& e) {
     FWKEXCEPTION(
         "In Security::getRegionPtr()  CacheFactory::getInstance encountered "
         "IllegalArgumentException: "
-        << e.getMessage());
+        << e.what());
   }
   return region;
 }

@@ -1192,7 +1192,7 @@ void CacheXmlParser::startPersistenceManager(const xmlChar** atts) {
       getFactoryFunc(libraryName, libraryFunctionName);
     }
   } catch (IllegalArgumentException& ex) {
-    throw CacheXmlException(ex.getMessage());
+    throw CacheXmlException(ex.what());
   }
 
   _stack.push(std::make_shared<std::string>(std::string(libraryName)));
@@ -1318,7 +1318,7 @@ void CacheXmlParser::startCacheLoader(const xmlChar** atts) {
       getFactoryFunc(libraryName, libraryFunctionName);
     }
   } catch (IllegalArgumentException& ex) {
-    throw CacheXmlException(ex.getMessage());
+    throw CacheXmlException(ex.what());
   }
 
   auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
@@ -1385,7 +1385,7 @@ void CacheXmlParser::startCacheListener(const xmlChar** atts) {
       getFactoryFunc(libraryName, libraryFunctionName);
     }
   } catch (IllegalArgumentException& ex) {
-    throw CacheXmlException(ex.getMessage());
+    throw CacheXmlException(ex.what());
   }
 
   auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
@@ -1455,7 +1455,7 @@ void CacheXmlParser::startPartitionResolver(const xmlChar** atts) {
       getFactoryFunc(libraryName, libraryFunctionName);
     }
   } catch (IllegalArgumentException& ex) {
-    throw CacheXmlException(ex.getMessage());
+    throw CacheXmlException(ex.what());
   }
 
   auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());
@@ -1523,7 +1523,7 @@ void CacheXmlParser::startCacheWriter(const xmlChar** atts) {
       getFactoryFunc(libraryName, libraryFunctionName);
     }
   } catch (IllegalArgumentException& ex) {
-    throw CacheXmlException(ex.getMessage());
+    throw CacheXmlException(ex.what());
   }
 
   auto attrsFactory = std::static_pointer_cast<AttributesFactory>(_stack.top());

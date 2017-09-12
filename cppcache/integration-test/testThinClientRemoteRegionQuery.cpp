@@ -196,35 +196,35 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
     try {
       SelectResultsPtr results = region->query("");
       FAIL("Expected IllegalArgumentException exception for empty predicate");
-    } catch (apache::geode::client::IllegalArgumentException ex) {
+    } catch (const apache::geode::client::IllegalArgumentException& ex) {
       LOG("got expected IllegalArgumentException exception for empty "
           "predicate:");
-      LOG(ex.getMessage());
+      LOG(ex.what());
     }
 
     try {
       SelectResultsPtr results =
           region->query(const_cast<char*>(regionQueries[0].query()), 2200000);
       FAIL("Expected IllegalArgumentException exception for invalid timeout");
-    } catch (apache::geode::client::IllegalArgumentException ex) {
+    } catch (const apache::geode::client::IllegalArgumentException& ex) {
       LOG("got expected IllegalArgumentException exception for invalid "
           "timeout:");
-      LOG(ex.getMessage());
+      LOG(ex.what());
     }
 
     try {
       SelectResultsPtr results =
           region->query(const_cast<char*>(regionQueries[0].query()), -1);
       FAIL("Expected IllegalArgumentException exception for invalid timeout");
-    } catch (apache::geode::client::IllegalArgumentException ex) {
+    } catch (const apache::geode::client::IllegalArgumentException& ex) {
       LOG("got expected IllegalArgumentException exception for invalid "
           "timeout:");
-      LOG(ex.getMessage());
+      LOG(ex.what());
     }
     try {
       SelectResultsPtr results = region->query("bad predicate");
       FAIL("Expected QueryException exception for wrong predicate");
-    } catch (QueryException ex) {
+    } catch (const QueryException& ex) {
       LOG("got expected QueryException exception for wrong predicate:");
       LOG(ex.getMessage());
     }
@@ -271,35 +271,35 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
     try {
       bool existsValue ATTR_UNUSED = region->existsValue("");
       FAIL("Expected IllegalArgumentException exception for empty predicate");
-    } catch (apache::geode::client::IllegalArgumentException ex) {
+    } catch (const apache::geode::client::IllegalArgumentException& ex) {
       LOG("got expected IllegalArgumentException exception for empty "
           "predicate:");
-      LOG(ex.getMessage());
+      LOG(ex.what());
     }
 
     try {
       bool existsValue ATTR_UNUSED = region->existsValue(
           const_cast<char*>(regionQueries[0].query()), 2200000);
       FAIL("Expected IllegalArgumentException exception for invalid timeout");
-    } catch (apache::geode::client::IllegalArgumentException ex) {
+    } catch (const apache::geode::client::IllegalArgumentException& ex) {
       LOG("got expected IllegalArgumentException exception for invalid "
           "timeout:");
-      LOG(ex.getMessage());
+      LOG(ex.what());
     }
 
     try {
       bool existsValue ATTR_UNUSED =
           region->existsValue(const_cast<char*>(regionQueries[0].query()), -1);
       FAIL("Expected IllegalArgumentException exception for invalid timeout");
-    } catch (apache::geode::client::IllegalArgumentException ex) {
+    } catch (const apache::geode::client::IllegalArgumentException& ex) {
       LOG("got expected IllegalArgumentException exception for invalid "
           "timeout:");
-      LOG(ex.getMessage());
+      LOG(ex.what());
     }
     try {
       bool existsValue ATTR_UNUSED = region->existsValue("bad predicate");
       FAIL("Expected QueryException exception for wrong predicate");
-    } catch (QueryException ex) {
+    } catch (const QueryException& ex) {
       LOG("got expected QueryException exception for wrong predicate:");
       LOG(ex.getMessage());
     }
@@ -376,10 +376,10 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFive)
       auto results =
           std::dynamic_pointer_cast<SelectResults>(region->selectValue(""));
       FAIL("Expected IllegalArgumentException exception for empty predicate");
-    } catch (apache::geode::client::IllegalArgumentException ex) {
+    } catch (const apache::geode::client::IllegalArgumentException& ex) {
       LOG("got expected IllegalArgumentException exception for empty "
           "predicate:");
-      LOG(ex.getMessage());
+      LOG(ex.what());
     }
 
     try {
@@ -387,26 +387,26 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFive)
           std::dynamic_pointer_cast<SelectResults>(region->selectValue(
               const_cast<char*>(regionQueries[0].query()), 2200000));
       FAIL("Expected IllegalArgumentException exception for invalid timeout");
-    } catch (apache::geode::client::IllegalArgumentException ex) {
+    } catch (const apache::geode::client::IllegalArgumentException& ex) {
       LOG("got expected IllegalArgumentException exception for invalid "
           "timeout:");
-      LOG(ex.getMessage());
+      LOG(ex.what());
     }
 
     try {
       auto results = std::dynamic_pointer_cast<SelectResults>(
           region->selectValue(const_cast<char*>(regionQueries[0].query()), -1));
       FAIL("Expected IllegalArgumentException exception for invalid timeout");
-    } catch (apache::geode::client::IllegalArgumentException ex) {
+    } catch (const apache::geode::client::IllegalArgumentException& ex) {
       LOG("got expected IllegalArgumentException exception for invalid "
           "timeout:");
-      LOG(ex.getMessage());
+      LOG(ex.what());
     }
     try {
       auto results = std::dynamic_pointer_cast<SelectResults>(
           region->selectValue("bad predicate"));
       FAIL("Expected IllegalArgumentException exception for wrong predicate");
-    } catch (QueryException ex) {
+    } catch (const QueryException& ex) {
       LOG("got expected QueryException for wrong predicate:");
       LOG(ex.getMessage());
     }
@@ -440,7 +440,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, QueryError)
         ACE_OS::sprintf(failmsg, "Query exception didnt occur for index %d", i);
         LOG(failmsg);
         FAIL(failmsg);
-      } catch (apache::geode::client::QueryException ex) {
+      } catch (const apache::geode::client::QueryException& ex) {
         // ok, expecting an exception, do nothing
       } catch (...) {
         LOG("Got unexpected exception");

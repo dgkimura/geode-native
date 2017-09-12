@@ -167,8 +167,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
       FAIL("Didnt get expected timeout exception for first execute");
     } catch (const TimeoutException& excp) {
       std::string logmsg = "";
-      logmsg += "First execute expected exception ";
-      logmsg += excp.getName();
+      logmsg += "First execute expected exception TimeoutException ";
       logmsg += ": ";
       logmsg += excp.getMessage();
       LOG(logmsg.c_str());
@@ -208,8 +207,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
       LOG(logmsg);
     } catch (Exception excp) {
       std::string failmsg = "";
-      failmsg += "Second execute unwanted exception ";
-      failmsg += excp.getName();
+      failmsg += "Second execute unwanted exception Exception ";
       failmsg += ": ";
       failmsg += excp.getMessage();
       LOG(failmsg.c_str());
@@ -251,8 +249,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFive)
       FAIL("Didnt get expected timeout exception for third execute");
     } catch (const TimeoutException& excp) {
       std::string logmsg = "";
-      logmsg += "Third execute expected exception ";
-      logmsg += excp.getName();
+      logmsg += "Third execute expected exception TimeoutException ";
       logmsg += ": ";
       logmsg += excp.getMessage();
       LOG(logmsg.c_str());
@@ -292,8 +289,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepSix)
       LOG(logmsg);
     } catch (Exception excp) {
       std::string failmsg = "";
-      failmsg += "Fourth execute unwanted exception ";
-      failmsg += excp.getName();
+      failmsg += "Fourth execute unwanted exception Exception ";
       failmsg += ": ";
       failmsg += excp.getMessage();
       LOG(failmsg.c_str());
@@ -344,8 +340,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepSeven)
       FAIL("Didnt get expected timeout exception for fifth execute");
     } catch (const TimeoutException& excp) {
       std::string logmsg = "";
-      logmsg += "Fifth execute expected exception ";
-      logmsg += excp.getName();
+      logmsg += "Fifth execute expected exception TimeoutException ";
       logmsg += ": ";
       logmsg += excp.getMessage();
       LOG(logmsg.c_str());
@@ -395,8 +390,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepEight)
       LOG(logmsg);
     } catch (Exception excp) {
       std::string failmsg = "";
-      failmsg += "Sixth execute unwanted exception ";
-      failmsg += excp.getName();
+      failmsg += "Sixth execute unwanted exception Exception ";
       failmsg += ": ";
       failmsg += excp.getMessage();
       LOG(failmsg.c_str());
@@ -440,10 +434,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, verifyNegativeValueTimeout)
 
     catch (const IllegalArgumentException& excp) {
       std::string logmsg = "";
-      logmsg += "execute expected exception ";
-      logmsg += excp.getName();
+      logmsg += "execute expected exception IllegalArgumentException ";
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
     }
 
@@ -486,10 +479,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, verifyLargeValueTimeout)
 
     catch (const IllegalArgumentException& excp) {
       std::string logmsg = "";
-      logmsg += "execute expected exception ";
-      logmsg += excp.getName();
+      logmsg += "execute expected exception IllegalArgumentException ";
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
     }
 
