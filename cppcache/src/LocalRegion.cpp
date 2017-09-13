@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <sstream>
 #include <vector>
 
 #include "LocalRegion.hpp"
@@ -535,12 +536,12 @@ void LocalRegion::getAll(const VectorOfCacheableKey& keys,
   // check for the combination which will result in no action
   if (values == nullptr &&
       !(addToLocalCache && m_regionAttributes->getCachingEnabled())) {
-    throw IllegalArgumentException(
-        "Region::getAll: either output \"values\""
-        " parameter should be non-null, or \"addToLocalCache\" should be "
-        "true "
-        "and caching should be enabled for the region [%s]",
-        getFullPath());
+    std::stringstream ss;
+    ss << "Region::getAll: either output \"values\""
+       << " parameter should be non-null, or \"addToLocalCache\" should be true "
+       << "and caching should be enabled for the region ["
+       << getFullPath() << "]";
+    throw IllegalArgumentException(ss.str());
   }
 
   int64_t sampleStartNanos = startStatOpTime();

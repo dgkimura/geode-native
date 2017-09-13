@@ -2922,24 +2922,15 @@ InterestResultPolicy ThinClientRegion::copyInterestList(
 void ThinClientRegion::registerInterestGetValues(
     const char* method, const VectorOfCacheableKey* keys,
     const VectorOfCacheableKeyPtr& resultKeys) {
-  try {
-    auto exceptions = std::make_shared<HashMapOfException>();
-    GfErrType err = getAllNoThrow_remote(keys, nullptr, exceptions, resultKeys,
-                                         true, nullptr);
-    GfErrTypeToException(method, err);
-    // log any exceptions here
-    for (const auto& iter : *exceptions) {
-      LOGWARN("%s Exception for key %s:: %s: %s", method,
-              Utils::getCacheableKeyString(iter.first)->asChar(),
-              iter.second->getName(), iter.second->getMessage());
-    }
-  } catch (const Exception& ex) {
-    LOGWARN("%s Exception while getting values: %s: %s", method, ex.getName(),
-            ex.getMessage());
-    std::string msg(method);
-    msg += " failed in getting values";
-    throw EntryNotFoundException(msg.c_str(), nullptr, false,
-                                 ExceptionPtr(ex.clone()));
+  auto exceptions = std::make_shared<HashMapOfException>();
+  GfErrType err = getAllNoThrow_remote(keys, nullptr, exceptions, resultKeys,
+                                       true, nullptr);
+  GfErrTypeToException(method, err);
+  // log any exceptions here
+  for (const auto& iter : *exceptions) {
+    LOGWARN("%s Exception for key %s:: %s: %s", method,
+            Utils::getCacheableKeyString(iter.first)->asChar(),
+            iter.second->getName(), iter.second->getMessage());
   }
 }
 

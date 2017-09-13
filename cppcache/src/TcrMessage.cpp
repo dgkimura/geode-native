@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <boost/stacktrace.hpp>
+
 #include "TcrMessage.hpp"
 #include <geode/Assert.hpp>
 #include <geode/CacheableBuiltins.hpp>
@@ -1474,8 +1476,9 @@ void TcrMessage::handleByteArrayResponse(
           "Unknown message type %d in response, possible serialization "
           "mismatch",
           m_msgType);
-      StackTrace st;
-      st.print();
+      std::stringstream ss;
+      ss << boost::stacktrace::stacktrace();
+      LOGERROR(ss.str().c_str());
       throw MessageException("handleByteArrayResponse: unknown message type");
   }
   LOGDEBUG("handleByteArrayResponse earlyack = %d ", earlyack);

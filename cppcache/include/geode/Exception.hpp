@@ -24,6 +24,8 @@
  * @file
  */
 
+#include <stdexcept>
+
 #include "geode_globals.hpp"
 #include "geode_types.hpp"
 
@@ -42,30 +44,23 @@ class DistributedSystem;
  * @class Exception Exception.hpp
  * A description of an exception that occurred during a cache operation.
  */
-class CPPCACHE_EXPORT Exception {
+class CPPCACHE_EXPORT Exception : std::runtime_error {
   /**
    * @brief public methods
    */
  public:
   /** Creates an exception.
    * @param  msg1 message pointer, this is copied into the exception.
-   * @param  msg2 optional extra message pointer, appended to msg1.
-   * @param  forceTrace enables a stacktrace for this exception regardless of
-   * stacktrace-enabled system property.
-   * @param  cause optional cause of the exception which can be later
-   *               retrieved using <code>getCause</code>
    **/
-  Exception(const char* msg1, const char* msg2 = nullptr,
-            bool forceTrace = false, const ExceptionPtr& cause = nullptr);
+  Exception(const char* msg1);
+
+  Exception(const std::string& msg1);
 
   /** Creates an exception as a copy of the given other exception.
    * @param  other the original exception.
    *
    **/
   Exception(const Exception& other);
-
-  /** Create a clone of this exception. */
-  virtual Exception* clone() const;
 
   /**
    * @brief destructor
@@ -103,18 +98,10 @@ class CPPCACHE_EXPORT Exception {
    */
   virtual void raise() { throw * this; }
 
-  inline ExceptionPtr getCause() const { return m_cause; }
-
  protected:
-  /** internal constructor used to clone this exception */
-  Exception(const CacheableStringPtr& message, const StackTracePtr& stack,
-            const ExceptionPtr& cause);
-
   static bool s_exceptionStackTraceEnabled;
 
-  CacheableStringPtr m_message;  // error message
   StackTracePtr m_stack;
-  ExceptionPtr m_cause;
 
  private:
   static void setStackTraces(bool stackTraceEnabled);

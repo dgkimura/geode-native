@@ -121,7 +121,12 @@ class TcrChunkedResult {
 
   inline bool exceptionOccurred() const { return (m_ex != nullptr); }
 
-  inline void setException(Exception& ex) { m_ex.reset(ex.clone()); }
+  inline void setException(Exception& ex) {
+    // FIXME: This is dangerous and terrible and bad and we shouldn't be doing it.
+    //        Why do we need to set exceptions here?
+    //        Is there a way to get rid of m_ex being shared_ptr?
+    m_ex.reset(&ex);
+  }
 
   inline ExceptionPtr& getException() { return m_ex; }
 };

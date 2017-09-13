@@ -37,21 +37,14 @@ namespace client {
   typedef std::shared_ptr<x> x##Ptr;                                         \
   class CPPCACHE_EXPORT x : public apache::geode::client::Exception {        \
    public:                                                                   \
-    x(const char* msg1, const char* msg2 = nullptr, bool forceStack = false, \
-      const ExceptionPtr& cause = nullptr)                                   \
-        : Exception(msg1, msg2, forceStack, cause) {}                        \
+    x(const char* msg1)                                                      \
+        : Exception(msg1) {}                                                 \
+    x(const std::string& msg1)                                               \
+        : Exception(msg1) {}                                                 \
     x(const x& other) : Exception(other) {}                                  \
-    virtual Exception* clone() const {                                       \
-      return new x(m_message, m_stack, m_cause);                             \
-    }                                                                        \
     virtual ~x() {}                                                          \
     virtual const char* getName() const { return _exception_name_##x; }      \
     virtual void raise() { throw * this; }                                   \
-                                                                             \
-   protected:                                                                \
-    x(const CacheableStringPtr& message, const StackTracePtr& stack,         \
-      const ExceptionPtr& cause)                                             \
-        : Exception(message, stack, cause) {}                                \
                                                                              \
    private:                                                                  \
     const x& operator=(const x&);                                            \

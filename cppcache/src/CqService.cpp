@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <sstream>
+
 #include "CqService.hpp"
 #include "ReadWriteLock.hpp"
 #include <geode/DistributedSystem.hpp>
@@ -601,10 +603,11 @@ CacheableArrayListPtr CqService::getAllDurableCqsFromServer() {
     err = ThinClientRegion::handleServerException(
         "CqService::getAllDurableCqsFromServer", reply.getException());
     if (err == GF_CACHESERVER_EXCEPTION) {
-      throw CqQueryException(
-          "CqService::getAllDurableCqsFromServer: exception "
-          "at the server side: ",
-          reply.getException());
+      std::stringstream message;
+      message << "CqService::getAllDurableCqsFromServer: exception "
+              << "at the server side: "
+              << reply.getException();
+      throw CqQueryException(message.str());
     } else {
       GfErrTypeToException("CqService::getAllDurableCqsFromServer", err);
     }

@@ -26,7 +26,8 @@ void Assert::throwAssertion(const char* expressionText, const char* file,
                             int line) {
   LOGERROR("AssertionException: ( %s ) at %s:%d", expressionText, file, line);
 
-  AssertionException ae(expressionText, nullptr, true);
+  // FIXME: AssertionException used to force stack trace.
+  AssertionException ae(expressionText);
   ae.printStackTrace();
   throw ae;
 }

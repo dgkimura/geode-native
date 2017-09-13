@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <sstream>
 #include <geode/geode_globals.hpp>
 #include <geode/geode_types.hpp>
 #include "ExecutionImpl.hpp"
@@ -442,10 +443,9 @@ void ExecutionImpl::executeOnAllServers(std::string& func, uint8_t getResult,
 
   if (err != GF_NOERR) {
     if (err == GF_CACHESERVER_EXCEPTION) {
-      throw FunctionExecutionException(
-          "Execute: exception "
-          "at the server side: ",
-          exceptionPtr->asChar());
+      auto message = std::string("Execute: exception at the server side: ") +
+                     exceptionPtr->asChar();
+      throw FunctionExecutionException(message);
     } else {
       LOGDEBUG("Execute errorred with server exception: %d", err);
       throw FunctionExecutionException(
