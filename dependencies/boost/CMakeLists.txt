@@ -15,8 +15,8 @@
 
 project( boost )
 
-set( ${PROJECT_NAME}_VERSION 1.64.0 )
-set( ${PROJECT_NAME}_SHA265 0445c22a5ef3bd69f5dfb48354978421a85ab395254a26b1ffb0aa1bfd63a108 )
+set( ${PROJECT_NAME}_VERSION 1.65.0 )
+set( ${PROJECT_NAME}_SHA265 8a142d33ab4b4ed0de3abea3280ae3b2ce91c48c09478518c73e5dd2ba8f20aa )
 string(REPLACE "." "_" _VERSION_UNDERSCORE ${${PROJECT_NAME}_VERSION})
 set( ${PROJECT_NAME}_URL "https://dl.bintray.com/boostorg/release/${${PROJECT_NAME}_VERSION}/source/boost_${_VERSION_UNDERSCORE}.tar.gz" )
 set( ${PROJECT_NAME}_EXTERN ${PROJECT_NAME}-extern )
@@ -67,6 +67,7 @@ set( ${PROJECT_NAME}_INSTALL_DIR ${INSTALL_DIR} )
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE
   $<BUILD_INTERFACE:${${PROJECT_NAME}_INSTALL_DIR}/include>
+  $<BUILD_INTERFACE:${${PROJECT_NAME}_INSTALL_DIR}/src>
 )
 target_compile_definitions(${PROJECT_NAME} INTERFACE
 )
