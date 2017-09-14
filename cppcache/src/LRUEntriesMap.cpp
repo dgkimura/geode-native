@@ -393,7 +393,7 @@ bool LRUEntriesMap::get(const CacheableKeyPtr& key, CacheablePtr& returnPtr,
       try {
         tmpObj = m_pmPtr->read(key, persistenceInfo);
       } catch (Exception& ex) {
-        LOGERROR("read on the persistence layer failed - %s", ex.getMessage());
+        LOGERROR("read on the persistence layer failed - %s", ex.what());
         if (segmentLocked == true) segmentRPtr->release();
         return false;
       }
@@ -506,7 +506,7 @@ CacheablePtr LRUEntriesMap::getFromDisk(const CacheableKeyPtr& key,
              key->toString()->asChar());
     tmpObj = m_pmPtr->read(key, persistenceInfo);
   } catch (Exception& ex) {
-    LOGERROR("read on the persistence layer failed - %s", ex.getMessage());
+    LOGERROR("read on the persistence layer failed - %s", ex.what());
     return nullptr;
   }
   return tmpObj;

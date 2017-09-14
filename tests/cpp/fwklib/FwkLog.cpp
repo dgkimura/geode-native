@@ -84,5 +84,6 @@ void apache::geode::client::testframework::plog(const char* l, const char* s,
 void apache::geode::client::testframework::dumpStack() {
   // FIXME: Exception used to force stack trace
   apache::geode::client::Exception trace("StackTrace  ");
-  trace.printStackTrace();
+  fprintf(stdout, "%s\n", trace.getStackTrace().c_str());
+  fflush(stdout);
 }

@@ -63,7 +63,7 @@ CacheableKeyPtr PutAllPartialResultServerException::getFirstFailedKey() {
   return m_result->getFirstFailedKey();
 }
 
-CacheableStringPtr PutAllPartialResultServerException::getMessage() {
+CacheableStringPtr PutAllPartialResultServerException::what() {
   return m_result->toString();
 }
 

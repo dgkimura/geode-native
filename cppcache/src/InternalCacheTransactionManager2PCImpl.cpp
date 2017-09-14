@@ -107,7 +107,7 @@ void InternalCacheTransactionManager2PCImpl::prepare() {
     }
   } catch (const Exception& ex) {
     LOGERROR("Unexpected exception during commit in prepare %s",
-             ex.getMessage());
+             ex.what());
     throw ex;
   }
 }
@@ -208,7 +208,7 @@ void InternalCacheTransactionManager2PCImpl::afterCompletion(int32_t status) {
     }
   } catch (const Exception& ex) {
     LOGERROR("Unexpected exception during completing transaction %s",
-             ex.getMessage());
+             ex.what());
     throw ex;
   }
 }

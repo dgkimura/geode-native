@@ -44,8 +44,8 @@ const char* locHostPort =
   }                                                              \
   catch (const apache::geode::client::Exception& other) {        \
     LOG("Got apache::geode::client::Exception& other ");         \
-    other.printStackTrace();                                     \
-    FAIL(other.getMessage());                                    \
+    LOG(other.getStackTrace().c_str());                          \
+    FAIL(other.what());                                          \
   }
 
 #define HANDLE_NOT_AUTHORIZED_EXCEPTION                          \
@@ -54,8 +54,8 @@ const char* locHostPort =
     LOG("Success");                                              \
   }                                                              \
   catch (const apache::geode::client::Exception& other) {        \
-    other.printStackTrace();                                     \
-    FAIL(other.getMessage());                                    \
+    LOG(other.getStackTrace().c_str());                          \
+    FAIL(other.what());                                          \
   }
 
 #define ADMIN_CLIENT s1p1
@@ -162,7 +162,7 @@ void checkExceptionsMap(const HashMapOfExceptionPtr& exceptions, int clientNum,
       ASSERT(std::dynamic_pointer_cast<NotAuthorizedExceptionPtr>(iter->second),
              "unexpected exception type in exception map");
       printf("Got expected NotAuthorizedException: %s",
-             iter->second->getMessage());
+             iter->second->what());
     }
   }
   printf("Expected number of exceptions: %d; got exceptions: %zd", expectedNum,

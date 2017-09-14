@@ -65,7 +65,7 @@ class CPPCACHE_EXPORT PutAllPartialResultServerException : public Serializable {
 
   CacheableKeyPtr getFirstFailedKey();
 
-  CacheableStringPtr getMessage();
+  CacheableStringPtr what();
 
   /**
    * @brief destructor

@@ -151,7 +151,7 @@ GfErrType ThinClientLocatorHelper::getAllServers(
       continue;
     } catch (const Exception& excp) {
       LOGFINE("Exception while querying locator: %s: %s", excp.getName(),
-              excp.getMessage());
+              excp.what());
       continue;
     }
   }
@@ -247,7 +247,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewCallBackConn(
       throw excp;
     } catch (const Exception& excp) {
       LOGFINE("Exception while querying locator: %s: %s", excp.getName(),
-              excp.getMessage());
+              excp.what());
       continue;
     }
   }
@@ -361,7 +361,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
       throw excp;
     } catch (const Exception& excp) {
       LOGFINE("Exception while querying locator: %s: %s", excp.getName(),
-              excp.getMessage());
+              excp.what());
       continue;
     }
   }
@@ -461,7 +461,7 @@ GfErrType ThinClientLocatorHelper::updateLocators(
       throw excp;
     } catch (const Exception& excp) {
       LOGFINE("Exception while querying locator: %s: %s", excp.getName(),
-              excp.getMessage());
+              excp.what());
       continue;
     }
   }

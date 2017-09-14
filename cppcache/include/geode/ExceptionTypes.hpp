@@ -44,7 +44,6 @@ namespace client {
     x(const x& other) : Exception(other) {}                                  \
     virtual ~x() {}                                                          \
     virtual const char* getName() const { return _exception_name_##x; }      \
-    virtual void raise() { throw * this; }                                   \
                                                                              \
    private:                                                                  \
     const x& operator=(const x&);                                            \

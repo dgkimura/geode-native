@@ -74,7 +74,7 @@ CacheablePtr TXState::replay(bool isRollback) {
       } catch (const Exception& ex) {
         LOGFINE(
             "caught exception when rolling back before retrying transaction %s",
-            ex.getMessage());
+            ex.what());
       }
     }
     m_txId = TXIdPtr(new TXId());
@@ -87,11 +87,11 @@ CacheablePtr TXState::replay(bool isRollback) {
 
       return result;
     } catch (const TransactionDataNodeHasDepartedException& ex) {
-      LOGDEBUG("Transaction exception:%s", ex.getMessage());
+      LOGDEBUG("Transaction exception:%s", ex.what());
       isRollback = false;
       // try again
     } catch (const TransactionDataRebalancedException& ex) {
-      LOGDEBUG("Transaction exception:%s", ex.getMessage());
+      LOGDEBUG("Transaction exception:%s", ex.what());
       isRollback = true;
       // try again
     }

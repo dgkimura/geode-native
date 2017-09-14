@@ -137,7 +137,7 @@ class putThread : public ACE_Task_Base {
         }
       } catch (const Exception& excp) {
         LOGINFO("Exception occured in put %s: %s ", excp.getName(),
-                excp.getMessage());
+                excp.what());
       } catch (...) {
         LOG("Random Exception occured");
       }
@@ -152,7 +152,7 @@ class putThread : public ACE_Task_Base {
           }
         } catch (const Exception& excp) {
           LOGINFO("Exception occured in get %s: %s ", excp.getName(),
-                  excp.getMessage());
+                  excp.what());
         } catch (...) {
           LOG("Random Exception occured");
         }
@@ -166,7 +166,7 @@ class putThread : public ACE_Task_Base {
           }
         } catch (const Exception& excp) {
           LOGINFO("Exception occured in destroy %s: %s ", excp.getName(),
-                  excp.getMessage());
+                  excp.what());
         } catch (...) {
           LOG("Random Exception occured");
         }
@@ -341,8 +341,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, WarmUpTask)
         // LOGINFO("CPPTEST: SINGLEHOP SUCCEEDED while putting key %s with
         // hashcode %d", logmsg, (int32_t)keyPtr->hashcode());
       } catch (Exception& ex) {
-        LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-        FAIL(ex.getMessage());
+        LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+        FAIL(ex.what());
       } catch (...) {
         LOGERROR("CPPTEST: Put caused random exception in WarmUpTask");
         cleanProc();
@@ -422,8 +422,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, WarmUpTask3)
         // LOGINFO("CPPTEST: SINGLEHOP SUCCEEDED while putting key %s with
         // hashcode %d", logmsg, (int32_t)keyPtr->hashcode());
       } catch (Exception& ex) {
-        LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-        FAIL(ex.getMessage());
+        LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+        FAIL(ex.what());
       } catch (...) {
         LOGERROR("CPPTEST: Put caused random exception in WarmUpTask");
         cleanProc();
@@ -535,7 +535,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForAllKeysTask)
         throw IllegalStateException("TEST FAIL DUE TO EXTRA HOP");
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: Put caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("Put caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -566,7 +566,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForAllKeysTask)
         throw IllegalStateException("TEST FAIL DUE TO EXTRA HOP");
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: Destroy caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("Destroy caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -674,7 +674,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask2)
             i, keyPtr->hashcode());
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: Put caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("Put caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -732,7 +732,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask2)
             i, keyPtr->hashcode());
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: Destroy caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("Destroy caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -794,7 +794,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask2)
             i, keyPtr->hashcode());
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: get caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("get caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -849,7 +849,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask2)
         // hashcode %d", i, (int32_t)keyPtr->hashcode());
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: getALL caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("getAll caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -936,7 +936,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask)
             i, keyPtr->hashcode());
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: Put caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("Put caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -986,7 +986,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask)
             i, keyPtr->hashcode());
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: Destroy caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("Destroy caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -1040,7 +1040,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask)
             i, keyPtr->hashcode());
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: get caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("get caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -1095,7 +1095,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask)
         // hashcode %d", i, (int32_t)keyPtr->hashcode());
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: getALL caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("getAll caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -1140,7 +1140,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask)
         // hashcode %d", i, (int32_t)keyPtr->hashcode());
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: getALL caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("getAll caused unexpected exception");
         throw IllegalStateException("TEST FAIL");

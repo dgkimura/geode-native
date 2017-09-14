@@ -118,12 +118,12 @@ void ValidateDestroyRegion(const char* name) {
   } catch (RegionDestroyedException& ex) {
     char buffer[1024];
     sprintf(buffer, "Got expected exception %s: msg = %s", ex.getName(),
-            ex.getMessage());
+            ex.what());
     LOG(buffer);
   } catch (Exception& ex) {
     char buffer[1024];
     sprintf(buffer, "Got unexpected exception %s: msg = %s", ex.getName(),
-            ex.getMessage());
+            ex.what());
     FAIL(buffer);
   }
 }
@@ -232,7 +232,7 @@ void createThinClientRegion(
     } catch (EntryNotFoundException& ex) {
       char buffer[1024];
       sprintf(buffer, "Got expected exception %s: msg = %s", ex.getName(),
-              ex.getMessage());
+              ex.what());
       LOG(buffer);
     }
     localDestroyRegion(regionName);

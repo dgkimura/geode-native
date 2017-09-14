@@ -916,7 +916,7 @@ void QueryHelper::destroyPortfolioOrPositionData(RegionPtr& rptr, int setSize,
     }
   } catch (Exception& e) {
     FWKSEVERE("QueryHelper::destroyPortfolioOrPositionData Caught Exception: "
-              << e.getMessage());
+              << e.what());
   }
   FWKINFO("destroy done \n");
 }
@@ -941,7 +941,7 @@ void QueryHelper::invalidatePortfolioOrPositionData(RegionPtr& rptr,
   } catch (Exception& e) {
     FWKSEVERE(
         "QueryHelper::invalidatePortfolioOrPositionData Caught Exception: "
-        << e.getMessage());
+        << e.what());
   }
   FWKINFO("Invalidation done \n");
 }

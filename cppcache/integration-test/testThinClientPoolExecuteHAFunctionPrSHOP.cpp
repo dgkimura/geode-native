@@ -247,9 +247,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1OpTest)
       std::string logmsg = "";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace());
       FAIL("Function Execution Failed!");
     }
   }
@@ -367,9 +367,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1OnServerHATest)
       std::string logmsg = "";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace());
       FAIL("Function Execution Failed!");
     }
   }

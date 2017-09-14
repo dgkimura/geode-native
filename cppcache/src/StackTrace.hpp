@@ -36,8 +36,7 @@ class StackTrace {
  public:
   StackTrace();
   virtual ~StackTrace();
-  void print() const;
-  void getString(std::string& tracestring) const;
+  std::string getString() const;
 
  private:
   boost::stacktrace::stacktrace stacktrace;

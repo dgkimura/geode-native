@@ -249,8 +249,8 @@ int testXmlCacheCreationWithPools() {
   try {
     cacheFactory = CacheFactory::createCacheFactory();
   } catch (Exception& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
     return -1;
   }
 
@@ -270,8 +270,8 @@ int testXmlCacheCreationWithPools() {
       std::cout << "getPdxIgnoreUnreadFields returned true." << std::endl;
     }
   } catch (Exception& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
     return -1;
   } catch (...) {
     LOGINFO("unknown exception");
@@ -407,8 +407,8 @@ int testXmlCacheCreationWithPools() {
     return -1;
   } catch (Exception& ex) {
     std::cout << "EXPECTED EXCEPTION" << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
   }
 
   try {
@@ -420,8 +420,8 @@ int testXmlCacheCreationWithPools() {
     return -1;
   } catch (Exception& ex) {
     std::cout << "EXPECTED EXCEPTION" << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
   }
 
   try {
@@ -433,8 +433,8 @@ int testXmlCacheCreationWithPools() {
     return -1;
   } catch (Exception& ex) {
     std::cout << "EXPECTED EXCEPTION" << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
   }
 
   try {
@@ -446,8 +446,8 @@ int testXmlCacheCreationWithPools() {
     return -1;
   } catch (Exception& ex) {
     std::cout << "EXPECTED EXCEPTION" << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
   }
 
   std::cout << "disconnecting..." << std::endl;
@@ -455,8 +455,8 @@ int testXmlCacheCreationWithPools() {
     std::cout << "just before disconnecting..." << std::endl;
     if (cptr != nullptr) cptr->close();
   } catch (Exception& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
     return -1;
   }
   std::cout << "done with test" << std::endl;
@@ -476,8 +476,8 @@ int testXmlDeclarativeCacheCreation() {
   try {
     cacheFactory = CacheFactory::createCacheFactory();
   } catch (Exception& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
     return -1;
   }
 
@@ -486,8 +486,8 @@ int testXmlDeclarativeCacheCreation() {
     cptr = cacheFactory->set("cache-xml-file", filePath.c_str())->create();
 
   } catch (Exception& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
     return -1;
   } catch (...) {
     LOGINFO("unknown exception");

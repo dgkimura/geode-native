@@ -410,9 +410,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
       std::string logmsg = "";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace());
     }
     /* Test for #1026 */
     {
@@ -441,8 +441,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
         LOG("Testing bug #1026 Complete");
         // Iterate through the rows of the query result.
       } catch (const Exception& geodeExcp) {
-        LOGERROR("CqQuery Geode Exception: %s", geodeExcp.getMessage());
-        FAIL(geodeExcp.getMessage());
+        LOGERROR("CqQuery Geode Exception: %s", geodeExcp.what());
+        FAIL(geodeExcp.what());
       }
     }
 
@@ -590,7 +590,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
         std::string failmsg = "";
         failmsg += excp.getName();
         failmsg += ": ";
-        failmsg += excp.getMessage();
+        failmsg += excp.what();
         LOG(failmsg.c_str());
         got_exception = true;
       }
@@ -615,10 +615,10 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
       std::string failmsg = "";
       failmsg += excp.getName();
       failmsg += ": ";
-      failmsg += excp.getMessage();
+      failmsg += excp.what();
       LOG(failmsg.c_str());
       FAIL(failmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace());
     }
     CqServiceStatisticsPtr serviceStats = qs->getCqServiceStatistics();
     ASSERT(serviceStats != nullptr, "serviceStats is nullptr");
@@ -653,10 +653,10 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
       std::string failmsg = "";
       failmsg += excp.getName();
       failmsg += ": ";
-      failmsg += excp.getMessage();
+      failmsg += excp.what();
       LOG(failmsg.c_str());
       FAIL(failmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace());
     }
     sprintf(buf,
             "numCqsActive=%d, numCqsCreated=%d, "
@@ -676,10 +676,10 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
       std::string failmsg = "";
       failmsg += excp.getName();
       failmsg += ": ";
-      failmsg += excp.getMessage();
+      failmsg += excp.what();
       LOG(failmsg.c_str());
       FAIL(failmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace());
     }
     sprintf(buf,
             "numCqsActive=%d, numCqsCreated=%d, "
@@ -707,10 +707,10 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
       std::string failmsg = "";
       failmsg += excp.getName();
       failmsg += ": ";
-      failmsg += excp.getMessage();
+      failmsg += excp.what();
       LOG(failmsg.c_str());
       FAIL(failmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace());
     }
 
     LOG("StepFour complete.");

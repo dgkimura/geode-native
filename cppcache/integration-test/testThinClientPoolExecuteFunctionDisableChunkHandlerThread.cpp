@@ -229,7 +229,7 @@ class putThread : public ACE_Task_Base {
           exc->execute(routingObj, args, rPtr, getFuncName2, 300 /*in millis*/)
               ->getResult();
         } catch (const TimeoutException& te) {
-          LOGINFO("Timeout exception occurred %s", te.getMessage());
+          LOGINFO("Timeout exception occurred %s", te.what());
           m_timeoutCount++;
         } catch (const Exception&) {
           LOG("Exception occurred");

@@ -170,7 +170,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
       logmsg += "First execute expected exception ";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
     }
 
@@ -211,7 +211,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFour)
       failmsg += "Second execute unwanted exception ";
       failmsg += excp.getName();
       failmsg += ": ";
-      failmsg += excp.getMessage();
+      failmsg += excp.what();
       LOG(failmsg.c_str());
       FAIL(failmsg.c_str());
     }
@@ -254,7 +254,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepFive)
       logmsg += "Third execute expected exception ";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
     }
 
@@ -295,7 +295,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepSix)
       failmsg += "Fourth execute unwanted exception ";
       failmsg += excp.getName();
       failmsg += ": ";
-      failmsg += excp.getMessage();
+      failmsg += excp.what();
       LOG(failmsg.c_str());
       FAIL(failmsg.c_str());
     }
@@ -347,7 +347,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepSeven)
       logmsg += "Fifth execute expected exception ";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
     }
 
@@ -398,7 +398,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepEight)
       failmsg += "Sixth execute unwanted exception ";
       failmsg += excp.getName();
       failmsg += ": ";
-      failmsg += excp.getMessage();
+      failmsg += excp.what();
       LOG(failmsg.c_str());
       FAIL(failmsg.c_str());
     }
@@ -443,7 +443,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, verifyNegativeValueTimeout)
       logmsg += "execute expected exception ";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
     }
 
@@ -489,7 +489,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, verifyLargeValueTimeout)
       logmsg += "execute expected exception ";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
     }
 

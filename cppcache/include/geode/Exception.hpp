@@ -26,14 +26,11 @@
 
 #include <stdexcept>
 
-#include "geode_globals.hpp"
 #include "geode_types.hpp"
 
 namespace apache {
 namespace geode {
 namespace client {
-
-#define GF_EX_MSG_LIMIT 2048
 
 class Exception;
 typedef std::shared_ptr<Exception> ExceptionPtr;
@@ -44,7 +41,7 @@ class DistributedSystem;
  * @class Exception Exception.hpp
  * A description of an exception that occurred during a cache operation.
  */
-class CPPCACHE_EXPORT Exception : std::runtime_error {
+class CPPCACHE_EXPORT Exception : public std::runtime_error {
   /**
    * @brief public methods
    */
@@ -67,36 +64,12 @@ class CPPCACHE_EXPORT Exception : std::runtime_error {
    */
   virtual ~Exception();
 
-  /** Returns the message pointer
-   *
-   * @return  message pointer
+  /** Get a stacktrace string from the location the exception was created.
    */
-  virtual const char* getMessage() const;
-  /** Show the message pointer
-   *
-   */
-  virtual void showMessage() const;
-
-  /** On some platforms, print a stacktrace from the location the exception
-   * was created.
-   */
-  virtual void printStackTrace() const;
-
-#ifndef _SOLARIS
-  /** On some platforms, get a stacktrace string from the location the
-   * exception was created.
-   */
-  virtual size_t getStackTrace(char* buffer, size_t maxLength) const;
-#endif
+  virtual std::string getStackTrace() const;
 
   /** Return the name of this exception type. */
   virtual const char* getName() const;
-
-  /**
-   * Throw polymorphically; this allows storing an exception object
-   * pointer and throwing it later.
-   */
-  virtual void raise() { throw * this; }
 
  protected:
   static bool s_exceptionStackTraceEnabled;

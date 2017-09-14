@@ -43,7 +43,7 @@ const int64_t INITIAL_CONNECTION_ID = 26739;
 
 #define throwException(ex)                              \
   {                                                     \
-    LOGFINEST("%s: %s", ex.getName(), ex.getMessage()); \
+    LOGFINEST("%s: %s", ex.getName(), ex.what()); \
     throw ex;                                           \
   }
 bool TcrConnection::InitTcrConnection(
@@ -289,9 +289,9 @@ bool TcrConnection::InitTcrConnection(
       throw;
     } catch (const Exception& ex) {
       LOGWARN("TcrConnection: failed to acquire handle to authLoader: [%s] %s",
-              ex.getName(), ex.getMessage());
+              ex.getName(), ex.what());
       auto message = std::string("TcrConnection: failed to load authInit library: ")
-                     + ex.getMessage();
+                     + ex.what();
       throwException(
           AuthenticationFailedException(message));
     }
@@ -1194,7 +1194,7 @@ void TcrConnection::close() {
       send(closeMsg->getMsgData(), closeMsg->getMsgLength(), 2, false);
     }
   } catch (Exception& e) {
-    LOGINFO("Close connection message failed with msg: %s", e.getMessage());
+    LOGINFO("Close connection message failed with msg: %s", e.what());
   } catch (...) {
     LOGINFO("Close connection message failed");
   }

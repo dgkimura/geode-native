@@ -161,7 +161,7 @@ DUNIT_TASK(CLIENT1, AgainFailoverC1)
           "got");
     } catch (const Exception& excp) {
       LOG(excp.getName());
-      LOG(excp.getMessage());
+      LOG(excp.what());
       FAIL(
           "Unexpected expection - only "
           "NotConnectedException expected");
@@ -193,14 +193,14 @@ DUNIT_TASK(CLIENT2, AgainFailoverC2)
       FAIL("Client Failover Should Fail");
     } catch (const NotConnectedException& ex) {
       LOG(ex.getName());
-      LOG(ex.getMessage());
+      LOG(ex.what());
       FAIL(
           "Unexpected expection - only "
           "NoAvailableLocatorsException "
           "expected");
     } catch (const Exception& excp) {
       LOG(excp.getName());
-      LOG(excp.getMessage());
+      LOG(excp.what());
       FAIL(
           "Unexpected expection - only "
           "NoAvailableLocatorsException "

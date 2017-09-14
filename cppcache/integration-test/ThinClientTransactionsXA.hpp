@@ -268,7 +268,7 @@ void createEntryTwice(const char* name, const char* key, const char* value) {
   try {
     regPtr->create(keyPtr, valPtr);
   } catch (const EntryExistsException& geodeExcp) {
-    LOG(geodeExcp.getMessage());
+    LOG(geodeExcp.what());
     LOG("createEntryTwice() Clean Exit.");
     return;
   }
@@ -905,7 +905,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CreateNonexistentServerRegion_Pooled_Locator)
       printf(
           "Got expected CacheServerException when performing operation "
           "on a non-existent region: %s\n",
-          ex.getMessage());
+          ex.what());
     }
   }
 END_TASK_DEFINITION
@@ -923,7 +923,7 @@ DUNIT_TASK_DEFINITION(CLIENT1,
       printf(
           "Got expected CacheServerException when performing operation "
           "on a non-existent region: %s\n",
-          ex.getMessage());
+          ex.what());
     }
   }
 END_TASK_DEFINITION
@@ -1067,7 +1067,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepEight_Pool)
       sprintf(message, "Third create on Key %s ", CREATE_TWICE_KEY);
       LOG(message);
     } catch (const EntryExistsException& geodeExcp) {
-      LOG(geodeExcp.getMessage());
+      LOG(geodeExcp.what());
       ASSERT(false,
              "Creating KEY Twice on a caching-enabled false region should be "
              "allowed.");
@@ -1109,7 +1109,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepEight_Pool_Sticky)
       sprintf(message, "Third create on Key %s ", CREATE_TWICE_KEY);
       LOG(message);
     } catch (const EntryExistsException& geodeExcp) {
-      LOG(geodeExcp.getMessage());
+      LOG(geodeExcp.what());
       ASSERT(false,
              "Creating KEY Twice on a caching-enabled false region should be "
              "allowed.");

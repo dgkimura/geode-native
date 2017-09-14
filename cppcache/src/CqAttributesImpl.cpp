@@ -55,7 +55,7 @@ void CqAttributesImpl::setCqListeners(
         // Handle client side exceptions.
       } catch (Exception& ex) {
         LOGWARN("Exception occured while closing CQ Listener %s Error",
-                ex.getMessage());
+                ex.what());
       }
     }
     oldListeners.clear();
@@ -76,7 +76,7 @@ void CqAttributesImpl::removeCqListener(const CqListenerPtr& cql) {
       cql->close();
       // Handle client side exceptions.
     } catch (Exception& ex) {
-      LOGWARN("Exception closing CQ Listener %s Error ", ex.getMessage());
+      LOGWARN("Exception closing CQ Listener %s Error ", ex.what());
     }
   }
 }

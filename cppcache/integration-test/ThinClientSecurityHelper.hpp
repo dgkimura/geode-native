@@ -95,8 +95,8 @@ opCodeList::value_type tmpAArr[] = {OP_CREATE,       OP_UPDATE,
     LOG("Success");                                              \
   }                                                              \
   catch (const apache::geode::client::Exception& other) {        \
-    other.printStackTrace();                                     \
-    FAIL(other.getMessage());                                    \
+    LOG(other.getStackTrace().c_str());                          \
+    FAIL(other.what());                                          \
   }
 
 #define HANDLE_CACHEWRITER_EXCEPTION                           \
@@ -244,7 +244,7 @@ class putThread : public ACE_Task_Base {
           }
         } catch (Exception& ex) {
           printf("%d: %ld exception got and exception message = %s\n", pid,
-                 (long)thr_id, ex.getMessage());
+                 (long)thr_id, ex.what());
         }
       }
     }

@@ -1015,9 +1015,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1OpTest)
       std::string logmsg = "";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace());
       FAIL("Function Execution Failed!");
     }
     isPoolWithEndpoint = true;
@@ -1100,9 +1100,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client2OpTest)
       std::string logmsg = "";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace());
       FAIL("Function Execution Failed!");
     }
     isPoolWithEndpoint = true;
@@ -1177,7 +1177,7 @@ class putThread : public ACE_Task_Base {
           exc->execute(routingObj, args, rPtr, getFuncName2, 300 /*in millis*/)
               ->getResult();
         } catch (const TimeoutException& te) {
-          LOGINFO("Timeout exception occurred %s", te.getMessage());
+          LOGINFO("Timeout exception occurred %s", te.what());
           m_timeoutCount++;
         } catch (const Exception&) {
           LOG("Exception occurred");

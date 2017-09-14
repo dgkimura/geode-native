@@ -170,7 +170,7 @@ class TcrChunkedContext {
         m_result->fireHandleChunk(m_bytes, m_len, m_isLastChunkWithSecurity,
                                   m_cache);
       } catch (Exception& ex) {
-        LOGERROR("HandleChunk error message %s, name = %s", ex.getMessage(),
+        LOGERROR("HandleChunk error message %s, name = %s", ex.what(),
                  ex.getName());
         m_result->setException(ex);
       } catch (std::exception& stdEx) {

@@ -334,9 +334,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThree)
       std::string logmsg = "";
       logmsg += excp.getName();
       logmsg += ": ";
-      logmsg += excp.getMessage();
+      logmsg += excp.what();
       LOG(logmsg.c_str());
-      excp.printStackTrace();
+      LOG(excp.getStackTrace().c_str());
     }
 
     LOG("StepThree complete.");

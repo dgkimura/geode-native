@@ -49,7 +49,7 @@ BEGIN_TEST(CacheFunction)
   try {
     rAttr = attrFac.createRegionAttributes();
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, "attribute create failed");
   }
   if (rAttr == nullptr) {
@@ -64,7 +64,7 @@ BEGIN_TEST(CacheFunction)
     CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cptr.get());
     cacheImpl->createRegion(regionName, rAttr, rptr);
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, (char*)"attribute create failed");
   }
   std::cout << "create Sub Region with name=" << subRegionName1 << std::endl;
@@ -72,7 +72,7 @@ BEGIN_TEST(CacheFunction)
   try {
     subRptr1 = rptr->createSubregion(subRegionName1, rAttr);
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, (char*)"subregion create failed");
   }
   std::cout << "create Sub Region with name=" << subRegionName2 << std::endl;
@@ -80,7 +80,7 @@ BEGIN_TEST(CacheFunction)
   try {
     subRptr2 = rptr->createSubregion(subRegionName2, rAttr);
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, (char*)"subregion create failed");
   }
   std::cout << "create Sub Region with name=" << subRegionName21
@@ -89,7 +89,7 @@ BEGIN_TEST(CacheFunction)
   try {
     subRptr21 = subRptr2->createSubregion(subRegionName21, rAttr);
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, (char*)"subregion create failed");
   }
   VectorOfRegion vr;
@@ -127,7 +127,7 @@ BEGIN_TEST(CacheFunction)
   try {
     region = cptr->getRegion(root.c_str());
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, (char*)"getRegion");
   }
   if (region == nullptr) {
@@ -139,7 +139,7 @@ BEGIN_TEST(CacheFunction)
   try {
     region = cptr->getRegion(subRegion1.c_str());
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, (char*)"getRegion");
   }
   if (region == nullptr) {
@@ -151,7 +151,7 @@ BEGIN_TEST(CacheFunction)
   try {
     region = cptr->getRegion(subRegion21.c_str());
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, (char*)"getRegion");
   }
   if (region == nullptr) {
@@ -164,7 +164,7 @@ BEGIN_TEST(CacheFunction)
   try {
     region = cptr->getRegion(subRegion21.c_str());
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, (char*)"getRegion");
   }
   if (region == nullptr) {
@@ -177,7 +177,7 @@ BEGIN_TEST(CacheFunction)
   try {
     region = cptr->getRegion(notExist);
   } catch (Exception& ex) {
-    std::cout << ex.getMessage() << std::endl;
+    std::cout << ex.what() << std::endl;
     ASSERT(false, (char*)"getRegion");
   }
   if (region == nullptr) {

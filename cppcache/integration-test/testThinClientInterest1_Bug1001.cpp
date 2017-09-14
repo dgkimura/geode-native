@@ -244,7 +244,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckUpdateBug1001)
           str, static_cast<int32_t>(wcslen(str) + 1) * sizeof(wchar_t));
       const wchar_t* lRtnCd ATTR_UNUSED = lCStringP->asWChar();
     } catch (const Exception& geodeExcp) {
-      printf("%s: %s", geodeExcp.getName(), geodeExcp.getMessage());
+      printf("%s: %s", geodeExcp.getName(), geodeExcp.what());
       FAIL("Should not have got exception.");
     }
 
@@ -254,7 +254,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckUpdateBug1001)
           str, static_cast<int32_t>(wcslen(str) + 1) * sizeof(wchar_t));
       const wchar_t* lRtnCd ATTR_UNUSED = lCStringP->asWChar();
     } catch (const Exception& geodeExcp) {
-      printf("%s: %s", geodeExcp.getName(), geodeExcp.getMessage());
+      printf("%s: %s", geodeExcp.getName(), geodeExcp.what());
       FAIL("Should not have got exception.");
     }
 

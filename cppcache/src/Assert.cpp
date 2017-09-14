@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <sstream>
+
+#include <boost/stacktrace.hpp>
 #include <geode/Assert.hpp>
 #include <geode/ExceptionTypes.hpp>
 #include <geode/Log.hpp>
@@ -24,11 +27,11 @@ namespace client {
 
 void Assert::throwAssertion(const char* expressionText, const char* file,
                             int line) {
-  LOGERROR("AssertionException: ( %s ) at %s:%d", expressionText, file, line);
-
-  // FIXME: AssertionException used to force stack trace.
   AssertionException ae(expressionText);
-  ae.printStackTrace();
+  LOGERROR("AssertionException: ( %s ) at %s:%d", expressionText, file, line);
+  std::stringstream ss;
+  ss << boost::stacktrace::stacktrace();
+  LOGERROR(ss.str().c_str());
   throw ae;
 }
 }  // namespace client

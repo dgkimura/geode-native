@@ -53,38 +53,9 @@ const char _exception_name_Exception[] = "apache::geode::client::Exception";
 
 const char* Exception::getName() const { return _exception_name_Exception; }
 
-const char* Exception::getMessage() const { return what(); }
-
-void Exception::showMessage() const {
-  printf("%s: msg = %s\n", this->getName(), what());
+std::string Exception::getStackTrace() const {
+  return m_stack ? m_stack->getString() : "  No stack available.\n";
 }
-
-void Exception::printStackTrace() const {
-  showMessage();
-  if (m_stack == nullptr) {
-    fprintf(stdout, "  No stack available.\n");
-  } else {
-    m_stack->print();
-  }
-}
-
-#ifndef _SOLARIS
-
-size_t Exception::getStackTrace(char* buffer, size_t maxLength) const {
-  size_t len = 0;
-  if (maxLength > 0) {
-    std::string traceString;
-    if (m_stack == nullptr) {
-      traceString = "  No stack available.\n";
-    } else {
-      m_stack->getString(traceString);
-    }
-    len = ACE_OS::snprintf(buffer, maxLength, "%s", traceString.c_str());
-  }
-  return len;
-}
-
-#endif
 
 Exception::Exception(const Exception& other)
     : std::runtime_error(other.what()),

@@ -374,7 +374,7 @@ void ThinClientRegion::initTCR() {
   } catch (const Exception& ex) {
     GF_SAFE_DELETE(m_tcrdm);
     LOGERROR("Exception while initializing region: %s: %s", ex.getName(),
-             ex.getMessage());
+             ex.what());
     throw;
   }
 }
@@ -2930,7 +2930,7 @@ void ThinClientRegion::registerInterestGetValues(
   for (const auto& iter : *exceptions) {
     LOGWARN("%s Exception for key %s:: %s: %s", method,
             Utils::getCacheableKeyString(iter.first)->asChar(),
-            iter.second->getName(), iter.second->getMessage());
+            iter.second->getName(), iter.second->what());
   }
 }
 

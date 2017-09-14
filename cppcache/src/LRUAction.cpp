@@ -77,10 +77,10 @@ bool LRUOverFlowToDiskAction::evict(const MapEntryImplPtr& mePtr) {
   try {
     pmPtr->write(keyPtr, valuePtr, persistenceInfo);
   } catch (DiskFailureException& ex) {
-    LOGERROR("DiskFailureException - %s", ex.getMessage());
+    LOGERROR("DiskFailureException - %s", ex.what());
     return false;
   } catch (Exception& ex) {
-    LOGERROR("write to persistence layer failed - %s", ex.getMessage());
+    LOGERROR("write to persistence layer failed - %s", ex.what());
     return false;
   }
   if (setInfo == true) {

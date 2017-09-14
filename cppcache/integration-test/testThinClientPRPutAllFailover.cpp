@@ -137,8 +137,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, PutAllOneTask)
     try {
       dataReg->putAll(entryMap);
     } catch (Exception& ex) {
-      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-      FAIL(ex.getMessage());
+      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+      FAIL(ex.what());
     } catch (...) {
       LOGERROR("CPPTEST: PutAll caused random exception in PutAllOneTask");
       cleanProc();
@@ -171,8 +171,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, PutAllTwoTask)
     try {
       dataReg->putAll(entryMap);
     } catch (Exception& ex) {
-      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-      FAIL(ex.getMessage());
+      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+      FAIL(ex.what());
     } catch (...) {
       LOGERROR("CPPTEST: PutAll caused random exception in PutAllTwoTask");
       cleanProc();
@@ -205,8 +205,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, PutAllThreeTask)
     try {
       dataReg->putAll(entryMap);
     } catch (Exception& ex) {
-      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-      FAIL(ex.getMessage());
+      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+      FAIL(ex.what());
     } catch (...) {
       LOGERROR("CPPTEST: PutAll caused random exception in PutAllThreeTask");
       cleanProc();
@@ -239,8 +239,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, PutAllFourTask)
     try {
       dataReg->putAll(entryMap);
     } catch (Exception& ex) {
-      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-      FAIL(ex.getMessage());
+      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+      FAIL(ex.what());
     } catch (...) {
       LOGERROR("CPPTEST: PutAll caused random exception in PutAllFourTask");
       cleanProc();
@@ -305,8 +305,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, RemoveAllOneTask)
       dataReg->putAll(entryMap);
       dataReg->removeAll(keys);
     } catch (Exception& ex) {
-      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-      FAIL(ex.getMessage());
+      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+      FAIL(ex.what());
     } catch (...) {
       LOGERROR("CPPTEST: RemoveAll caused random exception in PutAllOneTask");
       cleanProc();
@@ -341,8 +341,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, RemoveAllTwoTask)
       dataReg->putAll(entryMap);
       dataReg->removeAll(keys);
     } catch (Exception& ex) {
-      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-      FAIL(ex.getMessage());
+      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+      FAIL(ex.what());
     } catch (...) {
       LOGERROR("CPPTEST: RemoveAll caused random exception in PutAllTwoTask");
       cleanProc();
@@ -378,8 +378,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, RemoveAllThreeTask)
       dataReg->putAll(entryMap);
       dataReg->removeAll(keys);
     } catch (Exception& ex) {
-      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-      FAIL(ex.getMessage());
+      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+      FAIL(ex.what());
     } catch (...) {
       LOGERROR(
           "CPPTEST: RemoveAll caused random exception in RemoveAllThreeTask");
@@ -415,8 +415,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, RemoveAllFourTask)
       dataReg->putAll(entryMap);
       dataReg->removeAll(keys);
     } catch (Exception& ex) {
-      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.getMessage());
-      FAIL(ex.getMessage());
+      LOGERROR("CPPTEST: Unexpected %s: %s", ex.getName(), ex.what());
+      FAIL(ex.what());
     } catch (...) {
       LOGERROR(
           "CPPTEST: RemoveAll caused random exception in RemoveAllFourTask");

@@ -576,7 +576,7 @@ void TcrMessage::writeObjectPart(const SerializablePtr& se, bool isDelta,
         return;
       }
     } catch (const apache::geode::client::Exception& ex) {
-      LOGDEBUG("Exception in writing EMPTY_BYTE_ARRAY : %s", ex.getMessage());
+      LOGDEBUG("Exception in writing EMPTY_BYTE_ARRAY : %s", ex.what());
     }
     isObject = 0;
   }
@@ -856,7 +856,7 @@ void TcrMessage::processChunk(const uint8_t* bytes, int32_t len,
           m_chunkedResult->waitFinalize();
           ExceptionPtr ex = m_chunkedResult->getException();
           if (ex != nullptr) {
-            ex->raise();
+            throw *ex;
           }
         }
         break;
@@ -887,7 +887,7 @@ void TcrMessage::processChunk(const uint8_t* bytes, int32_t len,
           // of populating cache with registerAllKeys(), so that should be
           // documented since rolling that back may not be a good idea either.
           if (const auto& ex = m_chunkedResult->getException()) {
-            ex->raise();
+            throw *ex;
           }
         }
       } else if (TcrMessage::CQ_EXCEPTION_TYPE == m_msgType ||

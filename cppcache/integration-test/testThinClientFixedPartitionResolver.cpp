@@ -263,7 +263,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask_REGION)
         throw IllegalStateException("TEST FAIL DUE TO EXTRA HOP");
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: Put caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("Put caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -307,7 +307,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask_REGION)
         throw IllegalStateException("TEST FAIL DUE TO EXTRA HOP");
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: get caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("get caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -354,7 +354,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask_REGION)
         throw IllegalStateException("TEST FAIL DUE TO EXTRA HOP");
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: getALL caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("getAll caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -391,7 +391,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask_REGION)
         throw IllegalStateException("TEST FAIL DUE TO EXTRA HOP");
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: getALL caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("getAll caused unexpected exception");
         throw IllegalStateException("TEST FAIL");
@@ -434,7 +434,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask_REGION)
         throw IllegalStateException("TEST FAIL DUE TO EXTRA HOP");
       } catch (Exception& ex) {
         LOGERROR("CPPTEST: destroy caused unexpected %s: %s", ex.getName(),
-                 ex.getMessage());
+                 ex.what());
         cleanProc();
         FAIL("destroy caused unexpected exception");
         throw IllegalStateException("TEST FAIL");

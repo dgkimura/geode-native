@@ -40,8 +40,8 @@ int testXmlCacheCreationWithOverflow() {
   try {
     cacheFactory = CacheFactory::createCacheFactory();
   } catch (Exception& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
     return -1;
   }
 
@@ -54,8 +54,8 @@ int testXmlCacheCreationWithOverflow() {
     cptr = cacheFactory->set("cache-xml-file", filePath.c_str())->create();
     return -1;
   } catch (CacheXmlException& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "CacheXmlException: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
   } catch (...) {
     LOGINFO("Unknown exception");
     return -1;
@@ -75,8 +75,8 @@ int testXmlCacheCreationWithOverflow() {
     // return 0;
   } catch (Exception& ex) {
     std::cout << "getPdxIgnoreUnreadFields should return true2." << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
     return -1;
   } catch (...) {
     LOGINFO(" unknown exception");
@@ -226,8 +226,8 @@ int testXmlCacheCreationWithOverflow() {
     regPtr1->localDestroyRegion();
     regPtr2->localDestroyRegion();
   } catch (Exception& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
     return -1;
   }
 
@@ -253,8 +253,8 @@ int testXmlCacheCreationWithOverflow() {
     return -1;
   } catch (Exception& ex) {
     std::cout << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
   }
 
   ///////////////testing of invalid_cache1.xml completed///////////////////
@@ -272,8 +272,8 @@ int testXmlCacheCreationWithOverflow() {
     return -1;
   } catch (CacheXmlException& ex) {
     std::cout << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "CacheXmlException: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
   }
 
   ///////////////testing of invalid_cache2.xml completed///////////////////
@@ -292,8 +292,8 @@ int testXmlCacheCreationWithOverflow() {
     return -1;
   } catch (Exception& ex) {
     std::cout << std::endl;
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
   }
 
   ///////////////testing of invalid_cache3.xml completed///////////////////
@@ -305,8 +305,8 @@ int testXmlCacheCreationWithOverflow() {
       cptr = nullptr;
     }
   } catch (Exception& ex) {
-    ex.showMessage();
-    ex.printStackTrace();
+    std::cout << "Exception: msg = " << ex.what() << std::endl;
+    LOG(ex.getStackTrace());
     return -1;
   }
   std::cout << "done with test" << std::endl;

@@ -26,16 +26,10 @@ StackTrace::StackTrace()
 
 StackTrace::~StackTrace() {}
 
-void StackTrace::print() const {
+std::string StackTrace::getString() const {
   std::stringstream ss;
   ss << stacktrace;
-  printf("%s\n", ss.str().c_str());
-}
-
-void StackTrace::getString(std::string& tracestring) const {
-  std::stringstream ss;
-  ss << stacktrace;
-  tracestring = ss.str();
+  return ss.str();
 }
 
 }  // namespace client
