@@ -25,6 +25,7 @@
  */
 
 #include <stdexcept>
+#include <string>
 
 #include "geode_types.hpp"
 
@@ -41,7 +42,7 @@ class DistributedSystem;
  * @class Exception Exception.hpp
  * A description of an exception that occurred during a cache operation.
  */
-class CPPCACHE_EXPORT Exception : public std::runtime_error {
+class CPPCACHE_EXPORT Exception : public std::exception {
   /**
    * @brief public methods
    */
@@ -71,13 +72,17 @@ class CPPCACHE_EXPORT Exception : public std::runtime_error {
   /** Return the name of this exception type. */
   virtual const char* getName() const;
 
+  virtual const char *what() const noexcept;
+
  protected:
   static bool s_exceptionStackTraceEnabled;
 
-  StackTracePtr m_stack;
-
  private:
   static void setStackTraces(bool stackTraceEnabled);
+
+  StackTracePtr m_stack;
+
+  std::string message;
 
   friend class DistributedSystem;
 };

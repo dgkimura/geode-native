@@ -41,7 +41,6 @@ namespace client {
         : Exception(msg1) {}                                                 \
     x(const std::string& msg1)                                               \
         : Exception(msg1) {}                                                 \
-    x(const x& other) : Exception(other) {}                                  \
     virtual ~x() {}                                                          \
     virtual const char* getName() const { return _exception_name_##x; }      \
                                                                              \

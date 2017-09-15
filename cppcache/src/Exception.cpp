@@ -23,8 +23,6 @@
 #include <StackTrace.hpp>
 #include <ace/TSS_T.h>
 
-#include <string>
-
 namespace apache {
 namespace geode {
 namespace client {
@@ -41,10 +39,14 @@ Exception::Exception(const std::string& msg)
 }
 
 Exception::Exception(const char* msg1)
-  : std::runtime_error(msg1) {
+  : message(msg1) {
   if (s_exceptionStackTraceEnabled/* || forceTrace*/) {
     m_stack = std::unique_ptr<StackTrace>();
   }
+}
+
+const char *Exception::what() const noexcept {
+  return message.c_str();
 }
 
 Exception::~Exception() {}
@@ -58,7 +60,7 @@ std::string Exception::getStackTrace() const {
 }
 
 Exception::Exception(const Exception& other)
-    : std::runtime_error(other.what()),
+    : message(other.what()),
       m_stack(other.m_stack) {}
 
 // class to store/clear last server exception in TSS area
