@@ -18,7 +18,8 @@ project( boost )
 set( ${PROJECT_NAME}_VERSION 1.65.0 )
 set( ${PROJECT_NAME}_SHA265 8a142d33ab4b4ed0de3abea3280ae3b2ce91c48c09478518c73e5dd2ba8f20aa )
 string(REPLACE "." "_" _VERSION_UNDERSCORE ${${PROJECT_NAME}_VERSION})
-set( ${PROJECT_NAME}_URL "https://dl.bintray.com/boostorg/release/${${PROJECT_NAME}_VERSION}/source/boost_${_VERSION_UNDERSCORE}.tar.gz" )
+#set( ${PROJECT_NAME}_URL "https://dl.bintray.com/boostorg/release/${${PROJECT_NAME}_VERSION}/source/boost_${_VERSION_UNDERSCORE}.tar.gz" )
+set( ${PROJECT_NAME}_URL "https://sourceforge.net/projects/boost/files/boost/${${PROJECT_NAME}_VERSION}/boost_${_VERSION_UNDERSCORE}.tar.gz" )
 set( ${PROJECT_NAME}_EXTERN ${PROJECT_NAME}-extern )
 
 include(ProcessorCount)
@@ -63,6 +64,18 @@ ExternalProject_Get_Property( ${${PROJECT_NAME}_EXTERN} SOURCE_DIR )
 set( ${PROJECT_NAME}_SOURCE_DIR ${SOURCE_DIR} )
 ExternalProject_Get_Property( ${${PROJECT_NAME}_EXTERN} INSTALL_DIR )
 set( ${PROJECT_NAME}_INSTALL_DIR ${INSTALL_DIR} )
+
+if ("SunOS" STREQUAL ${CMAKE_SYSTEM_NAME})
+set( PATCH_FILE ${CMAKE_CURRENT_SOURCE_DIR}/solaris.patch )
+ExternalProject_Add_Step( ${${PROJECT_NAME}_EXTERN} patches
+    ALWAYS 0
+    DEPENDEES download
+    DEPENDERS patch
+    DEPENDS ${PATCH_FILE}
+    WORKING_DIRECTORY ${${PROJECT_NAME}_SOURCE_DIR}
+    COMMAND ${PATCH} -u -N -p1 < ${PATCH_FILE}
+)
+endif()
 
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE

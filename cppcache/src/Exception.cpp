@@ -49,7 +49,7 @@ const char *Exception::what() const noexcept {
   return message.c_str();
 }
 
-Exception::~Exception() {}
+Exception::~Exception() noexcept {}
 
 const char _exception_name_Exception[] = "apache::geode::client::Exception";
 

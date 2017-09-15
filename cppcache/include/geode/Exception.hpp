@@ -63,7 +63,7 @@ class CPPCACHE_EXPORT Exception : public std::exception {
   /**
    * @brief destructor
    */
-  virtual ~Exception();
+  virtual ~Exception() noexcept;
 
   /** Get a stacktrace string from the location the exception was created.
    */
