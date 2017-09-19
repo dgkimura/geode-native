@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <boost/stacktrace.hpp>
 
 #include "TcrMessage.hpp"
 #include <geode/Assert.hpp>
@@ -35,6 +34,7 @@
 #include "DiskStoreId.hpp"
 #include "DiskVersionTag.hpp"
 #include "CacheRegionHelper.hpp"
+#include <boost/stacktrace.hpp>
 
 using namespace apache::geode::client;
 static const uint32_t REGULAR_EXPRESSION =

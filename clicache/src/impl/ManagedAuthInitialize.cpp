@@ -156,7 +156,7 @@ namespace apache
             "loading managed library: ";
           ex_str += ex.getName();
           ex_str += ": ";
-          ex_str += ex.getMessage();
+          ex_str += ex.what();
           throw AuthenticationRequiredException(ex_str.c_str());
         }
         catch (System::Exception^ ex)
