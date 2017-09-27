@@ -55,9 +55,7 @@ void ThinClientBaseDM::init() {
 
 bool ThinClientBaseDM::isSecurityOn() {
   return m_connManager.getCacheImpl()
-      ->getDistributedSystem()
-      .getSystemProperties()
-      .isSecurityOn();
+      ->getAuthInitialize() != nullptr;
 }
 
 void ThinClientBaseDM::destroy(bool keepalive) {
