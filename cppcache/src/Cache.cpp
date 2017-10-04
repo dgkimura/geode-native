@@ -137,11 +137,13 @@ CacheTransactionManagerPtr Cache::getCacheTransactionManager() {
 TypeRegistry& Cache::getTypeRegistry() { return *(m_typeRegistry.get()); }
 
 Cache::Cache(const std::string& name, PropertiesPtr dsProp,
-             bool ignorePdxUnreadFields, bool readPdxSerialized, const AuthInitializePtr& authInitialize) {
+             bool ignorePdxUnreadFields, bool readPdxSerialized,
+             const AuthInitializePtr& authInitialize) {
   auto dsPtr = DistributedSystem::create(DEFAULT_DS_NAME, this, dsProp);
   dsPtr->connect();
-  m_cacheImpl = std::unique_ptr<CacheImpl>(new CacheImpl(
-      this, name, std::move(dsPtr), ignorePdxUnreadFields, readPdxSerialized, authInitialize));
+  m_cacheImpl = std::unique_ptr<CacheImpl>(
+      new CacheImpl(this, name, std::move(dsPtr), ignorePdxUnreadFields,
+                    readPdxSerialized, authInitialize));
   m_typeRegistry = std::unique_ptr<TypeRegistry>(new TypeRegistry(*this));
 }
 

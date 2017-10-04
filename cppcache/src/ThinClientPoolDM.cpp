@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 #include <algorithm>
 #include <ace/INET_Addr.h>
 
@@ -34,7 +33,6 @@
 #include "DistributedSystemImpl.hpp"
 #include "UserAttributes.hpp"
 #include "ThinClientStickyManager.hpp"
-
 
 #include "NonCopyable.hpp"
 
@@ -186,10 +184,8 @@ ThinClientPoolDM::ThinClientPoolDM(const char* name,
                              : "");
 
   const uint32_t durableTimeOut = sysProp.durableTimeout();
-  m_memId =
-      cacheImpl->getClientProxyMembershipIDFactory().create(
-          hostName, hostAddr, hostPort, clientDurableId.c_str(),
-          durableTimeOut);
+  m_memId = cacheImpl->getClientProxyMembershipIDFactory().create(
+      hostName, hostAddr, hostPort, clientDurableId.c_str(), durableTimeOut);
 
   if (m_attrs->m_initLocList.size() == 0 &&
       m_attrs->m_initServList.size() == 0) {

@@ -292,7 +292,7 @@ class CPPCACHE_EXPORT SystemProperties {
     m_onClientDisconnectClearPdxTypeIds = set;
   }
 
-   /** Return the security diffie hellman secret key algo */
+  /** Return the security diffie hellman secret key algo */
   const char* securityClientDhAlgo() const {
     return (m_securityClientDhAlgo == nullptr
                 ? ""
@@ -325,11 +325,10 @@ class CPPCACHE_EXPORT SystemProperties {
    * @return bool flag to indicate whether DH for credentials is on.
    */
   bool isDhOn() const {
-
-    //TODO: this function needs to be moved to a more appropriate location
+    // TODO: this function needs to be moved to a more appropriate location
     return false;
-//    return isSecurityOn() && m_securityClientDhAlgo != nullptr &&
-//           m_securityClientDhAlgo->length() > 0;
+    //    return isSecurityOn() && m_securityClientDhAlgo != nullptr &&
+    //           m_securityClientDhAlgo->length() > 0;
   }
 
   /**

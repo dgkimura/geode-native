@@ -142,7 +142,8 @@ CacheHelper::CacheHelper(const PropertiesPtr& configPtr,
   showRegionAttributes(*rootRegionPtr->getAttributes());
 }
 
-CacheHelper::CacheHelper(const bool isThinclient, const AuthInitializePtr& authInitialize,
+CacheHelper::CacheHelper(const bool isThinclient,
+                         const AuthInitializePtr& authInitialize,
                          const PropertiesPtr& configPtr) {
   PropertiesPtr pp = configPtr;
   if (pp == nullptr) {
@@ -1299,7 +1300,6 @@ void CacheHelper::initServer(int instance, const char* xml,
   printf("  creating dir = %s \n", sname.c_str());
   ACE_OS::mkdir(sname.c_str());
 
-  
   sprintf(cmd, "%s/bin/%s stop server --dir=%s 2>&1", gfjavaenv, GFSH,
           currDir.c_str());
 

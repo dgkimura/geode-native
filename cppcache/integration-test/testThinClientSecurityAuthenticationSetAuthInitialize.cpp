@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 #include <ace/OS.h>
 #include <ace/High_Res_Timer.h>
 

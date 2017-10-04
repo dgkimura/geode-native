@@ -39,7 +39,6 @@
 #include "Utils.hpp"  // for RandGen for server challenge
 #include "ThinClientRegion.hpp"
 
-
 using namespace apache::geode::client;
 
 const int HEADER_LENGTH = 17;

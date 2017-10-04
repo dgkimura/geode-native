@@ -125,7 +125,6 @@ class CPPCACHE_EXPORT DistributedSystemImpl {
   static void CallCliCallBack(Cache& cache);
 
  private:
-
   static ACE_Recursive_Thread_Mutex m_cliCallbackLock;
   static volatile bool m_isCliCallbackSet;
   static std::map<int, CliCallbackMethod> m_cliCallbackMap;

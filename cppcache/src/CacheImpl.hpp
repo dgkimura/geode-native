@@ -282,7 +282,9 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
 
   ThreadPool* getThreadPool();
 
-  inline const AuthInitializePtr& getAuthInitialize() { return m_authInitialize; }
+  inline const AuthInitializePtr& getAuthInitialize() {
+    return m_authInitialize;
+  }
 
  private:
   std::atomic<bool> m_networkhop;
