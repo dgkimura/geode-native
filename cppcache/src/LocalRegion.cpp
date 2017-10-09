@@ -274,12 +274,11 @@ RegionPtr LocalRegion::createSubregion(
   return region_ptr;
 }
 
-void LocalRegion::subregions(const bool recursive, VectorOfRegion& sr) {
+VectorOfRegion LocalRegion::subregions(const bool recursive) {
   CHECK_DESTROY_PENDING(TryReadGuard, LocalRegion::subregions);
-  sr.clear();
-  if (m_subRegions.current_size() == 0) return;
+  if (m_subRegions.current_size() == 0) return VectorOfRegion();
 
-  subregions_internal(recursive, sr);
+  return subregions_internal(recursive);
 }
 
 RegionEntryPtr LocalRegion::getEntry(const CacheableKeyPtr& key) {
@@ -759,17 +758,17 @@ bool LocalRegion::containsKey_internal(const CacheableKeyPtr& keyPtr) const {
   return m_entries->containsKey(keyPtr);
 }
 
-void LocalRegion::subregions_internal(const bool recursive,
-                                      VectorOfRegion& sr) {
+VectorOfRegion LocalRegion::subregions_internal(const bool recursive) {
   MapOfRegionGuard guard(m_subRegions.mutex());
 
-  if (m_subRegions.current_size() == 0) return;
+  if (m_subRegions.current_size() == 0) return VectorOfRegion();
 
+  VectorOfRegion regions;
   VectorOfRegion subRegions;
 
   for (MapOfRegionWithLock::iterator p = m_subRegions.begin();
        p != m_subRegions.end(); ++p) {
-    sr.push_back((*p).int_id_);
+    regions.push_back((*p).int_id_);
     // seperate list so children can be descended.
     if (recursive) {
       subRegions.push_back((*p).int_id_);
@@ -779,10 +778,12 @@ void LocalRegion::subregions_internal(const bool recursive,
   if (recursive == true) {
     // decend...
     for (int32_t i = 0; i < subRegions.size(); i++) {
-      dynamic_cast<LocalRegion*>(subRegions.at(i).get())
-          ->subregions_internal(true, sr);
+      auto temp = dynamic_cast<LocalRegion*>(subRegions.at(i).get())
+          ->subregions_internal(true);
+      regions.insert(regions.end(), temp.begin(), temp.end());
     }
   }
+  return regions;
 }
 
 GfErrType LocalRegion::getNoThrow(const CacheableKeyPtr& keyPtr,

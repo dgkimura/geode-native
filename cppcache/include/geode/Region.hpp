@@ -249,7 +249,7 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    * @param[out] sr subregions
    * @throws RegionDestroyedException
    */
-  virtual void subregions(const bool recursive, VectorOfRegion& sr) = 0;
+  virtual VectorOfRegion subregions(const bool recursive) = 0;
 
   /** Return the meta-object RegionEntry for key.
    * @throws IllegalArgumentException, RegionDestroyedException.

@@ -92,8 +92,7 @@ BEGIN_TEST(CacheFunction)
     std::cout << ex.getMessage() << std::endl;
     ASSERT(false, (char*)"subregion create failed");
   }
-  VectorOfRegion vr;
-  rptr->subregions(true, vr);
+  VectorOfRegion vr = rptr->subregions(true);
   std::cout << "  vr.size=" << vr.size() << std::endl;
   ASSERT(vr.size() == totalSubRegions, "Number of Subregions does not match");
   std::cout << "sub regions:" << std::endl;

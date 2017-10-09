@@ -157,7 +157,7 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
   RegionPtr getSubregion(const char* path);
   RegionPtr createSubregion(const char* subregionName,
                             const RegionAttributesPtr& aRegionAttributes);
-  void subregions(const bool recursive, VectorOfRegion& sr);
+  VectorOfRegion subregions(const bool recursive);
   RegionEntryPtr getEntry(const CacheableKeyPtr& key);
   void getEntry(const CacheableKeyPtr& key, CacheablePtr& valuePtr);
   CacheablePtr get(const CacheableKeyPtr& key,
@@ -472,7 +472,7 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
   // functions related to expirations.
   void updateAccessAndModifiedTimeForEntry(MapEntryImplPtr& ptr, bool modified);
   void registerEntryExpiryTask(MapEntryImplPtr& entry);
-  void subregions_internal(const bool recursive, VectorOfRegion& sr);
+  VectorOfRegion subregions_internal(const bool recursive);
   void entries_internal(VectorOfRegionEntry& me, const bool recursive);
 
   PersistenceManagerPtr m_persistenceManager;

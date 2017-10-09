@@ -260,17 +260,17 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    * @param[out] sr subregions
    * @throws RegionDestroyedException
    */
-  virtual void subregions(const bool recursive, VectorOfRegion& sr) {
-    VectorOfRegion realVectorRegion;
-    m_realRegion->subregions(recursive, realVectorRegion);
+  VectorOfRegion subregions(const bool recursive) {
+    VectorOfRegion realVectorRegion = m_realRegion->subregions(recursive);
 
     if (realVectorRegion.size() > 0) {
       for (int32_t i = 0; i < realVectorRegion.size(); i++) {
         auto prPtr =
             std::make_shared<ProxyRegion>(m_proxyCache, realVectorRegion.at(i));
-        sr.push_back(prPtr);
+        realVectorRegion.push_back(prPtr);
       }
     }
+    return realVectorRegion;
   }
 
   /** Return the meta-object RegionEntry for key.
