@@ -993,8 +993,9 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    * Return all the keys in the local process for this region. This includes
    * keys for which the entry is invalid.
    */
-  virtual void keys(VectorOfCacheableKey& v) {
+  virtual VectorOfCacheableKey keys() {
     unSupportedOperation("Region.keys()");
+    return VectorOfCacheableKey();
   }
 
   /**

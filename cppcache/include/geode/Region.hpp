@@ -952,7 +952,7 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    * Return all the keys in the local process for this region. This includes
    * keys for which the entry is invalid.
    */
-  virtual void keys(VectorOfCacheableKey& v) = 0;
+  virtual VectorOfCacheableKey keys() = 0;
 
   /**
    * Return the set of keys defined in the server process associated to this

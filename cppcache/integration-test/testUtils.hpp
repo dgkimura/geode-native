@@ -122,8 +122,7 @@ class TestUtils {
       LOG(buf);
       return;
     }
-    VectorOfCacheableKey v;
-    rptr->keys(v);
+    VectorOfCacheableKey v = rptr->keys();
     auto len = v.size();
     sprintf(buf, "Total keys in region %s : %zu\n", rptr->getName(), len);
     LOG(buf);
@@ -142,8 +141,7 @@ class TestUtils {
       LOG(buf);
       return;
     }
-    VectorOfCacheableKey v;
-    rptr->keys(v);
+    VectorOfCacheableKey v = rptr->keys();
     auto len = v.size();
     sprintf(buf, "Total keys in region %s : %zu\n", rptr->getName(), len);
     LOG(buf);

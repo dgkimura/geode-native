@@ -36,8 +36,7 @@ std::string sqlite_dir = "SqLiteRegionData";
 
 // Return the number of keys and values in entries map.
 void getNumOfEntries(RegionPtr& regionPtr, uint32_t num) {
-  VectorOfCacheableKey v;
-  regionPtr->keys(v);
+  VectorOfCacheableKey v = regionPtr->keys();
   VectorOfCacheable vecValues;
   regionPtr->values(vecValues);
   printf("Values vector size is %zd\n", vecValues.size());
@@ -87,8 +86,7 @@ void validateAttribute(RegionPtr& regionPtr) {
 }
 
 void checkOverflowTokenValues(RegionPtr& regionPtr, uint32_t num) {
-  VectorOfCacheableKey v;
-  regionPtr->keys(v);
+  VectorOfCacheableKey v = regionPtr->keys();
   CacheableKeyPtr keyPtr;
   CacheablePtr valuePtr;
   int count = 0;
@@ -111,8 +109,7 @@ void checkOverflowTokenValues(RegionPtr& regionPtr, uint32_t num) {
 }
 
 void checkOverflowToken(RegionPtr& regionPtr, uint32_t lruLimit) {
-  VectorOfCacheableKey v;
-  regionPtr->keys(v);
+  VectorOfCacheableKey v = regionPtr->keys();
   CacheableKeyPtr keyPtr;
   CacheablePtr valuePtr;
   int normalCount = 0;
@@ -226,8 +223,7 @@ uint32_t doNget(RegionPtr& regionPtr, uint32_t num, uint32_t start = 0) {
  *  Test the entry operation ( local invalidate, localDestroy ).
  */
 void testEntryDestroy(RegionPtr& regionPtr, uint32_t num) {
-  VectorOfCacheableKey v;
-  regionPtr->keys(v);
+  VectorOfCacheableKey v = regionPtr->keys();
   VectorOfCacheable vecValues;
   CacheablePtr valuePtr;
   for (uint32_t i = 45; i < 50; i++) {
@@ -239,13 +235,12 @@ void testEntryDestroy(RegionPtr& regionPtr, uint32_t num) {
       ASSERT(false, (char*)"entry missing");
     }
   }
-  regionPtr->keys(v);
+  v = regionPtr->keys();
   ASSERT(v.size() == num - 5, (char*)"size of key vec not equal");
 }
 
 void testEntryInvalidate(RegionPtr& regionPtr, uint32_t num) {
-  VectorOfCacheableKey v;
-  regionPtr->keys(v);
+  VectorOfCacheableKey v = regionPtr->keys();
   VectorOfCacheable vecValues;
   CacheablePtr valuePtr;
   for (uint32_t i = 40; i < 45; i++) {
@@ -257,7 +252,7 @@ void testEntryInvalidate(RegionPtr& regionPtr, uint32_t num) {
       ASSERT(false, (char*)"entry missing");
     }
   }
-  regionPtr->keys(v);
+  v = regionPtr->keys();
   ASSERT(v.size() == num, (char*)"size of key vec not equal");
 }
 

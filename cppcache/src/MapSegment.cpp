@@ -445,7 +445,7 @@ bool MapSegment::containsKey(const CacheableKeyPtr& key) {
 /**
  * @brief return the all the keys in the provided list.
  */
-void MapSegment::keys(VectorOfCacheableKey& result) {
+void MapSegment::appendKeys(VectorOfCacheableKey& result) {
   std::lock_guard<spinlock_mutex> lk(m_spinlock);
   for (CacheableKeyHashMap::iterator iter = m_map->begin();
        iter != m_map->end(); iter++) {

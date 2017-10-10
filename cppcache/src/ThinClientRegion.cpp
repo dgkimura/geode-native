@@ -2850,8 +2850,7 @@ void ThinClientRegion::localInvalidateRegion_internal() {
   MapEntryImplPtr me;
   CacheablePtr oldValue;
 
-  VectorOfCacheableKey keysVec;
-  keys_internal(keysVec);
+  VectorOfCacheableKey keysVec = keys_internal();
   for (const auto& key : keysVec) {
     VersionTagPtr versionTag;
     m_entries->invalidate(key, me, oldValue, versionTag);

@@ -267,7 +267,7 @@ class CPPCACHE_EXPORT MapSegment {
   /**
    * @brief return the all the keys in the provided list.
    */
-  void keys(VectorOfCacheableKey& result);
+  void appendKeys(VectorOfCacheableKey& result);
 
   /**
    * @brief return all the entries in the provided list.

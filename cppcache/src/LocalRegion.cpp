@@ -493,9 +493,9 @@ bool LocalRegion::localRemoveEx(const CacheableKeyPtr& key,
   return result;
 }
 
-void LocalRegion::keys(VectorOfCacheableKey& v) {
+VectorOfCacheableKey LocalRegion::keys() {
   CHECK_DESTROY_PENDING(TryReadGuard, LocalRegion::keys);
-  keys_internal(v);
+  return keys_internal();
 }
 
 void LocalRegion::serverKeys(VectorOfCacheableKey& v) {
@@ -2284,8 +2284,7 @@ GfErrType LocalRegion::invalidateRegionNoThrow(
   GfErrType err = GF_NOERR;
 
   if (m_regionAttributes->getCachingEnabled()) {
-    VectorOfCacheableKey v;
-    keys_internal(v);
+    VectorOfCacheableKey v = keys_internal();
     const auto size = v.size();
     MapEntryImplPtr me;
     for (size_t i = 0; i < size; i++) {
@@ -2519,16 +2518,15 @@ GfErrType LocalRegion::putLocal(const char* name, bool isCreate,
   return err;
 }
 
-void LocalRegion::keys_internal(VectorOfCacheableKey& v) {
+VectorOfCacheableKey LocalRegion::keys_internal() {
   if (!m_regionAttributes->getCachingEnabled()) {
-    return;
+    return VectorOfCacheableKey();
   }
   uint32_t size = m_entries->size();
-  v.clear();
   if (size == 0) {
-    return;
+    return VectorOfCacheableKey();
   }
-  m_entries->keys(v);
+  return m_entries->keys();
 }
 
 void LocalRegion::entries_internal(VectorOfRegionEntry& me,

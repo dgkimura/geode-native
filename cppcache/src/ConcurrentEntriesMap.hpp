@@ -125,7 +125,7 @@ class CPPCACHE_EXPORT ConcurrentEntriesMap : public EntriesMap {
   /**
    * @brief return the all the keys in a list.
    */
-  virtual void keys(VectorOfCacheableKey& result) const;
+  virtual VectorOfCacheableKey keys() const;
 
   /**
    * @brief return all the entries in a list.

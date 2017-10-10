@@ -186,7 +186,7 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
                    const SerializablePtr& aCallbackArgument = nullptr);
   bool localRemoveEx(const CacheableKeyPtr& key,
                      const SerializablePtr& aCallbackArgument = nullptr);
-  void keys(VectorOfCacheableKey& v);
+  VectorOfCacheableKey keys();
   void serverKeys(VectorOfCacheableKey& v);
   void values(VectorOfCacheable& vc);
   void entries(VectorOfRegionEntry& me, bool recursive);
@@ -449,7 +449,7 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
   bool m_enableTimeStatistics;
 
   mutable ACE_RW_Thread_Mutex m_rwLock;
-  void keys_internal(VectorOfCacheableKey& v);
+  VectorOfCacheableKey keys_internal();
   bool containsKey_internal(const CacheableKeyPtr& keyPtr) const;
   int removeRegion(const std::string& name);
 
