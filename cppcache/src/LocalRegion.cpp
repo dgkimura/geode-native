@@ -498,7 +498,7 @@ VectorOfCacheableKey LocalRegion::keys() {
   return keys_internal();
 }
 
-void LocalRegion::serverKeys(VectorOfCacheableKey& v) {
+VectorOfCacheableKey LocalRegion::serverKeys() {
   throw UnsupportedOperationException(
       "serverKeys is not supported for local regions.");
 }

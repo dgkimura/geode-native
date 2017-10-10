@@ -1020,9 +1020,9 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    * @throws UnsupportedOperationException if the member type is not CLIENT
    *                                       or region is not a native client one.
    */
-  virtual void serverKeys(VectorOfCacheableKey& v) {
+  virtual VectorOfCacheableKey serverKeys() {
     GuardUserAttribures gua(m_proxyCache);
-    m_realRegion->serverKeys(v);
+    return m_realRegion->serverKeys();
   }
 
   /**

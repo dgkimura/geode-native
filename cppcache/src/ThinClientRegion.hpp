@@ -85,7 +85,7 @@ class CPPCACHE_EXPORT ThinClientRegion : public LocalRegion {
                              bool getInitialValues = false,
                              bool receiveValues = true);
   virtual void unregisterRegex(const char* regex);
-  virtual void serverKeys(VectorOfCacheableKey& v);
+  virtual VectorOfCacheableKey serverKeys();
   virtual void clear(const SerializablePtr& aCallbackArgument = nullptr);
 
   virtual SelectResultsPtr query(

@@ -258,8 +258,7 @@ DUNIT_TASK_DEFINITION(ADMIN_CLIENT, StepOne)
       }
 
       LOG("GetServerKeys check started for ADMIN");
-      VectorOfCacheableKey keysvec;
-      regPtr->serverKeys(keysvec);
+      auto keysvec = regPtr->serverKeys();
       LOG("GetServerKeys check passed for ADMIN");
 
       regPtr->query("1=1");
@@ -442,8 +441,7 @@ DUNIT_TASK_DEFINITION(WRITER_CLIENT, StepTwo)
 
     try {
       LOG("GetServerKeys check started for WRITER");
-      VectorOfCacheableKey keysvec;
-      regPtr0->serverKeys(keysvec);
+      auto keysvec = regPtr0->serverKeys();
       LOG("GetServerKeys check passed for WRITER");
       FAIL("GetServerKeys should not have completed successfully for WRITER");
     }
@@ -553,8 +551,7 @@ DUNIT_TASK_DEFINITION(READER_CLIENT, StepThree)
 
     try {
       LOG("GetServerKeys check started for READER");
-      VectorOfCacheableKey keysvec;
-      regPtr0->serverKeys(keysvec);
+      auto keysvec = regPtr0->serverKeys();
       LOG("GetServerKeys check passed for READER");
     }
     HANDLE_NO_NOT_AUTHORIZED_EXCEPTION

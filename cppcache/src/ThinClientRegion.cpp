@@ -767,17 +767,16 @@ SerializablePtr ThinClientRegion::selectValue(const char* predicate,
   return results->operator[](0);
 }
 
-void ThinClientRegion::serverKeys(VectorOfCacheableKey& v) {
+VectorOfCacheableKey ThinClientRegion::serverKeys() {
   CHECK_DESTROY_PENDING(TryReadGuard, Region::serverKeys);
 
   TcrMessageReply reply(true, m_tcrdm);
   TcrMessageKeySet request(m_cacheImpl->getCache()->createDataOutput(),
                            m_fullPath, m_tcrdm);
   reply.setMessageTypeRequest(TcrMessage::KEY_SET);
-  // need to check
-  ChunkedKeySetResponse* resultCollector(
-      new ChunkedKeySetResponse(request, v, reply));
-  reply.setChunkedResultHandler(resultCollector);
+  VectorOfCacheableKey serverKeys;
+  ChunkedKeySetResponse resultCollector(request, serverKeys, reply);
+  reply.setChunkedResultHandler(&resultCollector);
 
   GfErrType err = GF_NOERR;
 
@@ -806,8 +805,9 @@ void ThinClientRegion::serverKeys(VectorOfCacheableKey& v) {
       break;
     }
   }
-  delete resultCollector;
   GfErrTypeToException("Region::serverKeys", err);
+
+  return serverKeys;
 }
 
 bool ThinClientRegion::containsKeyOnServer(

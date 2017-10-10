@@ -979,7 +979,7 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    * @throws UnsupportedOperationException if the member type is not CLIENT
    *                                       or region is not a native client one.
    */
-  virtual void serverKeys(VectorOfCacheableKey& v) = 0;
+  virtual VectorOfCacheableKey serverKeys() = 0;
 
   /**
    * Return all values in the local process for this region. No value is

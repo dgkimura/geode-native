@@ -187,7 +187,7 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
   bool localRemoveEx(const CacheableKeyPtr& key,
                      const SerializablePtr& aCallbackArgument = nullptr);
   VectorOfCacheableKey keys();
-  void serverKeys(VectorOfCacheableKey& v);
+  VectorOfCacheableKey serverKeys();
   void values(VectorOfCacheable& vc);
   void entries(VectorOfRegionEntry& me, bool recursive);
   void getAll(const VectorOfCacheableKey& keys, HashMapOfCacheablePtr values,

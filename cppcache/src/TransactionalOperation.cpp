@@ -103,11 +103,13 @@ CacheablePtr TransactionalOperation::replay(Cache* cache) {
       cache->getRegion(m_regionName)
           ->remove(m_key, m_arguments->at(0), m_arguments->at(1));
       break;
-    case GF_KEY_SET:
-      cache->getRegion(m_regionName)
-          ->serverKeys(*std::dynamic_pointer_cast<VectorOfCacheableKey>(
-              m_arguments->at(0)));
+    case GF_KEY_SET: {
+      auto serverKeys =
+          std::dynamic_pointer_cast<VectorOfCacheableKey>(m_arguments->at(0));
+      auto tmp = cache->getRegion(m_regionName)->serverKeys();
+      serverKeys->insert(serverKeys->end(), tmp.begin(), tmp.end());
       break;
+    }
     case GF_CREATE:  // includes PUT_IF_ABSENT
       cache->getRegion(m_regionName)
           ->create(m_key, m_arguments->at(0), m_arguments->at(1));
