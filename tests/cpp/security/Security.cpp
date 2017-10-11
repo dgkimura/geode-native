@@ -703,10 +703,9 @@ int32_t Security::checkValues() {
   int32_t result = FWK_SEVERE;
   FWKINFO("In Security::checkValues()");
   try {
-    RegionPtr region = getRegionPtr();
+    auto region = getRegionPtr();
 
-    VectorOfCacheable vals;
-    region->values(vals);
+    auto vals = region->values();
     int32_t creates = 0;
     int32_t updates = 0;
     int32_t unknowns = 0;

@@ -1029,7 +1029,7 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    * Return all values in the local process for this region. No value is
    * included for entries that are invalidated.
    */
-  virtual void values(VectorOfCacheable& vc) {
+  virtual VectorOfCacheable values() {
     unSupportedOperation("Region.values()");
   }
 

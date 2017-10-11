@@ -1081,8 +1081,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepEight)
     ASSERT(keys.size() == reg->size(),
            "region size should be equal to keys size");
 
-    VectorOfCacheable values;
-    reg->values(values);
+    auto values = reg->values();
     LOGINFO("Region values = %d ", values.size());
     ASSERT(values.size() == reg->size(),
            "region size should be equal to values size");
@@ -1093,7 +1092,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepEight)
     ASSERT(keys.size() == reg->size(),
            "region size should be equal to keys size");
 
-    reg->values(values);
+    values = reg->values();
     LOGINFO("Region values = %d ", values.size());
     ASSERT(values.size() == reg->size(),
            "region size should be equal to values size");

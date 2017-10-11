@@ -199,12 +199,11 @@ size_t getNumOfEntries(const char* regName, bool isValue = false) {
   dumpCounters(regName);
   RegionPtr rptr = getHelper()->getRegion(regName);
   if (isValue) {
-    VectorOfCacheable v;
-    rptr->values(v);
+    auto v = rptr->values();
     printf("Region value size: %zd\n", v.size());
     return v.size();
   } else if (!useRegionSize) {
-    VectorOfCacheableKey v = rptr->keys();
+    auto v = rptr->keys();
     printf("Region key size: %zd\n", v.size());
     return v.size();
   } else {

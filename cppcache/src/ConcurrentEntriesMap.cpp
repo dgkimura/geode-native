@@ -147,25 +147,24 @@ bool ConcurrentEntriesMap::containsKey(const CacheableKeyPtr& key) const {
   return segmentFor(key)->containsKey(key);
 }
 
-VectorOfCacheableKey ConcurrentEntriesMap::keys() const {
-  VectorOfCacheableKey keys;
+void ConcurrentEntriesMap::getKeys(VectorOfCacheableKey& result) const {
+  result.reserve(this->size());
   for (int index = 0; index < m_concurrency; ++index) {
-    m_segments[index].appendKeys(keys);
-  }
-  return keys;
-}
-
-void ConcurrentEntriesMap::entries(VectorOfRegionEntry& result) const {
-  result.clear();
-  for (int index = 0; index < m_concurrency; ++index) {
-    m_segments[index].entries(result);
+    m_segments[index].getKeys(result);
   }
 }
 
-void ConcurrentEntriesMap::values(VectorOfCacheable& result) const {
-  result.clear();
+void ConcurrentEntriesMap::getEntries(VectorOfRegionEntry& result) const {
+  result.reserve(this->size());
   for (int index = 0; index < m_concurrency; ++index) {
-    m_segments[index].values(result);
+    m_segments[index].getEntries(result);
+  }
+}
+
+void ConcurrentEntriesMap::getValues(VectorOfCacheable& result) const {
+  result.reserve(this->size());
+  for (int index = 0; index < m_concurrency; ++index) {
+    m_segments[index].getValues(result);
   }
 }
 

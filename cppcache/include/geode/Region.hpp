@@ -985,7 +985,7 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    * Return all values in the local process for this region. No value is
    * included for entries that are invalidated.
    */
-  virtual void values(VectorOfCacheable& vc) = 0;
+  virtual VectorOfCacheable values() = 0;
 
   virtual void entries(VectorOfRegionEntry& me, bool recursive) = 0;
 

@@ -503,16 +503,17 @@ VectorOfCacheableKey LocalRegion::serverKeys() {
       "serverKeys is not supported for local regions.");
 }
 
-void LocalRegion::values(VectorOfCacheable& vc) {
+VectorOfCacheable LocalRegion::values() {
   CHECK_DESTROY_PENDING(TryReadGuard, LocalRegion::values);
-  if (!m_regionAttributes->getCachingEnabled()) {
-    return;
+
+  VectorOfCacheable values;
+
+  if (m_regionAttributes->getCachingEnabled()) {
+    // invalidToken should not be added by the MapSegments.
+    m_entries->getValues(values);
   }
-  uint32_t size = m_entries->size();
-  vc.clear();
-  if (size == 0) return;
-  m_entries->values(vc);
-  // invalidToken should not be added by the MapSegments.
+
+  return values;
 }
 
 void LocalRegion::entries(VectorOfRegionEntry& me, bool recursive) {
@@ -2519,19 +2520,18 @@ GfErrType LocalRegion::putLocal(const char* name, bool isCreate,
 }
 
 VectorOfCacheableKey LocalRegion::keys_internal() {
-  if (!m_regionAttributes->getCachingEnabled()) {
-    return VectorOfCacheableKey();
+  VectorOfCacheableKey keys;
+
+  if (m_regionAttributes->getCachingEnabled()) {
+    m_entries->getKeys(keys);
   }
-  uint32_t size = m_entries->size();
-  if (size == 0) {
-    return VectorOfCacheableKey();
-  }
-  return m_entries->keys();
+
+  return keys;
 }
 
 void LocalRegion::entries_internal(VectorOfRegionEntry& me,
                                    const bool recursive) {
-  m_entries->entries(me);
+  m_entries->getEntries(me);
 
   if (recursive == true) {
     MapOfRegionGuard guard(m_subRegions.mutex());

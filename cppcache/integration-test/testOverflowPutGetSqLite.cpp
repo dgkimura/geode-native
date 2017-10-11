@@ -36,9 +36,8 @@ std::string sqlite_dir = "SqLiteRegionData";
 
 // Return the number of keys and values in entries map.
 void getNumOfEntries(RegionPtr& regionPtr, uint32_t num) {
-  VectorOfCacheableKey v = regionPtr->keys();
-  VectorOfCacheable vecValues;
-  regionPtr->values(vecValues);
+  auto v = regionPtr->keys();
+  auto vecValues = regionPtr->values();
   printf("Values vector size is %zd\n", vecValues.size());
   printf("Num is %d\n", num);
   ASSERT(vecValues.size() == num, (char*)"size of value vec and num not equal");

@@ -164,8 +164,7 @@ class TestUtils {
       LOG(buf);
       return;
     }
-    VectorOfCacheable v;
-    rptr->values(v);
+    auto v = rptr->values();
     auto len = v.size();
     sprintf(buf, "Total values in region %s : %zu\n", rptr->getName(), len);
     LOG(buf);
