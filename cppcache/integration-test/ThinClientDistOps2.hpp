@@ -231,8 +231,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1GetAll)
 
     // also check that the region is properly populated
     ASSERT(reg1->size() == 2, "Expected 2 entries in the region");
-    VectorOfRegionEntry regEntries;
-    reg1->entries(regEntries, false);
+    auto regEntries = reg1->entries(false);
     ASSERT(regEntries.size() == 2, "Expected 2 entries in the region.entries");
     verifyEntry(_regionNames[1], _keys[2], _nvals[2], true);
     verifyEntry(_regionNames[1], _keys[3], _vals[3], true);
@@ -244,8 +243,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1GetAll)
     reg1->getAll(keys1, values, exceptions, true);
     // now check that the region is properly populated
     ASSERT(reg1->size() == 2, "Expected 2 entries in the region");
-    regEntries.clear();
-    reg1->entries(regEntries, false);
+    regEntries = reg1->entries(false);
     ASSERT(regEntries.size() == 2, "Expected 2 entries in the region.entries");
     verifyEntry(_regionNames[1], _keys[2], _nvals[2], true);
     verifyEntry(_regionNames[1], _keys[3], _nvals[3], true);
@@ -332,8 +330,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1GetAll_Pool)
 
     // also check that the region is properly populated
     ASSERT(reg1->size() == 2, "Expected 2 entries in the region");
-    VectorOfRegionEntry regEntries;
-    reg1->entries(regEntries, false);
+    auto regEntries = reg1->entries(false);
     ASSERT(regEntries.size() == 2, "Expected 2 entries in the region.entries");
     verifyEntry(_regionNames[1], _keys[2], _nvals[2], true);
     verifyEntry(_regionNames[1], _keys[3], _vals[3], true);
@@ -345,8 +342,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1GetAll_Pool)
     reg1->getAll(keys1, values, exceptions, true);
     // now check that the region is properly populated
     ASSERT(reg1->size() == 2, "Expected 2 entries in the region");
-    regEntries.clear();
-    reg1->entries(regEntries, false);
+    regEntries = reg1->entries(false);
     ASSERT(regEntries.size() == 2, "Expected 2 entries in the region.entries");
     verifyEntry(_regionNames[1], _keys[2], _nvals[2], true);
     verifyEntry(_regionNames[1], _keys[3], _nvals[3], true);

@@ -987,7 +987,7 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    */
   virtual VectorOfCacheable values() = 0;
 
-  virtual void entries(VectorOfRegionEntry& me, bool recursive) = 0;
+  virtual VectorOfRegionEntry entries(bool recursive) = 0;
 
   /**
    * Returns the <code>cache</code> associated with this region.

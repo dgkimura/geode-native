@@ -516,13 +516,16 @@ VectorOfCacheable LocalRegion::values() {
   return values;
 }
 
-void LocalRegion::entries(VectorOfRegionEntry& me, bool recursive) {
+VectorOfRegionEntry LocalRegion::entries(bool recursive) {
   CHECK_DESTROY_PENDING(TryReadGuard, LocalRegion::entries);
-  me.clear();
-  if (!m_regionAttributes->getCachingEnabled()) {
-    return;
+
+  VectorOfRegionEntry entries;
+
+  if (m_regionAttributes->getCachingEnabled()) {
+    entries_internal(entries, recursive);
   }
-  entries_internal(me, recursive);
+
+  return entries;
 }
 
 void LocalRegion::getAll(const VectorOfCacheableKey& keys,
