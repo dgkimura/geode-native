@@ -273,10 +273,9 @@ DUNIT_TASK_DEFINITION(ADMIN_CLIENT, StepOne)
       for (int i = 0; i < 5; i++) {
         entrykeys.push_back(CacheableKey::create(i));
       }
-      auto valuesMap = std::make_shared<HashMapOfCacheable>();
-      valuesMap->clear();
-      regionPtr->getAll(entrykeys, valuesMap, nullptr, false);
-      if (valuesMap->size() > 0) {
+
+      const auto valuesMap = std::get<0>(regionPtr->getAll(entrykeys));
+      if (valuesMap.size() > 0) {
         LOG("GetAll completed successfully");
       } else {
         FAIL("GetAll did not complete successfully");
@@ -650,10 +649,9 @@ DUNIT_TASK_DEFINITION(WRITER_CLIENT, StepTwo)
       for (int i = 0; i < 5; i++) {
         entrykeys.push_back(CacheableKey::create(i));
       }
-      auto valuesMap = std::make_shared<HashMapOfCacheable>();
-      valuesMap->clear();
-      regionPtr->getAll(entrykeys, valuesMap, nullptr, false);
-      if (valuesMap->size() > 0) {
+
+      const auto valuesMap = std::get<0>(regionPtr->getAll(entrykeys));
+      if (valuesMap.size() > 0) {
         FAIL("GetAll should not have completed successfully");
       }
     }
@@ -987,10 +985,8 @@ DUNIT_TASK_DEFINITION(READER_CLIENT, StepThree)
       for (int i = 0; i < 5; i++) {
         entrykeys.push_back(CacheableKey::create(i));
       }
-      auto valuesMap = std::make_shared<HashMapOfCacheable>();
-      valuesMap->clear();
-      rptr->getAll(entrykeys, valuesMap, nullptr, false);
-      if (valuesMap->size() > 0) {
+      const auto valuesMap = std::get<0>(rptr->getAll(entrykeys));
+      if (valuesMap.size() > 0) {
         LOG("GetAll completed successfully");
       } else {
         FAIL("GetAll did not complete successfully");

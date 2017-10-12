@@ -532,34 +532,46 @@ DUNIT_TASK_DEFINITION(CLIENT1, GetAll)
       }
     }
 
-    auto resMap = std::make_shared<HashMapOfCacheable>();
-    auto exMap = std::make_shared<HashMapOfException>();
-
     // execute getAll for different regions and verify results
-    regPtr0->getAll(portKeys, resMap, exMap);
-    compareMaps(*resMap, expectedPortMap);
-    ASSERT(exMap->size() == 0, "Expected no exceptions");
-    resMap->clear();
+    {
+      auto results = regPtr0->getAll(portKeys);
+      auto resMap = std::get<0>(results);
+      auto exMap = std::get<1>(results);
+      compareMaps(resMap, expectedPortMap);
+      ASSERT(exMap.size() == 0, "Expected no exceptions");
+    }
 
-    regPtr1->getAll(posKeys, resMap, exMap);
-    compareMaps(*resMap, expectedPosMap);
-    ASSERT(exMap->size() == 0, "Expected no exceptions");
-    resMap->clear();
+    {
+      auto results = regPtr1->getAll(posKeys);
+      auto resMap = std::get<0>(results);
+      auto exMap = std::get<1>(results);
+      compareMaps(resMap, expectedPosMap);
+      ASSERT(exMap.size() == 0, "Expected no exceptions");
+    }
 
-    regPtr2->getAll(posKeys, resMap, exMap);
-    compareMaps(*resMap, expectedPosMap);
-    ASSERT(exMap->size() == 0, "Expected no exceptions");
-    resMap->clear();
+    {
+      auto results = regPtr2->getAll(posKeys);
+      auto resMap = std::get<0>(results);
+      auto exMap = std::get<1>(results);
+      compareMaps(resMap, expectedPosMap);
+      ASSERT(exMap.size() == 0, "Expected no exceptions");
+    }
 
-    regPtr3->getAll(portKeys, resMap, exMap);
-    compareMaps(*resMap, expectedPortMap);
-    ASSERT(exMap->size() == 0, "Expected no exceptions");
-    resMap->clear();
+    {
+      auto results = regPtr3->getAll(portKeys);
+      auto resMap = std::get<0>(results);
+      auto exMap = std::get<1>(results);
+      compareMaps(resMap, expectedPortMap);
+      ASSERT(exMap.size() == 0, "Expected no exceptions");
+    }
 
-    regPtr4->getAll(portKeys, resMap, exMap);
-    compareMaps(*resMap, expectedPortMap);
-    ASSERT(exMap->size() == 0, "Expected no exceptions");
-    resMap->clear();
+    {
+      auto results = regPtr4->getAll(portKeys);
+      auto resMap = std::get<0>(results);
+      auto exMap = std::get<1>(results);
+      compareMaps(resMap, expectedPortMap);
+      ASSERT(exMap.size() == 0, "Expected no exceptions");
+    }
   }
 END_TASK_DEFINITION
 

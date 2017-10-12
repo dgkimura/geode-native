@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 #include <vector>
+#include <tuple>
 
 #include "LocalRegion.hpp"
 #include <geode/Log.hpp>
@@ -528,32 +529,35 @@ VectorOfRegionEntry LocalRegion::entries(bool recursive) {
   return entries;
 }
 
-void LocalRegion::getAll(const VectorOfCacheableKey& keys,
-                         HashMapOfCacheablePtr values,
-                         HashMapOfExceptionPtr exceptions, bool addToLocalCache,
-                         const SerializablePtr& aCallbackArgument) {
-  if (keys.size() == 0) {
+std::tuple<HashMapOfCacheable, HashMapOfException> LocalRegion::getAll(
+    const VectorOfCacheableKey& keys,
+    const SerializablePtr& aCallbackArgument) {
+  return getAll_internal(keys, aCallbackArgument, true);
+}
+
+std::tuple<HashMapOfCacheable, HashMapOfException> LocalRegion::getAll_internal(
+    const VectorOfCacheableKey& keys, const SerializablePtr& aCallbackArgument,
+    bool addToLocalCache) {
+
+  if (keys.empty()) {
     throw IllegalArgumentException("Region::getAll: zero keys provided");
-  }
-  // check for the combination which will result in no action
-  if (values == nullptr &&
-      !(addToLocalCache && m_regionAttributes->getCachingEnabled())) {
-    throw IllegalArgumentException(
-        "Region::getAll: either output \"values\""
-        " parameter should be non-null, or \"addToLocalCache\" should be "
-        "true "
-        "and caching should be enabled for the region [%s]",
-        getFullPath());
   }
 
   int64_t sampleStartNanos = startStatOpTime();
+
+  auto values = std::make_shared<HashMapOfCacheable>();
+  auto exceptions = std::make_shared<HashMapOfException>();
   GfErrType err = getAllNoThrow(keys, values, exceptions, addToLocalCache,
                                 aCallbackArgument);
+
   updateStatOpTime(m_regionStats->getStat(), m_regionStats->getGetAllTimeId(),
                    sampleStartNanos);
-  // handleReplay(err, nullptr);
+
   GfErrTypeToException("Region::getAll", err);
+
+  return std::make_tuple(std::move(*values), std::move(*exceptions));
 }
+
 uint32_t LocalRegion::size_remote() {
   CHECK_DESTROY_PENDING(TryReadGuard, LocalRegion::size);
   if (m_regionAttributes->getCachingEnabled()) {
@@ -971,7 +975,7 @@ GfErrType LocalRegion::getNoThrow(const CacheableKeyPtr& keyPtr,
 GfErrType LocalRegion::getAllNoThrow(const VectorOfCacheableKey& keys,
                                      const HashMapOfCacheablePtr& values,
                                      const HashMapOfExceptionPtr& exceptions,
-                                     bool addToLocalCache,
+                                     const bool addToLocalCache,
                                      const SerializablePtr& aCallbackArgument) {
   CHECK_DESTROY_PENDING_NOTHROW(TryReadGuard);
   GfErrType err = GF_NOERR;

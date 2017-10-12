@@ -26,6 +26,8 @@
 #include <geode/Cache.hpp>
 #include <geode/FunctionService.hpp>
 
+#include "RegionInternal.hpp"
+
 namespace apache {
 namespace geode {
 namespace client {
@@ -86,16 +88,28 @@ CacheablePtr TransactionalOperation::replay(Cache* cache) {
       GfErrTypeThrowException("getEntry not supported in transaction",
                               GF_NOTSUP);
       break;
-    case GF_GET_ALL:
-      cache->getRegion(m_regionName)
-          ->getAll(
-              *std::dynamic_pointer_cast<VectorOfCacheableKey>(
-                  m_arguments->at(0)),
-              std::dynamic_pointer_cast<HashMapOfCacheable>(m_arguments->at(1)),
-              std::dynamic_pointer_cast<HashMapOfException>(m_arguments->at(2)),
-              std::static_pointer_cast<CacheableBoolean>(m_arguments->at(3))
-                  ->value());
+    case GF_GET_ALL: {
+      const auto result =
+          std::static_pointer_cast<RegionInternal>(
+              cache->getRegion(m_regionName))
+              ->getAll_internal(
+                  *std::dynamic_pointer_cast<VectorOfCacheableKey>(
+                      m_arguments->at(0)),
+                  nullptr,
+                  std::static_pointer_cast<CacheableBoolean>(m_arguments->at(3))
+                      ->value());
+
+      const auto& tmpValues = std::get<0>(result);
+      auto values =
+          std::dynamic_pointer_cast<HashMapOfCacheable>(m_arguments->at(1));
+      values->insert(tmpValues.begin(), tmpValues.end());
+
+      const auto& tmpExceptions = std::get<1>(result);
+      auto exceptions =
+          std::dynamic_pointer_cast<HashMapOfException>(m_arguments->at(2));
+      exceptions->insert(tmpExceptions.begin(), tmpExceptions.end());
       break;
+    }
     case GF_INVALIDATE:
       cache->getRegion(m_regionName)->invalidate(m_key, m_arguments->at(0));
       break;
@@ -104,9 +118,9 @@ CacheablePtr TransactionalOperation::replay(Cache* cache) {
           ->remove(m_key, m_arguments->at(0), m_arguments->at(1));
       break;
     case GF_KEY_SET: {
+      auto tmp = cache->getRegion(m_regionName)->serverKeys();
       auto serverKeys =
           std::dynamic_pointer_cast<VectorOfCacheableKey>(m_arguments->at(0));
-      auto tmp = cache->getRegion(m_regionName)->serverKeys();
       serverKeys->insert(serverKeys->end(), tmp.begin(), tmp.end());
       break;
     }

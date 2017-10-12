@@ -284,12 +284,10 @@ void verifyGetAll(RegionPtr region, int startIndex) {
   for (int i = 0; i <= 100; i++) keysVector.push_back(CacheableKey::create(i));
 
   // keysVector.push_back(CacheableKey::create(101)); //key not there
-  auto valuesMap = std::make_shared<HashMapOfCacheable>();
-  valuesMap->clear();
-  region->getAll(keysVector, valuesMap, nullptr, false);
-  if (valuesMap->size() == keysVector.size()) {
+  const auto valuesMap = std::get<0>(region->getAll(keysVector));
+  if (valuesMap.size() == keysVector.size()) {
     int i = startIndex;
-    for (const auto& iter : *valuesMap) {
+    for (const auto& iter : valuesMap) {
       auto key = std::dynamic_pointer_cast<CacheableKey>(iter.first);
       CacheablePtr mVal = iter.second;
       if (mVal != nullptr) {

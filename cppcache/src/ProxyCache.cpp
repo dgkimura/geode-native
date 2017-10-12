@@ -97,7 +97,9 @@ RegionPtr ProxyCache::getRegion(const char* path) {
           result->getAttributes()->getPoolName());
       if (pool != nullptr && pool.get() == userAttachedPool.get() &&
           !pool->isDestroyed()) {
-        return std::make_shared<ProxyRegion>(shared_from_this(), result);
+        return std::make_shared<ProxyRegion>(
+            shared_from_this(),
+            std::static_pointer_cast<RegionInternal>(result));
       }
       throw IllegalArgumentException(
           "The Region argument is not attached with the pool, which used to "
@@ -141,15 +143,13 @@ void ProxyCache::rootRegions(VectorOfRegion& regions) {
       // mode
       m_cacheImpl->rootRegions(tmp);
 
-      if (tmp.size() > 0) {
-        for (int32_t i = 0; i < tmp.size(); i++) {
-          RegionPtr reg = tmp.at(i);
-          if (strcmp(m_userAttributes->getPool()->getName(),
-                     reg->getAttributes()->getPoolName()) == 0) {
-            auto pRegion =
-                std::make_shared<ProxyRegion>(shared_from_this(), reg);
-            regions.push_back(pRegion);
-          }
+      for (const auto& reg : tmp) {
+        if (strcmp(m_userAttributes->getPool()->getName(),
+                   reg->getAttributes()->getPoolName()) == 0) {
+          auto pRegion = std::make_shared<ProxyRegion>(
+              shared_from_this(),
+              std::static_pointer_cast<RegionInternal>(reg));
+          regions.push_back(pRegion);
         }
       }
     }

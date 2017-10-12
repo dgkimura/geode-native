@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef GEODE_REGION_H_
-#define GEODE_REGION_H_
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -20,7 +15,14 @@
  * limitations under the License.
  */
 
+#pragma once
+
+#ifndef GEODE_REGION_H_
+#define GEODE_REGION_H_
+
 //#### Warning: DO NOT directly include Region.hpp, include Cache.hpp instead.
+
+#include <tuple>
 
 #include "geode_globals.hpp"
 #include "geode_types.hpp"
@@ -1282,8 +1284,6 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    *   otherwise an <code>IllegalArgumentException</code> is thrown.
    * @param exceptions Output parameter that provides the map of keys
    *   to any exceptions while obtaining the key. It is ignored if nullptr.
-   * @param addToLocalCache true if the obtained values have also to be added
-   *   to the local cache
    * @since 8.1
    * @param aCallbackArgument an argument that is passed to the callback
    *functions.
@@ -1305,11 +1305,9 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    *
    * @see get
    */
-  virtual void getAll(const VectorOfCacheableKey& keys,
-                      HashMapOfCacheablePtr values,
-                      HashMapOfExceptionPtr exceptions,
-                      bool addToLocalCache = false,
-                      const SerializablePtr& aCallbackArgument = nullptr) = 0;
+  virtual std::tuple<HashMapOfCacheable, HashMapOfException> getAll(
+      const VectorOfCacheableKey& keys,
+      const SerializablePtr& aCallbackArgument = nullptr) = 0;
 
   /**
    * Executes the query on the server based on the predicate.

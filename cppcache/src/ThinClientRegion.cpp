@@ -2467,7 +2467,6 @@ GfErrType ThinClientRegion::registerRegexNoThrow(
     }
   }
 
-  TcrMessageReply replyLocal(true, m_tcrdm);
   ChunkedInterestResponse* resultCollector = nullptr;
   ChunkedGetAllResponse* getAllResultCollector = nullptr;
   if (reply != nullptr) {
@@ -2493,10 +2492,13 @@ GfErrType ThinClientRegion::registerRegexNoThrow(
       isDurable, getAttributes()->getCachingEnabled(), receiveValues, m_tcrdm);
   ACE_Recursive_Thread_Mutex responseLock;
   if (reply == nullptr) {
+    TcrMessageReply replyLocal(true, m_tcrdm);
+    auto values = std::make_shared<HashMapOfCacheable>();
+    auto exceptions = std::make_shared<HashMapOfException>();
+
     reply = &replyLocal;
     if (interestPolicy.ordinal == InterestResultPolicy::KEYS_VALUES.ordinal) {
-      auto values = std::make_shared<HashMapOfCacheable>();
-      auto exceptions = std::make_shared<HashMapOfException>();
+
       MapOfUpdateCounters trackers;
       int32_t destroyTracker = 1;
       if (resultKeys == nullptr) {
@@ -2515,9 +2517,12 @@ GfErrType ThinClientRegion::registerRegexNoThrow(
           new ChunkedInterestResponse(request, resultKeys, replyLocal);
       reply->setChunkedResultHandler(resultCollector);
     }
+    err = m_tcrdm->sendSyncRequestRegisterInterest(
+        request, replyLocal, attemptFailover, this, endpoint);
+  } else{
+    err = m_tcrdm->sendSyncRequestRegisterInterest(
+        request, *reply, attemptFailover, this, endpoint);
   }
-  err = m_tcrdm->sendSyncRequestRegisterInterest(
-      request, *reply, attemptFailover, this, endpoint);
   if (err == GF_NOERR /*|| err == GF_CACHE_REDUNDANCY_FAILURE*/) {
     if (reply->getMessageType() == TcrMessage::RESPONSE_FROM_SECONDARY) {
       LOGFINER(
@@ -2921,8 +2926,9 @@ void ThinClientRegion::registerInterestGetValues(
     const char* method, const VectorOfCacheableKey* keys,
     const VectorOfCacheableKeyPtr& resultKeys) {
   try {
+    auto values = std::make_shared<HashMapOfCacheable>();
     auto exceptions = std::make_shared<HashMapOfException>();
-    GfErrType err = getAllNoThrow_remote(keys, nullptr, exceptions, resultKeys,
+    GfErrType err = getAllNoThrow_remote(keys, values, exceptions, resultKeys,
                                          true, nullptr);
     GfErrTypeToException(method, err);
     // log any exceptions here

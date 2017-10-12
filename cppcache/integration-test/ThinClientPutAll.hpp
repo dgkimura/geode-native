@@ -488,10 +488,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, PutAllOps)
       getAllkeys.push_back(CacheableKey::create(key));
     }
 
-    auto valuesMap = std::make_shared<HashMapOfCacheable>();
-    valuesMap->clear();
-    regPtr0->getAll(getAllkeys, valuesMap, nullptr, false);
-    ASSERT(valuesMap->size() == 500, "GetAll should return 2 entries.");
+    const auto valuesMap = std::get<0>(regPtr0->getAll(getAllkeys));
+    ASSERT(valuesMap.size() == 500, "GetAll should return 500 entries.");
 
     LOG("PutAllOps complete.");
   }
@@ -740,12 +738,10 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepThirteen)
     VectorOfCacheableKey keys1;
     keys1.push_back(keyObject7);
     keys1.push_back(keyObject8);
-    auto valuesMap = std::make_shared<HashMapOfCacheable>();
-    valuesMap->clear();
-    regPtr0->getAll(keys1, valuesMap, nullptr, true);
-    if (valuesMap->size() == keys1.size()) {
+    const auto valuesMap = std::get<0>(regPtr0->getAll(keys1));
+    if (valuesMap.size() == keys1.size()) {
       char buf[2048];
-      for (const auto& iter : *valuesMap) {
+      for (const auto& iter : valuesMap) {
         const auto key = std::dynamic_pointer_cast<CacheableKey>(iter.first);
         const auto& mVal = iter.second;
         if (mVal != nullptr) {

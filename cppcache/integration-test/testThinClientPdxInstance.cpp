@@ -508,12 +508,11 @@ DUNIT_TASK_DEFINITION(CLIENT2, verifyPdxNullIdentityFieldHC)
     VectorOfCacheableKey keys1;
     keys1.push_back(CacheableInt32::create(1));
     keys1.push_back(CacheableInt32::create(2));
-    auto valuesMap = std::make_shared<HashMapOfCacheable>();
-    valuesMap->clear();
-    rptr->getAll(keys1, valuesMap, nullptr, true);
+
+    const auto valuesMap = std::get<0>(rptr->getAll(keys1));
     LOG("getAll on Pdx objects completed.");
 
-    ASSERT(valuesMap->size() == keys1.size(), "getAll size did not match");
+    ASSERT(valuesMap.size() == keys1.size(), "getAll size did not match");
 
     LOG("verifyPdxNullIdentityFieldHC complete.");
   }

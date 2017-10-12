@@ -190,9 +190,15 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
   VectorOfCacheableKey serverKeys();
   VectorOfCacheable values();
   VectorOfRegionEntry entries(bool recursive);
-  void getAll(const VectorOfCacheableKey& keys, HashMapOfCacheablePtr values,
-              HashMapOfExceptionPtr exceptions, bool addToLocalCache,
-              const SerializablePtr& aCallbackArgument = nullptr);
+
+  std::tuple<HashMapOfCacheable, HashMapOfException> getAll(
+      const VectorOfCacheableKey& keys,
+      const SerializablePtr& aCallbackArgument = nullptr);
+
+  std::tuple<HashMapOfCacheable, HashMapOfException> getAll_internal(
+      const VectorOfCacheableKey& keys,
+      const SerializablePtr& aCallbackArgument, bool addToLocalCache);
+
   void putAll(const HashMapOfCacheable& map,
               uint32_t timeout = DEFAULT_RESPONSE_TIMEOUT,
               const SerializablePtr& aCallbackArgument = nullptr);
@@ -218,7 +224,7 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
                                const SerializablePtr& aCallbackArgument);
   virtual GfErrType getAllNoThrow(
       const VectorOfCacheableKey& keys, const HashMapOfCacheablePtr& values,
-      const HashMapOfExceptionPtr& exceptions, bool addToLocalCache,
+      const HashMapOfExceptionPtr& exceptions, const bool addToLocalCache,
       const SerializablePtr& aCallbackArgument = nullptr);
   virtual GfErrType putNoThrow(const CacheableKeyPtr& key,
                                const CacheablePtr& value,
@@ -383,7 +389,7 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
   virtual GfErrType getAllNoThrow_remote(
       const VectorOfCacheableKey* keys, const HashMapOfCacheablePtr& values,
       const HashMapOfExceptionPtr& exceptions,
-      const VectorOfCacheableKeyPtr& resultKeys, bool addToLocalCache,
+      const VectorOfCacheableKeyPtr& resultKeys, const bool addToLocalCache,
       const SerializablePtr& aCallbackArgument);
   virtual GfErrType invalidateRegionNoThrow_remote(
       const SerializablePtr& aCallbackArgument);

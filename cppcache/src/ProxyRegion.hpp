@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef GEODE_PROXYREGION_H_
-#define GEODE_PROXYREGION_H_
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -20,6 +15,13 @@
  * limitations under the License.
  */
 
+#pragma once
+
+#ifndef GEODE_PROXYREGION_H_
+#define GEODE_PROXYREGION_H_
+
+#include <algorithm>
+
 #include <geode/geode_globals.hpp>
 #include <geode/geode_types.hpp>
 #include <geode/CacheableKey.hpp>
@@ -28,11 +30,6 @@
 #include <geode/ExceptionTypes.hpp>
 #include <geode/CacheableString.hpp>
 #include <geode/CacheableBuiltins.hpp>
-
-/**
- * @file
- */
-
 #include <geode/RegionEntry.hpp>
 #include <geode/CacheListener.hpp>
 #include <geode/CacheWriter.hpp>
@@ -42,12 +39,16 @@
 #include <geode/AttributesFactory.hpp>
 #include <geode/CacheableKey.hpp>
 #include <geode/Query.hpp>
+
+#include "RegionInternal.hpp"
 #include "ProxyCache.hpp"
 
 namespace apache {
 namespace geode {
 namespace client {
+
 class FunctionService;
+
 /**
  * @class ProxyRegion ProxyRegion.hpp
  * This class wrapper around real region
@@ -229,7 +230,8 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    */
   virtual RegionPtr getSubregion(const char* path) {
     LOGDEBUG("ProxyRegion getSubregion");
-    RegionPtr rPtr = m_realRegion->getSubregion(path);
+    auto rPtr = std::static_pointer_cast<RegionInternal>(
+        m_realRegion->getSubregion(path));
 
     if (rPtr == nullptr) return rPtr;
 
@@ -261,15 +263,18 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    */
   VectorOfRegion subregions(const bool recursive) {
     VectorOfRegion realVectorRegion = m_realRegion->subregions(recursive);
+    VectorOfRegion proxyRegions(realVectorRegion.size());
 
-    if (realVectorRegion.size() > 0) {
-      for (int32_t i = 0; i < realVectorRegion.size(); i++) {
-        auto prPtr =
-            std::make_shared<ProxyRegion>(m_proxyCache, realVectorRegion.at(i));
-        realVectorRegion.push_back(prPtr);
-      }
-    }
-    return realVectorRegion;
+    std::transform(
+        realVectorRegion.begin(), realVectorRegion.end(),
+        std::back_inserter(proxyRegions),
+        [this](const RegionPtr& realRegion) -> std::shared_ptr<ProxyRegion> {
+          return std::make_shared<ProxyRegion>(
+              m_proxyCache,
+              std::static_pointer_cast<RegionInternal>(realRegion));
+        });
+
+    return proxyRegions;
   }
 
   /** Return the meta-object RegionEntry for key.
@@ -1357,14 +1362,11 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    *
    * @see get
    */
-  virtual void getAll(const VectorOfCacheableKey& keys,
-                      HashMapOfCacheablePtr values,
-                      HashMapOfExceptionPtr exceptions,
-                      bool addToLocalCache = false,
-                      const SerializablePtr& aCallbackArgument = nullptr) {
+  virtual std::tuple<HashMapOfCacheable, HashMapOfException> getAll(
+      const VectorOfCacheableKey& keys,
+      const SerializablePtr& aCallbackArgument = nullptr) {
     GuardUserAttribures gua(m_proxyCache);
-    m_realRegion->getAll(keys, values, exceptions, false /*TODO:*/,
-                         aCallbackArgument);
+    return m_realRegion->getAll_internal(keys, aCallbackArgument, false);
   }
 
   /**
@@ -1494,7 +1496,7 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
 
   virtual const PoolPtr& getPool() { return m_realRegion->getPool(); }
 
-  ProxyRegion(const ProxyCachePtr& proxyCache, const RegionPtr& realRegion)
+  ProxyRegion(const ProxyCachePtr& proxyCache, const std::shared_ptr<RegionInternal>& realRegion)
       : Region(realRegion->getCache()) {
     m_proxyCache = proxyCache;
     m_realRegion = realRegion;
@@ -1508,7 +1510,7 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
  private:
 
   ProxyCachePtr m_proxyCache;
-  RegionPtr m_realRegion;
+  std::shared_ptr<RegionInternal> m_realRegion;
   friend class FunctionService;
 
   FRIEND_STD_SHARED_PTR(ProxyRegion)
