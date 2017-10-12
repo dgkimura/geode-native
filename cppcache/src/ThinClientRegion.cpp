@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+
 #include <geode/SelectResultsIterator.hpp>
 #include <geode/SystemProperties.hpp>
 #include <geode/PoolManager.hpp>
@@ -2664,40 +2666,51 @@ void ThinClientRegion::addRegex(const std::string& regex, bool isDurable,
       std::pair<std::string, InterestResultPolicy>(regex, interestpolicy));
 }
 
-void ThinClientRegion::getInterestList(VectorOfCacheableKey& vlist) const {
+VectorOfCacheableKey ThinClientRegion::getInterestList() const {
   ThinClientRegion* nthis = const_cast<ThinClientRegion*>(this);
   RegionGlobalLocks acquireLocksRedundancy(nthis, false);
   RegionGlobalLocks acquireLocksFailover(nthis);
   CHECK_DESTROY_PENDING(TryReadGuard, getInterestList);
   ACE_Guard<ACE_Recursive_Thread_Mutex> keysGuard(nthis->m_keysLock);
-  for (std::unordered_map<CacheableKeyPtr, InterestResultPolicy>::iterator itr =
-           nthis->m_durableInterestList.begin();
-       itr != nthis->m_durableInterestList.end(); ++itr) {
-    vlist.push_back(itr->first);
-  }
-  for (std::unordered_map<CacheableKeyPtr, InterestResultPolicy>::iterator itr =
-           nthis->m_interestList.begin();
-       itr != nthis->m_interestList.end(); ++itr) {
-    vlist.push_back(itr->first);
-  }
+
+  VectorOfCacheableKey vlist;
+
+  std::transform(std::begin(m_durableInterestList),
+                 std::end(m_durableInterestList), std::back_inserter(vlist),
+                 [](const decltype(m_durableInterestList)::value_type& e) {
+                   return e.first;
+                 });
+
+  std::transform(
+      std::begin(m_interestList), std::end(m_interestList),
+      std::back_inserter(vlist),
+      [](const decltype(m_interestList)::value_type& e) { return e.first; });
+
+  return vlist;
 }
-void ThinClientRegion::getInterestListRegex(
-    VectorOfCacheableString& vregex) const {
+VectorOfCacheableString ThinClientRegion::getInterestListRegex() const {
   ThinClientRegion* nthis = const_cast<ThinClientRegion*>(this);
   RegionGlobalLocks acquireLocksRedundancy(nthis, false);
   RegionGlobalLocks acquireLocksFailover(nthis);
   CHECK_DESTROY_PENDING(TryReadGuard, getInterestListRegex);
   ACE_Guard<ACE_Recursive_Thread_Mutex> keysGuard(nthis->m_keysLock);
-  for (std::unordered_map<std::string, InterestResultPolicy>::iterator itr =
-           nthis->m_durableInterestListRegex.begin();
-       itr != nthis->m_durableInterestListRegex.end(); ++itr) {
-    vregex.push_back(CacheableString::create((*itr).first.c_str()));
-  }
-  for (std::unordered_map<std::string, InterestResultPolicy>::iterator itr =
-           nthis->m_interestListRegex.begin();
-       itr != nthis->m_interestListRegex.end(); ++itr) {
-    vregex.push_back(CacheableString::create((*itr).first.c_str()));
-  }
+
+  VectorOfCacheableString vlist;
+
+  std::transform(std::begin(m_durableInterestListRegex),
+                 std::end(m_durableInterestListRegex),
+                 std::back_inserter(vlist),
+                 [](const decltype(m_durableInterestListRegex)::value_type& e) {
+                   return CacheableString::create(e.first.c_str());
+                 });
+
+  std::transform(std::begin(m_interestListRegex), std::end(m_interestListRegex),
+                 std::back_inserter(vlist),
+                 [](const decltype(m_interestListRegex)::value_type& e) {
+                   return CacheableString::create(e.first.c_str());
+                 });
+
+  return vlist;
 }
 
 GfErrType ThinClientRegion::clientNotificationHandler(TcrMessage& msg) {

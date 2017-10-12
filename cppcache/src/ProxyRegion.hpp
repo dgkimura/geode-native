@@ -1094,7 +1094,7 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    * @throws UnsupportedOperationException if the region's scope is
    * ScopeType::LOCAL.
    */
-  virtual void getInterestList(VectorOfCacheableKey& vlist) const {
+  virtual VectorOfCacheableKey getInterestList() const {
     throw UnsupportedOperationException("Region.getInterestList()");
   }
   /**
@@ -1103,7 +1103,7 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    * @throws UnsupportedOperationException if the region's scope is
    * ScopeType::LOCAL.
    */
-  virtual void getInterestListRegex(VectorOfCacheableString& vregex) const {
+  virtual VectorOfCacheableString getInterestListRegex() const {
     throw UnsupportedOperationException("Region.getInterestListRegex()");
   }
 

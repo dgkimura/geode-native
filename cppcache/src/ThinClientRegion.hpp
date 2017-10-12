@@ -120,8 +120,8 @@ class CPPCACHE_EXPORT ThinClientRegion : public LocalRegion {
 
   bool containsKeyOnServer(const CacheableKeyPtr& keyPtr) const;
   virtual bool containsValueForKey_remote(const CacheableKeyPtr& keyPtr) const;
-  virtual void getInterestList(VectorOfCacheableKey& vlist) const;
-  virtual void getInterestListRegex(VectorOfCacheableString& vregex) const;
+  virtual VectorOfCacheableKey getInterestList() const;
+  virtual VectorOfCacheableString getInterestListRegex() const;
 
   /** @brief Public Methods from RegionInternal
    *  These are all virtual methods

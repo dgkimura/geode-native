@@ -211,8 +211,8 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
   bool containsValueForKey(const CacheableKeyPtr& keyPtr) const;
   bool containsKey(const CacheableKeyPtr& keyPtr) const;
   virtual bool containsKeyOnServer(const CacheableKeyPtr& keyPtr) const;
-  virtual void getInterestList(VectorOfCacheableKey& vlist) const;
-  virtual void getInterestListRegex(VectorOfCacheableString& vregex) const;
+  virtual VectorOfCacheableKey getInterestList() const;
+  virtual VectorOfCacheableString getInterestListRegex() const;
 
   /** @brief Public Methods from RegionInternal
    *  There are all virtual methods

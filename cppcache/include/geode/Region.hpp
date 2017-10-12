@@ -1036,14 +1036,14 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    * @throws UnsupportedOperationException if the region's scope is
    * ScopeType::LOCAL.
    */
-  virtual void getInterestList(VectorOfCacheableKey& vlist) const = 0;
+  virtual VectorOfCacheableKey getInterestList() const = 0;
   /**
    * Returns the list of regular expresssions on which this client is
    * interested and will be notified of changes.
    * @throws UnsupportedOperationException if the region's scope is
    * ScopeType::LOCAL.
    */
-  virtual void getInterestListRegex(VectorOfCacheableString& vregex) const = 0;
+  virtual VectorOfCacheableString getInterestListRegex() const = 0;
   /**
    * Convenience method allowing key to be a const char*
    * This operations checks for the key in the local cache .

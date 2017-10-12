@@ -622,11 +622,11 @@ bool LocalRegion::containsKeyOnServer(const CacheableKeyPtr& keyPtr) const {
   throw UnsupportedOperationException(
       "LocalRegion::containsKeyOnServer: is not supported.");
 }
-void LocalRegion::getInterestList(VectorOfCacheableKey& vlist) const {
+VectorOfCacheableKey LocalRegion::getInterestList() const {
   throw UnsupportedOperationException(
       "LocalRegion::getInterestList: is not supported.");
 }
-void LocalRegion::getInterestListRegex(VectorOfCacheableString& vregex) const {
+VectorOfCacheableString LocalRegion::getInterestListRegex() const {
   throw UnsupportedOperationException(
       "LocalRegion::getInterestListRegex: is not supported.");
 }
