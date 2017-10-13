@@ -128,7 +128,7 @@ void HostStatHelperWin::HostStatsFetchData() {
   SystemObj = nullptr;
   ObjectsObj = nullptr;
 
-  if (res != ERROR_SUCCESS) {
+  if (res != ERROR_SUCCESS || PerfData == nullptr) {
     LOGDEBUG(
         "HostStatHeleperWin: Can't get Windows performance data. "
         "RegQueryValueEx returned %ld\n",

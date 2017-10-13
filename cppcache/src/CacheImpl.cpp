@@ -79,7 +79,7 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
   m_cacheTXManager = InternalCacheTransactionManager2PCPtr(
       new InternalCacheTransactionManager2PCImpl(c));
 
-  m_regions = new MapOfRegionWithLock();
+  m_regions = std::unique_ptr<MapOfRegionWithLock>(new MapOfRegionWithLock());
   auto& prop = m_distributedSystem->getSystemProperties();
   if (prop.heapLRULimitEnabled()) {
     m_evictionControllerPtr =
@@ -214,10 +214,6 @@ CacheImpl::~CacheImpl() {
   if (!m_closed) {
     close();
   }
-
-  if (m_regions != nullptr) {
-    delete m_regions;
-  }
 }
 
 const std::string& CacheImpl::getName() const {
@@ -319,7 +315,6 @@ void CacheImpl::close(bool keepalive) {
     GF_SAFE_DELETE(m_cacheStats);
   }
 
-  m_regions->unbind_all();
   LOGDEBUG("CacheImpl::close( ): destroyed regions.");
 
   GF_SAFE_DELETE(m_tcrConnectionManager);

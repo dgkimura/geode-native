@@ -328,7 +328,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
 
   std::unique_ptr<DistributedSystem> m_distributedSystem;
   ClientProxyMembershipIDFactory m_clientProxyMembershipIDFactory;
-  MapOfRegionWithLock* m_regions;
+  std::unique_ptr<MapOfRegionWithLock> m_regions;
   Cache* m_implementee;
   ACE_Recursive_Thread_Mutex m_mutex;
   Condition m_cond;
