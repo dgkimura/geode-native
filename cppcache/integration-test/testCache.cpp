@@ -101,9 +101,8 @@ BEGIN_TEST(CacheFunction)
     std::cout << "vc[" << i << "]=" << vr.at(i)->getName() << std::endl;
   }
   vr.clear();
-  VectorOfRegion vrp;
   std::cout << "get cache root regions" << std::endl;
-  cptr->rootRegions(vrp);
+  auto vrp = cptr->rootRegions();
   std::cout << "  vrp.size=" << vrp.size() << std::endl;
   std::cout << "root regions in Cache:" << std::endl;
   for (i = 0; i < static_cast<uint32_t>(vrp.size()); i++) {

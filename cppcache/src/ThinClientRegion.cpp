@@ -2641,7 +2641,7 @@ void ThinClientRegion::addKeys(const VectorOfCacheableKey& keys, bool isDurable,
   }
 }
 
-void ThinClientRegion::addRegex(const std::string& regex, bool isDurable,
+void ThinClientRegion:: addRegex(const std::string& regex, bool isDurable,
                                 bool receiveValues,
                                 InterestResultPolicy interestpolicy) {
   std::unordered_map<CacheableKeyPtr, InterestResultPolicy>& interestList =

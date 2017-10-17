@@ -278,9 +278,8 @@ int testXmlCacheCreationWithPools() {
     return -1;
   }
 
-  VectorOfRegion vrp;
   std::cout << "Test if number of root regions are correct" << std::endl;
-  cptr->rootRegions(vrp);
+  auto vrp = cptr->rootRegions();
   std::cout << "  vrp.size=" << vrp.size() << std::endl;
 
   if (vrp.size() != 2) {
@@ -493,9 +492,8 @@ int testXmlDeclarativeCacheCreation() {
     return -1;
   }
 
-  VectorOfRegion vrp;
   std::cout << "Test if number of root regions are correct" << std::endl;
-  cptr->rootRegions(vrp);
+  auto vrp = cptr->rootRegions();
   std::cout << "  vrp.size=" << vrp.size() << std::endl;
 
   if (vrp.size() != 1) {

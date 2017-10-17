@@ -760,8 +760,7 @@ RegionPtr Security::getRegionPtr(const char *reg) {
   }
   try {
     if (name.empty()) {  // just get a random root region
-      VectorOfRegion rootRegionVector;
-      m_cache->rootRegions(rootRegionVector);
+      auto rootRegionVector = m_cache->rootRegions();
       int32_t size = rootRegionVector.size();
 
       if (size == 0) {

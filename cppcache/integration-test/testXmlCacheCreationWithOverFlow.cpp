@@ -83,9 +83,8 @@ int testXmlCacheCreationWithOverflow() {
     return -1;
   }
 
-  VectorOfRegion vrp;
   std::cout << "Test if number of root regions are correct" << std::endl;
-  cptr->rootRegions(vrp);
+  auto vrp = cptr->rootRegions();
   std::cout << "  vrp.size=" << vrp.size() << std::endl;
 
   if (vrp.size() != totalRootRegions) {
