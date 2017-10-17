@@ -456,15 +456,7 @@ void CqService::invokeCqListeners(const std::map<std::string, int>* cqs,
     cQueryImpl->updateStats(*cqEvent);
 
     // invoke CQ Listeners.
-    CqAttributes::listener_container_type cqListeners;
-    cQueryImpl->getCqAttributes()->getCqListeners(cqListeners);
-    /*
-    Log::fine(("Invoking CqListeners for the CQ, CqName : " + cqName +
-        " , Number of Listeners : " + cqListeners.length() + " cqEvent : " +
-    cqEvent);
-        */
-
-    for (auto l : cqListeners) {
+    for (auto l : cQueryImpl->getCqAttributes()->getCqListeners()) {
       try {
         // Check if the listener is not null, it could have been changed/reset
         // by the CqAttributeMutator.
@@ -511,9 +503,7 @@ void CqService::invokeCqConnectedListeners(const std::string& poolName,
     }
 
     // invoke CQ Listeners.
-    std::vector<CqListenerPtr> cqListeners;
-    cQueryImpl->getCqAttributes()->getCqListeners(cqListeners);
-    for (auto l : cqListeners) {
+    for (auto l : cQueryImpl->getCqAttributes()->getCqListeners()) {
       try {
         // Check if the listener is not null, it could have been changed/reset
         // by the CqAttributeMutator.
