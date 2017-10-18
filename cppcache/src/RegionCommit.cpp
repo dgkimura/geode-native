@@ -34,8 +34,7 @@ void RegionCommit::fromData(DataInput& input) {
 
   input.readInt(&size);
   if (size > 0) {
-    bool largeModCount;
-    input.readBoolean(&largeModCount);
+    const auto largeModCount = input.readBoolean();
     DSMemberForVersionStampPtr dsMember;
     input.readObject(dsMember);
 

@@ -82,10 +82,9 @@ class CPPCACHE_EXPORT DataInput {
    *
    * @param value output parameter to hold the boolean read from stream
    */
-  inline void readBoolean(bool* value) {
+  inline bool readBoolean() {
     checkBufferSize(1);
-    *value = (*m_buf == 1 ? true : false);
-    m_buf++;
+    return *(m_buf++) == 1 ? true : false;
   }
 
   /**
@@ -605,9 +604,7 @@ class CPPCACHE_EXPORT DataInput {
   inline bool readNativeBool() {
     read(); // ignore type id
 
-    bool val;
-    readBoolean(&val);
-    return val;
+    return readBoolean();
   }
 
   inline int32_t readNativeInt32() {
@@ -669,7 +666,7 @@ class CPPCACHE_EXPORT DataInput {
     *value = static_cast<wchar_t>(temp);
   }
 
-  inline void readObject(bool* value) { readBoolean(value); }
+  inline void readObject(bool* value) { *value = readBoolean(); }
 
   inline void readObject(int8_t* value) { *value = read(); }
 

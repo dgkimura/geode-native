@@ -100,8 +100,7 @@ void TcrMessage::writeByteAndTimeOutPart(uint8_t byteValue, int32_t timeout) {
 void TcrMessage::readBooleanPartAsObject(DataInput& input, bool* boolVal) {
   int32_t lenObj;
   input.readInt(&lenObj);
-  bool isObj;
-  input.readBoolean(&isObj);
+  const auto isObj = input.readBoolean();
   if (lenObj > 0) {
     if (isObj) {
       // CacheableBooleanPtr cip;
@@ -237,8 +236,7 @@ inline void TcrMessage::readCallbackObjectPart(DataInput& input,
                                                bool defaultString) {
   int32_t lenObj;
   input.readInt(&lenObj);
-  bool isObj;
-  input.readBoolean(&isObj);
+  const auto isObj = input.readBoolean();
   if (lenObj > 0) {
     if (isObj) {
       input.readObject(m_callbackArgument);
@@ -300,8 +298,7 @@ void TcrMessage::readSecureObjectPart(DataInput& input, bool defaultString,
 
   int32_t lenObj;
   input.readInt(&lenObj);
-  bool isObj;
-  input.readBoolean(&isObj);
+  const auto isObj = input.readBoolean();
   LOGDEBUG(
       "TcrMessage::readSecureObjectPart lenObj = %d isObj = %d, "
       "m_msgTypeRequest = %d defaultString = %d ",
@@ -341,8 +338,7 @@ void TcrMessage::readUniqueIDObjectPart(DataInput& input) {
 
   int32_t lenObj;
   input.readInt(&lenObj);
-  bool isObj;
-  input.readBoolean(&isObj);
+  const auto isObj = input.readBoolean();
   LOGDEBUG("TcrMessage::readUniqueIDObjectPart lenObj = %d isObj = %d", lenObj,
            isObj);
   if (lenObj > 0) {
@@ -385,8 +381,7 @@ inline void TcrMessage::readFailedNodePart(DataInput& input,
                                            bool defaultString) {
   int32_t lenObj;
   input.readInt(&lenObj);
-  bool isObj;
-  input.readBoolean(&isObj);
+  const auto isObj = input.readBoolean();
   m_failedNode = CacheableHashSet::create();
   input.read(); // ignore typeId
   // input.readDirectObject(m_failedNode, typeId);
@@ -397,8 +392,7 @@ inline void TcrMessage::readFailedNodePart(DataInput& input,
 inline void TcrMessage::readKeyPart(DataInput& input) {
   int32_t lenObj;
   input.readInt(&lenObj);
-  bool isObj;
-  input.readBoolean(&isObj);
+  const auto isObj = input.readBoolean();
   if (lenObj > 0) {
     if (isObj) {
       input.readObject(m_key);
@@ -1067,8 +1061,7 @@ void TcrMessage::handleByteArrayResponse(
           } else {
             int32_t lenObj;
             input->readInt(&lenObj);
-            bool isObj;
-            input->readBoolean(&isObj);
+            input->readBoolean();
             m_metaDataVersion = input->read();
             if (lenObj == 2) {
               m_serverGroupVersion = input->read();
@@ -1081,8 +1074,7 @@ void TcrMessage::handleByteArrayResponse(
           skipParts(*input, 1);
           int32_t lenObj;
           input->readInt(&lenObj);
-          bool isObj;
-          input->readBoolean(&isObj);
+          input->readBoolean();
           m_metaDataVersion = input->read();
           LOGFINE("Single-hop metadata version in message response is %d",
                   m_metaDataVersion);

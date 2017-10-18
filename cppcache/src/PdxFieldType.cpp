@@ -90,7 +90,7 @@ void PdxFieldType::fromData(DataInput& input) {
   m_typeId = input.read();
   input.readInt(&m_relativeOffset);
   input.readInt(&m_vlOffsetIndex);
-  input.readBoolean(&m_isIdentityField);
+  m_isIdentityField = input.readBoolean();
   m_fixedSize = getFixedTypeSize();
   if (m_fixedSize != -1) {
     m_isVariableLengthType = false;

@@ -804,7 +804,7 @@ bool PdxInstanceImpl::hasField(const char* fieldname) {
 
 void PdxInstanceImpl::getField(const char* fieldname, bool& value) const {
   auto dataInput = getDataInputForField(fieldname);
-  dataInput->readBoolean(&value);
+  value = dataInput->readBoolean();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname,

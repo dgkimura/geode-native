@@ -1250,8 +1250,7 @@ class TcrMessageHelper {
       int32_t expectedPartType, const char* methodName, uint32_t& partLen,
       uint8_t isLastChunk) {
     input.readInt(&partLen);
-    bool isObj;
-    input.readBoolean(&isObj);
+    const auto isObj = input.readBoolean();
 
     if (partLen == 0) {
       // special null object is case for scalar query result
@@ -1327,8 +1326,7 @@ class TcrMessageHelper {
                                            uint32_t& partLen,
                                            uint8_t isLastChunk) {
     input.readInt(&partLen);
-    bool isObj;
-    input.readBoolean(&isObj);
+    const auto isObj = input.readBoolean();
 
     if (partLen == 0) {
       // special null object is case for scalar query result

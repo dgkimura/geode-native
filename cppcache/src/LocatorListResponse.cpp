@@ -23,7 +23,7 @@ using namespace apache::geode::client;
 
 void LocatorListResponse::fromData(DataInput& input) {
   readList(input);
-  input.readBoolean(&m_isBalanced);
+  m_isBalanced = input.readBoolean();
 }
 
 int8_t LocatorListResponse::typeId() const {

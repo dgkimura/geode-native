@@ -70,7 +70,7 @@ class TestDataInput {
 
   void read(int8_t *value) { *value = m_dataInput.read(); }
 
-  void readBoolean(bool *value) { m_dataInput.readBoolean(value); }
+  void readBoolean(bool *value) { *value = m_dataInput.readBoolean(); }
 
   void readBytesOnly(uint8_t *buffer, uint32_t len) {
     m_dataInput.readBytesOnly(buffer, len);
@@ -259,12 +259,10 @@ TEST_F(DataInputTest, CanReadABooleanFromInput) {
   bool boolArray[2] = {true, false};
   DataInputUnderTest dataInput(reinterpret_cast<uint8_t *>(boolArray), 2, nullptr);
 
-  bool aBool = false;
-  dataInput.readBoolean(&aBool);
+  auto aBool = dataInput.readBoolean();
   EXPECT_EQ(aBool, true);
 
-  aBool = true;
-  dataInput.readBoolean(&aBool);
+  aBool = dataInput.readBoolean();
   EXPECT_EQ(aBool, false);
 }
 

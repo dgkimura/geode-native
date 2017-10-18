@@ -23,7 +23,7 @@
 using namespace apache::geode::client;
 
 void QueueConnectionResponse::fromData(DataInput& input) {
-  input.readBoolean(&m_durableQueueFound);
+  m_durableQueueFound = input.readBoolean();
   readList(input);
 }
 

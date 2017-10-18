@@ -60,9 +60,7 @@ m_processorId = -1;
   ClientProxyMembershipID memId;
   memId.fromData(input);
 
-  bool boolVar;
-  input.readBoolean(&boolVar);
-  if (boolVar) {
+  if (input.readBoolean()) {
     memId.fromData(input);
     int32_t m_lockId;
     input.readInt(&m_lockId);
@@ -84,8 +82,7 @@ m_processorId = -1;
   int64_t seqId;
   input.readInt(&seqId);
 
-  bool m_needsLargeModCount;
-  input.readBoolean(&m_needsLargeModCount);
+  input.readBoolean(); // ignore needsLargeModCount
 
   int32_t regionSize;
   input.readInt(&regionSize);

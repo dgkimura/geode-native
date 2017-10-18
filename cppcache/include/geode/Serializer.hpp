@@ -145,7 +145,7 @@ inline void writeObject(apache::geode::client::DataOutput& output, bool value) {
 }
 
 inline void readObject(apache::geode::client::DataInput& input, bool& value) {
-  input.readBoolean(&value);
+  value = input.readBoolean();
 }
 
 inline void writeObject(apache::geode::client::DataOutput& output,

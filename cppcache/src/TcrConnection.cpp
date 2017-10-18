@@ -469,11 +469,9 @@ bool TcrConnection::InitTcrConnection(
 
     if (!isClientNotification) {
       CacheableBytesPtr deltaEnabledMsg = readHandshakeData(1, connectTimeout);
-      auto di =
-          cacheImpl->getCache()->createDataInput(deltaEnabledMsg->value(), 1);
-      bool isDeltaEnabledOnServer;
-      di->readBoolean(&isDeltaEnabledOnServer);
-      ThinClientBaseDM::setDeltaEnabledOnServer(isDeltaEnabledOnServer);
+      auto di = m_connectionManager->getCacheImpl()->getCache()->createDataInput(
+                   deltaEnabledMsg->value(), 1);
+      ThinClientBaseDM::setDeltaEnabledOnServer(di->readBoolean());
     }
 
     switch ((*acceptanceCode)[0]) {

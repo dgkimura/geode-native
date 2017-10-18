@@ -32,8 +32,7 @@ void CacheableObjectPartList::toData(DataOutput& output) const {
 }
 
 void CacheableObjectPartList::fromData(DataInput& input) {
-  bool hasKeys;
-  input.readBoolean(&hasKeys);
+  const auto hasKeys = input.readBoolean();
   int32_t len;
   input.readInt(&len);
   if (len > 0) {

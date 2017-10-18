@@ -78,11 +78,9 @@ void FarSideEntryOp::fromData(DataInput& input, bool largeModCount,
   // input.readObject(sPtr);
   input.readInt(&m_eventOffset);
   if (!isDestroy(m_op)) {
-    input.readBoolean(&m_didDestroy);
+    m_didDestroy = input.readBoolean();
     if (!isInvalidate(m_op)) {
-      bool isToken;
-      input.readBoolean(&isToken);
-      if (isToken) {
+      if (input.readBoolean()) {
         int32_t rewind = 1;
         int16_t fixedId = 0;
         if (input.read() == GeodeTypeIdsImpl::FixedIDShort) {
@@ -90,15 +88,11 @@ void FarSideEntryOp::fromData(DataInput& input, bool largeModCount,
           rewind += 2;
         }
 
-        //			  public static final short TOKEN_INVALID = 141;
-        //			  public static final short TOKEN_LOCAL_INVALID
-        //=
-        // 142;
-        //			  public static final short TOKEN_DESTROYED =
-        // 143;
-        //			  public static final short TOKEN_REMOVED = 144;
-        //			  public static final short TOKEN_REMOVED2 =
-        // 145;
+        // TOKEN_INVALID = 141;
+        // TOKEN_LOCAL_INVALID = 142;
+        // TOKEN_DESTROYED = 43;
+        // TOKEN_REMOVED = 144;
+        // TOKEN_REMOVED2 = 145;
         if (fixedId >= 141 && fixedId < 146) {
           m_value = nullptr;
         } else {
@@ -151,18 +145,7 @@ void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
       int32_t len;
       input.readArrayLen(&len);
 
-      /*
-                        for(int j = 0; j < len; j++)
-                        {
-                                input.readObject(tmp);
-                                input.readObject(tmp);
-                        }
-      */
-
-      bool hasCQs;
-      input.readBoolean(&hasCQs);
-
-      if (hasCQs) {
+      if (input.readBoolean()) {
         input.readArrayLen(&len);
         for (int j = 0; j < len; j++) {
           int64_t ignore;
@@ -173,8 +156,7 @@ void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
 
       input.readInt(&len);
       if (len != -1) {
-        bool isLong;
-        input.readBoolean(&isLong);
+        const auto isLong = input.readBoolean();
 
         for (int j = 0; j < len; j++) {
           if (isLong) {
@@ -189,8 +171,7 @@ void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
 
       input.readInt(&len);
       if (len != -1) {
-        bool isLong;
-        input.readBoolean(&isLong);
+        const auto isLong = input.readBoolean();
 
         for (int j = 0; j < len; j++) {
           if (isLong) {

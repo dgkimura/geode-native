@@ -3436,10 +3436,8 @@ void ChunkedQueryResponse::reset() {
 
 void ChunkedQueryResponse::readObjectPartList(DataInput& input,
                                               bool isResultSet) {
-  bool hasKeys;
-  input.readBoolean(&hasKeys);
 
-  if (hasKeys) {
+  if (input.readBoolean()) {
     LOGERROR("Query response has keys which is unexpected.");
     throw IllegalStateException("Query response has keys which is unexpected.");
   }
@@ -3968,10 +3966,7 @@ void ChunkedDurableCQListResponse::handleChunk(const uint8_t* chunk,
   uint32_t partLen;
   input->readInt(&partLen);
 
-  bool isObj;
-  input->readBoolean(&isObj);
-
-  if (!isObj) {
+  if (!input->readBoolean()) {
     // we're currently always expecting an object
     char exMsg[256];
     ACE_OS::snprintf(

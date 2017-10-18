@@ -76,12 +76,10 @@ BEGIN_TEST(Boolean)
     ASSERT(buffer[0] == (uint8_t)0x1, "expected 0x1.");
     ASSERT(buffer[1] == (uint8_t)0x0, "expected 0x0.");
 
-    bool result;
-
     DataInputInternal dataInput(buffer, dataOutput.getBufferLength(), nullptr);
-    dataInput.readBoolean(&result);
+    auto result = dataInput.readBoolean();
     ASSERT(result, "expected true");
-    dataInput.readBoolean(&result);
+    result = dataInput.readBoolean();
     ASSERT(result == false, "expected false");
   }
 END_TEST(Boolean)

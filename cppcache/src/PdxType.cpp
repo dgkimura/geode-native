@@ -100,7 +100,7 @@ void PdxType::fromData(DataInput& input) {
   input.read(); // ignore int8_t classtypeId;2
   input.readUTF(&m_className);
 
-  input.readBoolean(&m_noJavaClass);
+  m_noJavaClass = input.readBoolean();
 
   input.readInt(&m_geodeTypeId);
 

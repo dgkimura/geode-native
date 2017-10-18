@@ -114,9 +114,7 @@ wchar_t PdxLocalReader::readWideChar(const char* fieldName) {
 
 bool PdxLocalReader::readBoolean(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  bool value;
-  m_dataInput->readBoolean(&value);
-  return value;
+  return m_dataInput->readBoolean();
 }
 
 int8_t PdxLocalReader::readByte(const char* fieldName) {
