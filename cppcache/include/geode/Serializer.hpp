@@ -48,7 +48,7 @@ inline void writeObject(apache::geode::client::DataOutput& output,
 
 inline void readObject(apache::geode::client::DataInput& input,
                        uint8_t& value) {
-  input.read(&value);
+  value = input.read();
 }
 
 inline void writeObject(apache::geode::client::DataOutput& output,
@@ -57,7 +57,7 @@ inline void writeObject(apache::geode::client::DataOutput& output,
 }
 
 inline void readObject(apache::geode::client::DataInput& input, int8_t& value) {
-  input.read(&value);
+  value = input.read();
 }
 
 inline void writeObject(apache::geode::client::DataOutput& output,

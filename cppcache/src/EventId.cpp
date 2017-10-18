@@ -77,13 +77,10 @@ void EventId::fromData(DataInput& input) {
   input.readBytesOnly(reinterpret_cast<int8_t*>(m_eidMem), m_eidMemLen);
   int32_t arrayLen;
   input.readArrayLen(&arrayLen);
-  char numberCode = 0;
-  input.read(reinterpret_cast<uint8_t*>(&numberCode));
-  m_eidThr = getEventIdData(input, numberCode);
-  input.read(reinterpret_cast<uint8_t*>(&numberCode));
-  m_eidSeq = getEventIdData(input, numberCode);
+  m_eidThr = getEventIdData(input, input.read());
+  m_eidSeq = getEventIdData(input, input.read());
   input.readInt(&m_bucketId);
-  input.read(&m_breadcrumbCounter);
+  m_breadcrumbCounter = input.read();
 }
 
 const char* EventId::getMemId() const { return m_eidMem; }
@@ -99,9 +96,7 @@ int64_t EventId::getEventIdData(DataInput& input, char numberCode) {
 
   //  Read number based on numeric code written by java server.
   if (numberCode == 0) {
-    int8_t byteVal;
-    input.read(&byteVal);
-    retVal = byteVal;
+    return input.read();
   } else if (numberCode == 1) {
     int16_t shortVal;
     input.readInt(&shortVal);

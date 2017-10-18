@@ -447,9 +447,7 @@ void writeBool(DataOutput& out, bool field) {
 }
 
 void readBool(DataInput& in, bool* field) {
-  int8_t v = 0;
-  in.read(&v);
-  *field = v ? true : false;
+  *field = in.read() ? true : false;
 }
 
 void writeCharStar(DataOutput& out, const char* field) {

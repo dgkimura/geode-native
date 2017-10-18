@@ -90,18 +90,14 @@ void PdxType::toData(DataOutput& output) const {
 }
 
 void PdxType::fromData(DataInput& input) {
-  int8_t dsByte;
-  input.read(&dsByte);
+  input.read(); // ignore dsByte
 
-  int8_t classByte;
-  input.read(&classByte);
+  input.read(); // ignore classByte
 
-  int8_t classtypeId;
-  input.read(&classtypeId);
+  input.read(); // ignore classtypeId
   input.readUTF(const_cast<char**>(&m_javaPdxClass));
 
-  int8_t classtypeId2;
-  input.read(&classtypeId2);
+  input.read(); // ignore int8_t classtypeId;2
   input.readUTF(&m_className);
 
   input.readBoolean(&m_noJavaClass);

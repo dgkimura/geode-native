@@ -1135,8 +1135,7 @@ void TcrConnection::readMessageChunked(TcrMessageReply& reply,
     input->readInt(&chunkLen);
     //  check that chunk length is valid.
     GF_DEV_ASSERT(chunkLen > 0);
-    // input->readBoolean(&isLastChunk);
-    input->read(&isLastChunk);
+    isLastChunk = input->read();
 
     uint8_t* chunk_body;
     GF_NEW(chunk_body, uint8_t[chunkLen]);
@@ -1292,11 +1291,9 @@ CacheableBytesPtr TcrConnection::readHandshakeByteArray(
 // read a byte array
 uint32_t TcrConnection::readHandshakeArraySize(uint32_t connectTimeout) {
   CacheableBytesPtr codeBytes = readHandshakeData(1, connectTimeout);
-  auto codeDI =
-      m_connectionManager->getCacheImpl()->getCache()->createDataInput(
-          codeBytes->value(), codeBytes->length());
-  uint8_t code = 0;
-  codeDI->read(&code);
+  auto codeDI = m_connectionManager->getCacheImpl()->getCache()->createDataInput(
+                   codeBytes->value(), codeBytes->length());
+  uint8_t code = codeDI->read();
   uint32_t arraySize = 0;
   if (code == 0xFF) {
     return 0;

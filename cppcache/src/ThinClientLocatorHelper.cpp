@@ -135,9 +135,7 @@ GfErrType ThinClientLocatorHelper::getAllServers(
       /* adongre
        * SSL Enabled on Location and not in the client
        */
-      int8_t acceptanceCode;
-      di->read(&acceptanceCode);
-      if (acceptanceCode == REPLY_SSL_ENABLED && !sysProps.sslEnabled()) {
+      if (di->read() == REPLY_SSL_ENABLED && !sysProps.sslEnabled()) {
         LOGERROR("SSL is enabled on locator, enable SSL in client as well");
         throw AuthenticationRequiredException(
             "SSL is enabled on locator, enable SSL in client as well");
@@ -232,8 +230,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewCallBackConn(
       /* adongre
        * ssl defect
        */
-      int8_t acceptanceCode;
-      di->read(&acceptanceCode);
+      const auto acceptanceCode = di->read();
       if (acceptanceCode == REPLY_SSL_ENABLED && !sysProps.sslEnabled()) {
         LOGERROR("SSL is enabled on locator, enable SSL in client as well");
         throw AuthenticationRequiredException(
@@ -336,8 +333,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
       /* adongre
        * SSL is enabled on locator and not in the client
        */
-      int8_t acceptanceCode;
-      di->read(&acceptanceCode);
+      const auto acceptanceCode = di->read();
       if (acceptanceCode == REPLY_SSL_ENABLED && !sysProps.sslEnabled()) {
         LOGERROR("SSL is enabled on locator, enable SSL in client as well");
         throw AuthenticationRequiredException(
@@ -428,8 +424,7 @@ GfErrType ThinClientLocatorHelper::updateLocators(
       /* adongre
        * SSL Enabled on Location and not in the client
        */
-      int8_t acceptanceCode;
-      di->read(&acceptanceCode);
+      const auto acceptanceCode = di->read();
       if (acceptanceCode == REPLY_SSL_ENABLED && !sysProps.sslEnabled()) {
         LOGERROR("SSL is enabled on locator, enable SSL in client as well");
         throw AuthenticationRequiredException(

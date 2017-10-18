@@ -121,9 +121,9 @@ void TheTypeMap::setup() {
 SerializablePtr SerializationRegistry::deserialize(DataInput& input,
                                                    int8_t typeId) const {
   bool findinternal = false;
-  int8_t currentTypeId = typeId;
+  auto currentTypeId = typeId;
 
-  if (typeId == -1) input.read(&currentTypeId);
+  if (typeId == -1) currentTypeId = input.read();
   int64_t compId = currentTypeId;
 
   LOGDEBUG("SerializationRegistry::deserialize typeid = %d currentTypeId= %d ",
@@ -149,9 +149,7 @@ SerializablePtr SerializationRegistry::deserialize(DataInput& input,
       break;
     }
     case GeodeTypeIdsImpl::CacheableUserData: {
-      int8_t classId = 0;
-      input.read(&classId);
-      compId |= ((static_cast<int64_t>(classId)) << 32);
+      compId |= ((static_cast<int64_t>(input.read())) << 32);
       break;
     }
     case GeodeTypeIdsImpl::CacheableUserData2: {
@@ -167,9 +165,7 @@ SerializablePtr SerializationRegistry::deserialize(DataInput& input,
       break;
     }
     case GeodeTypeIdsImpl::FixedIDByte: {
-      int8_t fixedId;
-      input.read(&fixedId);
-      compId = fixedId;
+      compId = input.read();
       findinternal = true;
       break;
     }

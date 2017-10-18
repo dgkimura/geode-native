@@ -66,9 +66,9 @@ class TestDataInput {
 
   operator DataInput &() { return m_dataInput; }
 
-  void read(uint8_t *value) { m_dataInput.read(value); }
+  void read(uint8_t *value) { *value = m_dataInput.read(); }
 
-  void read(int8_t *value) { m_dataInput.read(value); }
+  void read(int8_t *value) { *value = m_dataInput.read(); }
 
   void readBoolean(bool *value) { m_dataInput.readBoolean(value); }
 

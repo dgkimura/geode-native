@@ -50,8 +50,7 @@ void CacheableEnum::toData(apache::geode::client::DataOutput& output) const {
 }
 
 void CacheableEnum::fromData(apache::geode::client::DataInput& input) {
-  int8_t dsId;
-  input.read(&dsId);
+  auto dsId = input.read();
   int32_t arrLen;
   input.readArrayLen(&arrLen);
   int enumId = (dsId << 24) | (arrLen & 0xFFFFFF);

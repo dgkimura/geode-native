@@ -40,10 +40,9 @@ void VersionedCacheableObjectPartList::toData(DataOutput& output) const {
 void VersionedCacheableObjectPartList::readObjectPart(int32_t index,
                                                       DataInput& input,
                                                       CacheableKeyPtr keyPtr) {
-  uint8_t objType = 0;
   CacheableStringPtr exMsgPtr;
   ExceptionPtr ex;
-  input.read(&objType);
+  auto objType = input.read();
   CacheablePtr value;
   m_byteArray[index] = objType;
   bool isException = (objType == 2 ? 1 : 0);
@@ -99,8 +98,7 @@ void VersionedCacheableObjectPartList::readObjectPart(int32_t index,
 void VersionedCacheableObjectPartList::fromData(DataInput& input) {
   ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_responseLock);
   LOGDEBUG("VersionedCacheableObjectPartList::fromData");
-  uint8_t flags = 0;
-  input.read(&flags);
+  uint8_t flags = input.read();
   m_hasKeys = (flags & 0x01) == 0x01;
   bool hasObjects = (flags & 0x02) == 0x02;
   m_hasTags = (flags & 0x04) == 0x04;
@@ -205,8 +203,7 @@ void VersionedCacheableObjectPartList::fromData(DataInput& input) {
     MemberListForVersionStamp& memberListForVersionStamp =
         *(m_region->getCacheImpl()->getMemberListForVersionStamp());
     for (int32_t index = 0; index < versionTaglen; index++) {
-      uint8_t entryType = 0;
-      input.read(&entryType);
+      uint8_t entryType = input.read();
       VersionTagPtr versionTag;
       switch (entryType) {
         case FLAG_NULL_TAG: {

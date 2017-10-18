@@ -3448,10 +3448,8 @@ void ChunkedQueryResponse::readObjectPartList(DataInput& input,
   input.readInt(&len);
 
   for (int32_t index = 0; index < len; ++index) {
-    uint8_t byte = 0;
-    input.read(&byte);
 
-    if (byte == 2 /* for exception*/) {
+    if (input.read() == 2 /* for exception*/) {
       int32_t skipLen;
       input.readArrayLen(&skipLen);
       input.advanceCursor(skipLen);
@@ -3464,10 +3462,9 @@ void ChunkedQueryResponse::readObjectPartList(DataInput& input,
         input.readObject(value);
         m_queryResults->push_back(value);
       } else {
-        int8_t arrayType;
-        input.read(&arrayType);
+        auto arrayType = input.read();
         if (arrayType == GeodeTypeIdsImpl::FixedIDByte) {
-          input.read(&arrayType);
+          arrayType = input.read();
           if (arrayType != GeodeTypeIdsImpl::CacheableObjectPartList) {
             LOGERROR(
                 "Query response got unhandled message format %d while "
@@ -3513,7 +3510,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
   } else if (objType == TcrMessageHelper::NULL_OBJECT) {
     // special case for scalar result
     input->readInt(&partLen);
-    input->read(&isObj);
+    input->read();
     CacheableInt32Ptr intVal;
     input->readObject(intVal, true);
     m_queryResults->push_back(intVal);
@@ -3524,7 +3521,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
     return;
   }
 
-  uint8_t classByte;
+
   char* isStructTypeImpl = nullptr;
   uint16_t stiLen = 0;
   // soubhik: ignoring parent classes for now
@@ -3539,12 +3536,10 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
   // skipping CollectionTypeImpl
   // skipClass(*input); // no longer, since GFE 5.7
 
-  int8_t structType;
-  input->read(&structType);  // this is Fixed ID byte (1)
-  input->read(&structType);  // this is DataSerializable (45)
-  input->read(&classByte);
-  uint8_t stringType;
-  input->read(&stringType);  // ignore string header - assume 64k string
+  input->read();  // this is Fixed ID byte (1)
+  input->read();  // this is DataSerializable (45)
+  uint8_t classByte = input->read();
+  uint8_t stringType = input->read();  // ignore string header - assume 64k string
   input->readUTF(&isStructTypeImpl, &stiLen);
 
   DeleteArray<char> delSTI(isStructTypeImpl);
@@ -3571,8 +3566,8 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
   input->advanceCursor(partLen + 5);
 
   input->readInt(&partLen);
-  input->read(&isObj);
-  if (!isObj) {
+
+  if (!input->read()) {
     LOGERROR(
         "Query response part is not an object; possible serialization "
         "mismatch");
@@ -3583,8 +3578,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
 
   bool isResultSet = (m_structFieldNames.size() == 0);
 
-  int8_t arrayType;
-  input->read(&arrayType);
+  auto arrayType = input->read();
 
   if (arrayType == GeodeTypeIds::CacheableObjectArray) {
     int32_t arraySize;
@@ -3596,7 +3590,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
         input->readObject(value);
         m_queryResults->push_back(value);
       } else {
-        input->read(&isObj);
+        input->read();
         int32_t arraySize2;
         input->readArrayLen(&arraySize2);
         skipClass(*input);
@@ -3607,7 +3601,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
       }
     }
   } else if (arrayType == GeodeTypeIdsImpl::FixedIDByte) {
-    input->read(&arrayType);
+    arrayType = input->read();
     if (arrayType != GeodeTypeIdsImpl::CacheableObjectPartList) {
       LOGERROR(
           "Query response got unhandled message format %d while expecting "
@@ -3632,12 +3626,10 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
 }
 
 void ChunkedQueryResponse::skipClass(DataInput& input) {
-  uint8_t classByte;
-  input.read(&classByte);
+  uint8_t classByte = input.read();
   if (classByte == GeodeTypeIdsImpl::Class) {
-    uint8_t stringType;
     // ignore string type id - assuming its a normal (under 64k) string.
-    input.read(&stringType);
+    uint8_t stringType = input.read();
     uint16_t classlen;
     input.readInt(&classlen);
     input.advanceCursor(classlen);
@@ -3690,8 +3682,7 @@ void ChunkedFunctionExecutionResponse::handleChunk(
 
   // read a byte to determine whether to read exception part for sendException
   // or read objects.
-  uint8_t partType;
-  input->read(&partType);
+  uint8_t partType = input->read();
   bool isExceptionPart = false;
   // See If partType is JavaSerializable
   const int CHUNK_HDR_LEN = 5;
@@ -3722,16 +3713,15 @@ void ChunkedFunctionExecutionResponse::handleChunk(
       // read the second part which is string in usual manner, first its length.
       input->readInt(&partLen);
 
-      int8_t isObject;
       // then isObject byte
-      input->read(&isObject);
+      input->read(); // ignore iSobject
 
       startLen = input->getBytesRead();  // reset from here need to look value
                                         // part + memberid AND -1 for array type
 
       // Since it is contained as a part of other results, read arrayType which
       // is arrayList = 65.
-      input->read(&arrayType);
+      arrayType = input->read();
 
       // then its len which is 2
       input->readArrayLen(&len);
@@ -3874,12 +3864,10 @@ void ChunkedPutAllResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
     m_msg.readSecureObjectPart(*input, false, true, isLastChunkWithSecurity);
   } else {
     LOGDEBUG("ChunkedPutAllResponse::handleChunk BYTES PART");
-    int8_t byte0;
-    input->read(&byte0);
+    const auto byte0 = input->read();
     LOGDEBUG("ChunkedPutAllResponse::handleChunk single-hop bytes byte0 = %d ",
              byte0);
-    int8_t byte1;
-    input->read(&byte1);
+    const auto byte1 = input->read();
     m_msg.readSecureObjectPart(*input, false, true, isLastChunkWithSecurity);
 
     PoolPtr pool = cache->getPoolManager().find(m_msg.getPoolName());
@@ -3938,13 +3926,11 @@ void ChunkedRemoveAllResponse::handleChunk(const uint8_t* chunk,
     m_msg.readSecureObjectPart(*input, false, true, isLastChunkWithSecurity);
   } else {
     LOGDEBUG("ChunkedRemoveAllResponse::handleChunk BYTES PART");
-    int8_t byte0;
-    input->read(&byte0);
+    const auto byte0 = input->read();
     LOGDEBUG(
         "ChunkedRemoveAllResponse::handleChunk single-hop bytes byte0 = %d ",
         byte0);
-    int8_t byte1;
-    input->read(&byte1);
+    const auto byte1 = input->read();
     m_msg.readSecureObjectPart(*input, false, true, isLastChunkWithSecurity);
 
     PoolPtr pool = cache->getPoolManager().find(m_msg.getPoolName());
@@ -3996,9 +3982,7 @@ void ChunkedDurableCQListResponse::handleChunk(const uint8_t* chunk,
 
   input->advanceCursor(1);  // skip the CacheableArrayList type ID byte
 
-  int8_t stringParts;
-
-  input->read(&stringParts);  // read the number of strings in the message this
+  const auto stringParts = input->read();  // read the number of strings in the message this
                              // is one byte
 
   CacheableStringPtr strTemp;

@@ -57,8 +57,7 @@ void CacheableObjectPartList::fromData(DataInput& input) {
         m_resultKeys->push_back(key);
       }
       // input.readBoolean(&isException);
-      uint8_t byte = 0;
-      input.read(&byte);
+      uint8_t byte = input.read();
 
       if (byte == 2 /* for exception*/) {
         int32_t skipLen;

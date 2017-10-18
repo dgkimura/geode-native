@@ -59,17 +59,14 @@ bool FarSideEntryOp::isInvalidate(int8_t op) {
 void FarSideEntryOp::fromData(DataInput& input, bool largeModCount,
                               uint16_t memId) {
   input.readObject(m_key);
-  input.read(&m_op);
+  m_op = input.read();
   if (largeModCount) {
     input.readInt(&m_modSerialNum);
   } else {
-    int8_t modSerialNum;
-    input.read(&modSerialNum);
-    m_modSerialNum = modSerialNum;
+    m_modSerialNum = input.read();
   }
-  uint8_t firstByte;
-  input.read(&firstByte);
-  if (firstByte != GeodeTypeIds::NullObj) {
+
+  if (input.read() != GeodeTypeIds::NullObj) {
     input.rewindCursor(1);
     input.readObject(m_callbackArg);
   }
@@ -86,11 +83,9 @@ void FarSideEntryOp::fromData(DataInput& input, bool largeModCount,
       bool isToken;
       input.readBoolean(&isToken);
       if (isToken) {
-        int8_t objType;
         int32_t rewind = 1;
         int16_t fixedId = 0;
-        input.read(&objType);
-        if (objType == GeodeTypeIdsImpl::FixedIDShort) {
+        if (input.read() == GeodeTypeIdsImpl::FixedIDShort) {
           input.readInt(&fixedId);
           rewind += 2;
         }
@@ -138,15 +133,13 @@ void FarSideEntryOp::apply(RegionPtr& region) {
 }
 
 void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
-  int8_t structType;
-  uint8_t classByte;
   CacheablePtr tmp;
-  input.read(&structType);  // this is DataSerializable (45)
+  auto structType = input.read();  // this is DataSerializable (45)
 
   if (structType == GeodeTypeIds::NullObj) {
     return;
   } else if (structType == GeodeTypeIdsImpl::DataSerializable) {
-    input.read(&classByte);
+    input.read(); // ignore classbyte
     input.readObject(tmp);
     int32_t size;
     input.readInt(&size);

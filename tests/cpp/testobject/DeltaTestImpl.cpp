@@ -111,7 +111,7 @@ void DeltaTestImpl::fromDelta(DataInput& input) {
     ACE_Guard<ACE_Recursive_Thread_Mutex> _guard(m_lock);
     fromDeltaCounter++;
   }
-  input.read(&deltaBits);
+  deltaBits = input.read();
   if ((deltaBits & INT_MASK) == INT_MASK) {
     input.readInt(&intVar);
   }

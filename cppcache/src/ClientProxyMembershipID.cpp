@@ -232,10 +232,10 @@ void ClientProxyMembershipID::fromData(DataInput& input) {
   input.readBytesOnly(hostAddr, len);  // inetaddress
   input.readInt(&hostPort);            // port
   input.readObject(hostname);          // hostname
-  input.read(&splitbrain);             // splitbrain
+  splitbrain = input.read();             // splitbrain
   input.readInt(&dcport);              // port
   input.readInt(&vPID);                // pid
-  input.read(&vmKind);                 // vmkind
+  vmKind = input.read();                 // vmkind
   auto aStringArray = CacheableStringArray::create();
   aStringArray->fromData(input);
   input.readObject(dsName);            // name
@@ -265,8 +265,6 @@ Serializable* ClientProxyMembershipID::readEssentialData(DataInput& input) {
   uint8_t* hostAddr;
   int32_t len, hostPort, vmViewId = 0;
   CacheableStringPtr hostname, dsName, uniqueTag, vmViewIdstr;
-  int8_t vmKind;
-  uint8_t flag;
 
   input.readArrayLen(&len);  // inetaddress len
   m_hostAddrLocalMem = true;
@@ -281,9 +279,9 @@ Serializable* ClientProxyMembershipID::readEssentialData(DataInput& input) {
   input.readInt(&hostPort);  // port
   // TODO: RVV get the host name from
 
-  input.read(&flag);
+  const uint8_t flag = input.read();
 
-  input.read(&vmKind);  // vmkind
+  const auto vmKind = input.read();  // vmkind
 
   if (vmKind == ClientProxyMembershipID::LONER_DM_TYPE) {
     input.readObject(uniqueTag);  // unique tag
@@ -377,14 +375,13 @@ int16_t ClientProxyMembershipID::compareTo(
 
 void ClientProxyMembershipID::readVersion(int flags, DataInput& input) {
   if ((flags & ClientProxyMembershipID::VERSION_MASK) != 0) {
-    int8_t ordinal;
-    input.read(&ordinal);
+    int8_t ordinal = input.read();
     LOGDEBUG("ClientProxyMembershipID::readVersion ordinal = %d ", ordinal);
     if (ordinal != ClientProxyMembershipID::TOKEN_ORDINAL) {
     } else {
-      int16_t ordinal;
-      input.readInt(&ordinal);
-      LOGDEBUG("ClientProxyMembershipID::readVersion ordinal = %d ", ordinal);
+      int16_t ordinal16;
+      input.readInt(&ordinal16);
+      LOGDEBUG("ClientProxyMembershipID::readVersion ordinal = %d ", ordinal16);
     }
   }
 }

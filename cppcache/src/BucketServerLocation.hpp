@@ -114,8 +114,8 @@ class BucketServerLocation : public ServerLocation {
     ServerLocation::fromData(input);
     input.readInt(&m_bucketId);
     input.readBoolean(&m_isPrimary);
-    input.read(&m_version);
-    input.read((&m_numServerGroups));
+    m_version = input.read();
+    m_numServerGroups = input.read();
     CacheableStringPtr* serverGroups = nullptr;
     if (m_numServerGroups > 0) {
       serverGroups = new CacheableStringPtr[m_numServerGroups];

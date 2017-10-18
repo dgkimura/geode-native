@@ -40,9 +40,8 @@ void CacheableObjectArray::fromData(DataInput& input) {
   int32_t len;
   input.readArrayLen(&len);
   if (len >= 0) {
-    int8_t header;
-    input.read(&header);  // ignore CLASS typeid
-    input.read(&header);  // ignore string typeid
+    input.read();  // ignore CLASS typeid
+    input.read();  // ignore string typeid
     uint16_t classLen;
     input.readInt(&classLen);
     input.advanceCursor(classLen);

@@ -54,8 +54,7 @@ void VersionTag::fromData(DataInput& input) {
   uint16_t flags;
   input.readInt(&flags);
   input.readInt(&m_bits);
-  int8_t distributedSystemId;
-  input.read(&distributedSystemId);
+  input.read(); //skip distributedSystemId
   if ((flags & VERSION_TWO_BYTES) != 0) {
     int16_t tempVar;
     input.readInt(&tempVar);

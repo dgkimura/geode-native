@@ -121,9 +121,7 @@ bool PdxLocalReader::readBoolean(const char* fieldName) {
 
 int8_t PdxLocalReader::readByte(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  int8_t value;
-  m_dataInput->read(&value);
-  return value;
+  return m_dataInput->read();
 }
 
 int16_t PdxLocalReader::readShort(const char* fieldName) {
@@ -334,11 +332,9 @@ PdxRemotePreservedDataPtr PdxLocalReader::getPreservedData(
 
         resettoPdxHead();
         m_dataInput->advanceCursor(pos);
-        uint8_t dataByte = 0;
 
         for (int i = 0; i < (nFieldPos - pos); i++) {
-          m_dataInput->read(&dataByte);
-          pdVector.push_back(dataByte);
+          pdVector.push_back(m_dataInput->read());
         }
         resettoPdxHead();
 

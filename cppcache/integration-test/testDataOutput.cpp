@@ -59,10 +59,8 @@ BEGIN_TEST(Byte)
 
     ASSERT(buffer[0] == (uint8_t)0x11, "expected 0x11.");
 
-    int8_t result;
-
     DataInputInternal dataInput(buffer, dataOutput.getBufferLength(), nullptr);
-    dataInput.read(&result);
+    const  auto result = dataInput.read();
     ASSERT(result == (uint8_t)0x11, "expected 0x11");
   }
 END_TEST(Byte)

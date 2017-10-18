@@ -1268,8 +1268,7 @@ class TcrMessageHelper {
       return EXCEPTION;
     }
 
-    uint8_t partType;
-    input.read(&partType);
+    uint8_t partType = input.read();
     int32_t compId = partType;
 
     //  ugly hack to check for exception chunk
@@ -1309,7 +1308,7 @@ class TcrMessageHelper {
       }  // This is for QUERY or REGISTER INTEREST.
       else if (expectedFirstType == GeodeTypeIdsImpl::FixedIDByte ||
                expectedFirstType == 0) {
-        input.read(&partType);
+        partType = input.read();
         compId = partType;
       }
     }
@@ -1344,8 +1343,7 @@ class TcrMessageHelper {
       throw MessageException(exMsg);
     }
 
-    int8_t partType;
-    input.read(&partType);
+    const auto partType = input.read();
     //  ugly hack to check for exception chunk
     if (partType == GeodeTypeIdsImpl::JavaSerializable) {
       input.reset();

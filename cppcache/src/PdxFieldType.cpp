@@ -79,8 +79,7 @@ void PdxFieldType::toData(DataOutput& output) const {
 }
 
 void PdxFieldType::fromData(DataInput& input) {
-  int8_t typeId;
-  input.read(&typeId);
+  input.read(); // ignore typeid
   char* fname = nullptr;
   input.readUTF(&fname);
   m_fieldName = fname;
@@ -88,7 +87,7 @@ void PdxFieldType::fromData(DataInput& input) {
 
   input.readInt(&m_sequenceId);
   input.readInt(&m_varLenFieldIdx);
-  input.read(&m_typeId);
+  m_typeId = input.read();
   input.readInt(&m_relativeOffset);
   input.readInt(&m_vlOffsetIndex);
   input.readBoolean(&m_isIdentityField);

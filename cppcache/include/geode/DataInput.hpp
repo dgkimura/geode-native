@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef GEODE_DATAINPUT_H_
-#define GEODE_DATAINPUT_H_
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -19,6 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#pragma once
+
+#ifndef GEODE_DATAINPUT_H_
+#define GEODE_DATAINPUT_H_
 
 #include "geode_globals.hpp"
 #include "ExceptionTypes.hpp"
@@ -58,24 +57,24 @@ class DataInputInternal;
  */
 class CPPCACHE_EXPORT DataInput {
  public:
-  /**
-   * Read an unsigned byte from the <code>DataInput</code>.
-   *
-   * @param value output parameter to hold the unsigned byte read from stream
-   */
-  inline void read(uint8_t* value) {
-    checkBufferSize(1);
-    *value = *(m_buf++);
-  }
+//  /**
+//   * Read an unsigned byte from the <code>DataInput</code>.
+//   *
+//   * @param value output parameter to hold the unsigned byte read from stream
+//   */
+//  inline void read(uint8_t* value) {
+//    checkBufferSize(1);
+//    *value = *(m_buf++);
+//  }
 
   /**
    * Read a signed byte from the <code>DataInput</code>.
    *
-   * @param value output parameter to hold the signed byte read from stream
+   * @@return signed byte read from stream
    */
-  inline void read(int8_t* value) {
+  inline int8_t read() {
     checkBufferSize(1);
-    *value = *(m_buf++);
+    return *(m_buf++);
   }
 
   /**
@@ -277,8 +276,7 @@ class CPPCACHE_EXPORT DataInput {
    *   read from stream
    */
   inline void readArrayLen(int32_t* len) {
-    uint8_t code;
-    read(&code);
+    const uint8_t code = read();
     if (code == 0xFF) {
       *len = -1;
     } else {
@@ -310,8 +308,7 @@ class CPPCACHE_EXPORT DataInput {
     int32_t shift = 0;
     int64_t result = 0;
     while (shift < 64) {
-      int8_t b;
-      read(&b);
+      const auto b = read();
       result |= static_cast<int64_t>(b & 0x7F) << shift;
       if ((b & 0x80) == 0) {
         *value = result;
@@ -500,10 +497,8 @@ class CPPCACHE_EXPORT DataInput {
     GF_NEW(str, char[length + 1]);
     *value = str;
     for (uint32_t i = 0; i < length; i++) {
-      int8_t item;
-      read(&item);  // ignore this - should be higher order zero byte
-      read(&item);
-      *str = item;
+      read();  // ignore this - should be higher order zero byte
+      *str = read();
       str++;
     }
     *str = '\0';  // null terminate for c-string.
@@ -567,10 +562,8 @@ class CPPCACHE_EXPORT DataInput {
     GF_NEW(str, wchar_t[length + 1]);
     *value = str;
     for (uint32_t i = 0; i < length; i++) {
-      uint8_t hibyte;
-      read(&hibyte);
-      uint8_t lobyte;
-      read(&lobyte);
+      const auto hibyte = read();
+      const auto lobyte = read();
       *str = ((static_cast<uint16_t>(hibyte)) << 8) |
              static_cast<uint16_t>(lobyte);
       str++;
@@ -610,8 +603,7 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   inline bool readNativeBool() {
-    int8_t typeId = 0;
-    read(&typeId);
+    read(); // ignore type id
 
     bool val;
     readBoolean(&val);
@@ -619,8 +611,7 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   inline int32_t readNativeInt32() {
-    int8_t typeId = 0;
-    read(&typeId);
+    read(); // ignore type id
 
     int32_t val;
     readInt(&val);
@@ -628,9 +619,7 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   inline bool readNativeString(CacheableStringPtr& csPtr) {
-    int8_t typeId = 0;
-    read(&typeId);
-    int64_t compId = typeId;
+    const int64_t compId = read();
     if (compId == GeodeTypeIds::NullObj) {
       csPtr = nullptr;
     } else if (compId == GeodeTypeIds::CacheableNullString) {
@@ -682,7 +671,7 @@ class CPPCACHE_EXPORT DataInput {
 
   inline void readObject(bool* value) { readBoolean(value); }
 
-  inline void readObject(int8_t* value) { read(value); }
+  inline void readObject(int8_t* value) { *value = read(); }
 
   inline void readObject(int16_t* value) { readInt(value); }
 
@@ -744,8 +733,7 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   inline void readString(char** value) {
-    int8_t typeId;
-    read(&typeId);
+    const auto typeId = read();
 
     // Check for nullptr String
     if (typeId == GeodeTypeIds::CacheableNullString) {
@@ -777,8 +765,7 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   inline void readWideString(wchar_t** value) {
-    int8_t typeId;
-    read(&typeId);
+    const auto typeId = read();
 
     // Check for nullptr String
     if (typeId == GeodeTypeIds::CacheableNullString) {

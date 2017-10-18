@@ -95,11 +95,9 @@ m_processorId = -1;
     m_regions.push_back(rc);
   }
 
-  int8_t fixedId;
-  input.read(&fixedId);
+  const auto fixedId = input.read();
   if (fixedId == GeodeTypeIdsImpl::FixedIDByte) {
-    int8_t dfsid;
-    input.read(&dfsid);
+    const auto dfsid = input.read();
     if (dfsid == GeodeTypeIdsImpl::ClientProxyMembershipId) {
       ClientProxyMembershipID memId1;
       /* adongre

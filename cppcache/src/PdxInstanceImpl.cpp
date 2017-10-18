@@ -810,17 +810,13 @@ void PdxInstanceImpl::getField(const char* fieldname, bool& value) const {
 void PdxInstanceImpl::getField(const char* fieldname,
                                signed char& value) const {
   auto dataInput = getDataInputForField(fieldname);
-  int8_t tmp = 0;
-  dataInput->read(&tmp);
-  value = (signed char)tmp;
+  value = dataInput->read();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname,
                                unsigned char& value) const {
   auto dataInput = getDataInputForField(fieldname);
-  int8_t tmp = 0;
-  dataInput->read(&tmp);
-  value = static_cast<unsigned char>(tmp);
+  value = dataInput->read();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, int16_t& value) const {
@@ -1453,14 +1449,11 @@ bool PdxInstanceImpl::compareRawBytes(PdxInstanceImpl& other, PdxTypePtr myPT,
     }
 
     for (int i = pos; i < nextpos; i++) {
-      int8_t myByte = 0;
-      int8_t otherByte = 0;
-      myDataInput.read(&myByte);
-      otherDataInput.read(&otherByte);
-      if (myByte != otherByte) {
+      if (myDataInput.read() != otherDataInput.read()) {
         return false;
       }
     }
+
     return true;
   } else {
     if (myF->equals(m_DefaultPdxFieldType)) {
@@ -1512,9 +1505,7 @@ void PdxInstanceImpl::writeUnmodifieldField(DataInput& dataInput, int startPos,
                                             PdxLocalWriterPtr localWriter) {
   dataInput.reset(startPos);
   for (; startPos < endPos; startPos++) {
-    uint8_t byte;
-    dataInput.read(&byte);
-    localWriter->writeByte(byte);
+    localWriter->writeByte(dataInput.read());
   }
 }
 
@@ -1670,10 +1661,8 @@ int PdxInstanceImpl::getRawHashCode(PdxTypePtr pt, PdxFieldTypePtr pField,
   dataInput.advanceCursor(nextpos - 1);
 
   int h = 1;
-  int8_t byte = 0;
   for (int i = nextpos - 1; i >= pos; i--) {
-    dataInput.read(&byte);
-    h = 31 * h + static_cast<int>(byte);
+    h = 31 * h + static_cast<int>(dataInput.read());
     dataInput.reset();
     dataInput.advanceCursor(i - 1);
   }
@@ -1729,9 +1718,7 @@ bool PdxInstanceImpl::compareDefaultBytes(DataInput& dataInput, int start,
   dataInput.advanceCursor(start);
   int j = 0;
   for (int i = start; i < end; i++) {
-    int8_t byte;
-    dataInput.read(&byte);
-    if (defaultBytes[j++] != byte) {
+    if (defaultBytes[j++] != dataInput.read()) {
       return false;
     }
   }
