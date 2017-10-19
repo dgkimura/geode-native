@@ -50,7 +50,7 @@ void PSTObject::toData(apache::geode::client::DataOutput& output) const {
 
 void PSTObject::fromData(apache::geode::client::DataInput& input) {
   input.readInt(reinterpret_cast<int64_t*>(&timestamp));
-  input.readInt(&field1);
+  field1 = input.readInt32();
   field2 = input.read();
   input.readObject(valueData);
 }

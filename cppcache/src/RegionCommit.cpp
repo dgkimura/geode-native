@@ -30,9 +30,7 @@ namespace client {
 void RegionCommit::fromData(DataInput& input) {
   input.readObject(m_regionPath);
   input.readObject(m_parentRegionPath);
-  int32_t size = 0;
-
-  input.readInt(&size);
+  int32_t size = input.readInt32();
   if (size > 0) {
     const auto largeModCount = input.readBoolean();
     DSMemberForVersionStampPtr dsMember;

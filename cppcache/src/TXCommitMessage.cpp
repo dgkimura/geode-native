@@ -44,8 +44,7 @@ TXCommitMessage::~TXCommitMessage() {}
 bool TXCommitMessage::isAckRequired() { return false; }
 
 void TXCommitMessage::fromData(DataInput& input) {
-  int32_t pId;
-  input.readInt(&pId);
+  int32_t pId = input.readInt32();
   /*
 if(isAckRequired()) {
 m_processorId = pId;
@@ -55,18 +54,15 @@ m_processorId = -1;
 }
    */
 
-  int32_t m_txIdent;
-  input.readInt(&m_txIdent);
+  int32_t m_txIdent = input.readInt32();
   ClientProxyMembershipID memId;
   memId.fromData(input);
 
   if (input.readBoolean()) {
     memId.fromData(input);
-    int32_t m_lockId;
-    input.readInt(&m_lockId);
+    int32_t m_lockId = input.readInt32();
   }
-  int32_t totalMaxSize;
-  input.readInt(&totalMaxSize);
+  int32_t totalMaxSize = input.readInt32();
 
   int8_t* m_farsideBaseMembershipId;
   int32_t m_farsideBaseMembershipIdLen;
@@ -84,8 +80,7 @@ m_processorId = -1;
 
   input.readBoolean(); // ignore needsLargeModCount
 
-  int32_t regionSize;
-  input.readInt(&regionSize);
+  int32_t regionSize = input.readInt32();
   for (int32_t i = 0; i < regionSize; i++) {
     auto rc = std::make_shared<RegionCommit>(m_memberListForVersionStamp);
     rc->fromData(input);
@@ -97,26 +92,12 @@ m_processorId = -1;
     const auto dfsid = input.read();
     if (dfsid == GeodeTypeIdsImpl::ClientProxyMembershipId) {
       ClientProxyMembershipID memId1;
-      /* adongre
-       * CID 28816: Resource leak (RESOURCE_LEAK)
-       * Calling allocation function
-       * "apache::geode::client::DataInput::readBytes(signed char
-       * **, int *)" on "bytes".
-       * no need to read the bytes, just advance curstor
-       * more performant solution
-       */
+
       int32_t len;
       input.readArrayLen(&len);
       input.advanceCursor(len);
-      // int8_t* bytes;
-      // int32_t len;
-      // input.readBytes(&bytes, &len);
-      // if ( bytes != nullptr ) {
-      // GF_SAFE_DELETE_ARRAY(bytes);
-      // bytes = nullptr;
-      //}
-      input.readInt(&len);
-      // memId1.fromData(input);
+
+      input.readInt32();
     } else {
       LOGERROR(
           "TXCommitMessage::fromData Unexpected type id: %d while "

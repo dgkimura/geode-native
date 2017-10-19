@@ -112,7 +112,7 @@ class BucketServerLocation : public ServerLocation {
 
   void fromData(apache::geode::client::DataInput& input) {
     ServerLocation::fromData(input);
-    input.readInt(&m_bucketId);
+    m_bucketId = input.readInt32();
     m_isPrimary = input.readBoolean();
     m_version = input.read();
     m_numServerGroups = input.read();

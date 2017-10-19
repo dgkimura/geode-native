@@ -61,7 +61,7 @@ void FarSideEntryOp::fromData(DataInput& input, bool largeModCount,
   input.readObject(m_key);
   m_op = input.read();
   if (largeModCount) {
-    input.readInt(&m_modSerialNum);
+    m_modSerialNum = input.readInt32();
   } else {
     m_modSerialNum = input.read();
   }
@@ -76,7 +76,7 @@ void FarSideEntryOp::fromData(DataInput& input, bool largeModCount,
       TcrMessage::readVersionTagPart(input, memId, m_memberListForVersionStamp);
   // SerializablePtr sPtr;
   // input.readObject(sPtr);
-  input.readInt(&m_eventOffset);
+  m_eventOffset = input.readInt32();
   if (!isDestroy(m_op)) {
     m_didDestroy = input.readBoolean();
     if (!isInvalidate(m_op)) {
@@ -135,8 +135,7 @@ void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
   } else if (structType == GeodeTypeIdsImpl::DataSerializable) {
     input.read(); // ignore classbyte
     input.readObject(tmp);
-    int32_t size;
-    input.readInt(&size);
+    int32_t size = input.readInt32();
     for (int i = 0; i < size; i++) {
       ClientProxyMembershipID memId;
       // memId.fromData(input);
@@ -154,7 +153,7 @@ void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
         }
       }
 
-      input.readInt(&len);
+      len = input.readInt32();
       if (len != -1) {
         const auto isLong = input.readBoolean();
 
@@ -163,13 +162,12 @@ void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
             int64_t val;
             input.readInt(&val);
           } else {
-            int32_t val;
-            input.readInt(&val);
+            input.readInt32();
           }
         }
       }
 
-      input.readInt(&len);
+      len = input.readInt32();
       if (len != -1) {
         const auto isLong = input.readBoolean();
 
@@ -178,8 +176,7 @@ void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
             int64_t val;
             input.readInt(&val);
           } else {
-            int32_t val;
-            input.readInt(&val);
+            input.readInt32();
           }
         }
       }

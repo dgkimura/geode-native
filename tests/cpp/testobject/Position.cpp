@@ -112,10 +112,10 @@ void Position::fromData(apache::geode::client::DataInput& input) {
   input.readObject(secId);
   input.readObject(secLinks);
   input.readUTF(&secType);
-  input.readInt(&sharesOutstanding);
+  sharesOutstanding = input.readInt32();
   input.readObject(underlyer);
   input.readInt(&volatility);
-  input.readInt(&pid);
+  pid = input.readInt32();
 }
 
 CacheableStringPtr Position::toString() const {

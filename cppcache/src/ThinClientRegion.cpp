@@ -3442,8 +3442,7 @@ void ChunkedQueryResponse::readObjectPartList(DataInput& input,
     throw IllegalStateException("Query response has keys which is unexpected.");
   }
 
-  int32_t len;
-  input.readInt(&len);
+  int32_t len = input.readInt32();
 
   for (int32_t index = 0; index < len; ++index) {
 

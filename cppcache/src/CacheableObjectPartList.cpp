@@ -33,8 +33,7 @@ void CacheableObjectPartList::toData(DataOutput& output) const {
 
 void CacheableObjectPartList::fromData(DataInput& input) {
   const auto hasKeys = input.readBoolean();
-  int32_t len;
-  input.readInt(&len);
+  int32_t len = input.readInt32();
   if (len > 0) {
     CacheableKeyPtr key;
     CacheablePtr value;

@@ -92,7 +92,7 @@ class TestDataInput {
 
   void readInt(uint32_t *value) { m_dataInput.readInt(value); }
 
-  void readInt(int32_t *value) { m_dataInput.readInt(value); }
+  void readInt(int32_t *value) { *value = m_dataInput.readInt32(); }
 
   void readInt(uint64_t *value) { m_dataInput.readInt(value); }
 

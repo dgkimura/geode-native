@@ -66,7 +66,7 @@ DeltaTestImpl::DeltaTestImpl(DeltaTestImplPtr rhs) : Delta(nullptr) {
 }
 
 void DeltaTestImpl::fromData(DataInput& input) {
-  input.readInt(&intVar);
+  intVar = input.readInt32();
   input.readObject(str);
   input.readDouble(&doubleVar);
   input.readObject(byteArr);
@@ -113,7 +113,7 @@ void DeltaTestImpl::fromDelta(DataInput& input) {
   }
   deltaBits = input.read();
   if ((deltaBits & INT_MASK) == INT_MASK) {
-    input.readInt(&intVar);
+    intVar = input.readInt32();
   }
   if ((deltaBits & STR_MASK) == STR_MASK) {
     input.readObject(str);

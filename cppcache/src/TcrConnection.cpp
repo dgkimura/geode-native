@@ -404,7 +404,7 @@ bool TcrConnection::InitTcrConnection(
     auto dI = cacheImpl->getCache()->createDataInput(queueSizeMsg->value(),
                                                      queueSizeMsg->length());
     int32_t queueSize = 0;
-    dI->readInt(&queueSize);
+    queueSize = dI->readInt32();
     m_queueSize = queueSize > 0 ? queueSize : 0;
 
     m_endpointObj->setServerQueueStatus(m_hasServerQueue, m_queueSize);
@@ -439,9 +439,9 @@ bool TcrConnection::InitTcrConnection(
       } else if (static_cast<int8_t>((*arrayLenHeader)[0]) == -3) {
         CacheableBytesPtr recvMsgLenBytes =
             readHandshakeData(4, connectTimeout);
-        auto dI2 = cacheImpl->getCache()->createDataInput(
-            recvMsgLenBytes->value(), recvMsgLenBytes->length());
-        dI2->readInt(&recvMsgLen);
+        auto dI2 = m_connectionManager->getCacheImpl()->getCache()->createDataInput(
+                      recvMsgLenBytes->value(), recvMsgLenBytes->length());
+        recvMsgLen = dI2->readInt32();
       }
       auto recvMessage = readHandshakeData(recvMsgLen, connectTimeout);
       // If the distributed member has not been set yet, set it.
@@ -948,8 +948,8 @@ char* TcrConnection::readMessage(size_t* recvLen, uint32_t receiveTimeoutSec,
 
   auto input = m_connectionManager->getCacheImpl()->getCache()->createDataInput(
       reinterpret_cast<uint8_t*>(msg_header), HEADER_LENGTH);
-  input->readInt(&msgType);
-  input->readInt(&msgLen);
+  msgType = input->readInt32();
+  msgLen = input->readInt32();
   //  check that message length is valid.
   if (!(msgLen > 0) && request == TcrMessage::GET_CLIENT_PR_METADATA) {
     char* fullMessage;
@@ -1058,16 +1058,14 @@ void TcrConnection::readMessageChunked(TcrMessageReply& reply,
 
   auto input = m_connectionManager->getCacheImpl()->getCache()->createDataInput(
       msg_header, HDR_LEN_12);
-  int32_t msgType;
-  input->readInt(&msgType);
+  int32_t msgType = input->readInt32();
   reply.setMessageType(msgType);
   int32_t txId;
-  int32_t numOfParts;
-  input->readInt(&numOfParts);
+  int32_t numOfParts = input->readInt32();
   LOGDEBUG("TcrConnection::readMessageChunked numberof parts = %d ",
            numOfParts);
   // input->advanceCursor(4);
-  input->readInt(&txId);
+  txId = input->readInt32();
   reply.setTransId(txId);
 
   // bool isLastChunk = false;
@@ -1127,7 +1125,7 @@ void TcrConnection::readMessageChunked(TcrMessageReply& reply,
         m_connectionManager->getCacheImpl()->getCache()->createDataInput(
             msg_header + HDR_LEN_12, HDR_LEN);
     int32_t chunkLen;
-    input->readInt(&chunkLen);
+    chunkLen = input->readInt32();
     //  check that chunk length is valid.
     GF_DEV_ASSERT(chunkLen > 0);
     isLastChunk = input->read();
@@ -1395,10 +1393,8 @@ int32_t TcrConnection::readHandShakeInt(uint32_t connectTimeout) {
     }
   }
 
-  auto di = m_connectionManager->getCacheImpl()->getCache()->createDataInput(
-      recvMessage, 4);
-  int32_t val;
-  di->readInt(&val);
+  auto di = m_connectionManager->getCacheImpl()->getCache()->createDataInput(recvMessage, 4);
+  int32_t val = di->readInt32();
 
   GF_SAFE_DELETE_ARRAY(recvMessage);
 

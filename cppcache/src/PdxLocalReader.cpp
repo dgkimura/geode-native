@@ -127,9 +127,7 @@ int16_t PdxLocalReader::readShort(const char* fieldName) {
 
 int32_t PdxLocalReader::readInt(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  int32_t value;
-  m_dataInput->readInt(&value);
-  return value;
+  return m_dataInput->readInt32();
 }
 
 int64_t PdxLocalReader::readLong(const char* fieldName) {

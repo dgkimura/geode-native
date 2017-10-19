@@ -57,15 +57,6 @@ class DataInputInternal;
  */
 class CPPCACHE_EXPORT DataInput {
  public:
-//  /**
-//   * Read an unsigned byte from the <code>DataInput</code>.
-//   *
-//   * @param value output parameter to hold the unsigned byte read from stream
-//   */
-//  inline void read(uint8_t* value) {
-//    checkBufferSize(1);
-//    *value = *(m_buf++);
-//  }
 
   /**
    * Read a signed byte from the <code>DataInput</code>.
@@ -238,9 +229,13 @@ class CPPCACHE_EXPORT DataInput {
    * @param value output parameter to hold the 32-bit signed integer
    *   read from stream
    */
-  inline void readInt(int32_t* value) {
+  inline int32_t readInt32() {
     checkBufferSize(4);
-    readInt(reinterpret_cast<uint32_t*>(value));
+    int32_t tmp = *(m_buf++);
+    tmp = (tmp << 8) | *(m_buf++);
+    tmp = (tmp << 8) | *(m_buf++);
+    tmp = (tmp << 8) | *(m_buf++);
+    return tmp;
   }
 
   /**
@@ -593,10 +588,7 @@ class CPPCACHE_EXPORT DataInput {
 
   inline int32_t readNativeInt32() {
     read(); // ignore type id
-
-    int32_t val;
-    readInt(&val);
-    return val;
+    return readInt32();
   }
 
   inline bool readNativeString(CacheableStringPtr& csPtr) {
@@ -655,7 +647,7 @@ class CPPCACHE_EXPORT DataInput {
 
   inline void readObject(int16_t* value) { *value = readInt16(); }
 
-  inline void readObject(int32_t* value) { readInt(value); }
+  inline void readObject(int32_t* value) { *value = readInt32(); }
 
   inline void readObject(int64_t* value) { readInt(value); }
 

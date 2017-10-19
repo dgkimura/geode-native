@@ -112,8 +112,7 @@ BEGIN_TEST(int_t)
     ASSERT(buffer[3] == (uint8_t)0x44, "expected 0x44.");
 
     DataInputInternal dataInput(buffer, dataOutput.getBufferLength(), nullptr);
-    int32_t result;
-    dataInput.readInt(&result);
+    int32_t result = dataInput.readInt32();
     ASSERT(result == 0x11223344, "expected 0x11223344");
   }
 END_TEST(int_t)

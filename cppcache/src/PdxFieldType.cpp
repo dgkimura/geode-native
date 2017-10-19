@@ -86,10 +86,10 @@ void PdxFieldType::fromData(DataInput& input) {
   input.freeUTFMemory(fname);  // freeing fname
 
   input.readInt(&m_sequenceId);
-  input.readInt(&m_varLenFieldIdx);
+  m_varLenFieldIdx = input.readInt32();
   m_typeId = input.read();
-  input.readInt(&m_relativeOffset);
-  input.readInt(&m_vlOffsetIndex);
+  m_relativeOffset = input.readInt32();
+  m_vlOffsetIndex = input.readInt32();
   m_isIdentityField = input.readBoolean();
   m_fixedSize = getFixedTypeSize();
   if (m_fixedSize != -1) {

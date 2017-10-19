@@ -230,18 +230,18 @@ void ClientProxyMembershipID::fromData(DataInput& input) {
   hostAddr = new uint8_t[len];
 
   input.readBytesOnly(hostAddr, len);  // inetaddress
-  input.readInt(&hostPort);            // port
+  hostPort = input.readInt32();            // port
   input.readObject(hostname);          // hostname
   splitbrain = input.read();             // splitbrain
-  input.readInt(&dcport);              // port
-  input.readInt(&vPID);                // pid
+  dcport = input.readInt32();              // port
+  vPID = input.readInt32();                // pid
   vmKind = input.read();                 // vmkind
   auto aStringArray = CacheableStringArray::create();
   aStringArray->fromData(input);
   input.readObject(dsName);            // name
   input.readObject(uniqueTag);         // unique tag
   input.readObject(durableClientId);   // durable client id
-  input.readInt(&durableClntTimeOut);  // durable client timeout
+  durableClntTimeOut = input.readInt32();  // durable client timeout
   int32_t vmViewId = 0;
   readVersion(splitbrain, input);
 
@@ -276,7 +276,7 @@ Serializable* ClientProxyMembershipID::readEssentialData(DataInput& input) {
 
   input.readBytesOnly(hostAddr, len);  // inetaddress
 
-  input.readInt(&hostPort);  // port
+  hostPort = input.readInt32();  // port
   // TODO: RVV get the host name from
 
   const uint8_t flag = input.read();

@@ -80,7 +80,7 @@ class CPPCACHE_EXPORT ServerLocation : public Serializable {
   }
   void fromData(DataInput& input) {
     input.readNativeString(m_serverName);
-    input.readInt((int32_t*)&m_port);
+    m_port = input.readInt32();
     makeEpString();
   }
   uint32_t objectSize() const {

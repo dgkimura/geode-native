@@ -58,13 +58,13 @@ void VersionTag::fromData(DataInput& input) {
     m_entryVersion = input.readInt16();
     m_entryVersion &= 0xffff;
   } else {
-    input.readInt(&m_entryVersion);
+    m_entryVersion = input.readInt32();
     m_entryVersion &= 0xffffffff;
   }
   if ((flags & HAS_RVV_HIGH_BYTE) != 0) {
     m_regionVersionHighBytes = input.readInt16();
   }
-  input.readInt(&m_regionVersionLowBytes);
+  m_regionVersionLowBytes = input.readInt32();
   input.readUnsignedVL(&m_timeStamp);
   readMembers(flags, input);
 }

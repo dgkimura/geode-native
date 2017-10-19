@@ -175,16 +175,16 @@ void EqStruct::fromData(apache::geode::client::DataInput &in) {
   in.readUTF(&var9);
 
   // ints
-  in.readInt(&myIndex);
-  in.readInt(&cxlQty);
-  in.readInt(&isSyntheticOrder);
-  in.readInt(&isRestricted);
-  in.readInt(&orderQty);
-  in.readInt(&cumQty);
-  in.readInt(&isDoneForDay);
-  in.readInt(&revisionSeqNum);
-  in.readInt(&replaceQty);
-  in.readInt(&isIrregularSettlmnt);
+  myIndex = in.readInt32();
+  cxlQty = in.readInt32();
+  isSyntheticOrder = in.readInt32();
+  isRestricted = in.readInt32();
+  orderQty = in.readInt32();
+  cumQty = in.readInt32();
+  isDoneForDay = in.readInt32();
+  revisionSeqNum = in.readInt32();
+  replaceQty = in.readInt32();
+  isIrregularSettlmnt = in.readInt32();
 
   // longs
   in.readInt(reinterpret_cast<int64_t *>(&timestamp));

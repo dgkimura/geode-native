@@ -83,7 +83,7 @@ void Portfolio::toData(DataOutput& output) const {
 }
 
 void Portfolio::fromData(DataInput& input) {
-  input.readInt(&ID);
+  ID = input.readInt32();
   input.readObject(pkid);
   input.readObject(position1);
   input.readObject(position2);

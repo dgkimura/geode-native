@@ -102,9 +102,9 @@ void PdxType::fromData(DataInput& input) {
 
   m_noJavaClass = input.readBoolean();
 
-  input.readInt(&m_geodeTypeId);
+  m_geodeTypeId = input.readInt32();
 
-  input.readInt(&m_varLenFieldIdx);
+  m_varLenFieldIdx = input.readInt32();
 
   int len;
   input.readArrayLen(&len);

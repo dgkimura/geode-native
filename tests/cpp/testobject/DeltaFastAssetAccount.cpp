@@ -53,7 +53,7 @@ void DeltaFastAssetAccount::toData(
 }
 
 void DeltaFastAssetAccount::fromData(apache::geode::client::DataInput& input) {
-  input.readInt(&acctId);
+  acctId = input.readInt32();
   input.readObject(customerName);
   input.readDouble(&netWorth);
   input.readObject(assets);

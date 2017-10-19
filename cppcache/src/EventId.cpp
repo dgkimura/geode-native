@@ -79,7 +79,7 @@ void EventId::fromData(DataInput& input) {
   input.readArrayLen(&arrayLen);
   m_eidThr = getEventIdData(input, input.read());
   m_eidSeq = getEventIdData(input, input.read());
-  input.readInt(&m_bucketId);
+  m_bucketId = input.readInt32();
   m_breadcrumbCounter = input.read();
 }
 
@@ -101,7 +101,7 @@ int64_t EventId::getEventIdData(DataInput& input, char numberCode) {
     retVal = input.readInt16();
   } else if (numberCode == 2) {
     int32_t intVal;
-    input.readInt(&intVal);
+    intVal = input.readInt32();
     retVal = intVal;
   } else if (numberCode == 3) {
     int64_t longVal;

@@ -98,8 +98,7 @@ void TcrMessage::writeByteAndTimeOutPart(uint8_t byteValue, int32_t timeout) {
 }
 
 void TcrMessage::readBooleanPartAsObject(DataInput& input, bool* boolVal) {
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   const auto isObj = input.readBoolean();
   if (lenObj > 0) {
     if (isObj) {
@@ -110,16 +109,14 @@ void TcrMessage::readBooleanPartAsObject(DataInput& input, bool* boolVal) {
 }
 
 void TcrMessage::readOldValue(DataInput& input) {
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   input.read(); //ignore isObj
   CacheablePtr value;
   input.readObject(value);  // we are not using this value currently
 }
 
 void TcrMessage::readPrMetaData(DataInput& input) {
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   input.read(); // ignore
   m_metaDataVersion = input.read();// read refresh meta data byte
   if (lenObj == 2) {
@@ -158,8 +155,7 @@ VersionTagPtr TcrMessage::readVersionTagPart(
 void TcrMessage::readVersionTag(
     DataInput& input, uint16_t endpointMemId,
     MemberListForVersionStamp& memberListForVersionStamp) {
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   input.read(); // ignore byte
 
   if (lenObj == 0) return;
@@ -186,8 +182,7 @@ void TcrMessage::readLongPart(DataInput& input, uint64_t* intValue) {
 
 void TcrMessage::readStringPart(DataInput& input, uint32_t* len, char** str) {
   char* ts;
-  int32_t sl;
-  input.readInt(&sl);
+  int32_t sl = input.readInt32();
   ts = new char[sl];
   if (input.read()) throw Exception("String is not an object");
   input.readBytesOnly(reinterpret_cast<int8_t*>(ts), sl);
@@ -215,8 +210,7 @@ void TcrMessage::readCqsPart(DataInput& input) {
 
 inline void TcrMessage::readCallbackObjectPart(DataInput& input,
                                                bool defaultString) {
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   const auto isObj = input.readBoolean();
   if (lenObj > 0) {
     if (isObj) {
@@ -239,8 +233,7 @@ inline void TcrMessage::readCallbackObjectPart(DataInput& input,
 }
 
 inline void TcrMessage::readObjectPart(DataInput& input, bool defaultString) {
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   auto isObj = input.read();
   if (lenObj > 0) {
     if (isObj == 1) {
@@ -277,8 +270,7 @@ void TcrMessage::readSecureObjectPart(DataInput& input, bool defaultString,
     }
   }
 
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   const auto isObj = input.readBoolean();
   LOGDEBUG(
       "TcrMessage::readSecureObjectPart lenObj = %d isObj = %d, "
@@ -317,8 +309,7 @@ void TcrMessage::readSecureObjectPart(DataInput& input, bool defaultString,
 void TcrMessage::readUniqueIDObjectPart(DataInput& input) {
   LOGDEBUG("TcrMessage::readUniqueIDObjectPart");
 
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   const auto isObj = input.readBoolean();
   LOGDEBUG("TcrMessage::readUniqueIDObjectPart lenObj = %d isObj = %d", lenObj,
            isObj);
@@ -360,8 +351,7 @@ int64_t TcrMessage::getUniqueId(TcrConnection* conn) {
 
 inline void TcrMessage::readFailedNodePart(DataInput& input,
                                            bool defaultString) {
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   const auto isObj = input.readBoolean();
   m_failedNode = CacheableHashSet::create();
   input.read(); // ignore typeId
@@ -371,8 +361,7 @@ inline void TcrMessage::readFailedNodePart(DataInput& input,
 }
 
 inline void TcrMessage::readKeyPart(DataInput& input) {
-  int32_t lenObj;
-  input.readInt(&lenObj);
+  int32_t lenObj = input.readInt32();
   const auto isObj = input.readBoolean();
   if (lenObj > 0) {
     if (isObj) {
@@ -959,12 +948,12 @@ void TcrMessage::handleByteArrayResponse(
   //  if(m_tcdm == nullptr)
   //  throw IllegalArgumentException("Pool is nullptr in TcrMessage");
   input->setPoolName(getPoolName());
-  input->readInt(&m_msgType);
+  m_msgType = input->readInt32();
   int32_t msglen;
-  input->readInt(&msglen);
+  msglen = input->readInt32();
   int32_t numparts;
-  input->readInt(&numparts);
-  input->readInt(&m_txId);
+  numparts = input->readInt32();
+  m_txId = input->readInt32();
   auto earlyack = input->read();
   LOGDEBUG(
       "handleByteArrayResponse m_msgType = %d isSecurityOn = %d requesttype "
@@ -1001,8 +990,7 @@ void TcrMessage::handleByteArrayResponse(
         input->advanceCursor(5);  // part header
         m_value = serializationRegistry.deserialize(*input);
       } else if (m_msgTypeRequest == TcrMessage::GET_FUNCTION_ATTRIBUTES) {
-        int32_t lenObj;
-        input->readInt(&lenObj);
+        int32_t lenObj = input->readInt32();
         input->advanceCursor(1); // ignore byte
 
         m_functionAttributes = new std::vector<int8_t>();
@@ -1040,8 +1028,7 @@ void TcrMessage::handleByteArrayResponse(
           if (m_isCallBackArguement) {
             readCallbackObjectPart(*input);
           } else {
-            int32_t lenObj;
-            input->readInt(&lenObj);
+            int32_t lenObj = input->readInt32();
             input->readBoolean();
             m_metaDataVersion = input->read();
             if (lenObj == 2) {
@@ -1053,8 +1040,7 @@ void TcrMessage::handleByteArrayResponse(
           }
         } else if (numparts > 2) {
           skipParts(*input, 1);
-          int32_t lenObj;
-          input->readInt(&lenObj);
+          int32_t lenObj = input->readInt32();
           input->readBoolean();
           m_metaDataVersion = input->read();
           LOGFINE("Single-hop metadata version in message response is %d",
@@ -1156,8 +1142,7 @@ void TcrMessage::handleByteArrayResponse(
     }
     case TcrMessage::LOCAL_INVALIDATE:
     case TcrMessage::LOCAL_DESTROY: {
-      int32_t regionLen;
-      input->readInt(&regionLen);
+      int32_t regionLen = input->readInt32();
       input->advanceCursor(1); // ignore byte
       char* regname = nullptr;
       regname = new char[regionLen + 1];
@@ -1192,8 +1177,7 @@ void TcrMessage::handleByteArrayResponse(
 
     case TcrMessage::LOCAL_CREATE:
     case TcrMessage::LOCAL_UPDATE: {
-      int32_t regionLen;
-      input->readInt(&regionLen);
+      int32_t regionLen = input->readInt32();
       input->advanceCursor(1); // ignore byte
       char* regname = nullptr;
       regname = new char[regionLen + 1];
@@ -1207,7 +1191,7 @@ void TcrMessage::handleByteArrayResponse(
       bool isDelta = false;
       readBooleanPartAsObject(*input, &isDelta);
       if (isDelta) {
-        input->readInt(&m_deltaBytesLen);
+        m_deltaBytesLen = input->readInt32();
 
         input->advanceCursor(1); // ignore byte
         m_deltaBytes = new uint8_t[m_deltaBytesLen];
@@ -1245,8 +1229,7 @@ void TcrMessage::handleByteArrayResponse(
 
     case TcrMessage::LOCAL_DESTROY_REGION:
     case TcrMessage::CLEAR_REGION: {
-      int32_t regionLen;
-      input->readInt(&regionLen);
+      int32_t regionLen = input->readInt32();
       input->advanceCursor(1); // ignore byte
       char* regname = nullptr;
       regname = new char[regionLen + 1];
@@ -1274,8 +1257,7 @@ void TcrMessage::handleByteArrayResponse(
       }
       m_metadata = new std::vector<std::vector<BucketServerLocationPtr> >();
       for (int32_t i = 0; i < numparts; i++) {
-        int32_t bits32;
-        input->readInt(&bits32);  // partlen;
+        int32_t bits32 = input->readInt32();  // partlen;
         input->read();  // isObj;
         auto bits8 = input->read();  // cacheable vector typeid
         LOGDEBUG("Expected typeID %d, got %d", GeodeTypeIds::CacheableArrayList,
@@ -1311,27 +1293,26 @@ void TcrMessage::handleByteArrayResponse(
     }
 
     case TcrMessage::RESPONSE_CLIENT_PARTITION_ATTRIBUTES: {
-      int32_t bits32;
-      input->readInt(&bits32);  // partlen;
+      int32_t bits32 = input->readInt32();  // partlen;
       input->read();  //ignore isObj;
 
       m_bucketCount = input->readNativeInt32();  // PART1 = bucketCount
 
-      input->readInt(&bits32);  // partlen;
+      bits32 = input->readInt32();  // partlen;
       input->read();      //ignore isObj;
       if (bits32 > 0) {
         input->readNativeString(m_colocatedWith);  // PART2 = colocatedwith
       }
 
       if (numparts == 4) {
-        input->readInt(&bits32);  // partlen;
+        bits32 = input->readInt32();  // partlen;
         input->read();      //ignore isObj;
         if (bits32 > 0) {
           input->readNativeString(
               m_partitionResolverName);  // PART3 = partitionresolvername
         }
 
-        input->readInt(&bits32);  // partlen;
+        bits32 = input->readInt32();  // partlen;
         input->read();      // ignore isObj;
         input->read();      // ignore cacheable CacheableHashSet typeid
 
@@ -1355,8 +1336,7 @@ void TcrMessage::handleByteArrayResponse(
     }
     case TcrMessage::TOMBSTONE_OPERATION: {
       uint32_t tombstoneOpType;
-      int32_t regionLen;
-      input->readInt(&regionLen);
+      int32_t regionLen = input->readInt32();
       input->read();
       char* regname = nullptr;
 
@@ -1366,8 +1346,7 @@ void TcrMessage::handleByteArrayResponse(
       regname[regionLen] = '\0';
       m_regionName = regname;
       readIntPart(*input, &tombstoneOpType);  // partlen;
-      int32_t len;
-      input->readInt(&len);
+      int32_t len = input->readInt32();
       input->read();
 
       if (tombstoneOpType == 0) {
@@ -2892,8 +2871,7 @@ void TcrMessage::setTimeout(uint32_t timeout) { m_timeout = timeout; }
 void TcrMessage::skipParts(DataInput& input, int32_t numParts) {
   while (numParts > 0) {
     numParts--;
-    int32_t partLen;
-    input.readInt(&partLen);
+    int32_t partLen = input.readInt32();
     LOGDEBUG("TcrMessage::skipParts partLen= %d ", partLen);
     input.advanceCursor(partLen + 1);  // Skip the whole part including "isObj"
   }
@@ -2907,9 +2885,7 @@ void TcrMessage::readEventIdPart(DataInput& input, bool skip, int32_t parts) {
 
   // read the eventid part
 
-  int32_t eventIdLen;
-
-  input.readInt(&eventIdLen);
+  int32_t eventIdLen = input.readInt32();
   const auto isObj = input.read();
 
   GF_D_ASSERT(isObj != 0);

@@ -512,20 +512,20 @@ void RegionAttributes::toData(DataOutput& out) const {
 }
 
 void RegionAttributes::fromData(DataInput& in) {
-  in.readInt(reinterpret_cast<int32_t*>(&m_regionTimeToLive));
-  in.readInt(reinterpret_cast<int32_t*>(&m_regionTimeToLiveExpirationAction));
-  in.readInt(reinterpret_cast<int32_t*>(&m_regionIdleTimeout));
-  in.readInt(reinterpret_cast<int32_t*>(&m_regionIdleTimeoutExpirationAction));
-  in.readInt(reinterpret_cast<int32_t*>(&m_entryTimeToLive));
-  in.readInt(reinterpret_cast<int32_t*>(&m_entryTimeToLiveExpirationAction));
-  in.readInt(reinterpret_cast<int32_t*>(&m_entryIdleTimeout));
-  in.readInt(reinterpret_cast<int32_t*>(&m_entryIdleTimeoutExpirationAction));
-  in.readInt(reinterpret_cast<int32_t*>(&m_initialCapacity));
+  m_regionTimeToLive = in.readInt32();
+  m_regionTimeToLiveExpirationAction = static_cast<ExpirationAction::Action>(in.readInt32());
+  m_regionIdleTimeout = in.readInt32();
+  m_regionIdleTimeoutExpirationAction = static_cast<ExpirationAction::Action>(in.readInt32());
+  m_entryTimeToLive = in.readInt32();
+  m_entryTimeToLiveExpirationAction = static_cast<ExpirationAction::Action>(in.readInt32());
+  m_entryIdleTimeout = in.readInt32();
+  m_entryIdleTimeoutExpirationAction = static_cast<ExpirationAction::Action>(in.readInt32());
+  m_initialCapacity = in.readInt32();
   in.readFloat(&m_loadFactor);
-  in.readInt(reinterpret_cast<int32_t*>(&m_maxValueDistLimit));
-  in.readInt(reinterpret_cast<int32_t*>(&m_concurrencyLevel));
-  in.readInt(reinterpret_cast<int32_t*>(&m_lruEntriesLimit));
-  in.readInt(reinterpret_cast<int32_t*>(&m_lruEvictionAction));
+  m_maxValueDistLimit = in.readInt32();
+  m_concurrencyLevel = in.readInt32();
+  m_lruEntriesLimit = in.readInt32();
+  m_lruEvictionAction = static_cast<ExpirationAction::Action>(in.readInt32());
 
   apache::geode::client::impl::readBool(in, &m_caching);
   apache::geode::client::impl::readBool(in, &m_clientNotificationEnabled);
@@ -538,7 +538,7 @@ void RegionAttributes::fromData(DataInput& in) {
   apache::geode::client::impl::readCharStar(in, &m_cacheListenerFactory);
   apache::geode::client::impl::readCharStar(in, &m_partitionResolverLibrary);
   apache::geode::client::impl::readCharStar(in, &m_partitionResolverFactory);
-  in.readInt(reinterpret_cast<int32_t*>(&m_diskPolicy));
+  m_diskPolicy = static_cast<DiskPolicyType::PolicyType>(in.readInt32());
   apache::geode::client::impl::readCharStar(in, &m_endpoints);
   apache::geode::client::impl::readCharStar(in, &m_persistenceLibrary);
   apache::geode::client::impl::readCharStar(in, &m_persistenceFactory);

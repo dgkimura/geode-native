@@ -41,9 +41,9 @@ void BatchObject::toData(apache::geode::client::DataOutput& output) const {
 }
 
 void BatchObject::fromData(apache::geode::client::DataInput& input) {
-  input.readInt(&index);
+  index = input.readInt32();
   input.readInt(reinterpret_cast<int64_t*>(&timestamp));
-  input.readInt(&batch);
+  batch = input.readInt32();
   input.readObject(byteArray);
 }
 
