@@ -228,8 +228,9 @@ class CPPCACHE_EXPORT DataInput {
    */
   inline void readInt(int16_t* value) {
     checkBufferSize(2);
-    int16_t tmp = static_cast<int16_t>(*(m_buf++));
-    *value = (tmp << 8) | (static_cast<int16_t >(*(m_buf++)));
+    int16_t tmp = *(m_buf++);
+    tmp = static_cast<int16_t>((tmp << 8) | *(m_buf++));
+    *value = tmp;
   }
 
   /**
@@ -270,8 +271,8 @@ class CPPCACHE_EXPORT DataInput {
       int32_t result = code;
       if (result > 252) {  // 252 is java's ((byte)-4 && 0xFF)
         if (code == 0xFE) {
-          int16_t val;
-          readInt(&val);
+          uint16_t val;
+          readInt(reinterpret_cast<int16_t*>(&val));
           result = static_cast<uint16_t>(val);
         } else if (code == 0xFD) {
           uint32_t val;
@@ -367,11 +368,11 @@ class CPPCACHE_EXPORT DataInput {
    *   stream; not set if nullptr
    */
   inline void readASCII(char** value, uint16_t* len = nullptr) {
-    int16_t length;
-    readInt(&length);
+    uint16_t length;
+    readInt(reinterpret_cast<int16_t*>(&length));
     checkBufferSize(length);
     if (len != nullptr) {
-      *len = static_cast<uint16_t>(length);
+      *len = length;
     }
     char* str;
     GF_NEW(str, char[length + 1]);
@@ -424,9 +425,9 @@ class CPPCACHE_EXPORT DataInput {
    *   stream; not set if nullptr
    */
   inline void readUTF(char** value, uint16_t* len = nullptr) {
-    int16_t length;
-    readInt(&length);
-    checkBufferSize(static_cast<uint16_t>(length));
+    uint16_t length;
+    readInt(reinterpret_cast<int16_t*>(&length));
+    checkBufferSize(length);
     uint16_t decodedLen =
         static_cast<uint16_t>(getDecodedLength(m_buf, length));
     if (len != nullptr) {
@@ -508,8 +509,8 @@ class CPPCACHE_EXPORT DataInput {
    *   stream; not set if nullptr
    */
   inline void readUTF(wchar_t** value, uint16_t* len = nullptr) {
-    int16_t length;
-    readInt(&length);
+    uint16_t length;
+    readInt(reinterpret_cast<int16_t *>(&length));
     checkBufferSize(length);
     uint16_t decodedLen =
         static_cast<uint16_t>(getDecodedLength(m_buf, length));
@@ -649,8 +650,8 @@ class CPPCACHE_EXPORT DataInput {
   inline void readObject(SerializablePtr& ptr) { readObjectInternal(ptr); }
 
   inline void readObject(wchar_t* value) {
-    int16_t temp = 0;
-    readInt(&temp);
+    uint16_t temp = 0;
+    readInt(reinterpret_cast<int16_t*>(&temp));
     *value = static_cast<wchar_t>(temp);
   }
 

@@ -846,15 +846,15 @@ void PdxInstanceImpl::getField(const char* fieldname, double& value) const {
 
 void PdxInstanceImpl::getField(const char* fieldname, wchar_t& value) const {
   auto dataInput = getDataInputForField(fieldname);
-  int16_t temp = 0;
-  dataInput->readInt(&temp);
+  uint16_t temp = 0;
+  dataInput->readInt(reinterpret_cast<int16_t *>(&temp));
   value = static_cast<wchar_t>(temp);
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, char& value) const {
   auto dataInput = getDataInputForField(fieldname);
-  int16_t temp = 0;
-  dataInput->readInt(&temp);
+  uint16_t temp = 0;
+  dataInput->readInt(reinterpret_cast<int16_t *>(&temp));
   value = static_cast<char>(temp);
 }
 

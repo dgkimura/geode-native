@@ -38,8 +38,8 @@ void Struct::skipClassName(DataInput& input) {
   if (input.read() == GeodeTypeIdsImpl::Class) {
     input.read();  // ignore string type id - assuming its a normal
                               // (under 64k) string.
-    int16_t len;
-    input.readInt(&len);
+    uint16_t len;
+    input.readInt(reinterpret_cast<int16_t *>(&len));
     input.advanceCursor(len);
   } else {
     throw IllegalStateException(

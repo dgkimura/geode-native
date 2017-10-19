@@ -477,9 +477,9 @@ TEST_F(DataInputTest, TestReadInt8_tBytes) {
 
 TEST_F(DataInputTest, TestReadIntUint16) {
   TestDataInput dataInput("123456789ABCDEF0", nullptr);
-  int16_t value = 0U;
-  dataInput.readInt(&value);
-  EXPECT_EQ((uint16_t)4660U, static_cast<uint16_t >(value)) << "Correct uint16_t";
+  uint16_t value = 0U;
+  dataInput.readInt(reinterpret_cast<int16_t*>(&value));
+  EXPECT_EQ((uint16_t)4660U, value) << "Correct uint16_t";
 }
 
 TEST_F(DataInputTest, TestReadIntInt16) {

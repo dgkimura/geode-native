@@ -1292,7 +1292,7 @@ void TcrMessage::handleByteArrayResponse(
             input->advanceCursor(3);
             int16_t classLen;
             input->readInt(&classLen);  // Read classLen
-            input->advanceCursor(classLen);
+            input->advanceCursor(static_cast<uint16_t>(classLen));
             auto location = std::make_shared<BucketServerLocation>();
             location->fromData(*input);
             LOGFINE("location contains %d\t%s\t%d\t%d\t%s",
@@ -1343,8 +1343,8 @@ void TcrMessage::handleByteArrayResponse(
           m_fpaSet = new std::vector<FixedPartitionAttributesImplPtr>();
           for (int32_t index = 0; index < bits32; index++) {
             input->advanceCursor(3);  // ignore DS typeid, CLASS typeid, string typeid
-            int16_t classLen;
-            input->readInt(&classLen);  // Read classLen
+            uint16_t classLen;
+            input->readInt(reinterpret_cast<int16_t *>(&classLen));  // Read classLen
             input->advanceCursor(classLen);
             auto fpa = std::make_shared<FixedPartitionAttributesImpl>();
             fpa->fromData(*input);  // PART4 = set of FixedAttributes.
@@ -2937,8 +2937,8 @@ DSMemberForVersionStampPtr TcrMessage::readDSMember(
     memId->fromData(input);
     return (DSMemberForVersionStampPtr)memId;
   } else if (typeidLen == 2) {
-    int16_t typeidofMember;
-    input.readInt(&typeidofMember);
+    uint16_t typeidofMember;
+    input.readInt(reinterpret_cast<int16_t *>(&typeidofMember));
     if (typeidofMember != GeodeTypeIdsImpl::DiskStoreId) {
       throw Exception(
           "Reading DSMember. Expecting type id 2133 for DiskStoreId. ");

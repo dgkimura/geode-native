@@ -465,7 +465,7 @@ bool TcrConnection::InitTcrConnection(
     int16_t recvMsgLen2 = 0;
     dI3->readInt(&recvMsgLen2);
     CacheableBytesPtr recvMessage =
-        readHandshakeData(recvMsgLen2, connectTimeout);
+        readHandshakeData(static_cast<uint16_t>(recvMsgLen2), connectTimeout);
 
     if (!isClientNotification) {
       CacheableBytesPtr deltaEnabledMsg = readHandshakeData(1, connectTimeout);
@@ -478,7 +478,7 @@ bool TcrConnection::InitTcrConnection(
       case REPLY_OK:
       case SUCCESSFUL_SERVER_TO_CLIENT:
         LOGFINER("Handshake reply: %u,%u,%u", (*acceptanceCode)[0],
-                 (*serverQueueStatus)[0], recvMsgLen2);
+                 (*serverQueueStatus)[0], static_cast<uint16_t>(recvMsgLen2));
         if (isClientNotification) readHandshakeInstantiatorMsg(connectTimeout);
         break;
       case REPLY_AUTHENTICATION_FAILED: {
@@ -1301,8 +1301,8 @@ uint32_t TcrConnection::readHandshakeArraySize(uint32_t connectTimeout) {
       if (code == 0xFE) {
         CacheableBytesPtr lenBytes = readHandshakeData(2, connectTimeout);
         auto lenDI = m_connectionManager->getCacheImpl()->getCache()->createDataInput(lenBytes->value(), lenBytes->length());
-        int16_t val;
-        lenDI->readInt(&val);
+        uint16_t val;
+        lenDI->readInt(reinterpret_cast<int16_t *>(&val));
         tempLen = val;
       } else if (code == 0xFD) {
         CacheableBytesPtr lenBytes = readHandshakeData(4, connectTimeout);
@@ -1436,13 +1436,11 @@ CacheableStringPtr TcrConnection::readHandshakeString(uint32_t connectTimeout) {
       break;
     }
     case GF_STRING: {
-      int16_t shortLen = 0;
+      uint16_t shortLen = 0;
       CacheableBytesPtr lenBytes = readHandshakeData(2, connectTimeout);
-      auto lenDI =
-          m_connectionManager->getCacheImpl()->getCache()->createDataInput(
-              lenBytes->value(), lenBytes->length());
-      lenDI->readInt(&shortLen);
-      length = static_cast<uint32_t>(shortLen);
+      auto lenDI = m_connectionManager->getCacheImpl()->getCache()->createDataInput(lenBytes->value(), lenBytes->length());
+      lenDI->readInt(reinterpret_cast<int16_t *>(&shortLen));
+      length = shortLen;
       break;
     }
     default: {

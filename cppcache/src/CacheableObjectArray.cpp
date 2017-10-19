@@ -42,8 +42,8 @@ void CacheableObjectArray::fromData(DataInput& input) {
   if (len >= 0) {
     input.read();  // ignore CLASS typeid
     input.read();  // ignore string typeid
-    int16_t classLen;
-    input.readInt(&classLen);
+    uint16_t classLen;
+    input.readInt(reinterpret_cast<int16_t  *>(&classLen));
     input.advanceCursor(classLen);
     CacheablePtr obj;
     for (int32_t index = 0; index < len; index++) {
