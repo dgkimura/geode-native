@@ -433,11 +433,9 @@ bool TcrConnection::InitTcrConnection(
       if (static_cast<int8_t>((*arrayLenHeader)[0]) == -2) {
         CacheableBytesPtr recvMsgLenBytes =
             readHandshakeData(2, connectTimeout);
-        auto dI2 = cacheImpl->getCache()->createDataInput(
-            recvMsgLenBytes->value(), recvMsgLenBytes->length());
-        int16_t recvMsgLenShort = 0;
-        dI2->readInt(&recvMsgLenShort);
-        recvMsgLen = recvMsgLenShort;
+        auto dI2 = m_connectionManager->getCacheImpl()->getCache()->createDataInput(
+                      recvMsgLenBytes->value(), recvMsgLenBytes->length());
+        recvMsgLen = dI2->readInt16();
       } else if (static_cast<int8_t>((*arrayLenHeader)[0]) == -3) {
         CacheableBytesPtr recvMsgLenBytes =
             readHandshakeData(4, connectTimeout);
@@ -462,10 +460,9 @@ bool TcrConnection::InitTcrConnection(
     CacheableBytesPtr recvMsgLenBytes = readHandshakeData(2, connectTimeout);
     auto dI3 = m_connectionManager->getCacheImpl()->getCache()->createDataInput(
                   recvMsgLenBytes->value(), recvMsgLenBytes->length());
-    int16_t recvMsgLen2 = 0;
-    dI3->readInt(&recvMsgLen2);
+    uint16_t recvMsgLen2 = static_cast<uint16_t >(dI3->readInt16());
     CacheableBytesPtr recvMessage =
-        readHandshakeData(static_cast<uint16_t>(recvMsgLen2), connectTimeout);
+        readHandshakeData(recvMsgLen2, connectTimeout);
 
     if (!isClientNotification) {
       CacheableBytesPtr deltaEnabledMsg = readHandshakeData(1, connectTimeout);
@@ -478,7 +475,7 @@ bool TcrConnection::InitTcrConnection(
       case REPLY_OK:
       case SUCCESSFUL_SERVER_TO_CLIENT:
         LOGFINER("Handshake reply: %u,%u,%u", (*acceptanceCode)[0],
-                 (*serverQueueStatus)[0], static_cast<uint16_t>(recvMsgLen2));
+                 (*serverQueueStatus)[0], recvMsgLen2);
         if (isClientNotification) readHandshakeInstantiatorMsg(connectTimeout);
         break;
       case REPLY_AUTHENTICATION_FAILED: {
@@ -1301,8 +1298,7 @@ uint32_t TcrConnection::readHandshakeArraySize(uint32_t connectTimeout) {
       if (code == 0xFE) {
         CacheableBytesPtr lenBytes = readHandshakeData(2, connectTimeout);
         auto lenDI = m_connectionManager->getCacheImpl()->getCache()->createDataInput(lenBytes->value(), lenBytes->length());
-        uint16_t val;
-        lenDI->readInt(reinterpret_cast<int16_t *>(&val));
+        uint16_t val = static_cast<uint16_t >(lenDI->readInt16());
         tempLen = val;
       } else if (code == 0xFD) {
         CacheableBytesPtr lenBytes = readHandshakeData(4, connectTimeout);
@@ -1436,11 +1432,10 @@ CacheableStringPtr TcrConnection::readHandshakeString(uint32_t connectTimeout) {
       break;
     }
     case GF_STRING: {
-      uint16_t shortLen = 0;
       CacheableBytesPtr lenBytes = readHandshakeData(2, connectTimeout);
       auto lenDI = m_connectionManager->getCacheImpl()->getCache()->createDataInput(lenBytes->value(), lenBytes->length());
-      lenDI->readInt(reinterpret_cast<int16_t *>(&shortLen));
-      length = shortLen;
+      length = static_cast<uint16_t>(lenDI->readInt16());;
+
       break;
     }
     default: {

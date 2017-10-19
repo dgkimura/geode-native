@@ -145,9 +145,7 @@ VersionTagPtr TcrMessage::readVersionTagPart(
       return versionTag;
     }
   } else if (isObj == GeodeTypeIdsImpl::FixedIDShort) {
-    int16_t fixedId;
-    input.readInt(&fixedId);
-    if (fixedId == GeodeTypeIdsImpl::DiskVersionTag) {
+    if (input.readInt16() == GeodeTypeIdsImpl::DiskVersionTag) {
       DiskVersionTag* disk = new DiskVersionTag(memberListForVersionStamp);
       disk->fromData(input);
       versionTag.reset(disk);
@@ -1290,9 +1288,8 @@ void TcrMessage::handleByteArrayResponse(
           for (int32_t index = 0; index < bits32; index++) {
             // ignore DS typeid, CLASS typeid, and string typeid
             input->advanceCursor(3);
-            int16_t classLen;
-            input->readInt(&classLen);  // Read classLen
-            input->advanceCursor(static_cast<uint16_t>(classLen));
+            uint16_t classLen = static_cast<uint16_t>(input->readInt16());  // Read classLen
+            input->advanceCursor(classLen);
             auto location = std::make_shared<BucketServerLocation>();
             location->fromData(*input);
             LOGFINE("location contains %d\t%s\t%d\t%d\t%s",
@@ -1343,8 +1340,7 @@ void TcrMessage::handleByteArrayResponse(
           m_fpaSet = new std::vector<FixedPartitionAttributesImplPtr>();
           for (int32_t index = 0; index < bits32; index++) {
             input->advanceCursor(3);  // ignore DS typeid, CLASS typeid, string typeid
-            uint16_t classLen;
-            input->readInt(reinterpret_cast<int16_t *>(&classLen));  // Read classLen
+            uint16_t classLen = static_cast<uint16_t>(input->readInt16());  // Read classLen
             input->advanceCursor(classLen);
             auto fpa = std::make_shared<FixedPartitionAttributesImpl>();
             fpa->fromData(*input);  // PART4 = set of FixedAttributes.
@@ -2937,8 +2933,7 @@ DSMemberForVersionStampPtr TcrMessage::readDSMember(
     memId->fromData(input);
     return (DSMemberForVersionStampPtr)memId;
   } else if (typeidLen == 2) {
-    uint16_t typeidofMember;
-    input.readInt(reinterpret_cast<int16_t *>(&typeidofMember));
+    uint16_t typeidofMember = static_cast<uint16_t >(input.readInt16());
     if (typeidofMember != GeodeTypeIdsImpl::DiskStoreId) {
       throw Exception(
           "Reading DSMember. Expecting type id 2133 for DiskStoreId. ");

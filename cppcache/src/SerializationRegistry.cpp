@@ -153,9 +153,7 @@ SerializablePtr SerializationRegistry::deserialize(DataInput& input,
       break;
     }
     case GeodeTypeIdsImpl::CacheableUserData2: {
-      int16_t classId = 0;
-      input.readInt(&classId);
-      compId |= ((static_cast<int64_t>(classId)) << 32);
+      compId |= ((static_cast<int64_t>(input.readInt16())) << 32);
       break;
     }
     case GeodeTypeIdsImpl::CacheableUserData4: {
@@ -170,9 +168,7 @@ SerializablePtr SerializationRegistry::deserialize(DataInput& input,
       break;
     }
     case GeodeTypeIdsImpl::FixedIDShort: {
-      int16_t fixedId;
-      input.readInt(&fixedId);
-      compId = fixedId;
+      compId = input.readInt16();
       findinternal = true;
       break;
     }

@@ -98,9 +98,7 @@ int64_t EventId::getEventIdData(DataInput& input, char numberCode) {
   if (numberCode == 0) {
     return input.read();
   } else if (numberCode == 1) {
-    int16_t shortVal;
-    input.readInt(&shortVal);
-    retVal = shortVal;
+    retVal = input.readInt16();
   } else if (numberCode == 2) {
     int32_t intVal;
     input.readInt(&intVal);

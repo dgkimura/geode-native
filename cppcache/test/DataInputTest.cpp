@@ -88,7 +88,7 @@ class TestDataInput {
     m_dataInput.readBytes(buffer, len);
   }
 
-  void readInt(int16_t *value) { m_dataInput.readInt(value); }
+  void readInt(int16_t *value) { *value = m_dataInput.readInt16(); }
 
   void readInt(uint32_t *value) { m_dataInput.readInt(value); }
 

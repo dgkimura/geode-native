@@ -821,7 +821,7 @@ void PdxInstanceImpl::getField(const char* fieldname,
 
 void PdxInstanceImpl::getField(const char* fieldname, int16_t& value) const {
   auto dataInput = getDataInputForField(fieldname);
-  dataInput->readInt(&value);
+  value = dataInput->readInt16();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, int32_t& value) const {
@@ -846,15 +846,13 @@ void PdxInstanceImpl::getField(const char* fieldname, double& value) const {
 
 void PdxInstanceImpl::getField(const char* fieldname, wchar_t& value) const {
   auto dataInput = getDataInputForField(fieldname);
-  uint16_t temp = 0;
-  dataInput->readInt(reinterpret_cast<int16_t *>(&temp));
+  uint16_t temp = static_cast<uint16_t >(dataInput->readInt16());
   value = static_cast<wchar_t>(temp);
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, char& value) const {
   auto dataInput = getDataInputForField(fieldname);
-  uint16_t temp = 0;
-  dataInput->readInt(reinterpret_cast<int16_t *>(&temp));
+  uint16_t temp =  static_cast<uint16_t >(dataInput->readInt16());
   value = static_cast<char>(temp);
 }
 

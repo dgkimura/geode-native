@@ -93,10 +93,8 @@ BEGIN_TEST(Short)
     ASSERT(buffer[0] == (uint8_t)0x11, "expected 0x11.");
     ASSERT(buffer[1] == (uint8_t)0x22, "expected 0x11.");
 
-    int16_t result;
-
     DataInputInternal dataInput(buffer, dataOutput.getBufferLength(), nullptr);
-    dataInput.readInt(&result);
+    int16_t result = dataInput.readInt16();
     ASSERT(result == 0x1122, "expected 0x1122");
   }
 END_TEST(Short)

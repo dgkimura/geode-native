@@ -379,9 +379,7 @@ void ClientProxyMembershipID::readVersion(int flags, DataInput& input) {
     LOGDEBUG("ClientProxyMembershipID::readVersion ordinal = %d ", ordinal);
     if (ordinal != ClientProxyMembershipID::TOKEN_ORDINAL) {
     } else {
-      int16_t ordinal16;
-      input.readInt(&ordinal16);
-      LOGDEBUG("ClientProxyMembershipID::readVersion ordinal = %d ", ordinal16);
+      LOGDEBUG("ClientProxyMembershipID::readVersion ordinal = %d ", input.readInt16());
     }
   }
 }

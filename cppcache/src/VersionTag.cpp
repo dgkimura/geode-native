@@ -51,21 +51,18 @@ void VersionTag::toData(DataOutput& output) const {
 }
 
 void VersionTag::fromData(DataInput& input) {
-  uint16_t flags;
-  input.readInt(reinterpret_cast<int16_t *>(&flags));
-  input.readInt(reinterpret_cast<int16_t *>(&m_bits));
+  uint16_t flags = static_cast<uint16_t >(input.readInt16());
+  m_bits = static_cast<uint16_t>(input.readInt16());
   input.read(); //skip distributedSystemId
   if ((flags & VERSION_TWO_BYTES) != 0) {
-    int16_t tempVar;
-    input.readInt(&tempVar);
-    m_entryVersion = tempVar;
+    m_entryVersion = input.readInt16();
     m_entryVersion &= 0xffff;
   } else {
     input.readInt(&m_entryVersion);
     m_entryVersion &= 0xffffffff;
   }
   if ((flags & HAS_RVV_HIGH_BYTE) != 0) {
-    input.readInt(&m_regionVersionHighBytes);
+    m_regionVersionHighBytes = input.readInt16();
   }
   input.readInt(&m_regionVersionLowBytes);
   input.readUnsignedVL(&m_timeStamp);

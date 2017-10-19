@@ -100,15 +100,13 @@ void PdxLocalReader::checkEmptyFieldName(const char* fieldName) {
 
 char PdxLocalReader::readChar(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  uint16_t value = 0;
-  m_dataInput->readInt(reinterpret_cast<int16_t *>(&value));
+  uint16_t value = static_cast<uint16_t>(m_dataInput->readInt16());
   return (static_cast<char>(value));
 }
 
 wchar_t PdxLocalReader::readWideChar(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  uint16_t value = 0;
-  m_dataInput->readInt(reinterpret_cast<int16_t *>(&value));
+  uint16_t value = static_cast<uint16_t>(m_dataInput->readInt16());
   return static_cast<wchar_t>(value);
 }
 
@@ -124,9 +122,7 @@ int8_t PdxLocalReader::readByte(const char* fieldName) {
 
 int16_t PdxLocalReader::readShort(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  int16_t value;
-  m_dataInput->readInt(&value);
-  return value;
+  return m_dataInput->readInt16();
 }
 
 int32_t PdxLocalReader::readInt(const char* fieldName) {

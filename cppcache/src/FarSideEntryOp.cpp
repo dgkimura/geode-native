@@ -84,7 +84,7 @@ void FarSideEntryOp::fromData(DataInput& input, bool largeModCount,
         int32_t rewind = 1;
         int16_t fixedId = 0;
         if (input.read() == GeodeTypeIdsImpl::FixedIDShort) {
-          input.readInt(&fixedId);
+          fixedId = input.readInt16();
           rewind += 2;
         }
 
