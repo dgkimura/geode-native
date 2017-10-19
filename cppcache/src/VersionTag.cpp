@@ -52,8 +52,8 @@ void VersionTag::toData(DataOutput& output) const {
 
 void VersionTag::fromData(DataInput& input) {
   uint16_t flags;
-  input.readInt(&flags);
-  input.readInt(&m_bits);
+  input.readInt(reinterpret_cast<int16_t *>(&flags));
+  input.readInt(reinterpret_cast<int16_t *>(&m_bits));
   input.read(); //skip distributedSystemId
   if ((flags & VERSION_TWO_BYTES) != 0) {
     int16_t tempVar;

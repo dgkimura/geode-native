@@ -3628,7 +3628,7 @@ void ChunkedQueryResponse::skipClass(DataInput& input) {
   if (classByte == GeodeTypeIdsImpl::Class) {
     // ignore string type id - assuming its a normal (under 64k) string.
     uint8_t stringType = input.read();
-    uint16_t classlen;
+    int16_t classlen;
     input.readInt(&classlen);
     input.advanceCursor(classlen);
   } else {

@@ -103,27 +103,10 @@ void TcrMessage::readBooleanPartAsObject(DataInput& input, bool* boolVal) {
   const auto isObj = input.readBoolean();
   if (lenObj > 0) {
     if (isObj) {
-      // CacheableBooleanPtr cip;
-      // input.readObject(cip);
-      //*boolVal = cip->value();
       bool bVal = input.readNativeBool();
       *boolVal = bVal;
     }
   }
-  /*
-int32_t lenObj;
-input.readInt( &lenObj );
-if(lenObj!=2)
-  throw Exception("Invalid boolean length, should have been 2");
-
-bool isObj;
-input.readBoolean( &isObj );
-if(!isObj)
-  throw Exception("boolean is not object");
-char tmp[2];
-input.readBytesOnly((int8_t*)tmp, (int32_t)2);
-*boolVal = tmp[1]== 0? false : true;
-*/
 }
 
 void TcrMessage::readOldValue(DataInput& input) {
@@ -1307,7 +1290,7 @@ void TcrMessage::handleByteArrayResponse(
           for (int32_t index = 0; index < bits32; index++) {
             // ignore DS typeid, CLASS typeid, and string typeid
             input->advanceCursor(3);
-            uint16_t classLen;
+            int16_t classLen;
             input->readInt(&classLen);  // Read classLen
             input->advanceCursor(classLen);
             auto location = std::make_shared<BucketServerLocation>();
@@ -1360,7 +1343,7 @@ void TcrMessage::handleByteArrayResponse(
           m_fpaSet = new std::vector<FixedPartitionAttributesImplPtr>();
           for (int32_t index = 0; index < bits32; index++) {
             input->advanceCursor(3);  // ignore DS typeid, CLASS typeid, string typeid
-            uint16_t classLen;
+            int16_t classLen;
             input->readInt(&classLen);  // Read classLen
             input->advanceCursor(classLen);
             auto fpa = std::make_shared<FixedPartitionAttributesImpl>();
@@ -2954,7 +2937,7 @@ DSMemberForVersionStampPtr TcrMessage::readDSMember(
     memId->fromData(input);
     return (DSMemberForVersionStampPtr)memId;
   } else if (typeidLen == 2) {
-    uint16_t typeidofMember;
+    int16_t typeidofMember;
     input.readInt(&typeidofMember);
     if (typeidofMember != GeodeTypeIdsImpl::DiskStoreId) {
       throw Exception(

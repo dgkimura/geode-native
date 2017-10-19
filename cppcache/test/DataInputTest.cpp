@@ -88,8 +88,6 @@ class TestDataInput {
     m_dataInput.readBytes(buffer, len);
   }
 
-  void readInt(uint16_t *value) { m_dataInput.readInt(value); }
-
   void readInt(int16_t *value) { m_dataInput.readInt(value); }
 
   void readInt(uint32_t *value) { m_dataInput.readInt(value); }
@@ -479,9 +477,9 @@ TEST_F(DataInputTest, TestReadInt8_tBytes) {
 
 TEST_F(DataInputTest, TestReadIntUint16) {
   TestDataInput dataInput("123456789ABCDEF0", nullptr);
-  uint16_t value = 0U;
+  int16_t value = 0U;
   dataInput.readInt(&value);
-  EXPECT_EQ((uint16_t)4660U, value) << "Correct uint16_t";
+  EXPECT_EQ((uint16_t)4660U, static_cast<uint16_t >(value)) << "Correct uint16_t";
 }
 
 TEST_F(DataInputTest, TestReadIntInt16) {

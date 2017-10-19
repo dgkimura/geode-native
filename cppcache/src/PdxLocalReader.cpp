@@ -100,14 +100,14 @@ void PdxLocalReader::checkEmptyFieldName(const char* fieldName) {
 
 char PdxLocalReader::readChar(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  uint16_t value = 0;
+  int16_t value = 0;
   m_dataInput->readInt(&value);
   return (static_cast<char>(value));
 }
 
 wchar_t PdxLocalReader::readWideChar(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  uint16_t value = 0;
+  int16_t value = 0;
   m_dataInput->readInt(&value);
   return static_cast<wchar_t>(value);
 }

@@ -117,7 +117,7 @@ inline void writeObject(apache::geode::client::DataOutput& output,
 
 inline void readObject(apache::geode::client::DataInput& input,
                        uint16_t& value) {
-  input.readInt(&value);
+  input.readInt(reinterpret_cast<int16_t*>(value));
 }
 
 inline void writeObject(apache::geode::client::DataOutput& output,
