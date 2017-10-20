@@ -151,8 +151,7 @@ BEGIN_TEST(Float)
     ASSERT(buffer[3] == (uint8_t)0x9a, "expected 0x9a.");
 
     DataInputInternal dataInput(buffer, dataOutput.getBufferLength(), nullptr);
-    float result;
-    dataInput.readFloat(&result);
+    float result = dataInput.readFloat();
     ASSERT(result == 1.2f, "expected 1.2f");
   }
 END_TEST(Float)

@@ -100,7 +100,7 @@ class TestDataInput {
 
   int64_t readUnsignedVL() { return m_dataInput.readUnsignedVL(); }
 
-  void readFloat(float *value) { m_dataInput.readFloat(value); }
+  float readFloat() { return m_dataInput.readFloat(); }
 
   void readDouble(double *value) { m_dataInput.readDouble(value); }
 
@@ -550,8 +550,7 @@ TEST_F(DataInputTest, TestReadUnsignedVL) {
 
 TEST_F(DataInputTest, TestReadFloat) {
   TestDataInput dataInput("123456789ABCDEF0", nullptr);
-  float value = 0.F;
-  dataInput.readFloat(&value);
+  float value = dataInput.readFloat();
   EXPECT_FLOAT_EQ(5.6904566e-28F, value) << "Correct float";
 }
 

@@ -163,7 +163,7 @@ inline void writeObject(apache::geode::client::DataOutput& output,
 }
 
 inline void readObject(apache::geode::client::DataInput& input, float& value) {
-  input.readFloat(&value);
+  value = input.readFloat();
 }
 
 inline void writeObject(apache::geode::client::DataOutput& output,

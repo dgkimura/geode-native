@@ -520,7 +520,7 @@ void RegionAttributes::fromData(DataInput& in) {
   m_entryIdleTimeout = in.readInt32();
   m_entryIdleTimeoutExpirationAction = static_cast<ExpirationAction::Action>(in.readInt32());
   m_initialCapacity = in.readInt32();
-  in.readFloat(&m_loadFactor);
+  m_loadFactor = in.readFloat();
   m_maxValueDistLimit = in.readInt32();
   m_concurrencyLevel = in.readInt32();
   m_lruEntriesLimit = in.readInt32();

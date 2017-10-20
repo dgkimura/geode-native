@@ -275,14 +275,14 @@ class CPPCACHE_EXPORT DataInput {
    *
    * @param value output parameter to hold the float read from stream
    */
-  inline void readFloat(float* value) {
+  inline float readFloat() {
     checkBufferSize(4);
     union float_uint32_t {
       float f;
       uint32_t u;
     } v;
     v.u = readInt32();
-    *value = v.f;
+    return v.f;
   }
 
   /**
@@ -618,7 +618,7 @@ class CPPCACHE_EXPORT DataInput {
 
   inline void readObject(int64_t* value) { *value = readInt64(); }
 
-  inline void readObject(float* value) { readFloat(value); }
+  inline void readObject(float* value) { *value = readFloat(); }
 
   inline void readObject(double* value) { readDouble(value); }
 
