@@ -37,8 +37,7 @@ void CacheableObjectArray::toData(DataOutput& output) const {
 }
 
 void CacheableObjectArray::fromData(DataInput& input) {
-  int32_t len;
-  input.readArrayLen(&len);
+  int32_t len = input.readArrayLen();
   if (len >= 0) {
     input.read();  // ignore CLASS typeid
     input.read();  // ignore string typeid

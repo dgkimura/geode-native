@@ -91,9 +91,7 @@ m_processorId = -1;
     if (dfsid == GeodeTypeIdsImpl::ClientProxyMembershipId) {
       ClientProxyMembershipID memId1;
 
-      int32_t len;
-      input.readArrayLen(&len);
-      input.advanceCursor(len);
+      input.advanceCursor(input.readArrayLen());
 
       input.readInt32();
     } else {
@@ -115,8 +113,7 @@ m_processorId = -1;
         GF_CACHE_ILLEGAL_STATE_EXCEPTION);
   }
 
-  int32_t len;
-  input.readArrayLen(&len);
+  int32_t len = input.readArrayLen();
   for (int j = 0; j < len; j++) {
     CacheablePtr tmp;
     input.readObject(tmp);

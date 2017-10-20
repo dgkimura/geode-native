@@ -96,9 +96,9 @@ class TestDataInput {
 
   int64_t readInt64() { return m_dataInput.readInt64(); }
 
-  void readArrayLen(int32_t *len) { m_dataInput.readArrayLen(len); }
+  void readArrayLen(int32_t *len) { *len = m_dataInput.readArrayLen(); }
 
-  void readUnsignedVL(int64_t *value) { m_dataInput.readUnsignedVL(value); }
+  int64_t readUnsignedVL() { return m_dataInput.readUnsignedVL(); }
 
   void readFloat(float *value) { m_dataInput.readFloat(value); }
 
@@ -544,8 +544,7 @@ TEST_F(DataInputTest, TestReadUnsignedVL) {
   // 00    92       9A       95       CF       89       D5       F3       BD F0
 
   TestDataInput dataInput("F0BDF3D589CF959A9200", nullptr);
-  int64_t value = 0;
-  dataInput.readUnsignedVL(&value);
+  int64_t value = dataInput.readUnsignedVL();
   EXPECT_EQ((int64_t)1311768467463790320, value) << "Correct int64_t";
 }
 

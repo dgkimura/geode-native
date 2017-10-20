@@ -125,8 +125,7 @@ class CPPCACHE_EXPORT DataInput {
    * @param len output parameter to hold the length of array read from stream
    */
   inline void readBytes(uint8_t** bytes, int32_t* len) {
-    int32_t length;
-    readArrayLen(&length);
+    int32_t length = readArrayLen();
     *len = length;
     uint8_t* buffer = nullptr;
     if (length > 0) {
@@ -149,8 +148,7 @@ class CPPCACHE_EXPORT DataInput {
    * @param len output parameter to hold the length of array read from stream
    */
   inline void readBytes(int8_t** bytes, int32_t* len) {
-    int32_t length;
-    readArrayLen(&length);
+    int32_t length = readArrayLen();
     *len = length;
     int8_t* buffer = nullptr;
     if (length > 0) {
@@ -231,10 +229,10 @@ class CPPCACHE_EXPORT DataInput {
    * @param len output parameter to hold the 32-bit signed length
    *   read from stream
    */
-  inline void readArrayLen(int32_t* len) {
+  inline int32_t readArrayLen() {
     const uint8_t code = read();
     if (code == 0xFF) {
-      *len = -1;
+      return -1;
     } else {
       int32_t result = code;
       if (result > 252) {  // 252 is java's ((byte)-4 && 0xFF)
@@ -248,7 +246,7 @@ class CPPCACHE_EXPORT DataInput {
           throw IllegalStateException("unexpected array length code");
         }
       }
-      *len = result;
+      return result;
     }
   }
 
@@ -258,15 +256,14 @@ class CPPCACHE_EXPORT DataInput {
    * This is taken from the varint encoding in protobufs (BSD licensed).
    * See https://developers.google.com/protocol-buffers/docs/encoding
    */
-  inline void readUnsignedVL(int64_t* value) {
+  inline int64_t readUnsignedVL() {
     int32_t shift = 0;
     int64_t result = 0;
     while (shift < 64) {
       const auto b = read();
       result |= static_cast<int64_t>(b & 0x7F) << shift;
       if ((b & 0x80) == 0) {
-        *value = result;
-        return;
+        return result;
       }
       shift += 7;
     }
@@ -626,8 +623,7 @@ class CPPCACHE_EXPORT DataInput {
   inline void readObject(double* value) { readDouble(value); }
 
   inline void readCharArray(char** value, int32_t& length) {
-    int arrayLen = 0;
-    readArrayLen(&arrayLen);
+    int arrayLen = readArrayLen();
     length = arrayLen;
     char* objArray = nullptr;
     if (arrayLen > 0) {
@@ -731,8 +727,7 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   inline void readStringArray(char*** strArray, int32_t& length) {
-    int32_t arrLen;
-    readArrayLen(&arrLen);
+    int32_t arrLen = readArrayLen();
     length = arrLen;
     if (arrLen == -1) {
       *strArray = nullptr;
@@ -748,8 +743,7 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   inline void readWideStringArray(wchar_t*** strArray, int32_t& length) {
-    int32_t arrLen;
-    readArrayLen(&arrLen);
+    int32_t arrLen = readArrayLen();
     length = arrLen;
     if (arrLen == -1) {
       *strArray = nullptr;
@@ -767,8 +761,7 @@ class CPPCACHE_EXPORT DataInput {
   inline void readArrayOfByteArrays(int8_t*** arrayofBytearr,
                                     int32_t& arrayLength,
                                     int32_t** elementLength) {
-    int32_t arrLen;
-    readArrayLen(&arrLen);
+    int32_t arrLen = readArrayLen();
     arrayLength = arrLen;
 
     if (arrLen == -1) {
@@ -913,8 +906,7 @@ class CPPCACHE_EXPORT DataInput {
 
   template <typename mType>
   void readObject(mType** value, int32_t& length) {
-    int arrayLen;
-    readArrayLen(&arrayLen);
+    int arrayLen = readArrayLen();
     length = arrayLen;
     mType* objArray;
     if (arrayLen > 0) {

@@ -49,9 +49,7 @@ void VersionedCacheableObjectPartList::readObjectPart(int32_t index,
 
   if (isException) {  // Exception case
     // Skip the exception that is in java serialized format, we cant read it.
-    int32_t skipLen;
-    input.readArrayLen(&skipLen);
-    input.advanceCursor(skipLen);
+    input.advanceCursor(input.readArrayLen());
 
     input.readNativeString(exMsgPtr);  ////4.1
     if (m_exceptions != nullptr) {
@@ -69,8 +67,7 @@ void VersionedCacheableObjectPartList::readObjectPart(int32_t index,
     }
   } else if (m_serializeValues) {
     // read length
-    int32_t skipLen;
-    input.readArrayLen(&skipLen);
+    int32_t skipLen = input.readArrayLen();
     uint8_t* bytes = nullptr;
     if (skipLen > 0) {
       // readObject
@@ -125,9 +122,7 @@ void VersionedCacheableObjectPartList::fromData(DataInput& input) {
 
   auto localKeys = std::make_shared<VectorOfCacheableKey>();
   if (m_hasKeys) {
-    int64_t tempLen;
-    input.readUnsignedVL(&tempLen);
-    len = static_cast<int32_t>(tempLen);
+    len = static_cast<int32_t>(input.readUnsignedVL());
 
     for (int32_t index = 0; index < len; ++index) {
       input.readObject(key, true);
@@ -175,9 +170,7 @@ void VersionedCacheableObjectPartList::fromData(DataInput& input) {
   }  // m_hasKeys else ends here
 
   if (hasObjects) {
-    int64_t tempLen;
-    input.readUnsignedVL(&tempLen);
-    len = static_cast<int32_t>(tempLen);
+    len = static_cast<int32_t>(input.readUnsignedVL());
     m_byteArray.resize(len);
     for (int32_t index = 0; index < len; ++index) {
       if (m_keys != nullptr && !m_hasKeys) {
@@ -193,16 +186,12 @@ void VersionedCacheableObjectPartList::fromData(DataInput& input) {
   }  // hasObjects ends here
 
   if (m_hasTags) {
-    int32_t versionTaglen;
-    int64_t tempLen;
-    input.readUnsignedVL(&tempLen);
-    versionTaglen = static_cast<int32_t>(tempLen);
-    len = versionTaglen;
-    m_versionTags.resize(versionTaglen);
+    len = static_cast<int32_t>(input.readUnsignedVL());;
+    m_versionTags.resize(len);
     std::vector<uint16_t> ids;
     MemberListForVersionStamp& memberListForVersionStamp =
         *(m_region->getCacheImpl()->getMemberListForVersionStamp());
-    for (int32_t index = 0; index < versionTaglen; index++) {
+    for (int32_t index = 0; index < len; index++) {
       uint8_t entryType = input.read();
       VersionTagPtr versionTag;
       switch (entryType) {
@@ -244,10 +233,7 @@ void VersionedCacheableObjectPartList::fromData(DataInput& input) {
                 VersionTagPtr(new VersionTag(memberListForVersionStamp));
           }
           versionTag->fromData(input);
-          int32_t idNumber;
-          int64_t tempLen;
-          input.readUnsignedVL(&tempLen);
-          idNumber = static_cast<int32_t>(tempLen);
+          int32_t idNumber = input.readUnsignedVL();
           versionTag->setInternalMemID(ids.at(idNumber));
           break;
         }

@@ -64,8 +64,7 @@ void Struct::fromData(DataInput& input) {
   input.advanceCursor(2); // ignore classType
   skipClassName(input);
 
-  int32_t numOfFields;
-  input.readArrayLen(&numOfFields);
+  int32_t numOfFields = input.readArrayLen();
 
   m_parent = nullptr;
   for (int32_t i = 0; i < numOfFields; i++) {
@@ -74,15 +73,13 @@ void Struct::fromData(DataInput& input) {
     input.readNativeString(fieldName);
     m_fieldNames.emplace(fieldName->asChar(), i);
   }
-  int32_t lengthForTypes;
-  input.readArrayLen(&lengthForTypes);
+  int32_t lengthForTypes = input.readArrayLen();
   skipClassName(input);
   for (int i = 0; i < lengthForTypes; i++) {
     input.advanceCursor(2); // ignore classType
     skipClassName(input);
   }
-  int32_t numOfSerializedValues;
-  input.readArrayLen(&numOfSerializedValues);
+  int32_t numOfSerializedValues = input.readArrayLen();
   skipClassName(input);
   for (int i = 0; i < numOfSerializedValues; i++) {
     SerializablePtr val;

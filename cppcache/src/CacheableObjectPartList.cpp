@@ -58,9 +58,7 @@ void CacheableObjectPartList::fromData(DataInput& input) {
       uint8_t byte = input.read();
 
       if (byte == 2 /* for exception*/) {
-        int32_t skipLen;
-        input.readArrayLen(&skipLen);
-        input.advanceCursor(skipLen);
+        input.advanceCursor(input.readArrayLen());
         // input.readObject(exMsgPtr, true);// Changed
         input.readNativeString(exMsgPtr);
         if (m_exceptions != nullptr) {

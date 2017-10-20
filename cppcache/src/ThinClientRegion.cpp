@@ -3447,9 +3447,7 @@ void ChunkedQueryResponse::readObjectPartList(DataInput& input,
   for (int32_t index = 0; index < len; ++index) {
 
     if (input.read() == 2 /* for exception*/) {
-      int32_t skipLen;
-      input.readArrayLen(&skipLen);
-      input.advanceCursor(skipLen);
+      input.advanceCursor(input.readArrayLen()); // skipLen
       CacheableStringPtr exMsgPtr;
       input.readNativeString(exMsgPtr);
       throw IllegalStateException(exMsgPtr->asChar());
@@ -3541,8 +3539,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
 
   DeleteArray<char> delSTI(isStructTypeImpl);
   if (strcmp(isStructTypeImpl, "org.apache.geode.cache.query.Struct") == 0) {
-    int32_t numOfFldNames;
-    input->readArrayLen(&numOfFldNames);
+    int32_t numOfFldNames = input->readArrayLen();
     bool skip = false;
     if (m_structFieldNames.size() != 0) {
       skip = true;
@@ -3578,8 +3575,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
   auto arrayType = input->read();
 
   if (arrayType == GeodeTypeIds::CacheableObjectArray) {
-    int32_t arraySize;
-    input->readArrayLen(&arraySize);
+    int32_t arraySize = input->readArrayLen();
     skipClass(*input);
     for (int32_t arrayItem = 0; arrayItem < arraySize; ++arrayItem) {
       SerializablePtr value;
@@ -3588,8 +3584,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
         m_queryResults->push_back(value);
       } else {
         input->read();
-        int32_t arraySize2;
-        input->readArrayLen(&arraySize2);
+        int32_t arraySize2 = input->readArrayLen();
         skipClass(*input);
         for (int32_t index = 0; index < arraySize2; ++index) {
           input->readObject(value);
@@ -3670,11 +3665,10 @@ void ChunkedFunctionExecutionResponse::handleChunk(
     return;
   }
 
-  int32_t len;
   int startLen =
       input->getBytesRead() -
       1;  // from here need to look value part + memberid AND -1 for array type
-  input->readArrayLen(&len);
+  int32_t len = input->readArrayLen();
 
   // read a byte to determine whether to read exception part for sendException
   // or read objects.
@@ -3720,7 +3714,7 @@ void ChunkedFunctionExecutionResponse::handleChunk(
       arrayType = input->read();
 
       // then its len which is 2
-      input->readArrayLen(&len);
+      len = input->readArrayLen();
     }
   } else {
     // rewind cursor by 1 to what we had read a byte to determine whether to

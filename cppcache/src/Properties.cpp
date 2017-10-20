@@ -308,8 +308,7 @@ void Properties::toData(DataOutput& output) const {
 }
 
 void Properties::fromData(DataInput& input) {
-  int32_t mapSize = 0;
-  input.readArrayLen(&mapSize);
+  int32_t mapSize = input.readArrayLen();
   for (int i = 0; i < mapSize; i++) {
     CacheableStringPtr key;
     CacheableStringPtr val;

@@ -106,8 +106,7 @@ void PdxType::fromData(DataInput& input) {
 
   m_varLenFieldIdx = input.readInt32();
 
-  int len;
-  input.readArrayLen(&len);
+  int len = input.readArrayLen();
 
   bool foundVarLenType = false;
 

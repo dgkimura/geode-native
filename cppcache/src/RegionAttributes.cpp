@@ -462,8 +462,7 @@ void writeCharStar(DataOutput& out, const char* field) {
 /** this one allocates the memory and modifies field to point to it. */
 void readCharStar(DataInput& in, char** field) {
   GF_D_ASSERT(*field == nullptr);
-  int32_t memlen = 0;
-  in.readArrayLen(&memlen);
+  int32_t memlen = in.readArrayLen();
   if (memlen != 0) {
     *field = new char[memlen];
     in.readBytesOnly(reinterpret_cast<int8_t*>(*field), memlen);
