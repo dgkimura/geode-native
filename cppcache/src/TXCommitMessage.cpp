@@ -73,10 +73,8 @@ m_processorId = -1;
     m_farsideBaseMembershipId = nullptr;
   }
 
-  int64_t tid;
-  input.readInt(&tid);
-  int64_t seqId;
-  input.readInt(&seqId);
+  input.readInt64(); // ignore tid
+  input.readInt64(); // ignore seqId
 
   input.readBoolean(); // ignore needsLargeModCount
 

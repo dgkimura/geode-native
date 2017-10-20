@@ -163,55 +163,6 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   /**
-   * Read a 32-bit unsigned integer from the <code>DataInput</code>.
-   *
-   * @param value output parameter to hold the 32-bit unsigned integer
-   *   read from stream
-   */
-  inline void readInt(uint32_t* value) {
-    checkBufferSize(4);
-    uint32_t tmp = *(m_buf++);
-    tmp = (tmp << 8) | *(m_buf++);
-    tmp = (tmp << 8) | *(m_buf++);
-    tmp = (tmp << 8) | *(m_buf++);
-    *value = tmp;
-  }
-
-  /**
-   * Read a 64-bit unsigned integer from the <code>DataInput</code>.
-   *
-   * @param value output parameter to hold the 64-bit unsigned integer
-   *   read from stream
-   */
-  inline void readInt(uint64_t* value) {
-    checkBufferSize(8);
-    uint64_t tmp;
-    if (sizeof(long) == 8) {
-      tmp = *(m_buf++);
-      tmp = (tmp << 8) | *(m_buf++);
-      tmp = (tmp << 8) | *(m_buf++);
-      tmp = (tmp << 8) | *(m_buf++);
-      tmp = (tmp << 8) | *(m_buf++);
-      tmp = (tmp << 8) | *(m_buf++);
-      tmp = (tmp << 8) | *(m_buf++);
-      tmp = (tmp << 8) | *(m_buf++);
-    } else {
-      uint32_t hword = *(m_buf++);
-      hword = (hword << 8) | *(m_buf++);
-      hword = (hword << 8) | *(m_buf++);
-      hword = (hword << 8) | *(m_buf++);
-
-      tmp = hword;
-      hword = *(m_buf++);
-      hword = (hword << 8) | *(m_buf++);
-      hword = (hword << 8) | *(m_buf++);
-      hword = (hword << 8) | *(m_buf++);
-      tmp = (tmp << 32) | hword;
-    }
-    *value = tmp;
-  }
-
-  /**
    * Read a 16-bit signed integer from the <code>DataInput</code>.
    *
    * @return 16-bit signed integer read from stream
@@ -224,7 +175,7 @@ class CPPCACHE_EXPORT DataInput {
   }
 
   /**
-   * Read a 32-bit signed integer from the <code>DataInput</code>.
+   * Read a 32-bit signed integer from the <code>DataInput</code>.g
    *
    * @param value output parameter to hold the 32-bit signed integer
    *   read from stream
@@ -244,9 +195,32 @@ class CPPCACHE_EXPORT DataInput {
    * @param value output parameter to hold the 64-bit signed integer
    *   read from stream
    */
-  inline void readInt(int64_t* value) {
+  inline int64_t readInt64() {
     checkBufferSize(8);
-    readInt(reinterpret_cast<uint64_t*>(value));
+    int64_t tmp;
+    if (sizeof(long) == 8) {
+      tmp = *(m_buf++);
+      tmp = (tmp << 8) | *(m_buf++);
+      tmp = (tmp << 8) | *(m_buf++);
+      tmp = (tmp << 8) | *(m_buf++);
+      tmp = (tmp << 8) | *(m_buf++);
+      tmp = (tmp << 8) | *(m_buf++);
+      tmp = (tmp << 8) | *(m_buf++);
+      tmp = (tmp << 8) | *(m_buf++);
+    } else {
+      int32_t hword = *(m_buf++);
+      hword = (hword << 8) | *(m_buf++);
+      hword = (hword << 8) | *(m_buf++);
+      hword = (hword << 8) | *(m_buf++);
+
+      tmp = hword;
+      hword = *(m_buf++);
+      hword = (hword << 8) | *(m_buf++);
+      hword = (hword << 8) | *(m_buf++);
+      hword = (hword << 8) | *(m_buf++);
+      tmp = (tmp << 32) | hword;
+    }
+    return tmp;
   }
 
   /**
@@ -326,7 +300,7 @@ class CPPCACHE_EXPORT DataInput {
       double d;
       uint64_t ll;
     } v;
-    readInt(&v.ll);
+    v.ll = readInt64();
     *value = v.d;
   }
 
@@ -645,7 +619,7 @@ class CPPCACHE_EXPORT DataInput {
 
   inline void readObject(int32_t* value) { *value = readInt32(); }
 
-  inline void readObject(int64_t* value) { readInt(value); }
+  inline void readObject(int64_t* value) { *value = readInt64(); }
 
   inline void readObject(float* value) { readFloat(value); }
 

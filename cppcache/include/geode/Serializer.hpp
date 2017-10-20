@@ -107,7 +107,7 @@ inline void writeObject(apache::geode::client::DataOutput& output,
 
 inline void readObject(apache::geode::client::DataInput& input,
                        int64_t& value) {
-  input.readInt(&value);
+  value = input.readInt64();
 }
 
 inline void writeObject(apache::geode::client::DataOutput& output,
@@ -127,7 +127,7 @@ inline void writeObject(apache::geode::client::DataOutput& output,
 
 inline void readObject(apache::geode::client::DataInput& input,
                        uint32_t& value) {
-  input.readInt(&value);
+  value = input.readInt32();
 }
 
 inline void writeObject(apache::geode::client::DataOutput& output,
@@ -137,7 +137,7 @@ inline void writeObject(apache::geode::client::DataOutput& output,
 
 inline void readObject(apache::geode::client::DataInput& input,
                        uint64_t& value) {
-  input.readInt(&value);
+  value = input.readInt64();
 }
 
 inline void writeObject(apache::geode::client::DataOutput& output, bool value) {

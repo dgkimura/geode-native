@@ -831,7 +831,7 @@ void PdxInstanceImpl::getField(const char* fieldname, int32_t& value) const {
 
 void PdxInstanceImpl::getField(const char* fieldname, int64_t& value) const {
   auto dataInput = getDataInputForField(fieldname);
-  dataInput->readInt(&value);
+  value = dataInput->readInt64();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, float& value) const {

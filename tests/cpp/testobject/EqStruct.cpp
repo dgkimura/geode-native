@@ -187,9 +187,9 @@ void EqStruct::fromData(apache::geode::client::DataInput &in) {
   isIrregularSettlmnt = in.readInt32();
 
   // longs
-  in.readInt(reinterpret_cast<int64_t *>(&timestamp));
-  in.readInt(&availQty);
-  in.readInt(&usedClientAvailability);
+  timestamp = in.readInt64();
+  availQty = in.readInt64();
+  usedClientAvailability = in.readInt64();
 
   // doubles
   in.readDouble(&executedPriceSum);

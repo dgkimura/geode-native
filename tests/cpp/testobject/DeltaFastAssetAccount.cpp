@@ -57,7 +57,7 @@ void DeltaFastAssetAccount::fromData(apache::geode::client::DataInput& input) {
   input.readObject(customerName);
   input.readDouble(&netWorth);
   input.readObject(assets);
-  input.readInt(reinterpret_cast<int64_t*>(&timestamp));
+  timestamp = input.readInt64();
 }
 
 void DeltaFastAssetAccount::toDelta(
@@ -77,6 +77,6 @@ void DeltaFastAssetAccount::fromDelta(apache::geode::client::DataInput& input) {
     netWorth += netWorthTemp;
   }
   if (encodeTimestamp) {
-    input.readInt(reinterpret_cast<int64_t*>(&timestamp));
+    timestamp = input.readInt64();
   }
 }

@@ -175,7 +175,7 @@ void TcrMessage::readLongPart(DataInput& input, uint64_t* intValue) {
   uint32_t longLen = input.readInt32();
   if (longLen != 8) throw Exception("long length should have been 8");
   if (input.read()) throw Exception("Long is not an object");
-  input.readInt(intValue);
+  *intValue = input.readInt64();
 }
 
 void TcrMessage::readStringPart(DataInput& input, uint32_t* len, char** str) {
@@ -322,9 +322,7 @@ int64_t TcrMessage::getConnectionId(TcrConnection* conn) {
     CacheableBytesPtr tmp = conn->decryptBytes(m_connectionIDBytes);
     auto di = m_tcdm->getConnectionManager().getCacheImpl()->getCache()->createDataInput(
               tmp->value(), tmp->length());
-    int64_t connid;
-    di->readInt(&connid);
-    return connid;
+    return di->readInt64();
   } else {
     LOGWARN("Returning 0 as internal connection ID msgtype = %d ", m_msgType);
     return 0;
@@ -339,10 +337,7 @@ int64_t TcrMessage::getUniqueId(TcrConnection* conn) {
 
     auto di = m_tcdm->getConnectionManager().getCacheImpl()->getCache()->createDataInput(
               tmp->value(), tmp->length());
-    int64_t uniqueid;
-    di->readInt(&uniqueid);
-
-    return uniqueid;
+    return di->readInt64();
   }
   return 0;
 }
@@ -2937,10 +2932,8 @@ void TcrMessage::readHashMapForGCVersions(
     for (int32_t index = 0; index < len; index++) {
       key = readDSMember(input);
       uint8_t versiontype = input.read();
-      int64_t version;
-      input.readInt(&version);
 
-      auto valVersion = CacheableInt64::create(version);
+      auto valVersion = CacheableInt64::create(input.readInt64());
       auto keyPtr = std::dynamic_pointer_cast<CacheableKey>(key);
       auto valVersionPtr = std::dynamic_pointer_cast<Cacheable>(valVersion);
 

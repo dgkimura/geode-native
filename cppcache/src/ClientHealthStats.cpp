@@ -38,7 +38,7 @@ void ClientHealthStats::fromData(DataInput& input) {
   m_numMisses = input.readInt32();
   m_numCacheListenerCalls = input.readInt32();
   m_numThread = input.readInt32();
-  input.readInt(&m_processCpuTime);
+  m_processCpuTime = input.readInt64();
   m_cpus = input.readInt32();
   m_updateTime->fromData(input);
 }

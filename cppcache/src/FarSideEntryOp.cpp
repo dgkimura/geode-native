@@ -159,8 +159,7 @@ void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
 
         for (int j = 0; j < len; j++) {
           if (isLong) {
-            int64_t val;
-            input.readInt(&val);
+            input.readInt64();
           } else {
             input.readInt32();
           }
@@ -173,8 +172,7 @@ void FarSideEntryOp::skipFilterRoutingInfo(DataInput& input) {
 
         for (int j = 0; j < len; j++) {
           if (isLong) {
-            int64_t val;
-            input.readInt(&val);
+            input.readInt64();
           } else {
             input.readInt32();
           }

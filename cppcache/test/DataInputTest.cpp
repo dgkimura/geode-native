@@ -92,9 +92,9 @@ class TestDataInput {
 
   int32_t readInt32() { return m_dataInput.readInt32(); }
 
-  void readInt(uint64_t *value) { m_dataInput.readInt(value); }
+  void readInt(uint64_t *value) { *value = m_dataInput.readInt64(); }
 
-  void readInt(int64_t *value) { m_dataInput.readInt(value); }
+  int64_t readInt64() { return m_dataInput.readInt64(); }
 
   void readArrayLen(int32_t *len) { m_dataInput.readArrayLen(len); }
 
@@ -287,8 +287,7 @@ TEST_F(DataInputTest, CanReadIntWithAMaxSizeUnsigned64BitIntInput) {
   DataInputUnderTest dataInput(reinterpret_cast<uint8_t *>(intArray), sizeof(intArray),
                       nullptr);
 
-  uint64_t aInt = 0UL;
-  dataInput.readInt(&aInt);
+  uint64_t aInt = dataInput.readInt64();
   EXPECT_EQ(aInt, std::numeric_limits<uint64_t>::max());
 }
 
@@ -506,8 +505,7 @@ TEST_F(DataInputTest, TestReadIntUint64) {
 
 TEST_F(DataInputTest, TestReadIntInt64) {
   TestDataInput dataInput("123456789ABCDEF0", nullptr);
-  int64_t value = 0;
-  dataInput.readInt(&value);
+  int64_t value = dataInput.readInt64();
   EXPECT_EQ((int64_t)1311768467463790320, value) << "Correct int64_t";
 }
 

@@ -132,9 +132,7 @@ int32_t PdxLocalReader::readInt(const char* fieldName) {
 
 int64_t PdxLocalReader::readLong(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  int64_t value;
-  m_dataInput->readInt(&value);
-  return value;
+  return m_dataInput->readInt64();
 }
 
 float PdxLocalReader::readFloat(const char* fieldName) {

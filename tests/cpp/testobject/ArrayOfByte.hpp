@@ -89,8 +89,7 @@ class TESTOBJECT_EXPORT ArrayOfByte {
     DataInputInternal di(bytes->value(), bytes->length(), nullptr);
     try {
       di.readInt32();
-      int64_t timestamp;
-      di.readInt(&timestamp);
+      int64_t timestamp = di.readInt64();
       if (timestamp == 0) {
         FWKEXCEPTION("Object is not configured to encode timestamp");
       }
@@ -106,8 +105,7 @@ class TESTOBJECT_EXPORT ArrayOfByte {
     int32_t index;
     try {
       index = di.readInt32();
-      int64_t timestamp;
-      di.readInt(&timestamp);
+      int64_t timestamp = di.readInt64();
       if (timestamp == 0) {
         return;
       }

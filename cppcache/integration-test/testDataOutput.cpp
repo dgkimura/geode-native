@@ -134,8 +134,7 @@ BEGIN_TEST(Long)
     ASSERT(buffer[7] == (uint8_t)0x88, "expected 0x88.");
 
     DataInputInternal dataInput(buffer, dataOutput.getBufferLength(), nullptr);
-    int64_t result;
-    dataInput.readInt(&result);
+    int64_t result = dataInput.readInt64();
     ASSERT(result == value, "expected 0x1122334455667788");
   }
 END_TEST(Long)

@@ -105,7 +105,7 @@ int64_t EventId::getEventIdData(DataInput& input, char numberCode) {
     retVal = intVal;
   } else if (numberCode == 3) {
     int64_t longVal;
-    input.readInt(&longVal);
+    longVal = input.readInt64();
     retVal = longVal;
   }
 
