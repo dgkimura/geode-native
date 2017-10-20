@@ -142,9 +142,7 @@ float PdxLocalReader::readFloat(const char* fieldName) {
 
 double PdxLocalReader::readDouble(const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  double value;
-  m_dataInput->readDouble(&value);
-  return value;
+  return m_dataInput->readDouble();
 }
 
 char* PdxLocalReader::readString(const char* fieldName) {

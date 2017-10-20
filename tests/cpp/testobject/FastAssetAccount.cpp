@@ -57,7 +57,7 @@ void FastAssetAccount::toData(apache::geode::client::DataOutput& output) const {
 void FastAssetAccount::fromData(apache::geode::client::DataInput& input) {
   acctId = input.readInt32();
   input.readObject(customerName);
-  input.readDouble(&netWorth);
+  netWorth = input.readDouble();
   input.readObject(assets);
   timestamp = input.readInt64();
 }

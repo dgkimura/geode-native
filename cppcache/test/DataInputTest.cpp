@@ -96,13 +96,13 @@ class TestDataInput {
 
   int64_t readInt64() { return m_dataInput.readInt64(); }
 
-  void readArrayLen(int32_t *len) { *len = m_dataInput.readArrayLen(); }
+  int32_t readArrayLen() { return m_dataInput.readArrayLen(); }
 
   int64_t readUnsignedVL() { return m_dataInput.readUnsignedVL(); }
 
   float readFloat() { return m_dataInput.readFloat(); }
 
-  void readDouble(double *value) { m_dataInput.readDouble(value); }
+  double readDouble() { return m_dataInput.readDouble(); }
 
   void readASCII(char **value, uint16_t *len = nullptr) {
     m_dataInput.readASCII(value, len);
@@ -513,19 +513,19 @@ TEST_F(DataInputTest, TestReadArrayLen) {
   int32_t len = 0;
 
   TestDataInput dataInput0("FF12345678", nullptr);
-  dataInput0.readArrayLen(&len);
+  len = dataInput0.readArrayLen();
   EXPECT_EQ(-1, len) << "Correct length for 0xFF";
 
   TestDataInput dataInput1("FE12345678", nullptr);
-  dataInput1.readArrayLen(&len);
+  len = dataInput1.readArrayLen();
   EXPECT_EQ(4660, len) << "Correct length for 0xFE";
 
   TestDataInput dataInput2("FD12345678", nullptr);
-  dataInput2.readArrayLen(&len);
+  len = dataInput2.readArrayLen();
   EXPECT_EQ(305419896, len) << "Correct length for 0xFD";
 
   TestDataInput dataInput3("FC12345678", nullptr);
-  dataInput3.readArrayLen(&len);
+  len = dataInput3.readArrayLen();
   EXPECT_EQ(252, len) << "Correct length for 0xFC";
 }
 
@@ -557,7 +557,7 @@ TEST_F(DataInputTest, TestReadFloat) {
 TEST_F(DataInputTest, TestReadDouble) {
   TestDataInput dataInput("123456789ABCDEF0", nullptr);
   double value = 0.;
-  dataInput.readDouble(&value);
+  value = dataInput.readDouble();
   EXPECT_DOUBLE_EQ(5.626349274901198e-221, value) << "Correct double";
 }
 

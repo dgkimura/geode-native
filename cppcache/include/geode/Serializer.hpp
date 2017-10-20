@@ -154,7 +154,7 @@ inline void writeObject(apache::geode::client::DataOutput& output,
 }
 
 inline void readObject(apache::geode::client::DataInput& input, double& value) {
-  input.readDouble(&value);
+  value = input.readDouble();
 }
 
 inline void writeObject(apache::geode::client::DataOutput& output,

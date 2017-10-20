@@ -192,12 +192,12 @@ void EqStruct::fromData(apache::geode::client::DataInput &in) {
   usedClientAvailability = in.readInt64();
 
   // doubles
-  in.readDouble(&executedPriceSum);
-  in.readDouble(&positionQty);
-  in.readDouble(&price);
-  in.readDouble(&stopPx);
-  in.readDouble(&pegDifference);
-  in.readDouble(&discretionOffset);
+  executedPriceSum = in.readDouble();
+  positionQty = in.readDouble();
+  price = in.readDouble();
+  stopPx = in.readDouble();
+  pegDifference = in.readDouble();
+  discretionOffset = in.readDouble();
 }
 
 CacheableStringPtr EqStruct::toString() const {

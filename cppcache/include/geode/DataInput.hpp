@@ -291,14 +291,14 @@ class CPPCACHE_EXPORT DataInput {
    * @param value output parameter to hold the double precision number
    *   read from stream
    */
-  inline void readDouble(double* value) {
+  inline double readDouble() {
     checkBufferSize(8);
     union double_uint64_t {
       double d;
       uint64_t ll;
     } v;
     v.ll = readInt64();
-    *value = v.d;
+     return v.d;
   }
 
   /**
@@ -620,7 +620,7 @@ class CPPCACHE_EXPORT DataInput {
 
   inline void readObject(float* value) { *value = readFloat(); }
 
-  inline void readObject(double* value) { readDouble(value); }
+  inline void readObject(double* value) { *value = readDouble(); }
 
   inline void readCharArray(char** value, int32_t& length) {
     int arrayLen = readArrayLen();
@@ -630,8 +630,7 @@ class CPPCACHE_EXPORT DataInput {
       objArray = new char[arrayLen];
       int i = 0;
       for (i = 0; i < arrayLen; i++) {
-        char tmp = 0;
-        readPdxChar(&tmp);
+        char tmp = readPdxChar();
         objArray[i] = tmp;
       }
       *value = objArray;
@@ -921,8 +920,8 @@ class CPPCACHE_EXPORT DataInput {
     }
   }
 
-  inline void readPdxChar(char* value) {
-    *value = static_cast<char>(readInt16());
+  inline char readPdxChar() {
+    return static_cast<char>(readInt16());
   }
 
   inline void _checkBufferSize(int32_t size, int32_t line) {

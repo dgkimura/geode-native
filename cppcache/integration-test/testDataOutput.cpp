@@ -172,8 +172,7 @@ BEGIN_TEST(Double)
     ASSERT(buffer[7] == (uint8_t)0x33, "expected 0x33.");
 
     DataInputInternal dataInput(buffer, dataOutput.getBufferLength(), nullptr);
-    double result;
-    dataInput.readDouble(&result);
+    double result = dataInput.readDouble();
     ASSERT(result == 1.2, "expected 1.2");
   }
 END_TEST(Double)
