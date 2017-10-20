@@ -85,7 +85,7 @@ void PdxFieldType::fromData(DataInput& input) {
   m_fieldName = fname;
   input.freeUTFMemory(fname);  // freeing fname
 
-  input.readInt(&m_sequenceId);
+  m_sequenceId = input.readInt32();
   m_varLenFieldIdx = input.readInt32();
   m_typeId = input.read();
   m_relativeOffset = input.readInt32();

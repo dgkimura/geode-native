@@ -88,11 +88,9 @@ class TestDataInput {
     m_dataInput.readBytes(buffer, len);
   }
 
-  void readInt(int16_t *value) { *value = m_dataInput.readInt16(); }
+  int16_t readInt16() { return m_dataInput.readInt16(); }
 
-  void readInt(uint32_t *value) { m_dataInput.readInt(value); }
-
-  void readInt(int32_t *value) { *value = m_dataInput.readInt32(); }
+  int32_t readInt32() { return m_dataInput.readInt32(); }
 
   void readInt(uint64_t *value) { m_dataInput.readInt(value); }
 
@@ -477,29 +475,25 @@ TEST_F(DataInputTest, TestReadInt8_tBytes) {
 
 TEST_F(DataInputTest, TestReadIntUint16) {
   TestDataInput dataInput("123456789ABCDEF0", nullptr);
-  uint16_t value = 0U;
-  dataInput.readInt(reinterpret_cast<int16_t*>(&value));
+  uint16_t value = dataInput.readInt16();
   EXPECT_EQ((uint16_t)4660U, value) << "Correct uint16_t";
 }
 
 TEST_F(DataInputTest, TestReadIntInt16) {
   TestDataInput dataInput("123456789ABCDEF0", nullptr);
-  int16_t value = 0;
-  dataInput.readInt(&value);
+  int16_t value = dataInput.readInt16();
   EXPECT_EQ((int16_t)4660, value) << "Correct int16_t";
 }
 
 TEST_F(DataInputTest, TestReadIntUint32) {
   TestDataInput dataInput("123456789ABCDEF0", nullptr);
-  uint32_t value = 0U;
-  dataInput.readInt(&value);
+  uint32_t value = dataInput.readInt32();
   EXPECT_EQ((uint32_t)305419896U, value) << "Correct uint32_t";
 }
 
 TEST_F(DataInputTest, TestReadIntInt32) {
   TestDataInput dataInput("123456789ABCDEF0", nullptr);
-  int32_t value = 0;
-  dataInput.readInt(&value);
+  int32_t value = dataInput.readInt32();
   EXPECT_EQ((int32_t)305419896, value) << "Correct int32_t";
 }
 

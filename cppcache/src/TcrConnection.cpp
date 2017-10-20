@@ -1300,11 +1300,8 @@ uint32_t TcrConnection::readHandshakeArraySize(uint32_t connectTimeout) {
         tempLen = val;
       } else if (code == 0xFD) {
         CacheableBytesPtr lenBytes = readHandshakeData(4, connectTimeout);
-        auto lenDI =
-            m_connectionManager->getCacheImpl()->getCache()->createDataInput(
-                lenBytes->value(), lenBytes->length());
-        uint32_t val;
-        lenDI->readInt(&val);
+        auto lenDI = m_connectionManager->getCacheImpl()->getCache()->createDataInput(lenBytes->value(), lenBytes->length());
+        uint32_t val = lenDI->readInt32();
         tempLen = val;
       } else {
         GF_SAFE_DELETE_CON(m_conn);

@@ -1249,7 +1249,7 @@ class TcrMessageHelper {
       TcrMessage& msg, DataInput& input, uint8_t expectedFirstType,
       int32_t expectedPartType, const char* methodName, uint32_t& partLen,
       uint8_t isLastChunk) {
-    input.readInt(&partLen);
+    partLen = input.readInt32();
     const auto isObj = input.readBoolean();
 
     if (partLen == 0) {
@@ -1323,7 +1323,7 @@ class TcrMessageHelper {
                                            const char* methodName,
                                            uint32_t& partLen,
                                            uint8_t isLastChunk) {
-    input.readInt(&partLen);
+    partLen = input.readInt32();
     const auto isObj = input.readBoolean();
 
     if (partLen == 0) {

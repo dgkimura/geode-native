@@ -165,16 +165,14 @@ void TcrMessage::readVersionTag(
 }
 
 void TcrMessage::readIntPart(DataInput& input, uint32_t* intValue) {
-  uint32_t intLen;
-  input.readInt(&intLen);
+  uint32_t intLen = input.readInt32();
   if (intLen != 4) throw Exception("int length should have been 4");
   if (input.read()) throw Exception("Integer is not an object");
-  input.readInt(intValue);
+  *intValue = input.readInt32();
 }
 
 void TcrMessage::readLongPart(DataInput& input, uint64_t* intValue) {
-  uint32_t longLen;
-  input.readInt(&longLen);
+  uint32_t longLen = input.readInt32();
   if (longLen != 8) throw Exception("long length should have been 8");
   if (input.read()) throw Exception("Long is not an object");
   input.readInt(intValue);

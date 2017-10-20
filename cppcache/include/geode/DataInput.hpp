@@ -268,8 +268,7 @@ class CPPCACHE_EXPORT DataInput {
           uint16_t val =  readInt16();
           result = val;
         } else if (code == 0xFD) {
-          uint32_t val;
-          readInt(&val);
+          uint32_t val = readInt32();
           result = val;
         } else {
           throw IllegalStateException("unexpected array length code");
@@ -311,7 +310,7 @@ class CPPCACHE_EXPORT DataInput {
       float f;
       uint32_t u;
     } v;
-    readInt(&v.u);
+    v.u = readInt32();
     *value = v.f;
   }
 
@@ -388,8 +387,7 @@ class CPPCACHE_EXPORT DataInput {
    *   stream; not set if nullptr
    */
   inline void readASCIIHuge(char** value, uint32_t* len = nullptr) {
-    uint32_t length;
-    readInt(&length);
+    uint32_t length = readInt32();
     if (len != nullptr) {
       *len = length;
     }
@@ -467,8 +465,7 @@ class CPPCACHE_EXPORT DataInput {
    *   stream; not set if nullptr
    */
   inline void readUTFHuge(char** value, uint32_t* len = nullptr) {
-    uint32_t length;
-    readInt(&length);
+    uint32_t length = readInt32();
     if (len != nullptr) {
       *len = length;
     }
@@ -531,8 +528,7 @@ class CPPCACHE_EXPORT DataInput {
    *   stream; not set if nullptr
    */
   inline void readUTFHuge(wchar_t** value, uint32_t* len = nullptr) {
-    uint32_t length;
-    readInt(&length);
+    uint32_t length = readInt32();
     if (len != nullptr) {
       *len = length;
     }

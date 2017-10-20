@@ -3506,7 +3506,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
     return;
   } else if (objType == TcrMessageHelper::NULL_OBJECT) {
     // special case for scalar result
-    input->readInt(&partLen);
+    partLen = input->readInt32();
     input->read();
     CacheableInt32Ptr intVal;
     input->readObject(intVal, true);
@@ -3562,7 +3562,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
   // skip the whole part including partLen and isObj (4+1)
   input->advanceCursor(partLen + 5);
 
-  input->readInt(&partLen);
+  partLen = input->readInt32();
 
   if (!input->read()) {
     LOGERROR(
@@ -3699,7 +3699,7 @@ void ChunkedFunctionExecutionResponse::handleChunk(
         (((isLastChunkWithSecurity & 0x02) == 0) &&
          (chunkLen - static_cast<int32_t>(partLen) <= CHUNK_HDR_LEN))) {
       readPart = false;
-      input->readInt(&partLen);
+      partLen = input->readInt32();
       input->advanceCursor(1);  // skip isObject byte
       input->advanceCursor(partLen);
     } else {
@@ -3707,7 +3707,7 @@ void ChunkedFunctionExecutionResponse::handleChunk(
       TcrMessageHelper::skipParts(m_msg, *input, 1);
 
       // read the second part which is string in usual manner, first its length.
-      input->readInt(&partLen);
+      partLen = input->readInt32();
 
       // then isObject byte
       input->read(); // ignore iSobject
@@ -3962,8 +3962,7 @@ void ChunkedDurableCQListResponse::handleChunk(const uint8_t* chunk,
 
   // read part length
   uint32_t partLen;
-  input->readInt(&partLen);
-
+  partLen = input->readInt32();
   if (!input->readBoolean()) {
     // we're currently always expecting an object
     char exMsg[256];
