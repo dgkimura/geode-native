@@ -389,7 +389,7 @@ class CPPCACHE_EXPORT LocalRegion : public RegionInternal {
   virtual GfErrType getAllNoThrow_remote(
       const VectorOfCacheableKey* keys, const HashMapOfCacheablePtr& values,
       const HashMapOfExceptionPtr& exceptions,
-      const VectorOfCacheableKeyPtr& resultKeys, const bool addToLocalCache,
+      const VectorOfCacheableKeyPtr& resultKeys, bool addToLocalCache,
       const SerializablePtr& aCallbackArgument);
   virtual GfErrType invalidateRegionNoThrow_remote(
       const SerializablePtr& aCallbackArgument);

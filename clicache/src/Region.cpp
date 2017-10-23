@@ -16,6 +16,7 @@
  */
 
 #include "begin_native.hpp"
+#include <tuple>
 #include "geode/Region.hpp"
 #include "geode/Cache.hpp"
 #include "end_native.hpp"
@@ -173,7 +174,7 @@ namespace Apache
 
           try
           {
-            m_nativeptr->get()->entries(vc, false);
+			vc = m_nativeptr->get()->entries(false);
           }
           finally
           {
@@ -204,7 +205,7 @@ namespace Apache
 
           try
           {
-            m_nativeptr->get()->entries(vc, false);
+			vc = m_nativeptr->get()->entries(false);
           }
           finally
           {
@@ -320,7 +321,7 @@ namespace Apache
           native::VectorOfCacheableKey vc;
         try
         {
-          m_nativeptr->get()->serverKeys(vc);
+			vc = m_nativeptr->get()->serverKeys();
         }
         finally
         {
@@ -346,7 +347,7 @@ namespace Apache
           native::VectorOfCacheable vc;
         try
         {
-          m_nativeptr->get()->values(vc);
+			vc = m_nativeptr->get()->values();
         }
         finally
         {
@@ -678,31 +679,28 @@ namespace Apache
               Serializable::GetUnmanagedValueGeneric<TKey>(item));
           }
 
-          native::HashMapOfCacheablePtr valuesPtr;
-          if (values != nullptr) {
-            valuesPtr = std::make_shared<native::HashMapOfCacheable>();
-          }
-          native::HashMapOfExceptionPtr exceptionsPtr;
-          if (exceptions != nullptr) {
-            exceptionsPtr = std::make_shared<native::HashMapOfException>();
-          }
+          native::HashMapOfCacheable native_value;
+		      native::HashMapOfException native_exceptions;
+        
           try
           {
-            m_nativeptr->get()->getAll(vecKeys, valuesPtr, exceptionsPtr, addToLocalCache);
+            auto result = m_nativeptr->get()->getAll(vecKeys);
+            native_value = std::get<0>(result);
+            native_exceptions = std::get<1>(result);
           }
           finally
           {
             GC::KeepAlive(m_nativeptr);
           }
           if (values != nullptr) {
-            for (const auto& iter : *valuesPtr) {
+            for (const auto& iter : native_value) {
               TKey key = Serializable::GetManagedValueGeneric<TKey>(iter.first);
               TValue val = Serializable::GetManagedValueGeneric<TValue>(iter.second);
               values->Add(key, val);
             }
           }
           if (exceptions != nullptr) {
-            for (const auto& iter : *exceptionsPtr) {
+            for (const auto& iter : native_exceptions) {
               TKey key = Serializable::GetManagedValueGeneric<TKey>(iter.first);
               System::Exception^ ex = GeodeException::Get(*(iter.second));
               exceptions->Add(key, ex);
@@ -742,25 +740,28 @@ namespace Apache
             exceptionsPtr = std::make_shared<native::HashMapOfException>();
           }
 
-         native::SerializablePtr callbackptr = Serializable::GetUnmanagedValueGeneric<Object^>(callbackArg);
-
+         native::SerializablePtr callbackptr = Serializable::GetUnmanagedValueGeneric<Object^>(callbackArg, m_nativeptr->get()->getCache().get());
+         native::HashMapOfCacheable native_value;
+         native::HashMapOfException native_exceptions;
           try
           {
-            m_nativeptr->get()->getAll(vecKeys, valuesPtr, exceptionsPtr, addToLocalCache, callbackptr);
+			      auto result = m_nativeptr->get()->getAll(vecKeys, callbackptr);
+            native_value = std::get<0>(result);
+            native_exceptions = std::get<1>(result);
           }
           finally
           {
             GC::KeepAlive(m_nativeptr);
           }
           if (values != nullptr) {
-            for (const auto& iter : *valuesPtr) {
+            for (const auto& iter : native_value) {
               TKey key = Serializable::GetManagedValueGeneric<TKey>(iter.first);
               TValue val = Serializable::GetManagedValueGeneric<TValue>(iter.second);
               values->Add(key, val);
             }
           }
           if (exceptions != nullptr) {
-            for (const auto& iter : *exceptionsPtr) {
+            for (const auto& iter : native_exceptions) {
               TKey key = Serializable::GetManagedValueGeneric<TKey>(iter.first);
               System::Exception^ ex = GeodeException::Get(*(iter.second));
               exceptions->Add(key, ex);
@@ -955,7 +956,7 @@ namespace Apache
           native::VectorOfRegion vsr;
         try
         {
-          m_nativeptr->get()->subregions(recursive, vsr);
+          vsr = m_nativeptr->get()->subregions(recursive);
         }
         finally
         {
@@ -1002,7 +1003,7 @@ namespace Apache
         native::VectorOfRegionEntry vc;
         try
         {
-          m_nativeptr->get()->entries(vc, recursive);
+          vc = m_nativeptr->get()->entries(recursive);
         }
         finally
         {
@@ -1102,7 +1103,7 @@ namespace Apache
           native::VectorOfRegionEntry vc;
         try
         {
-          m_nativeptr->get()->entries(vc, false);
+			vc = m_nativeptr->get()->entries(false);
         }
         finally
         {
@@ -1275,7 +1276,7 @@ namespace Apache
           native::VectorOfCacheableKey vc;
         try
         {
-          m_nativeptr->get()->getInterestList(vc);
+			vc = m_nativeptr->get()->getInterestList();
         }
         finally
         {
@@ -1302,7 +1303,7 @@ namespace Apache
           native::VectorOfCacheableString vc;
         try
         {
-          m_nativeptr->get()->getInterestListRegex(vc);
+			vc = m_nativeptr->get()->getInterestListRegex();
         }
         finally
         {
