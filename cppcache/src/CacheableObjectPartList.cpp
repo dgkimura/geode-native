@@ -60,7 +60,7 @@ void CacheableObjectPartList::fromData(DataInput& input) {
       if (byte == 2 /* for exception*/) {
         input.advanceCursor(input.readArrayLen());
         // input.readObject(exMsgPtr, true);// Changed
-        input.readNativeString(exMsgPtr);
+        exMsgPtr = input.readNativeString();
         if (m_exceptions != nullptr) {
           const char* exMsg = exMsgPtr->asChar();
           if (strstr(exMsg,

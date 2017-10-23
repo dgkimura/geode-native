@@ -68,9 +68,7 @@ void Struct::fromData(DataInput& input) {
 
   m_parent = nullptr;
   for (int32_t i = 0; i < numOfFields; i++) {
-    CacheableStringPtr fieldName;
-    // input.readObject(fieldName);
-    input.readNativeString(fieldName);
+    CacheableStringPtr fieldName = input.readNativeString();
     m_fieldNames.emplace(fieldName->asChar(), i);
   }
   int32_t lengthForTypes = input.readArrayLen();

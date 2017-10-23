@@ -51,7 +51,7 @@ void VersionedCacheableObjectPartList::readObjectPart(int32_t index,
     // Skip the exception that is in java serialized format, we cant read it.
     input.advanceCursor(input.readArrayLen());
 
-    input.readNativeString(exMsgPtr);  ////4.1
+    exMsgPtr = input.readNativeString();  ////4.1
     if (m_exceptions != nullptr) {
       const char* exMsg = exMsgPtr->asChar();
       if (strstr(exMsg,

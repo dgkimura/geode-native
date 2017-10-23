@@ -315,14 +315,14 @@ void Properties::fromData(DataInput& input) {
     // TODO: need to look just look typeid if string then convert otherwise
     // continue with readobject
 
-    if (!input.readNativeString(key)) {
+    if (!(key = input.readNativeString())) {
       CacheableKeyPtr keyPtr;
       CacheablePtr valPtr;
       input.readObject(keyPtr, true);
       input.readObject(valPtr);
       MAP->rebind(keyPtr, valPtr);
     } else {
-      if (!input.readNativeString(val)) {
+      if (!(val = input.readNativeString())) {
         CacheablePtr valPtr;
         input.readObject(valPtr);
         MAP->rebind(key, valPtr);

@@ -143,7 +143,8 @@ class TestDataInput {
   int32_t readNativeInt32() { return m_dataInput.readNativeInt32(); }
 
   bool readNativeString(CacheableStringPtr &csPtr) {
-    return m_dataInput.readNativeString(csPtr);
+    csPtr =  m_dataInput.readNativeString();
+    return csPtr != nullptr;
   }
 
   void readDirectObject(SerializablePtr &ptr, int8_t typeId = -1) {

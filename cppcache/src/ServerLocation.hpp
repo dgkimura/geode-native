@@ -79,7 +79,7 @@ class CPPCACHE_EXPORT ServerLocation : public Serializable {
     output.writeInt(m_port);
   }
   void fromData(DataInput& input) {
-    input.readNativeString(m_serverName);
+    m_serverName = input.readNativeString();
     m_port = input.readInt32();
     makeEpString();
   }

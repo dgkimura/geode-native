@@ -120,7 +120,7 @@ class BucketServerLocation : public ServerLocation {
     if (m_numServerGroups > 0) {
       serverGroups = new CacheableStringPtr[m_numServerGroups];
       for (int i = 0; i < m_numServerGroups; i++) {
-        input.readNativeString(serverGroups[i]);
+        serverGroups[i] = input.readNativeString();
       }
     }
     if (m_numServerGroups > 0) {

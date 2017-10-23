@@ -3448,8 +3448,7 @@ void ChunkedQueryResponse::readObjectPartList(DataInput& input,
 
     if (input.read() == 2 /* for exception*/) {
       input.advanceCursor(input.readArrayLen()); // skipLen
-      CacheableStringPtr exMsgPtr;
-      input.readNativeString(exMsgPtr);
+      CacheableStringPtr exMsgPtr = input.readNativeString();
       throw IllegalStateException(exMsgPtr->asChar());
     } else {
       if (isResultSet) {
@@ -3545,9 +3544,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
       skip = true;
     }
     for (int i = 0; i < numOfFldNames; i++) {
-      CacheableStringPtr sptr;
-      // input->readObject(sptr);
-      input->readNativeString(sptr);
+      CacheableStringPtr sptr = input->readNativeString();
       if (!skip) {
         m_structFieldNames.push_back(sptr);
       }

@@ -558,7 +558,8 @@ class CPPCACHE_EXPORT DataInput {
     return readInt32();
   }
 
-  inline bool readNativeString(CacheableStringPtr& csPtr) {
+  inline CacheableStringPtr readNativeString() {
+    CacheableStringPtr csPtr;
     const int64_t compId = read();
     if (compId == GeodeTypeIds::NullObj) {
       csPtr = nullptr;
@@ -588,9 +589,8 @@ class CPPCACHE_EXPORT DataInput {
       LOGDEBUG("In readNativeString something is wrong while expecting string");
       rewindCursor(1);
       csPtr = nullptr;
-      return false;
     }
-    return true;
+    return csPtr;
   }
 
   inline void readDirectObject(SerializablePtr& ptr, int8_t typeId = -1) {

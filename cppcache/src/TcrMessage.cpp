@@ -1294,15 +1294,14 @@ void TcrMessage::handleByteArrayResponse(
       bits32 = input->readInt32();  // partlen;
       input->read();      //ignore isObj;
       if (bits32 > 0) {
-        input->readNativeString(m_colocatedWith);  // PART2 = colocatedwith
+        m_colocatedWith = input->readNativeString();  // PART2 = colocatedwith
       }
 
       if (numparts == 4) {
         bits32 = input->readInt32();  // partlen;
         input->read();      //ignore isObj;
         if (bits32 > 0) {
-          input->readNativeString(
-              m_partitionResolverName);  // PART3 = partitionresolvername
+          m_partitionResolverName = input->readNativeString();  // PART3 = partitionresolvername
         }
 
         bits32 = input->readInt32();  // partlen;
