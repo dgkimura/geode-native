@@ -128,9 +128,9 @@ void ProxyRemoteQueryService::closeCqs(bool keepAlive) {
   }
 }
 
-void ProxyRemoteQueryService::getCqs(query_container_type& vec) {
+QueryService::query_container_type ProxyRemoteQueryService::getCqs() {
   ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_cqQueryListLock);
-  vec = m_cqQueries;
+  return m_cqQueries;
 }
 
 CqQueryPtr ProxyRemoteQueryService::getCq(const char* name) {

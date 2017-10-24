@@ -185,16 +185,18 @@ void RemoteQueryService::closeCqs() {
   }
 }
 
-void RemoteQueryService::getCqs(CqService::query_container_type& vec) {
+CqService::query_container_type RemoteQueryService::getCqs() {
   TryReadGuard guard(m_rwLock, m_invalid);
 
+  CqService::query_container_type  vec;
   if (m_invalid) {
     throw CacheClosedException("QueryService::getCqs: Cache has been closed.");
   }
   // If cqService has not started, then no cq exists
   if (m_cqService != nullptr) {
-    m_cqService->getAllCqs(vec);
+    vec = m_cqService->getAllCqs();
   }
+  return vec;
 }
 
 CqQueryPtr RemoteQueryService::getCq(const char* name) {

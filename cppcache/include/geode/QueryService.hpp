@@ -136,7 +136,7 @@ class CPPCACHE_EXPORT QueryService {
    * Retrieve  all registered CQs
    * @endnativeclient
    */
-  virtual void getCqs(query_container_type& vec) = 0;
+  virtual query_container_type getCqs() = 0;
   /**
    * @nativeclient
    * Retrieve a CqQuery by name.
