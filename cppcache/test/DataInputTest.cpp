@@ -147,8 +147,8 @@ class TestDataInput {
     return csPtr != nullptr;
   }
 
-  void readDirectObject(SerializablePtr &ptr, int8_t typeId = -1) {
-    m_dataInput.readDirectObject(ptr, typeId);
+  SerializablePtr readDirectObject(int8_t typeId = -1) {
+    return m_dataInput.readDirectObject(typeId);
   }
 
   void readObject(SerializablePtr &ptr) { m_dataInput.readObject(ptr); }
@@ -677,8 +677,7 @@ TEST_F(DataInputTest, TestReadNativeString) {
 TEST_F(DataInputTest, TestReadDirectObject) {
   TestDataInput dataInput(
       "57001B596F7520686164206D65206174206D65617420746F726E61646F2E", nullptr);
-  SerializablePtr objptr;
-  dataInput.readDirectObject(objptr);
+  SerializablePtr objptr = dataInput.readDirectObject();
   EXPECT_STREQ(
       (const char *)"You had me at meat tornado.",
       (const char *)(std::dynamic_pointer_cast<CacheableString>(objptr))

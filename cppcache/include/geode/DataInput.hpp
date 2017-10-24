@@ -538,8 +538,7 @@ class CPPCACHE_EXPORT DataInput {
   template <class PTR>
   inline void readObject(std::shared_ptr<PTR>& ptr,
                          bool throwOnError = DINP_THROWONERROR_DEFAULT) {
-    SerializablePtr sPtr;
-    readObjectInternal(sPtr);
+    SerializablePtr sPtr = readObjectInternal();
     if (throwOnError) {
       ptr = std::dynamic_pointer_cast<PTR>(sPtr);
     } else {
@@ -593,15 +592,15 @@ class CPPCACHE_EXPORT DataInput {
     return csPtr;
   }
 
-  inline void readDirectObject(SerializablePtr& ptr, int8_t typeId = -1) {
-    readObjectInternal(ptr, typeId);
+  inline SerializablePtr readDirectObject(int8_t typeId = -1) {
+    return readObjectInternal(typeId);
   }
 
   /**
    * Read a <code>Serializable</code> object from the <code>DataInput</code>.
    * Null objects are handled.
    */
-  inline void readObject(SerializablePtr& ptr) { readObjectInternal(ptr); }
+  inline void readObject(SerializablePtr& ptr) { ptr = readObjectInternal(); }
 
   inline void readObject(wchar_t* value) {
     uint16_t temp = readInt16();
@@ -901,7 +900,7 @@ class CPPCACHE_EXPORT DataInput {
   const char* m_poolName;
   const Cache* m_cache;
 
-  void readObjectInternal(SerializablePtr& ptr, int8_t typeId = -1);
+  SerializablePtr readObjectInternal(int8_t typeId = -1);
 
   template <typename mType>
   void readObject(mType** value, int32_t& length) {

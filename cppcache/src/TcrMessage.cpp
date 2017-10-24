@@ -389,15 +389,14 @@ SerializablePtr TcrMessage::readCacheableString(DataInput& input, int lenObj) {
       input.rewindCursor(2);
       writeInt(const_cast<uint8_t*>(input.currentBufferPosition()),
                static_cast<uint16_t>(lenObj));
-      input.readDirectObject(
-          sPtr, static_cast<int8_t>(
+      sPtr = input.readDirectObject(
+          static_cast<int8_t>(
                     apache::geode::client::GeodeTypeIds::CacheableASCIIString));
     } else {
       input.rewindCursor(4);
       writeInt(const_cast<uint8_t*>(input.currentBufferPosition()),
                static_cast<uint32_t>(lenObj));
-      input.readDirectObject(
-          sPtr,
+      sPtr = input.readDirectObject(
           static_cast<int8_t>(
               apache::geode::client::GeodeTypeIds::CacheableASCIIStringHuge));
     }
@@ -406,15 +405,15 @@ SerializablePtr TcrMessage::readCacheableString(DataInput& input, int lenObj) {
       input.rewindCursor(2);
       writeInt(const_cast<uint8_t*>(input.currentBufferPosition()),
                static_cast<uint16_t>(lenObj));
-      input.readDirectObject(
-          sPtr, static_cast<int8_t>(
+      sPtr = input.readDirectObject(
+          static_cast<int8_t>(
                     apache::geode::client::GeodeTypeIds::CacheableString));
     } else {
       input.rewindCursor(4);
       writeInt(const_cast<uint8_t*>(input.currentBufferPosition()),
                static_cast<uint32_t>(lenObj));
-      input.readDirectObject(
-          sPtr, static_cast<int8_t>(
+      sPtr = input.readDirectObject(
+          static_cast<int8_t>(
                     apache::geode::client::GeodeTypeIds::CacheableStringHuge));
     }
   }
@@ -423,8 +422,6 @@ SerializablePtr TcrMessage::readCacheableString(DataInput& input, int lenObj) {
 }
 
 SerializablePtr TcrMessage::readCacheableBytes(DataInput& input, int lenObj) {
-  SerializablePtr sPtr;
-
   if (lenObj <= 252) {  // 252 is java's ((byte)-4 && 0xFF)
     input.rewindCursor(1);
     uint8_t* buffer = const_cast<uint8_t*>(input.currentBufferPosition());
@@ -441,11 +438,8 @@ SerializablePtr TcrMessage::readCacheableBytes(DataInput& input, int lenObj) {
     writeInt(buffer + 1, static_cast<uint32_t>(lenObj));
   }
 
-  input.readDirectObject(
-      sPtr,
+  return input.readDirectObject(
       static_cast<int8_t>(apache::geode::client::GeodeTypeIds::CacheableBytes));
-
-  return sPtr;
 }
 
 bool TcrMessage::readExceptionPart(DataInput& input, uint8_t isLastChunk,
