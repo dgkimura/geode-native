@@ -96,7 +96,7 @@ class CPPCACHE_EXPORT PdxInstance : public PdxSerializable {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldname, bool& value) const = 0;
+  virtual bool getBooleanField(const char *fieldname) const = 0;
 
   /**
    * Reads the named field and set its value in signed char type out param.
@@ -137,7 +137,7 @@ class CPPCACHE_EXPORT PdxInstance : public PdxSerializable {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldname, int16_t& value) const = 0;
+  virtual int16_t getShortField(const char *fieldname) const = 0;
 
   /**
    * Reads the named field and set its value in int32_t type out param.

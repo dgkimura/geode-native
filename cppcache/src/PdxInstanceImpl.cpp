@@ -802,9 +802,9 @@ bool PdxInstanceImpl::hasField(const char* fieldname) {
   return (pft != nullptr);
 }
 
-void PdxInstanceImpl::getField(const char* fieldname, bool& value) const {
+bool PdxInstanceImpl::getBooleanField(const char *fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
-  value = dataInput->readBoolean();
+  return dataInput->readBoolean();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname,
@@ -812,16 +812,15 @@ void PdxInstanceImpl::getField(const char* fieldname,
   auto dataInput = getDataInputForField(fieldname);
   value = dataInput->read();
 }
-
 void PdxInstanceImpl::getField(const char* fieldname,
                                unsigned char& value) const {
   auto dataInput = getDataInputForField(fieldname);
   value = dataInput->read();
 }
 
-void PdxInstanceImpl::getField(const char* fieldname, int16_t& value) const {
+int16_t PdxInstanceImpl::getShortField(const char *fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
-  value = dataInput->readInt16();
+  return dataInput->readInt16();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, int32_t& value) const {
@@ -1006,8 +1005,7 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
 
     switch (identityFields.at(i)->getTypeId()) {
       case PdxFieldTypes::BOOLEAN: {
-        bool value = false;
-        getField(identityFields.at(i)->getFieldName(), value);
+        bool value = getBooleanField(identityFields.at(i)->getFieldName());
         ACE_OS::snprintf(buf, 2048, "%s", value ? "true" : "false");
         toString += buf;
         break;
@@ -1020,8 +1018,7 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::SHORT: {
-        int16_t value = 0;
-        getField(identityFields.at(i)->getFieldName(), value);
+        int16_t value = getShortField(identityFields.at(i)->getFieldName());
         ACE_OS::snprintf(buf, 2048, "%d", value);
         toString += buf;
         break;

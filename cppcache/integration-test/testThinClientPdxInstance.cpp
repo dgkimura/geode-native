@@ -823,8 +823,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
 
     auto pdxobjPtr = std::make_shared<PdxTests::PdxType>();
 
-    bool bval = 0;
-    pIPtr->getField("m_bool", bval);
+    bool bval = pIPtr->getBooleanField("m_bool");
     ASSERT(pdxobjPtr->getBool() == bval, "bool values should be equal");
     ASSERT(pIPtr->getFieldType("m_bool") == PdxFieldTypes::BOOLEAN,
            "Type Value BOOLEAN Mismatch");
@@ -846,13 +845,12 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_sbyte") == PdxFieldTypes::BYTE,
            "Type Value BYTE Mismatch");
 
-    int16_t shortVal = 0;
-    pIPtr->getField("m_int16", shortVal);
+    int16_t shortVal = pIPtr->getShortField("m_int16");
     ASSERT(pdxobjPtr->getShort() == shortVal, "shortVal should be equal");
     ASSERT(pIPtr->getFieldType("m_int16") == PdxFieldTypes::SHORT,
            "Type Value SHORT Mismatch");
 
-    pIPtr->getField("m_uint16", shortVal);
+    shortVal = pIPtr->getShortField("m_uint16");
     ASSERT(pdxobjPtr->getUint16() == shortVal, "m_uint16 should be equal");
     ASSERT(pIPtr->getFieldType("m_uint16") == PdxFieldTypes::SHORT,
            "Type Value SHORT Mismatch");
@@ -1248,7 +1246,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_bool") == true, "m_bool = true expected");
-    newPiPtr->getField("m_bool", boolVal);
+    boolVal = newPiPtr->getBooleanField("m_bool");
     ASSERT(boolVal == false, "bool is not equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -1327,7 +1325,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_int16") == true, "m_int16 = true expected");
-    newPiPtr->getField("m_int16", shortVal);
+    shortVal = newPiPtr->getShortField("m_int16");
     ASSERT(shortVal == 0x5678, "short is not equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -2190,7 +2188,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(pIPtr->hasField("m_bool") == true, "m_bool = true expected");
     LOG("modifyPdxInstanceAndCheckLocally get again complete.");
-    newPiPtr->getField("m_bool", boolVal);
+    boolVal = newPiPtr->getBooleanField("m_bool");
     LOG("modifyPdxInstanceAndCheckLocally getField complete.");
     ASSERT(boolVal == false, "bool is not equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
@@ -2204,7 +2202,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(pIPtr->hasField("m_bool") == true, "m_bool = true expected");
     LOG("modifyPdxInstanceAndCheckLocally get again complete.");
-    newPiPtr->getField("m_bool", boolVal);
+    boolVal = newPiPtr->getBooleanField("m_bool");
     LOG("modifyPdxInstanceAndCheckLocally getField complete.");
     ASSERT(boolVal == true, "bool is not equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == true,
@@ -2268,7 +2266,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(pIPtr->hasField("m_int16") == true, "m_int16 = true expected");
     LOG("modifyPdxInstanceAndCheckLocally get again complete.");
-    newPiPtr->getField("m_int16", shortVal);
+    shortVal = newPiPtr->getShortField("m_int16");
     LOGINFO("modifyPdxInstanceAndCheckLocally getField complete shortVal = %d ",
             shortVal);
     ASSERT(shortVal == 0x5678, "short is not equal");
@@ -2710,8 +2708,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, pdxInstanceWithEmptyKeys)
 
     ASSERT(*putValue.get() == *getValue.get(),
            "Boolean Value Did not match in case of Empty PdxField Key");
-    bool fieldValue;
-    getValue->getField("", fieldValue);
+    bool fieldValue = getValue->getBooleanField("");
     ASSERT(fieldValue == falseValue,
            "Mismatch in the PdxInstance with Empty key");
 
