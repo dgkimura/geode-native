@@ -119,7 +119,7 @@ class MyResultCollector : public ResultCollector {
         m_addResultCount(0),
         m_getResultCount(0) {}
   ~MyResultCollector() {}
-  CacheableVectorPtr getResult(uint32_t timeout) {
+  CacheableVectorPtr getResult(uint32_t timeout) override {
     m_getResultCount++;
     if (m_isResultReady == true) {
       return m_resultList;
@@ -134,7 +134,7 @@ class MyResultCollector : public ResultCollector {
     }
   }
 
-  void addResult(CacheablePtr& resultItem) {
+  void addResult(const CacheablePtr& resultItem) override {
     m_addResultCount++;
     if (resultItem == nullptr) {
       return;
@@ -150,7 +150,7 @@ class MyResultCollector : public ResultCollector {
       m_resultList->push_back(ex);
     }
   }
-  void endResults() {
+  void endResults() override {
     m_isResultReady = true;
     m_endResultCount++;
   }
