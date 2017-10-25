@@ -1046,8 +1046,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_floatArray") == PdxFieldTypes::FLOAT_ARRAY,
            "Type Value FLOAT_ARRAY Mismatch");
 
-    CacheablePtr object = nullptr;
-    pIPtr->getField("m_pdxEnum", object);
+    CacheablePtr object = pIPtr->getCacheableField("m_pdxEnum");
     ASSERT(object != nullptr, "enumObject should not be nullptr");
     auto enumObject = std::dynamic_pointer_cast<CacheableEnum>(object);
     ASSERT(
@@ -1070,8 +1069,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_dateTime") == PdxFieldTypes::DATE,
            "Type Value DATE Mismatch");
 
-    CacheablePtr object2 = nullptr;
-    pIPtr->getField("m_map", object2);
+    CacheablePtr object2 = pIPtr->getCacheableField("m_map");
     ASSERT(object2 != nullptr, "object2 should not be nullptr");
     auto mapObject = std::dynamic_pointer_cast<CacheableHashMap>(object2);
     ASSERT(genericValCompare(pdxobjPtr->getHashMap()->size(),
@@ -1080,7 +1078,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_map") == PdxFieldTypes::OBJECT,
            "Type Value OBJECT Mismatch");
 
-    pIPtr->getField("m_vector", object2);
+    object2 = pIPtr->getCacheableField("m_vector");
     ASSERT(object2 != nullptr, "object2 should not be nullptr");
     auto vec = std::dynamic_pointer_cast<CacheableVector>(object2);
     ASSERT(
@@ -1089,7 +1087,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_vector") == PdxFieldTypes::OBJECT,
            "Type Value OBJECT Mismatch");
 
-    pIPtr->getField("m_arraylist", object2);
+    object2 = pIPtr->getCacheableField("m_arraylist");
     ASSERT(object2 != nullptr, "object2 should not be nullptr");
     auto arrList = std::dynamic_pointer_cast<CacheableArrayList>(object2);
     ASSERT(genericValCompare(pdxobjPtr->getArrayList()->size(),
@@ -1098,7 +1096,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_arraylist") == PdxFieldTypes::OBJECT,
            "Type Value OBJECT Mismatch");
 
-    pIPtr->getField("m_chs", object2);
+    object2 = pIPtr->getCacheableField("m_chs");
     ASSERT(object2 != nullptr, "object2 should not be nullptr");
     auto hashSet = std::dynamic_pointer_cast<CacheableHashSet>(object2);
     ASSERT(genericValCompare(pdxobjPtr->getHashSet()->size(),
@@ -1107,7 +1105,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_chs") == PdxFieldTypes::OBJECT,
            "Type Value OBJECT Mismatch");
 
-    pIPtr->getField("m_clhs", object2);
+    object2 = pIPtr->getCacheableField("m_clhs");
     ASSERT(object2 != nullptr, "object2 should not be nullptr");
     auto linkedHashSet =
         std::dynamic_pointer_cast<CacheableLinkedHashSet>(object2);
@@ -1186,8 +1184,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     pIPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport1));
     LOGINFO("PdxInstancePtr for ParentPdx object got ");
 
-    CacheablePtr childObjPtr;
-    pIPtr->getField("m_childPdx", childObjPtr);
+    CacheablePtr childObjPtr = pIPtr->getCacheableField("m_childPdx");
     ASSERT(childObjPtr != nullptr, "childObjPtr should not be nullptr");
     LOGINFO("got childPdx field ");
     auto cpi = std::dynamic_pointer_cast<PdxInstance>(childObjPtr);
@@ -1685,7 +1682,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_vector") == true, "m_vector = true expected");
     ASSERT(pIPtr->hasField("m_vector") == true, "m_vector = true expected");
-    newPiPtr->getField("m_vector", object);
+    object = newPiPtr->getCacheableField("m_vector");
     auto vecVal = std::dynamic_pointer_cast<CacheableVector>(object);
     ASSERT(genericValCompare(setVec->size(), vecVal->size()) == true,
            "vec size should be equal");
@@ -1716,7 +1713,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
            "m_arraylist = true expected");
     ASSERT(pIPtr->hasField("m_arraylist") == true,
            "m_arraylist = true expected");
-    newPiPtr->getField("m_arraylist", object);
+    object = newPiPtr->getCacheableField("m_arraylist");
     auto arrVal = std::dynamic_pointer_cast<CacheableArrayList>(object);
     ASSERT(genericValCompare(setarr->size(), arrVal->size()) == true,
            "arrList size should be equal");
@@ -1745,7 +1742,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_chs") == true, "m_chs = true expected");
     ASSERT(pIPtr->hasField("m_chs") == true, "m_chs = true expected");
-    newPiPtr->getField("m_chs", object);
+    object = newPiPtr->getCacheableField("m_chs");
     auto hashsetVal = std::dynamic_pointer_cast<CacheableHashSet>(object);
     ASSERT(genericValCompare(hashset->size(), hashsetVal->size()) == true,
            "m_chs size should be equal");
@@ -1771,7 +1768,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_map") == true, "m_map = true expected");
     ASSERT(pIPtr->hasField("m_map") == true, "m_map = true expected");
-    newPiPtr->getField("m_map", object);
+    object = newPiPtr->getCacheableField("m_map");
     auto hashmapVal = std::dynamic_pointer_cast<CacheableHashMap>(object);
     ASSERT(genericValCompare(hashmap->size(), hashmapVal->size()) == true,
            "m_map size should be equal");
@@ -1797,7 +1794,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_clhs") == true, "m_clhs = true expected");
     ASSERT(pIPtr->hasField("m_clhs") == true, "m_clhs = true expected");
-    newPiPtr->getField("m_clhs", object);
+    object = newPiPtr->getCacheableField("m_clhs");
     auto linkedhashsetVal =
         std::dynamic_pointer_cast<CacheableLinkedHashSet>(object);
     ASSERT(genericValCompare(linkedhashsetVal->size(), linkedhashset->size()) ==
@@ -1938,8 +1935,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     pIPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport1));
     LOGINFO("PdxInstancePtr for ParentPdx object got ");
 
-    CacheablePtr childObjPtr;
-    pIPtr->getField("m_childPdx", childObjPtr);
+    CacheablePtr childObjPtr = pIPtr->getCacheableField("m_childPdx");
     ASSERT(childObjPtr != nullptr, "childObjPtr should not be nullptr");
     LOGINFO("got childPdx field ");
     auto cpi = std::dynamic_pointer_cast<PdxInstance>(childObjPtr);
@@ -1954,7 +1950,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     LOGINFO("ChildPdx object put get done");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
-    newPiPtr->getField("m_childPdx", childObjPtr);
+    childObjPtr = newPiPtr->getCacheableField("m_childPdx");
     ASSERT(childObjPtr != nullptr, "childObjPtr should not be nullptr");
     LOGINFO("got childPdx field ");
     auto cpi1 = std::dynamic_pointer_cast<PdxInstance>(childObjPtr);

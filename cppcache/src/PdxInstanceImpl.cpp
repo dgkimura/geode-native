@@ -952,10 +952,11 @@ void PdxInstanceImpl::getField(const char* fieldname,
   value->fromData(*dataInput);
 }
 
-void PdxInstanceImpl::getField(const char* fieldname,
-                               CacheablePtr& value) const {
+CacheablePtr PdxInstanceImpl::getCacheableField(const char *fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
+  CacheablePtr value;
   dataInput->readObject(value);
+  return value;
 }
 
 void PdxInstanceImpl::getField(const char* fieldname,
@@ -1214,8 +1215,7 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       default: {
-        CacheablePtr value;
-        getField(identityFields.at(i)->getFieldName(), value);
+        CacheablePtr value = getCacheableField(identityFields.at(i)->getFieldName());
         if (value != nullptr) {
           ACE_OS::snprintf(buf, 2048, "%s\t", value->toString()->asChar());
           toString += buf;
