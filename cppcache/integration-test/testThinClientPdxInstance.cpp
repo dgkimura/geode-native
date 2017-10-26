@@ -1125,8 +1125,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
                PdxFieldTypes::ARRAY_OF_BYTE_ARRAYS,
            "Type Value ARRAY_OF_BYTE_ARRAYS Mismatch");
 
-    CacheableObjectArrayPtr objectArray = nullptr;
-    pIPtr->getField("m_objectArray", objectArray);
+    auto objectArray = pIPtr->getCacheableObjectArrayField("m_objectArray");
     ASSERT(objectArray != nullptr, "objectArray should not be nullptr");
     ASSERT(genericValCompare(pdxobjPtr->getCacheableObjectArray()->size(),
                              objectArray->size()) == true,
@@ -1134,8 +1133,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_objectArray") == PdxFieldTypes::OBJECT_ARRAY,
            "Type Value OBJECT_ARRAY Mismatch");
 
-    CacheableObjectArrayPtr objectArrayEmptyFieldName = nullptr;
-    pIPtr->getField("", objectArrayEmptyFieldName);
+    auto objectArrayEmptyFieldName = pIPtr->getCacheableObjectArrayField("");
     ASSERT(objectArrayEmptyFieldName != nullptr,
            "objectArrayEmptyFieldName should not be nullptr");
     ASSERT(genericValCompare(

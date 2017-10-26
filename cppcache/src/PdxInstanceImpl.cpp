@@ -284,7 +284,7 @@ void PdxInstanceImpl::writeField(PdxWriterPtr writer, const char* fieldName,
       break;
     }
     case PdxFieldTypes::OBJECT_ARRAY: {
-      CacheableObjectArrayPtr objArray =
+      auto objArray =
           std::dynamic_pointer_cast<CacheableObjectArray>(value);
       if (objArray != nullptr) {
         writer->writeObjectArray(fieldName, objArray);
@@ -954,11 +954,12 @@ CacheablePtr PdxInstanceImpl::getCacheableField(const char *fieldname) const {
   return value;
 }
 
-void PdxInstanceImpl::getField(const char* fieldname,
-                               CacheableObjectArrayPtr& value) const {
+CacheableObjectArrayPtr PdxInstanceImpl::getCacheableObjectArrayField(
+                                                const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
-  value = CacheableObjectArray::create();
+  auto value = CacheableObjectArray::create();
   value->fromData(*dataInput);
+  return value;
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, int8_t*** value,
@@ -1196,8 +1197,8 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::OBJECT_ARRAY: {
-        CacheableObjectArrayPtr value;
-        getField(identityFields.at(i)->getFieldName(), value);
+        CacheableObjectArrayPtr value = getCacheableObjectArrayField(
+                                        identityFields.at(i)->getFieldName());
         if (value != nullptr) {
           ACE_OS::snprintf(buf, 2048, "%s\t", value->toString()->asChar());
           toString += buf;
