@@ -939,11 +939,12 @@ void PdxInstanceImpl::getField(const char* fieldname, char*** value,
   dataInput->readStringArray(value, length);
 }
 
-void PdxInstanceImpl::getField(const char* fieldname,
-                               CacheableDatePtr& value) const {
+CacheableDatePtr PdxInstanceImpl::getCacheableDateField(
+                                                const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
-  value = CacheableDate::create();
+  auto value = CacheableDate::create();
   value->fromData(*dataInput);
+  return value;
 }
 
 CacheablePtr PdxInstanceImpl::getCacheableField(const char *fieldname) const {
@@ -1157,8 +1158,8 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::DATE: {
-        CacheableDatePtr value = nullptr;
-        getField(identityFields.at(i)->getFieldName(), value);
+        CacheableDatePtr value = getCacheableDateField(
+                                        identityFields.at(i)->getFieldName());
         if (value != nullptr) {
           ACE_OS::snprintf(buf, 2048, "%s", value->toString()->asChar());
           toString += buf;

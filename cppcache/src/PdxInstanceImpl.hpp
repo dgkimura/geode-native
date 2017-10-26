@@ -364,7 +364,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldname, CacheableDatePtr& value) const;
+  virtual CacheableDatePtr getCacheableDateField(const char* fieldname) const;
 
   /**
    * Reads the named field and set its value in array of byte arrays type out

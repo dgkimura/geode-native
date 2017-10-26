@@ -1056,8 +1056,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_pdxEnum") == PdxFieldTypes::OBJECT,
            "Type Value OBJECT Mismatch");
 
-    CacheableDatePtr dateObject = nullptr;
-    pIPtr->getField("m_dateTime", dateObject);
+    CacheableDatePtr dateObject = pIPtr->getCacheableDateField("m_dateTime");
     ASSERT(dateObject != nullptr, "date should not be nullptr");
     ASSERT((*(dateObject.get()) == *(pdxobjPtr->getDate().get())) == true,
            "dateObject should be equal");
@@ -1650,7 +1649,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     ASSERT(newPiPtr->hasField("m_dateTime") == true,
            "m_dateTime = true expected");
     ASSERT(pIPtr->hasField("m_dateTime") == true, "m_date = true expected");
-    newPiPtr->getField("m_dateTime", dateVal);
+    dateVal = newPiPtr->getCacheableDateField("m_dateTime");
     ASSERT((*(dateVal.get()) == *(datePtr.get())) == true,
            "dateObject should be equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
@@ -2318,7 +2317,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(pIPtr->hasField("m_dateTime") == true, "m_date = true expected");
-    newPiPtr->getField("m_dateTime", dateVal);
+    dateVal = newPiPtr->getCacheableDateField("m_dateTime");
     ASSERT((*(dateVal.get()) == *(datePtr.get())) == true,
            "dateObject should be equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
