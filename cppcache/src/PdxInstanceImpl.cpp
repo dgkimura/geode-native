@@ -811,11 +811,6 @@ int8_t PdxInstanceImpl::getByteField(const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
   return dataInput->read();
 }
-void PdxInstanceImpl::getField(const char* fieldname,
-                               unsigned char& value) const {
-  auto dataInput = getDataInputForField(fieldname);
-  value = dataInput->read();
-}
 
 int16_t PdxInstanceImpl::getShortField(const char *fieldname) const {
   auto dataInput = getDataInputForField(fieldname);

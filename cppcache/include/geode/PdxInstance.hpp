@@ -114,21 +114,6 @@ class CPPCACHE_EXPORT PdxInstance : public PdxSerializable {
   virtual int8_t getByteField(const char* fieldname) const = 0;
 
   /**
-   * Reads the named field and set its value in unsigned char type out param.
-   * unsigned char type is corresponding to java byte type.
-   * For C++ on Windows and Linux, unsigned char type is corresponding to int8_t
-   * type.
-   * However C++ users on Solaris should always use this api after casting
-   * int8_t to unsigned char.
-   * @param fieldname name of the field to read
-   * @param value value of the field to be set with unsigned char type.
-   * @throws IllegalStateException if PdxInstance doesn't has the named field.
-   *
-   * @see PdxInstance#hasField
-   */
-  virtual void getField(const char* fieldname, unsigned char& value) const = 0;
-
-  /**
    * Reads the named field and set its value in int16_t type out param.
    * int16_t type is corresponding to java short type.
    * @param fieldname name of the field to read
