@@ -124,7 +124,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    * @param value value of the field to be set with int32_t type.
    * @throws IllegalStateException if PdxInstance doesn't has the named field.
    */
-  virtual void getField(const char* fieldname, int32_t& value) const;
+  virtual int32_t getIntField(const char* fieldname) const;
 
   /**
    * Reads the named field and set its value in int64_t type out param.
@@ -135,7 +135,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldname, int64_t& value) const;
+  virtual int64_t getLongField(const char* fieldname) const;
 
   /**
    * Reads the named field and set its value in float type out param.

@@ -855,24 +855,22 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_uint16") == PdxFieldTypes::SHORT,
            "Type Value SHORT Mismatch");
 
-    int val = 0;
-    pIPtr->getField("m_int32", val);
+    int val = pIPtr->getIntField("m_int32");
     ASSERT(pdxobjPtr->getInt() == val, "int32 values should be equal");
     ASSERT(pIPtr->getFieldType("m_int32") == PdxFieldTypes::INT,
            "Type Value INT Mismatch");
 
-    pIPtr->getField("m_uint32", val);
+    val = pIPtr->getIntField("m_uint32");
     ASSERT(pdxobjPtr->getUInt() == val, "m_uint32 values should be equal");
     ASSERT(pIPtr->getFieldType("m_uint32") == PdxFieldTypes::INT,
            "Type Value INT Mismatch");
 
-    int64_t longVal = 0;
-    pIPtr->getField("m_long", longVal);
+    int64_t longVal = pIPtr->getLongField("m_long");
     ASSERT(pdxobjPtr->getLong() == longVal, "int64 values should be equal");
     ASSERT(pIPtr->getFieldType("m_long") == PdxFieldTypes::LONG,
            "Type Value LONG Mismatch");
 
-    pIPtr->getField("m_ulong", longVal);
+    longVal = pIPtr->getLongField("m_ulong");
     ASSERT(pdxobjPtr->getULong() == longVal, "m_ulong values should be equal");
     ASSERT(pIPtr->getFieldType("m_ulong") == PdxFieldTypes::LONG,
            "Type Value LONG Mismatch");
@@ -1216,12 +1214,12 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     int val = 0;
     int newVal = 0;
     ASSERT(pIPtr->hasField("m_int32") == true, "m_id1 = true expected");
-    pIPtr->getField("m_int32", val);
+    val = pIPtr->getIntField("m_int32");
     wpiPtr->setField("m_int32", val + 1);
     rptr->put(keyport, wpiPtr);
     auto newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_int32") == true, "m_int32 = true expected");
-    newPiPtr->getField("m_int32", newVal);
+    newVal = newPiPtr->getIntField("m_int32");
     ASSERT(val + 1 == newVal, "val + 1 == newVal expected");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -1344,7 +1342,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_long") == true, "m_long = true expected");
-    newPiPtr->getField("m_long", longVal);
+    longVal = newPiPtr->getLongField("m_long");
     ASSERT(longVal == 0x56787878, "long is not equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -2060,7 +2058,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     int val = 0;
     int newVal = 0;
     ASSERT(pIPtr->hasField("m_int32") == true, "m_int32 = true expected");
-    pIPtr->getField("m_int32", val);
+    val = pIPtr->getIntField("m_int32");
     LOGINFO("PdxInstance val is %d ", val);
     ASSERT(val == 591768540, "val = 591768540 expected");
 
@@ -2070,7 +2068,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     auto newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     LOG("modifyPdxInstanceAndCheckLocally get complete.");
     ASSERT(newPiPtr->hasField("m_int32") == true, "m_id1 = true expected");
-    newPiPtr->getField("m_int32", newVal);
+    newVal = newPiPtr->getIntField("m_int32");
     LOGINFO("PdxInstance newVal is %d ", newVal);
     ASSERT(val + 1 == newVal, "val + 1 == newVal expected");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
@@ -2278,7 +2276,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(pIPtr->hasField("m_long") == true, "m_long = true expected");
     LOG("modifyPdxInstanceAndCheckLocally get again complete.");
-    newPiPtr->getField("m_long", longVal);
+    longVal = newPiPtr->getLongField("m_long");
     LOGINFO("modifyPdxInstanceAndCheckLocally getField complete longVal = %ld ",
             longVal);
     ASSERT(longVal == 0x56787878, "long is not equal");
