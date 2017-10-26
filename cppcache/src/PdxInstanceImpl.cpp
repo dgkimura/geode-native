@@ -807,10 +807,9 @@ bool PdxInstanceImpl::getBooleanField(const char *fieldname) const {
   return dataInput->readBoolean();
 }
 
-void PdxInstanceImpl::getField(const char* fieldname,
-                               signed char& value) const {
+int8_t PdxInstanceImpl::getByteField(const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
-  value = dataInput->read();
+  return dataInput->read();
 }
 void PdxInstanceImpl::getField(const char* fieldname,
                                unsigned char& value) const {
@@ -1012,8 +1011,7 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::BYTE: {
-        signed char value = 0;
-        getField(identityFields.at(i)->getFieldName(), value);
+        signed char value = getByteField(identityFields.at(i)->getFieldName());
         ACE_OS::snprintf(buf, 2048, "%d", value);
         toString += buf;
         break;

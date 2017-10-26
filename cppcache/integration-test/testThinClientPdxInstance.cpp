@@ -834,13 +834,12 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_char") == PdxFieldTypes::CHAR,
            "Type Value CHAR Mismatch");
 
-    signed char byteVal = 0;
-    pIPtr->getField("m_byte", byteVal);
+    signed char byteVal = pIPtr->getByteField("m_byte");
     ASSERT(pdxobjPtr->getByte() == byteVal, "byte values should be equal");
     ASSERT(pIPtr->getFieldType("m_byte") == PdxFieldTypes::BYTE,
            "Type Value BYTE Mismatch");
 
-    pIPtr->getField("m_sbyte", byteVal);
+    byteVal = pIPtr->getByteField("m_sbyte");
     ASSERT(pdxobjPtr->getSByte() == byteVal, "Sbyte values should be equal");
     ASSERT(pIPtr->getFieldType("m_sbyte") == PdxFieldTypes::BYTE,
            "Type Value BYTE Mismatch");
@@ -1285,7 +1284,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_byte") == true, "m_byte = true expected");
-    newPiPtr->getField("m_byte", byteVal);
+    byteVal = newPiPtr->getByteField("m_byte");
     ASSERT(byteVal == setByteVal, "byte is not equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -1296,7 +1295,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_sbyte") == true, "m_sbyte = true expected");
-    newPiPtr->getField("m_sbyte", byteVal);
+    byteVal = newPiPtr->getByteField("m_sbyte");
     ASSERT(byteVal == setSByteVal, "m_sbyte is not equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -2242,7 +2241,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(pIPtr->hasField("m_byte") == true, "m_byte = true expected");
     LOG("modifyPdxInstanceAndCheckLocally get again complete.");
-    newPiPtr->getField("m_byte", byteVal);
+    byteVal = newPiPtr->getByteField("m_byte");
     LOGINFO("modifyPdxInstanceAndCheckLocally getField complete byteVal = %d ",
             byteVal);
     ASSERT(byteVal == setSByteVal, "byte is not equal");

@@ -89,7 +89,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldname, signed char& value) const;
+  virtual int8_t getByteField(const char* fieldname) const;
 
   /**
    * Reads the named field and set its value in unsigned char type out param.
