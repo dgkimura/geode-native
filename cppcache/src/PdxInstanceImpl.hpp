@@ -145,17 +145,6 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
   virtual double getDoubleField(const char* fieldname) const;
 
   /**
-   * Reads the named field and set its value in wchar_t type out param.
-   * wchar_t type is corresponding to java char type.
-   * @param fieldname name of the field to read
-   * @param value value of the field to be set with wchar_t type.
-   * @throws IllegalStateException if PdxInstance doesn't has the named field.
-   *
-   * @see PdxInstance#hasField
-   */
-  virtual void getField(const char* fieldName, wchar_t& value) const;
-
-  /**
    * Reads the named field and set its value in char type out param.
    * char type is corresponding to java char type.
    * @param fieldname name of the field to read
@@ -539,21 +528,6 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    * or if the type of the value is not compatible with the field.
    */
   virtual void setField(const char* fieldName, double value);
-
-  /**
-   * Set the existing named field to the given value.
-   * The setField method has copy-on-write semantics.
-   * So for the modifications to be stored in the cache the WritablePdxInstance
-   * must be put into a region after setField has been called one or more times.
-   * wchar_t type is corresponding to java char type.
-   * @param fieldName
-   *          name of the field whose value will be set
-   * @param value
-   *          value that will be set to the field of type wchar_t
-   * @throws IllegalStateException if the named field does not exist
-   * or if the type of the value is not compatible with the field.
-   */
-  virtual void setField(const char* fieldName, wchar_t value);
 
   /**
    * Set the existing named field to the given value.

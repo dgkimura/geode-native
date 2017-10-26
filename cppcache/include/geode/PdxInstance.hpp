@@ -167,17 +167,6 @@ class CPPCACHE_EXPORT PdxInstance : public PdxSerializable {
   virtual double getDoubleField(const char* fieldname) const = 0;
 
   /**
-   * Reads the named field and set its value in wchar_t type out param.
-   * wchar_t type is corresponding to java char type.
-   * @param fieldname name of the field to read
-   * @param value value of the field to be set with wchar_t type.
-   * @throws IllegalStateException if PdxInstance doesn't has the named field.
-   *
-   * @see PdxInstance#hasField
-   */
-  virtual void getField(const char* fieldName, wchar_t& value) const = 0;
-
-  /**
    * Reads the named field and set its value in char type out param.
    * char type is corresponding to java char type.
    * @param fieldname name of the field to read

@@ -828,12 +828,6 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_bool") == PdxFieldTypes::BOOLEAN,
            "Type Value BOOLEAN Mismatch");
 
-    wchar_t charVal = ' ';
-    pIPtr->getField("m_char", charVal);
-    ASSERT(pdxobjPtr->getChar() == charVal, "char values should be equal");
-    ASSERT(pIPtr->getFieldType("m_char") == PdxFieldTypes::CHAR,
-           "Type Value CHAR Mismatch");
-
     signed char byteVal = pIPtr->getByteField("m_byte");
     ASSERT(pdxobjPtr->getByte() == byteVal, "byte values should be equal");
     ASSERT(pIPtr->getFieldType("m_byte") == PdxFieldTypes::BYTE,
@@ -1250,18 +1244,6 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
       LOG("setField on m_bool with int value caught expected "
           "IllegalStateException");
     }
-
-    wchar_t charVal = ' ';
-    wchar_t setVal = 'D';
-    wpiPtr = pIPtr->createWriter();
-    wpiPtr->setField("m_char", setVal);
-    rptr->put(keyport, wpiPtr);
-    newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
-    ASSERT(newPiPtr->hasField("m_char") == true, "m_char = true expected");
-    newPiPtr->getField("m_char", charVal);
-    ASSERT(charVal == setVal, "char is not equal");
-    ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
-           "PdxInstance should not be equal");
 
     wpiPtr = pIPtr->createWriter();
     try {
@@ -1963,18 +1945,6 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     ASSERT(newPiPtr->hasField("m_char") == true, "m_char = true expected");
     newPiPtr->getField("m_char", parentCharVal);
     ASSERT(parentCharVal == parentCharSetVal, "char is not equal");
-
-    wchar_t parentWideCharVal = ' ';
-    wchar_t parentWideCharSetVal = L'Z';
-    wpiPtr = pIPtr->createWriter();
-    wpiPtr->setField("m_wideChar", parentWideCharSetVal);
-    rptr->put(keyport1, wpiPtr);
-    newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport1));
-    ASSERT(newPiPtr->hasField("m_wideChar") == true,
-           "m_wideChar = true expected");
-    newPiPtr->getField("m_wideChar", parentWideCharVal);
-    ASSERT(parentWideCharVal == parentWideCharSetVal,
-           "m_wideChar is not equal");
 
     wchar_t setParentWideCharArray[] = {L'c', L'v', L'c', L'v'};
     wchar_t* getParentWideCharArray = nullptr;

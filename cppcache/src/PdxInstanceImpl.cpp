@@ -837,12 +837,6 @@ double PdxInstanceImpl::getDoubleField(const char* fieldname) const {
   return dataInput->readDouble();
 }
 
-void PdxInstanceImpl::getField(const char* fieldname, wchar_t& value) const {
-  auto dataInput = getDataInputForField(fieldname);
-  uint16_t temp = dataInput->readInt16();
-  value = static_cast<wchar_t>(temp);
-}
-
 void PdxInstanceImpl::getField(const char* fieldname, char& value) const {
   auto dataInput = getDataInputForField(fieldname);
   uint16_t temp =  dataInput->readInt16();
@@ -1044,7 +1038,7 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::CHAR: {
-        wchar_t value = 0;
+        char value = 0;
         getField(identityFields.at(i)->getFieldName(), value);
         ACE_OS::snprintf(buf, 2048, "%c", value);
         toString += buf;
@@ -1962,32 +1956,6 @@ void PdxInstanceImpl::setField(const char* fieldName, double value) {
     throw IllegalStateException(excpStr);
   }
   CacheablePtr cacheableObject = CacheableDouble::create(value);
-  m_updatedFields[fieldName] = cacheableObject;
-}
-
-void PdxInstanceImpl::setField(const char* fieldName, wchar_t value) {
-  PdxTypePtr pt = getPdxType();
-  PdxFieldTypePtr pft = pt->getPdxField(fieldName);
-
-  if (pft != nullptr && pft->getTypeId() != PdxFieldTypes::CHAR) {
-    char excpStr[256] = {0};
-    /* adongre - Coverity II
-     * CID 29237: Calling risky function (SECURE_CODING)[VERY RISKY]. Using
-     * "sprintf" can cause a
-     * buffer overflow when done incorrectly. Because sprintf() assumes an
-     * arbitrarily long string,
-     * callers must be careful not to overflow the actual space of the
-     * destination.
-     * Use snprintf() instead, or correct precision specifiers.
-     * Fix : using ACE_OS::snprintf
-     */
-    ACE_OS::snprintf(
-        excpStr, 256,
-        "PdxInstance doesn't has field %s or type of field not matched %s ",
-        fieldName, (pft != nullptr ? pft->toString()->asChar() : ""));
-    throw IllegalStateException(excpStr);
-  }
-  CacheablePtr cacheableObject = CacheableWideChar::create(value);
   m_updatedFields[fieldName] = cacheableObject;
 }
 
