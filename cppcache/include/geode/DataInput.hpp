@@ -195,7 +195,7 @@ class CPPCACHE_EXPORT DataInput {
    */
   inline int64_t readInt64() {
     checkBufferSize(8);
-    int64_t tmp;
+    uint64_t tmp;
     if (sizeof(long) == 8) {
       tmp = *(m_buf++);
       tmp = (tmp << 8) | *(m_buf++);
@@ -206,7 +206,7 @@ class CPPCACHE_EXPORT DataInput {
       tmp = (tmp << 8) | *(m_buf++);
       tmp = (tmp << 8) | *(m_buf++);
     } else {
-      int32_t hword = *(m_buf++);
+      uint32_t hword = *(m_buf++);
       hword = (hword << 8) | *(m_buf++);
       hword = (hword << 8) | *(m_buf++);
       hword = (hword << 8) | *(m_buf++);
@@ -218,7 +218,7 @@ class CPPCACHE_EXPORT DataInput {
       hword = (hword << 8) | *(m_buf++);
       tmp = (tmp << 32) | hword;
     }
-    return tmp;
+    return static_cast<int64_t>(tmp);
   }
 
   /**
