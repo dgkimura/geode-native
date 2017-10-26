@@ -833,14 +833,14 @@ int64_t PdxInstanceImpl::getLongField(const char* fieldname) const {
   return dataInput->readInt64();
 }
 
-void PdxInstanceImpl::getField(const char* fieldname, float& value) const {
+float PdxInstanceImpl::getFloatField(const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
-  value = dataInput->readFloat();
+  return dataInput->readFloat();
 }
 
-void PdxInstanceImpl::getField(const char* fieldname, double& value) const {
+double PdxInstanceImpl::getDoubleField(const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
-  value = dataInput->readDouble();
+  return dataInput->readDouble();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, wchar_t& value) const {
@@ -1037,15 +1037,13 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::FLOAT: {
-        float value = 0;
-        getField(identityFields.at(i)->getFieldName(), value);
+        float value = getFloatField(identityFields.at(i)->getFieldName());
         ACE_OS::snprintf(buf, 2048, "%f", value);
         toString += buf;
         break;
       }
       case PdxFieldTypes::DOUBLE: {
-        double value = 0;
-        getField(identityFields.at(i)->getFieldName(), value);
+        double value =  getDoubleField(identityFields.at(i)->getFieldName());
         ACE_OS::snprintf(buf, 2048, "%f", value);
         toString += buf;
         break;

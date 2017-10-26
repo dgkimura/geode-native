@@ -168,7 +168,7 @@ class CPPCACHE_EXPORT PdxInstance : public PdxSerializable {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldname, float& value) const = 0;
+  virtual float getFloatField(const char* fieldname) const = 0;
 
   /**
    * Reads the named field and set its value in double type out param.
@@ -179,7 +179,7 @@ class CPPCACHE_EXPORT PdxInstance : public PdxSerializable {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldname, double& value) const = 0;
+  virtual double getDoubleField(const char* fieldname) const = 0;
 
   /**
    * Reads the named field and set its value in wchar_t type out param.

@@ -875,14 +875,12 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_ulong") == PdxFieldTypes::LONG,
            "Type Value LONG Mismatch");
 
-    float floatVal = 0.0f;
-    pIPtr->getField("m_float", floatVal);
+    float floatVal = pIPtr->getFloatField("m_float");
     ASSERT(pdxobjPtr->getFloat() == floatVal, "floatVal should be equal");
     ASSERT(pIPtr->getFieldType("m_float") == PdxFieldTypes::FLOAT,
            "Type Value FLOAT Mismatch");
 
-    double doubleVal = 0.0;
-    pIPtr->getField("m_double", doubleVal);
+    double doubleVal = pIPtr->getDoubleField("m_double");
     ASSERT(pdxobjPtr->getDouble() == doubleVal, "doubleVal should be equal");
     ASSERT(pIPtr->getFieldType("m_double") == PdxFieldTypes::DOUBLE,
            "Type Value DOUBLE Mismatch");
@@ -1364,7 +1362,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_float") == true, "m_float = true expected");
-    newPiPtr->getField("m_float", fVal);
+    fVal = newPiPtr->getFloatField("m_float");
     ASSERT(fVal == 18389.34f, "fval is not equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -1386,7 +1384,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_double") == true, "m_double = true expected");
-    newPiPtr->getField("m_double", dVal);
+    dVal = newPiPtr->getDoubleField("m_double");
     ASSERT(dVal == 18389.34, "dval is not equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -2211,7 +2209,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(pIPtr->hasField("m_float") == true, "m_float = true expected");
     LOG("modifyPdxInstanceAndCheckLocally get again complete.");
-    newPiPtr->getField("m_float", fVal);
+    fVal = newPiPtr->getFloatField("m_float");
     LOGINFO("modifyPdxInstanceAndCheckLocally getField complete. fval = %f",
             fVal);
     ASSERT(fVal == 18389.34f, "fval is not equal");
@@ -2227,7 +2225,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(pIPtr->hasField("m_double") == true, "m_double = true expected");
     LOG("modifyPdxInstanceAndCheckLocally get again complete.");
-    newPiPtr->getField("m_double", dVal);
+    dVal = newPiPtr->getDoubleField("m_double");
     LOGINFO("modifyPdxInstanceAndCheckLocally getField complete. fval = %lf",
             dVal);
     ASSERT(dVal == 18389.34, "fval is not equal");
