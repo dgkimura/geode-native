@@ -1126,9 +1126,6 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    * ( {@link AttributesFactory::setClientNotification} ) is true.
    *
    * @param isDurable flag to indicate whether this is a durable registration
-   * @param resultKeys If non-nullptr then all the keys on the server that got
-   *   registered are returned. The vector is cleared at the start to discard
-   *   any existing keys in the vector.
    * @param getInitialValues true to populate the cache with values of all keys
    *   from the server
    * @param receiveValues whether to act like notify-by-subscription is set
@@ -1156,7 +1153,6 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    * @throws TimeoutException if operation timed out
    */
   virtual void registerAllKeys(bool isDurable = false,
-                               VectorOfCacheableKeyPtr resultKeys = nullptr,
                                bool getInitialValues = false,
                                bool receiveValues = true) = 0;
 

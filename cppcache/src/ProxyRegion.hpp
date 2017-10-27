@@ -1216,7 +1216,6 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    * @throws TimeoutException if operation timed out
    */
   virtual void registerAllKeys(bool isDurable = false,
-                               VectorOfCacheableKeyPtr resultKeys = nullptr,
                                bool getInitialValues = false,
                                bool receiveValues = true) {
     throw UnsupportedOperationException("Region.registerAllKeys()");

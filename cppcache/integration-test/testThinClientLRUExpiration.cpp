@@ -140,7 +140,7 @@ void createRegion(const char* name, bool ackMode, int ettl, int eit, int rttl,
       getHelper()->createRegionAndAttachPool(name, ackMode, "LRUPool", true,
                                              ettl, eit, rttl, rit, lel, action);
   ASSERT(regPtr != nullptr, "Failed to create region.");
-  if (registerKey) regPtr->registerAllKeys(false, nullptr, false, false);
+  if (registerKey) regPtr->registerAllKeys(false, false, false);
   LOG("Region created.");
 }
 

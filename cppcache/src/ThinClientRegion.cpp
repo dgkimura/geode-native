@@ -461,7 +461,6 @@ void ThinClientRegion::unregisterKeys(const VectorOfCacheableKey& keys) {
 }
 
 void ThinClientRegion::registerAllKeys(bool isDurable,
-                                       VectorOfCacheableKeyPtr resultKeys,
                                        bool getInitialValues,
                                        bool receiveValues) {
   PoolPtr pool = m_cacheImpl->getCache()->getPoolManager().find(
@@ -485,12 +484,6 @@ void ThinClientRegion::registerAllKeys(bool isDurable,
         "Durable flag only applicable for durable clients");
   }
 
-  bool isresultKeys = true;
-  if (resultKeys == nullptr) {
-    resultKeys = VectorOfCacheableKeyPtr(new VectorOfCacheableKey());
-    isresultKeys = false;
-  }
-
   InterestResultPolicy interestPolicy = InterestResultPolicy::NONE;
   if (getInitialValues) {
     interestPolicy = InterestResultPolicy::KEYS_VALUES;
@@ -501,21 +494,19 @@ void ThinClientRegion::registerAllKeys(bool isDurable,
   LOGDEBUG("ThinClientRegion::registerAllKeys : interestpolicy is %d",
            interestPolicy.ordinal);
 
+  VectorOfCacheableKeyPtr resultKeys;
   //  if we need to fetch initial data, then we get the keys in
   // that call itself using the special GET_ALL message and do not need
   // to get the keys in the initial  register interest  call
   GfErrType err =
-      registerRegexNoThrow(".*", true, nullptr, isDurable, resultKeys,
-                           interestPolicy, receiveValues);
+      registerRegexNoThrow(".*", true, nullptr, isDurable,
+                           resultKeys, interestPolicy, receiveValues);
 
   if (m_tcrdm->isFatalError(err)) {
     GfErrTypeToException("Region::registerAllKeys", err);
   }
 
   // Get the entries from the server using a special GET_ALL message
-  if (isresultKeys == false) {
-    resultKeys = nullptr;
-  }
   GfErrTypeToException("Region::registerAllKeys", err);
 }
 
@@ -548,14 +539,6 @@ void ThinClientRegion::registerRegex(const char* regex, bool isDurable,
   }
 
   std::string sregex = regex;
-  // bool allKeys = (sregex == ".*");
-  bool isresultKeys = true;
-
-  // if we need initial values then use resultKeys to get the keys from server
-  if (resultKeys == nullptr) {
-    resultKeys = std::make_shared<VectorOfCacheableKey>();
-    isresultKeys = false;
-  }
 
   InterestResultPolicy interestPolicy = InterestResultPolicy::NONE;
   if (getInitialValues) {
@@ -567,20 +550,19 @@ void ThinClientRegion::registerRegex(const char* regex, bool isDurable,
   LOGDEBUG("ThinClientRegion::registerRegex : interestpolicy is %d",
            interestPolicy.ordinal);
 
+  VectorOfCacheableKeyPtr resultKeys2 = std::make_shared<VectorOfCacheableKey>();
+
   //  if we need to fetch initial data for "allKeys" case, then we
   // get the keys in that call itself using the special GET_ALL message and
   // do not need to get the keys in the initial  register interest  call
   GfErrType err =
-      registerRegexNoThrow(sregex, true, nullptr, isDurable, resultKeys,
+      registerRegexNoThrow(sregex, true, nullptr, isDurable, resultKeys2,
                            interestPolicy, receiveValues);
 
   if (m_tcrdm->isFatalError(err)) {
     GfErrTypeToException("Region::registerRegex", err);
   }
 
-  if (isresultKeys == false) {
-    resultKeys = nullptr;
-  }
   GfErrTypeToException("Region::registerRegex", err);
 }
 

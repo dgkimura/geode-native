@@ -76,7 +76,6 @@ class CPPCACHE_EXPORT ThinClientRegion : public LocalRegion {
                             bool receiveValues = true);
   virtual void unregisterKeys(const VectorOfCacheableKey& keys);
   virtual void registerAllKeys(bool isDurable = false,
-                               VectorOfCacheableKeyPtr resultKeys = nullptr,
                                bool getInitialValues = false,
                                bool receiveValues = true);
   virtual void unregisterAllKeys();

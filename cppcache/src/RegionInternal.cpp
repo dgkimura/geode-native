@@ -58,7 +58,6 @@ void RegionInternal::unregisterKeys(const VectorOfCacheableKey& keys) {
 }
 
 void RegionInternal::registerAllKeys(bool isDurable,
-                                     VectorOfCacheableKeyPtr resultKeys,
                                      bool getInitialValues,
                                      bool receiveValues) {
   throw UnsupportedOperationException(

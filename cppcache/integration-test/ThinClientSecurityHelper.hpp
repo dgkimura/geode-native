@@ -202,7 +202,7 @@ class putThread : public ACE_Task_Base {
     char buf[20];
     char valbuf[20];
     if (m_regInt) {
-      m_reg->registerAllKeys(false, nullptr, true);
+      m_reg->registerAllKeys(false, true);
     }
     if (m_waitTime != 0) {
       ACE_OS::sleep(m_waitTime);

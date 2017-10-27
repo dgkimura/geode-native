@@ -358,9 +358,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, StepOne_Pool_Locator)
     createPooledRegion(regionNames[1], NO_ACK, locatorsG, "__TEST_POOL1__",
                        true);
     RegionPtr regPtr = getHelper()->getRegion(regionNames[0]);
-    regPtr->registerAllKeys(false, nullptr, false, false);
+    regPtr->registerAllKeys(false, false, false);
     regPtr = getHelper()->getRegion(regionNames[1]);
-    regPtr->registerAllKeys(false, nullptr, false, false);
+    regPtr->registerAllKeys(false, false, false);
     LOG("StepOne complete.");
   }
 END_TASK_DEFINITION
@@ -376,9 +376,9 @@ DUNIT_TASK_DEFINITION(CLIENT2, StepTwo_Pool_Locator)
     createPooledRegion(regionNames[1], NO_ACK, locatorsG, "__TEST_POOL1__",
                        true);
     RegionPtr regPtr = getHelper()->getRegion(regionNames[0]);
-    regPtr->registerAllKeys(false, nullptr, false, false);
+    regPtr->registerAllKeys(false, false, false);
     regPtr = getHelper()->getRegion(regionNames[1]);
-    regPtr->registerAllKeys(false, nullptr, false, false);
+    regPtr->registerAllKeys(false, false, false);
     LOG("StepTwo complete.");
   }
 END_TASK_DEFINITION
