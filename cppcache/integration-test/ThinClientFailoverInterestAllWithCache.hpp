@@ -339,11 +339,10 @@ DUNIT_TASK_DEFINITION(CLIENT2, InitializeClient2Regex)
 
     RegionPtr regPtr0 = getHelper()->getRegion(regionNames[0]);
     RegionPtr regPtr1 = getHelper()->getRegion(regionNames[1]);
-    auto resultKeys = std::make_shared<VectorOfCacheableKey>();
     // create a local entry to check for no change after register interest
     createEntry(regionNames[0], keys[1], nvals[1]);
-    regPtr0->registerRegex(".*", false, resultKeys, true);
-    regPtr1->registerRegex(".*", false, nullptr, true);
+    regPtr0->registerRegex(".*", false, true);
+    regPtr1->registerRegex(".*", false, true);
 
     // check that initial entries are created properly
     ASSERT(regPtr0->size() == 1, "Expected one entry in region");
@@ -360,9 +359,6 @@ END_TASK_DEFINITION
 
 DUNIT_TASK_DEFINITION(CLIENT1, VerifyClient1)
   {
-    // check the combination of (resultKeys != nullptr) and
-    // (getValues == false) in registerAllKeys
-    auto resultKeys = std::make_shared<VectorOfCacheableKey>();
     RegionPtr regPtr0 = getHelper()->getRegion(regionNames[0]);
     regPtr0->registerAllKeys(false, false);
 
@@ -373,8 +369,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, VerifyClient1)
 
     // check the same for registerRegex(".*")
     RegionPtr regPtr1 = getHelper()->getRegion(regionNames[1]);
-    resultKeys->clear();
-    regPtr1->registerRegex(".*", false, resultKeys, false);
+    regPtr1->registerRegex(".*", false, false);
 
     ASSERT(regPtr1->size() == 1, "Expected one entry in region");
     ASSERT(regPtr1->containsKey(keys[3]), "Expected region to contain the key");

@@ -1224,7 +1224,6 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    * @throws TimeoutException if operation timed out
    */
   virtual void registerRegex(const char* regex, bool isDurable = false,
-                             VectorOfCacheableKeyPtr resultKeys = nullptr,
                              bool getInitialValues = false,
                              bool receiveValues = true) = 0;
 

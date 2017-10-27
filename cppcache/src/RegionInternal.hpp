@@ -154,7 +154,6 @@ class RegionInternal : public Region {
   virtual void unregisterAllKeys();
 
   virtual void registerRegex(const char* regex, bool isDurable = false,
-                             VectorOfCacheableKeyPtr resultKeys = nullptr,
                              bool getInitialValues = false,
                              bool receiveValues = true);
   virtual void unregisterRegex(const char* regex);

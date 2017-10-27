@@ -499,8 +499,8 @@ void ThinClientRegion::registerAllKeys(bool isDurable,
   // that call itself using the special GET_ALL message and do not need
   // to get the keys in the initial  register interest  call
   GfErrType err =
-      registerRegexNoThrow(".*", true, nullptr, isDurable,
-                           resultKeys, interestPolicy, receiveValues);
+      registerRegexNoThrow(".*", true, nullptr, isDurable, resultKeys,
+                           interestPolicy, receiveValues);
 
   if (m_tcrdm->isFatalError(err)) {
     GfErrTypeToException("Region::registerAllKeys", err);
@@ -511,7 +511,6 @@ void ThinClientRegion::registerAllKeys(bool isDurable,
 }
 
 void ThinClientRegion::registerRegex(const char* regex, bool isDurable,
-                                     VectorOfCacheableKeyPtr resultKeys,
                                      bool getInitialValues,
                                      bool receiveValues) {
   PoolPtr pool = m_cacheImpl->getCache()->getPoolManager().find(

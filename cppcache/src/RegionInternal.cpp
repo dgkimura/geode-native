@@ -70,7 +70,6 @@ void RegionInternal::unregisterAllKeys() {
 }
 
 void RegionInternal::registerRegex(const char* regex, bool isDurable,
-                                   VectorOfCacheableKeyPtr resultKeys,
                                    bool getInitialValues, bool receiveValues) {
   throw UnsupportedOperationException(
       "registerRegex only supported by Thin Client Region.");
