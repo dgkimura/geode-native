@@ -226,11 +226,8 @@ DUNIT_TASK_DEFINITION(ADMIN_CLIENT, StepOne)
       VectorOfCacheableKey keysVec;
       keysVec.push_back(key0);
       keysVec.push_back(key2);
-      auto result = regPtr0->getAll(keysVec);
-      auto& values = std::get<0>(result);
-      const auto& exceptions = std::get<1>(result);
+      auto values = regPtr0->getAll(keysVec);
       ASSERT(values.size() == 2, "Expected 2 entries");
-      ASSERT(exceptions.size() == (size_t)0, "Expected no exceptions");
       auto res0 = std::dynamic_pointer_cast<CacheableString>(values[key0]);
       auto res2 = std::dynamic_pointer_cast<CacheableString>(values[key2]);
       ASSERT(*res0 == *val0, "Unexpected value for key");
@@ -291,12 +288,9 @@ DUNIT_TASK_DEFINITION(READER_CLIENT, StepThree)
     VectorOfCacheableKey keys;
     getKeysVector(keys, 6);
     RegionPtr rptr = getHelper()->getRegion(regionNamesAuth[0]);
-    auto result = rptr->getAll(keys);
-    auto values = std::get<0>(result);
-    auto exceptions = std::get<1>(result);
+    auto values = rptr->getAll(keys);
 
     checkValuesMap(values, 2, 6);
-    checkExceptionsMap(exceptions, 2, 6);
 
     LOG("StepThree complete.");
   }
@@ -310,12 +304,9 @@ DUNIT_TASK_DEFINITION(READER2_CLIENT, StepFour)
     VectorOfCacheableKey keys;
     getKeysVector(keys, 6);
     RegionPtr rptr = getHelper()->getRegion(regionNamesAuth[0]);
-    auto result = rptr->getAll(keys);
-    auto values = std::get<0>(result);
-    auto exceptions = std::get<1>(result);
+    auto values = rptr->getAll(keys);
 
     checkValuesMap(values, 3, 6);
-    checkExceptionsMap(exceptions, 3, 6);
 
     LOG("StepFour complete.");
   }

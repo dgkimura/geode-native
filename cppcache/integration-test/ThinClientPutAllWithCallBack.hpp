@@ -493,9 +493,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, PutAllOps)
     }
 
 
-    const auto result = regPtr0->getAll(getAllkeys);
-    const auto& valuesMap = std::get<0>(result);
-    ASSERT(valuesMap.size() == 500, "GetAll should return 500 entries.");
+    const auto values = regPtr0->getAll(getAllkeys);
+    ASSERT(values.size() == 500, "GetAll should return 500 entries.");
 
     LOG("PutAllOps complete.");
   }
@@ -757,10 +756,10 @@ DUNIT_TASK_DEFINITION(CLIENT1, VerifyPutAllWithObjectKey)
     VectorOfCacheableKey keys1;
     keys1.push_back(keyObject7);
     keys1.push_back(keyObject8);
-    const auto valuesMap = std::get<0>(regPtr0->getAll(keys1));
-    if (valuesMap.size() == keys1.size()) {
+    const auto values = regPtr0->getAll(keys1);
+    if (values.size() == keys1.size()) {
       char buf[2048];
-      for (const auto& iter : valuesMap) {
+      for (const auto& iter : values) {
         auto key = std::dynamic_pointer_cast<CacheableKey>(iter.first);
         CacheablePtr mVal = iter.second;
         if (mVal != nullptr) {

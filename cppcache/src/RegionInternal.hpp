@@ -175,7 +175,7 @@ class RegionInternal : public Region {
   virtual GfErrType getNoThrow(const CacheableKeyPtr& key, CacheablePtr& value,
                                const SerializablePtr& aCallbackArgument) = 0;
 
-  virtual std::tuple<HashMapOfCacheable, HashMapOfException> getAll_internal(
+  virtual HashMapOfCacheable getAll_internal(
       const VectorOfCacheableKey& keys,
       const SerializablePtr& aCallbackArgument, bool addToLocalCache) = 0;
 

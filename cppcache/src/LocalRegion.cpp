@@ -529,13 +529,13 @@ VectorOfRegionEntry LocalRegion::entries(bool recursive) {
   return entries;
 }
 
-std::tuple<HashMapOfCacheable, HashMapOfException> LocalRegion::getAll(
+HashMapOfCacheable LocalRegion::getAll(
     const VectorOfCacheableKey& keys,
     const SerializablePtr& aCallbackArgument) {
   return getAll_internal(keys, aCallbackArgument, true);
 }
 
-std::tuple<HashMapOfCacheable, HashMapOfException> LocalRegion::getAll_internal(
+HashMapOfCacheable LocalRegion::getAll_internal(
     const VectorOfCacheableKey& keys, const SerializablePtr& aCallbackArgument,
     bool addToLocalCache) {
 
@@ -555,7 +555,7 @@ std::tuple<HashMapOfCacheable, HashMapOfException> LocalRegion::getAll_internal(
 
   GfErrTypeToException("Region::getAll", err);
 
-  return std::make_tuple(std::move(*values), std::move(*exceptions));
+  return *values;
 }
 
 uint32_t LocalRegion::size_remote() {
@@ -986,20 +986,6 @@ GfErrType LocalRegion::getAllNoThrow(const VectorOfCacheableKey& keys,
     if (isLocalOp()) {
       return GF_NOTSUP;
     }
-    //		if(!txState->isReplay())
-    //		{
-    //			auto args =
-    // std::make_shared<VectorOfCacheable>();
-    //			args->push_back(VectorOfCacheableKeyPtr(new
-    // VectorOfCacheableKey(keys)));
-    //			args->push_back(values);
-    //			args->push_back(exceptions);
-    //			args->push_back(CacheableBoolean::create(addToLocalCache));
-    //			txState->recordTXOperation(GF_GET_ALL,
-    // getFullPath(),
-    // nullptr,
-    // args);
-    //		}
     err = getAllNoThrow_remote(&keys, values, exceptions, nullptr, false,
                                aCallbackArgument);
     if (err == GF_NOERR) {
@@ -1098,14 +1084,6 @@ class PutActions {
                                 const CacheablePtr& value,
                                 const SerializablePtr& aCallbackArgument,
                                 VersionTagPtr& versionTag) {
-    //    	if(m_txState != nullptr && !m_txState->isReplay())
-    //    	{
-    //    		auto args = std::make_shared<VectorOfCacheable>();
-    //    		args->push_back(value);
-    //    		args->push_back(aCallbackArgument);
-    //    		m_txState->recordTXOperation(GF_PUT,
-    //    m_region.getFullPath(), key, args);
-    //    	}
     // propagate the put to remote server, if any
     return m_region.putNoThrow_remote(key, value, aCallbackArgument,
                                       versionTag);
@@ -1183,16 +1161,7 @@ class CreateActions {
                                 const CacheablePtr& value,
                                 const SerializablePtr& aCallbackArgument,
                                 VersionTagPtr& versionTag) {
-    // propagate the create to remote server, if any
-    //  	  if(m_txState != nullptr && !m_txState->isReplay())
-    //  	  {
-    //  		  auto args = std::make_shared<VectorOfCacheable>();
-    //  		  args->push_back(value);
-    //  		  args->push_back(aCallbackArgument);
-    //  		  m_txState->recordTXOperation(GF_CREATE,
-    //  m_region.getFullPath(), key, args);
-    //  	  }
-    return m_region.createNoThrow_remote(key, value, aCallbackArgument,
+     return m_region.createNoThrow_remote(key, value, aCallbackArgument,
                                          versionTag);
   }
 
@@ -1255,15 +1224,6 @@ class DestroyActions {
                                 const CacheablePtr& value,
                                 const SerializablePtr& aCallbackArgument,
                                 VersionTagPtr& versionTag) {
-    // propagate the destroy to remote server, if any
-    //    	if(m_txState != nullptr && !m_txState->isReplay())
-    //    	{
-    //    		auto args = std::make_shared<VectorOfCacheable>();
-    //    		args->push_back(aCallbackArgument);
-    //    		m_txState->recordTXOperation(GF_DESTROY,
-    //    m_region.getFullPath(), key, args);
-    //    	}
-
     return m_region.destroyNoThrow_remote(key, aCallbackArgument, versionTag);
   }
 
@@ -1403,16 +1363,6 @@ class RemoveActions {
           return err;
         }
       } else if ((valuePtr == nullptr || CacheableToken::isInvalid(valuePtr))) {
-        //        	if(m_txState != nullptr && !m_txState->isReplay())
-        //        	{
-        //        		VectorOfCacheablePtr args(new
-        //        VectorOfCacheable());
-        //        		args->push_back(value);
-        //        		args->push_back(aCallbackArgument);
-        //        		m_txState->recordTXOperation(GF_REMOVE,
-        //        m_region.getFullPath(), key, args);
-        //        	}
-
         m_ServerResponse = m_region.removeNoThrow_remote(
             key, value, aCallbackArgument, versionTag);
 
@@ -1422,14 +1372,6 @@ class RemoveActions {
         return err;
       }
     }
-    //  	if(m_txState != nullptr && !m_txState->isReplay())
-    //  	{
-    //  		auto args = std::make_shared<VectorOfCacheable>();
-    //  		args->push_back(value);
-    //  		args->push_back(aCallbackArgument);
-    //  		m_txState->recordTXOperation(GF_REMOVE,
-    //  m_region.getFullPath(), key, args);
-    //  	}
     if (allowNULLValue) {
       m_ServerResponse =
           m_region.removeNoThrowEX_remote(key, aCallbackArgument, versionTag);
@@ -1601,13 +1543,6 @@ class InvalidateActions {
                                 const CacheablePtr& value,
                                 const SerializablePtr& aCallbackArgument,
                                 VersionTagPtr& versionTag) {
-    //    	if(m_txState != nullptr && !m_txState->isReplay())
-    //    	{
-    //    		auto args = std::make_shared<VectorOfCacheable>();
-    //    		args->push_back(aCallbackArgument);
-    //    		m_txState->recordTXOperation(GF_INVALIDATE,
-    //    m_region.getFullPath(), key, args);
-    //    	}
     // propagate the invalidate to remote server, if any
     return m_region.invalidateNoThrow_remote(key, aCallbackArgument,
                                              versionTag);

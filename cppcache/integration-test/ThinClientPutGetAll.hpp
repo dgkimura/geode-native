@@ -74,7 +74,7 @@ void verifyGetAll(RegionPtr region, bool addToLocalCache, const char** _vals,
   expected[_keys[0]] = _vals[startIndex + 0];
   expected[_keys[1]] = _vals[startIndex + 1];
 
-  auto valuesMap = std::get<0>(region->getAll(keys1, callBack));
+  auto valuesMap = region->getAll(keys1, callBack);
   if (valuesMap.size() == keys1.size()) {
     char buf[2048];
     for (const auto& iter : valuesMap) {
@@ -339,7 +339,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, putallAndGetallPdxWithCallBackArg)
     keys1.push_back(CacheableInt32::create(29));
     keys1.push_back(CacheableInt32::create(30));
     auto valuesMap =
-        std::get<0>(regPtr0->getAll(keys1, CacheableInt32::create(1000)));
+        regPtr0->getAll(keys1, CacheableInt32::create(1000));
     LOG("GetallPdxWithCallBackArg on Pdx objects completed.");
 
     ASSERT(valuesMap.size() == keys1.size(), "getAll size did not match");
@@ -514,7 +514,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, putallAndGetallPdx)
     keys1.push_back(CacheableInt32::create(28));
     keys1.push_back(CacheableInt32::create(29));
     keys1.push_back(CacheableInt32::create(30));
-    auto valuesMap = std::get<0>(regPtr0->getAll(keys1));
+    auto valuesMap = regPtr0->getAll(keys1);
     LOG("getAll on Pdx objects completed.");
 
     ASSERT(valuesMap.size() == keys1.size(), "getAll size did not match");

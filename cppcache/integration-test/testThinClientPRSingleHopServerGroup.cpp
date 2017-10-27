@@ -194,7 +194,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForIntKeysTask_CLIENT1)
       auto exceptions = std::make_shared<HashMapOfException>();
 
       try {
-        auto values = std::get<0>(dataReg->getAll(keys));
+        auto values = dataReg->getAll(keys);
         bool networkhop = TestUtils::getCacheImpl(getHelper()->cachePtr)
                               ->getAndResetNetworkHopFlag();
         ASSERT(!networkhop, "It is networkhop operation.");
@@ -362,7 +362,7 @@ DUNIT_TASK_DEFINITION(CLIENT2, CheckPrSingleHopForIntKeysTask_CLIENT2)
       }
 
       try {
-        const auto values = std::get<0>(dataReg->getAll(keys));
+        const auto values = dataReg->getAll(keys);
         int8_t serverGroupFlag = TestUtils::getCacheImpl(getHelper()->cachePtr)
                                      ->getAndResetServerGroupFlag();
         ASSERT(values.size() == 5, "getall size should be 5 ");

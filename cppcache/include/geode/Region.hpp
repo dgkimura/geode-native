@@ -22,8 +22,6 @@
 
 //#### Warning: DO NOT directly include Region.hpp, include Cache.hpp instead.
 
-#include <tuple>
-
 #include "geode_globals.hpp"
 #include "geode_types.hpp"
 #include "CacheableKey.hpp"
@@ -1305,7 +1303,7 @@ class CPPCACHE_EXPORT Region : public std::enable_shared_from_this<Region> {
    *
    * @see get
    */
-  virtual std::tuple<HashMapOfCacheable, HashMapOfException> getAll(
+  virtual HashMapOfCacheable getAll(
       const VectorOfCacheableKey& keys,
       const SerializablePtr& aCallbackArgument = nullptr) = 0;
 

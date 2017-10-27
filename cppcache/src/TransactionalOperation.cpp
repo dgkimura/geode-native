@@ -99,15 +99,9 @@ CacheablePtr TransactionalOperation::replay(Cache* cache) {
                   std::static_pointer_cast<CacheableBoolean>(m_arguments->at(3))
                       ->value());
 
-      const auto& tmpValues = std::get<0>(result);
       auto values =
           std::dynamic_pointer_cast<HashMapOfCacheable>(m_arguments->at(1));
-      values->insert(tmpValues.begin(), tmpValues.end());
-
-      const auto& tmpExceptions = std::get<1>(result);
-      auto exceptions =
-          std::dynamic_pointer_cast<HashMapOfException>(m_arguments->at(2));
-      exceptions->insert(tmpExceptions.begin(), tmpExceptions.end());
+      values->insert(result.begin(), result.end());
       break;
     }
     case GF_INVALIDATE:

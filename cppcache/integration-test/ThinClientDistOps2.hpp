@@ -176,11 +176,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1GetAll)
     keys0.push_back(key0);
     keys0.push_back(key1);
     {
-      auto results = reg0->getAll(keys0);
-      auto& values = std::get<0>(results);
-      auto& exceptions = std::get<1>(results);
+      auto values = reg0->getAll(keys0);
       ASSERT(values.size() == 2, "Expected 2 values");
-      ASSERT(exceptions.size() == 0, "Expected no exceptions");
       auto val0 = std::dynamic_pointer_cast<CacheableString>(values[key0]);
       auto val1 = std::dynamic_pointer_cast<CacheableString>(values[key1]);
       ASSERT(strcmp(_nvals[0], val0->asChar()) == 0, "Got unexpected value");
@@ -198,11 +195,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1GetAll)
     keys1.push_back(key3);
 
     {
-      auto results = reg1->getAll(keys1);
-      auto& values = std::get<0>(results);
-      auto& exceptions = std::get<1>(results);
+      auto values = reg1->getAll(keys1);
       ASSERT(values.size() == 2, "Expected 2 values");
-      ASSERT(exceptions.size() == 0, "Expected no exceptions");
       auto val2 = std::dynamic_pointer_cast<CacheableString>(values[key2]);
       auto val3 = std::dynamic_pointer_cast<CacheableString>(values[key3]);
       ASSERT(strcmp(_nvals[2], val2->asChar()) == 0, "Got unexpected value");
@@ -219,9 +213,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1GetAll)
     // also check with nullptr values that region is properly populated
     {
       reg1->localInvalidate(key3);
-      auto results = reg1->getAll(keys1);
-      auto& values = std::get<0>(results);
-      auto& exceptions = std::get<1>(results);
+      auto values = reg1->getAll(keys1);
       // now check that the region is properly populated
       ASSERT(reg1->size() == 2, "Expected 2 entries in the region");
       regEntries = reg1->entries(false);
@@ -256,12 +248,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1GetAll_Pool)
       keys0.push_back(key0);
       keys0.push_back(key1);
 
-      auto results = reg0->getAll(keys0);
-      auto &values = std::get<0>(results);
-      auto &exceptions = std::get<1>(results);
+      auto values = reg0->getAll(keys0);
 
       ASSERT(values.size() == 2, "Expected 2 values");
-      ASSERT(exceptions.size() == 0, "Expected no exceptions");
       auto val0 = std::dynamic_pointer_cast<CacheableString>(values[key0]);
       auto val1 = std::dynamic_pointer_cast<CacheableString>(values[key1]);
       ASSERT(strcmp(_nvals[0], val0->asChar()) == 0, "Got unexpected value");
@@ -279,12 +268,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, Client1GetAll_Pool)
       keys1.push_back(key2);
       keys1.push_back(key3);
 
-      auto results = reg1->getAll(keys1);
-      auto &values = std::get<0>(results);
-      auto &exceptions = std::get<1>(results);
+      auto values = reg1->getAll(keys1);
 
       ASSERT(values.size() == 2, "Expected 2 values");
-      ASSERT(exceptions.size() == 0, "Expected no exceptions");
       auto val2 = std::dynamic_pointer_cast<CacheableString>(values[key2]);
       auto val3 = std::dynamic_pointer_cast<CacheableString>(values[key3]);
       ASSERT(strcmp(_nvals[2], val2->asChar()) == 0, "Got unexpected value");

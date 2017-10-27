@@ -873,11 +873,10 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckPrSingleHopForGetAllTask)
       keys.push_back(keyPtr);
     }
 
-    auto valuesMap = std::get<0>(dataReg->getAll(keys));
+    auto valuesMap = dataReg->getAll(keys);
     ASSERT(valuesMap.size() == 100, "GetAll returns wrong number of values");
 
-    valuesMap =
-        std::get<0>(dataReg->getAll(keys, CacheableInt32::create(1000)));
+    valuesMap = dataReg->getAll(keys, CacheableInt32::create(1000));
     ASSERT(valuesMap.size() == 100,
            "GetAllWithCallBack returns wrong number of values");
 
@@ -1247,7 +1246,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckGetAllTask)
     }
 
     ACE_Time_Value startTime = ACE_OS::gettimeofday();
-    auto valuesMap = std::get<0>(dataReg->getAll(keys));
+    auto valuesMap = dataReg->getAll(keys);
     ACE_Time_Value interval = ACE_OS::gettimeofday() - startTime;
     LOGDEBUG("NILKANTH: Time taken to execute getALL sec = %d and MSec = %d ",
              interval.sec(), interval.usec());
@@ -1255,7 +1254,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, CheckGetAllTask)
            "GetAll returns wrong number of values");
 
     valuesMap =
-        std::get<0>(dataReg->getAll(keys, CacheableInt32::create(10000)));
+        dataReg->getAll(keys, CacheableInt32::create(10000));
     ASSERT(valuesMap.size() == 100000,
            "GetAllWithCallBack returns wrong number of values");
 

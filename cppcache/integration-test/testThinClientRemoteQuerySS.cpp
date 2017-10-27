@@ -534,43 +534,28 @@ DUNIT_TASK_DEFINITION(CLIENT1, GetAll)
 
     // execute getAll for different regions and verify results
     {
-      auto results = regPtr0->getAll(portKeys);
-      auto resMap = std::get<0>(results);
-      auto exMap = std::get<1>(results);
+      auto resMap = regPtr0->getAll(portKeys);
       compareMaps(resMap, expectedPortMap);
-      ASSERT(exMap.size() == 0, "Expected no exceptions");
     }
 
     {
-      auto results = regPtr1->getAll(posKeys);
-      auto resMap = std::get<0>(results);
-      auto exMap = std::get<1>(results);
+      auto resMap = regPtr1->getAll(posKeys);
       compareMaps(resMap, expectedPosMap);
-      ASSERT(exMap.size() == 0, "Expected no exceptions");
     }
 
     {
-      auto results = regPtr2->getAll(posKeys);
-      auto resMap = std::get<0>(results);
-      auto exMap = std::get<1>(results);
+      auto resMap = regPtr2->getAll(posKeys);
       compareMaps(resMap, expectedPosMap);
-      ASSERT(exMap.size() == 0, "Expected no exceptions");
     }
 
     {
-      auto results = regPtr3->getAll(portKeys);
-      auto resMap = std::get<0>(results);
-      auto exMap = std::get<1>(results);
+      auto resMap = regPtr3->getAll(portKeys);
       compareMaps(resMap, expectedPortMap);
-      ASSERT(exMap.size() == 0, "Expected no exceptions");
     }
 
     {
-      auto results = regPtr4->getAll(portKeys);
-      auto resMap = std::get<0>(results);
-      auto exMap = std::get<1>(results);
+      auto resMap = regPtr4->getAll(portKeys);
       compareMaps(resMap, expectedPortMap);
-      ASSERT(exMap.size() == 0, "Expected no exceptions");
     }
   }
 END_TASK_DEFINITION

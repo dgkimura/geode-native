@@ -284,7 +284,7 @@ void verifyGetAll(RegionPtr region, int startIndex) {
   for (int i = 0; i <= 100; i++) keysVector.push_back(CacheableKey::create(i));
 
   // keysVector.push_back(CacheableKey::create(101)); //key not there
-  const auto valuesMap = std::get<0>(region->getAll(keysVector));
+  const auto valuesMap = region->getAll(keysVector);
   if (valuesMap.size() == keysVector.size()) {
     int i = startIndex;
     for (const auto& iter : valuesMap) {

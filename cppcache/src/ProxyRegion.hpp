@@ -1362,7 +1362,7 @@ class CPPCACHE_EXPORT ProxyRegion : public Region {
    *
    * @see get
    */
-  virtual std::tuple<HashMapOfCacheable, HashMapOfException> getAll(
+  virtual HashMapOfCacheable getAll(
       const VectorOfCacheableKey& keys,
       const SerializablePtr& aCallbackArgument = nullptr) {
     GuardUserAttribures gua(m_proxyCache);

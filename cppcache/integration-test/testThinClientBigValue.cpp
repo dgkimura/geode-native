@@ -354,7 +354,7 @@ DUNIT_TASK(CLIENT2, VerifyUpdatedManyPutsInt64GetAll)
       int64_t key = index * index * index;
       vec.push_back(CacheableInt64::create(key));
     }
-    const auto valuesMap = std::get<0>(regPtr->getAll(vec));
+    const auto valuesMap = regPtr->getAll(vec);
     LOG("On client getAll for int64 entries completed.");
     for (int32_t index = 0; index < entriesExpected; ++index) {
       auto key = vec[index];
