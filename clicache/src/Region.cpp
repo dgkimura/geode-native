@@ -1329,18 +1329,12 @@ namespace Apache
         {
           ManagedString mg_regex(regex);
           if (resultKeys != nullptr) {
-            auto mg_keys = std::make_shared<native::VectorOfCacheableKey>();
             m_nativeptr->get()->registerRegex(mg_regex.CharPtr, isDurable,
-              mg_keys, getInitialValues, receiveValues);
-
-            for (System::Int32 index = 0; index < mg_keys->size(); ++index) {
-              resultKeys->Add(Serializable::GetManagedValueGeneric<TKey>(
-                mg_keys->operator[](index)));
-            }
+              getInitialValues, receiveValues);
           }
           else {
             m_nativeptr->get()->registerRegex(mg_regex.CharPtr, isDurable,
-              nullptr, getInitialValues, receiveValues);
+              getInitialValues, receiveValues);
           }
         }
         finally
