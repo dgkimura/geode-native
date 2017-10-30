@@ -1936,14 +1936,13 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     ASSERT((cpo.get()->equals(*childpdxobjPtr.get())) == true,
            "child pdx should be equal");
 
-    char parentCharVal = ' ';
     char parentCharSetVal = 'Z';
     wpiPtr = pIPtr->createWriter();
     wpiPtr->setField("m_char", parentCharSetVal);
     rptr->put(keyport1, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport1));
     ASSERT(newPiPtr->hasField("m_char") == true, "m_char = true expected");
-    newPiPtr->getField("m_char", parentCharVal);
+    auto parentCharVal = newPiPtr->getCharField("m_char");
     ASSERT(parentCharVal == parentCharSetVal, "char is not equal");
 
     wchar_t setParentWideCharArray[] = {L'c', L'v', L'c', L'v'};
@@ -2428,7 +2427,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, pdxIFPutGetTest)
     pifPtr->writeArrayOfByteArrays(
         "m_byteByteArray", pdxobj->getArrayOfByteArrays(), 2, lengthArr);
     pifPtr->markIdentityField("m_byteByteArray");
-    pifPtr->writeWideChar("m_char", pdxobj->getChar());
+    pifPtr->writeChar("m_char", pdxobj->getChar());
     pifPtr->markIdentityField("m_char");
     pifPtr->writeWideCharArray("m_charArray", pdxobj->getCharArray(), 2);
     pifPtr->markIdentityField("m_charArray");
@@ -2579,7 +2578,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, pdxIFPutGetTest)
                               pp->getWideParentArrayName(), 3);
     if2->writeObject("m_childPdx", pp->getChildPdx());
     if2->writeChar("m_char", pp->getChar());
-    if2->writeWideChar("m_wideChar", pp->getWideChar());
+    if2->writeChar("m_wideChar", pp->getChar());
     if2->writeCharArray("m_charArray", pp->getCharArray(), 2);
     if2->writeWideCharArray("m_wideCharArray", pp->getWideCharArray(), 2);
 

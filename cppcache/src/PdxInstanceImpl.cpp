@@ -135,9 +135,8 @@ void PdxInstanceImpl::writeField(PdxWriterPtr writer, const char* fieldName,
       break;
     }
     case PdxFieldTypes::CHAR: {
-      CacheableWideChar* val = dynamic_cast<CacheableWideChar*>(value.get());
-      if (val != nullptr) {
-        writer->writeChar(fieldName, static_cast<char>(val->value()));
+      if (auto val = std::dynamic_pointer_cast<CacheableCharacter>(value)) {
+        writer->writeChar(fieldName, val->value());
       }
       break;
     }
@@ -837,10 +836,9 @@ double PdxInstanceImpl::getDoubleField(const char* fieldname) const {
   return dataInput->readDouble();
 }
 
-void PdxInstanceImpl::getField(const char* fieldname, char& value) const {
+char16_t PdxInstanceImpl::getCharField(const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
-  uint16_t temp =  dataInput->readInt16();
-  value = static_cast<char>(temp);
+  return dataInput->readInt16();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, bool** value,
@@ -1038,8 +1036,7 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::CHAR: {
-        char value = 0;
-        getField(identityFields.at(i)->getFieldName(), value);
+        auto value = getCharField(identityFields.at(i)->getFieldName());
         ACE_OS::snprintf(buf, 2048, "%c", value);
         toString += buf;
         break;
@@ -1959,30 +1956,19 @@ void PdxInstanceImpl::setField(const char* fieldName, double value) {
   m_updatedFields[fieldName] = cacheableObject;
 }
 
-void PdxInstanceImpl::setField(const char* fieldName, char value) {
+void PdxInstanceImpl::setField(const char* fieldName, char16_t value) {
   PdxTypePtr pt = getPdxType();
   PdxFieldTypePtr pft = pt->getPdxField(fieldName);
 
   if (pft != nullptr && pft->getTypeId() != PdxFieldTypes::CHAR) {
     char excpStr[256] = {0};
-    /* adongre - Coverity II
-     * CID 29230: Calling risky function (SECURE_CODING)[VERY RISKY]. Using
-     * "sprintf" can cause a
-     * buffer overflow when done incorrectly. Because sprintf() assumes an
-     * arbitrarily long string,
-     * callers must be careful not to overflow the actual space of the
-     * destination.
-     * Use snprintf() instead, or correct precision specifiers.
-     * Fix : using ACE_OS::snprintf
-     */
     ACE_OS::snprintf(
         excpStr, 256,
         "PdxInstance doesn't has field %s or type of field not matched %s ",
         fieldName, (pft != nullptr ? pft->toString()->asChar() : ""));
     throw IllegalStateException(excpStr);
   }
-  wchar_t tempWideChar = static_cast<wchar_t>(value);
-  CacheablePtr cacheableObject = CacheableWideChar::create(tempWideChar);
+  CacheablePtr cacheableObject = CacheableCharacter::create(value);
   m_updatedFields[fieldName] = cacheableObject;
 }
 

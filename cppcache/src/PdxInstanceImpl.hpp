@@ -153,7 +153,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldName, char& value) const;
+  virtual char16_t getCharField(const char* fieldName) const;
 
   /**
    * Reads the named field and set its value in bool array type out param.
@@ -542,7 +542,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    * @throws IllegalStateException if the named field does not exist
    * or if the type of the value is not compatible with the field.
    */
-  virtual void setField(const char* fieldName, char value);
+  virtual void setField(const char* fieldName, char16_t value);
 
   /**
    * Set the existing named field to the given value.

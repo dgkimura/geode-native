@@ -101,10 +101,6 @@ class CPPCACHE_EXPORT PdxInstance : public PdxSerializable {
   /**
    * Reads the named field and set its value in signed char type out param.
    * signed char type is corresponding to java byte type.
-   * For C++ on Windows and Linux, signed char type is corresponding to int8_t
-   * type.
-   * However C++ users on Solaris should always use this api after casting
-   * int8_t to signed char.
    * @param fieldname name of the field to read
    * @param value value of the field to be set with signed char type.
    * @throws IllegalStateException if PdxInstance doesn't has the named field.
@@ -175,7 +171,7 @@ class CPPCACHE_EXPORT PdxInstance : public PdxSerializable {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldName, char& value) const = 0;
+  virtual char16_t getCharField(const char* fieldName) const = 0;
 
   /**
    * Reads the named field and set its value in bool array type out param.
@@ -192,10 +188,7 @@ class CPPCACHE_EXPORT PdxInstance : public PdxSerializable {
 
   /**
    * Reads the named field and set its value in signed char array type out
-   * param. signed char* type is corresponding to java byte[] type. For C++ on
-   * Windows and Linux, signed char* type is corresponding to int8_t* type.
-   * However C++ users on Solaris should always use this api after casting
-   * int8_t* to signed char*.
+   * param. signed char* type is corresponding to java byte[] type.
    * @param fieldname name of the field to read
    * @param value value of the field to be set with signed char array type.
    * @param length length is set with number of signed char elements.

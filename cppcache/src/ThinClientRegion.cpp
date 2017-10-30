@@ -3472,7 +3472,6 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
   auto input = cache->createDataInput(chunk, chunkLen);
   input->setPoolName(m_msg.getPoolName());
   uint32_t partLen;
-  int8_t isObj;
   TcrMessageHelper::ChunkObjectType objType;
   if ((objType = TcrMessageHelper::readChunkPartHeader(
            m_msg, *input, GeodeTypeIdsImpl::FixedIDByte,

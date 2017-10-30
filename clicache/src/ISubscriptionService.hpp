@@ -254,9 +254,6 @@ namespace Apache
         /// Should only be called for durable clients and with cache server version 5.5 onwards.
         /// </summary>
         /// <param name="isDurable">whether the registration should be durable</param>
-        /// <param name="resultKeys">
-        /// if non-null then all keys on the server are returned
-        /// </param>
         /// <param name="getInitialValues">
         /// true to populate the cache with values of all the keys
         /// from the server
@@ -292,9 +289,6 @@ namespace Apache
         /// Should only be called for durable clients and with cache server version 5.5 onwards.
         /// </summary>
         /// <param name="isDurable">whether the registration should be durable</param>
-        /// <param name="resultKeys">
-        /// if non-null then all keys on the server are returned
-        /// </param>
         /// <param name="getInitialValues">
         /// true to populate the cache with values of all the keys
         /// from the server

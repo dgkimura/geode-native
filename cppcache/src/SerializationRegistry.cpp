@@ -98,7 +98,7 @@ void TheTypeMap::setup() {
   bind(CacheableArrayList::createDeserializable);
   bind(CacheableLinkedList::createDeserializable);
   bind(CacheableStack::createDeserializable);
-  bind(CacheableWideChar::createDeserializable);
+  bind(CacheableCharacter::createDeserializable);
   bind(CharArray::createDeserializable);
   bind(CacheableToken::createDeserializable);
   bind(RegionAttributes::createDeserializable);
