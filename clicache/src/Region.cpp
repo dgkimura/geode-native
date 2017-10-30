@@ -1296,46 +1296,32 @@ namespace Apache
       generic<class TKey, class TValue>
       void Region<TKey, TValue>::RegisterRegex(String^ regex)
       {
-        RegisterRegex(regex, false, nullptr, false);
+        RegisterRegex(regex, false, false);
       }
 
       generic<class TKey, class TValue>
       void Region<TKey, TValue>::RegisterRegex(String^ regex, bool isDurable)
       {
-        RegisterRegex(regex, isDurable, nullptr, false);
+        RegisterRegex(regex, isDurable, false);
       }
 
       generic<class TKey, class TValue>
-      void Region<TKey, TValue>::RegisterRegex(String^ regex, bool isDurable,
-                                                System::Collections::Generic::ICollection<TKey>^ resultKeys)
+      void Region<TKey, TValue>::RegisterRegex(String^ regex, bool isDurable, bool getInitialValues)
       {
-        RegisterRegex(regex, isDurable, resultKeys, false);
+        RegisterRegex(regex, isDurable, getInitialValues, true);
       }
 
       generic<class TKey, class TValue>
       void Region<TKey, TValue>::RegisterRegex(String^ regex, bool isDurable,
-                                                System::Collections::Generic::ICollection<TKey>^ resultKeys, bool getInitialValues)
-      {
-        RegisterRegex(regex, isDurable, resultKeys, getInitialValues, true);
-      }
-
-      generic<class TKey, class TValue>
-      void Region<TKey, TValue>::RegisterRegex(String^ regex, bool isDurable,
-                                                System::Collections::Generic::ICollection<TKey>^ resultKeys, bool getInitialValues, bool receiveValues)
+          bool getInitialValues, bool receiveValues)
       {
         _GF_MG_EXCEPTION_TRY2/* due to auto replace */
 
-          try
+        try
         {
           ManagedString mg_regex(regex);
-          if (resultKeys != nullptr) {
-            m_nativeptr->get()->registerRegex(mg_regex.CharPtr, isDurable,
-              getInitialValues, receiveValues);
-          }
-          else {
-            m_nativeptr->get()->registerRegex(mg_regex.CharPtr, isDurable,
-              getInitialValues, receiveValues);
-          }
+          m_nativeptr->get()->registerRegex(mg_regex.CharPtr, isDurable,
+            getInitialValues, receiveValues);
         }
         finally
         {
