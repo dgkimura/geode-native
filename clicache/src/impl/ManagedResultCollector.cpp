@@ -151,6 +151,7 @@ namespace apache
         try {
           Object^ rs = Apache::Geode::Client::Serializable::GetManagedValueGeneric<Object^>(result);
           m_managedptr->AddResult(rs);
+          GC::KeepAlive(rs);
         }
         catch (Apache::Geode::Client::GeodeException^ ex) {
           ex->ThrowNative();
