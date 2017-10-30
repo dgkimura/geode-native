@@ -45,20 +45,20 @@ class CPPCACHE_EXPORT NoResult : public ResultCollector {
  public:
   NoResult() {}
   ~NoResult() {}
-  inline void addResult(const CacheablePtr& resultOfSingleExecution) override {
+  inline void addResult(CacheablePtr& resultOfSingleExecution) {
     throw UnsupportedOperationException("can not add to NoResult");
   }
 
-  inline void endResults() override {
+  inline void endResults() {
     throw UnsupportedOperationException("can not close on NoResult");
   }
 
   inline CacheableVectorPtr getResult(
-      uint32_t timeout = DEFAULT_QUERY_RESPONSE_TIMEOUT) override {
+      uint32_t timeout = DEFAULT_QUERY_RESPONSE_TIMEOUT) {
     throw FunctionExecutionException(
         "Cannot return any result, as Function.hasResult() is false");
   }
-  inline void clearResults() override {
+  inline void clearResults() {
     throw UnsupportedOperationException("can not clear results on NoResult");
   }
 };

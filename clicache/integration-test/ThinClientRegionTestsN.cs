@@ -490,23 +490,13 @@ namespace Apache.Geode.Client.UnitTests
       Util.Log("RegexInterestAllStep2 Enters.");
       IRegion<object, object> region0 = CacheHelper.GetVerifyRegion<object, object>(m_regionNames[0]);
       IRegion<object, object> region1 = CacheHelper.GetVerifyRegion<object, object>(m_regionNames[1]);
-      List<object> resultKeys = new List<object>();
       //CreateEntry(m_regionNames[0], m_keys[1], m_vals[1]);
       //CreateEntry(m_regionNames[1], m_keys[1], m_vals[1]);
-      region0.GetSubscriptionService().RegisterAllKeys(false, resultKeys, true);
-      region1.GetSubscriptionService().RegisterAllKeys(false, null, true);
+      region0.GetSubscriptionService().RegisterAllKeys(false, true);
+      region1.GetSubscriptionService().RegisterAllKeys(false, true);
       if (region0.Count != 1 || region1.Count != 1)
       {
         Assert.Fail("Expected one entry in region");
-      }
-      if (resultKeys.Count != 1)
-      {
-        Assert.Fail("Expected one key from registerAllKeys");
-      }
-      object value = resultKeys[0];
-      if (!(value.ToString().Equals(m_keys[0])))
-      {
-        Assert.Fail("Unexpected key from RegisterAllKeys");
       }
       Util.Log("RegexInterestAllStep2 complete.");
     }
@@ -753,7 +743,7 @@ namespace Apache.Geode.Client.UnitTests
     {
       List<object> resultKeys = new List<object>();
       IRegion<object, object> region0 = CacheHelper.GetVerifyRegion<object, object>(m_regionNames[0]);
-      region0.GetSubscriptionService().RegisterAllKeys(false, resultKeys, false);
+      region0.GetSubscriptionService().RegisterAllKeys(false, false);
       if (region0.Count != 1)
       {
         Assert.Fail("Expected one entry in region");
@@ -767,18 +757,8 @@ namespace Apache.Geode.Client.UnitTests
       {
         Assert.Fail("Expected region to not contain the value");
       }
-      if (resultKeys.Count != 1)
-      {
-        Assert.Fail("Expected one key from registerAllKeys");
-      }
-      object value = resultKeys[0];
-      if (!(value.ToString().Equals(m_keys[0])))
-      {
-        Assert.Fail("Unexpected key from RegisterAllKeys");
-      }
 
       IRegion<object, object> region1 = CacheHelper.GetVerifyRegion<object, object>(m_regionNames[1]);
-      resultKeys.Clear();
       region1.GetSubscriptionService().RegisterRegex(".*", false, resultKeys, false);
 
       if (region1.Count != 1)
@@ -794,15 +774,6 @@ namespace Apache.Geode.Client.UnitTests
       if (region1.ContainsValueForKey(m_keys[2]))
       {
         Assert.Fail("Expected region to not contain the value");
-      }
-      if (resultKeys.Count != 1)
-      {
-        Assert.Fail("Expected one key from registerAllKeys");
-      }
-      value = resultKeys[0];
-      if (!(value.ToString().Equals(m_keys[2])))
-      {
-        Assert.Fail("Unexpected key from RegisterAllKeys");
       }
       CreateEntry(m_regionNames[0], m_keys[1], m_vals[1]);
       UpdateEntry(m_regionNames[0], m_keys[0], m_vals[0], false);

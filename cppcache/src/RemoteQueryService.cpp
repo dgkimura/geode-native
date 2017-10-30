@@ -145,7 +145,7 @@ void RemoteQueryService::executeAllCqs(bool failover) {
 }
 
 CqQueryPtr RemoteQueryService::newCq(const char* querystr,
-                                     const CqAttributesPtr& cqAttr, bool isDurable) {
+                                     CqAttributesPtr& cqAttr, bool isDurable) {
   TryReadGuard guard(m_rwLock, m_invalid);
 
   if (m_invalid) {
@@ -160,7 +160,7 @@ CqQueryPtr RemoteQueryService::newCq(const char* querystr,
 }
 
 CqQueryPtr RemoteQueryService::newCq(const char* name, const char* querystr,
-                                     const CqAttributesPtr& cqAttr, bool isDurable) {
+                                     CqAttributesPtr& cqAttr, bool isDurable) {
   TryReadGuard guard(m_rwLock, m_invalid);
 
   if (m_invalid) {

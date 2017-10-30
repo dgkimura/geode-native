@@ -215,11 +215,9 @@ namespace Apache
           virtual void RegisterAllKeys( bool isDurable );
 
           virtual void RegisterAllKeys(bool isDurable,
-            System::Collections::Generic::ICollection<TKey>^ resultKeys,
             bool getInitialValues);
 
           virtual void RegisterAllKeys(bool isDurable,
-            System::Collections::Generic::ICollection<TKey>^ resultKeys,
             bool getInitialValues,
             bool receiveValues);
 

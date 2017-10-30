@@ -282,7 +282,6 @@ namespace Apache
         /// </exception>
         /// <exception cref="UnknownException">For other exceptions.</exception>
         void RegisterAllKeys(bool isDurable,
-                             System::Collections::Generic::ICollection<TKey>^ resultKeys,
                              bool getInitialValues);
 
         /// <summary>
@@ -322,7 +321,6 @@ namespace Apache
         /// </exception>
         /// <exception cref="UnknownException">For other exceptions.</exception>
         void RegisterAllKeys(bool isDurable,
-                             System::Collections::Generic::ICollection<TKey>^ resultKeys,
                              bool getInitialValues,
                              bool receiveValues);
 
