@@ -585,10 +585,8 @@ void PdxVersionedV1::init(int32_t size) {
 
   m_string = (char *)"gfestring";
 
-  m_boolArray = new bool[3];
-  m_boolArray[0] = true;
-  m_boolArray[1] = false;
-  m_boolArray[2] = true;
+  m_boolArray = std::unique_ptr<std::vector<bool>>(
+      new std::vector<bool>{true, false, true});
 
   m_charArray = new char[2];
   m_charArray[0] = 'c';
@@ -611,7 +609,6 @@ void PdxVersionedV1::init(int32_t size) {
     // m_stringArray[i] = String.Format("one{0}", i);
   }
 
-  boolArrayLen = 0;
   byteArrayLen = 0;
   shortArrayLen = 0;
   intArrayLen = 0;
@@ -640,7 +637,7 @@ void PdxVersionedV1::toData(PdxWriterPtr pw) {
   pw->writeFloat("m_float", m_float);
   pw->writeDouble("m_double", m_double);
   pw->writeString("m_string", m_string);
-  pw->writeBooleanArray("m_boolArray", m_boolArray, 3);
+  pw->writeBooleanArray("m_boolArray", m_boolArray.get());
   // pw->writeCharArray("m_charArray", m_charArray, 2);
   pw->writeDate("m_dateTime", m_dateTime);
   pw->writeShortArray("m_int16Array", m_int16Array, 2);
@@ -660,7 +657,7 @@ void PdxVersionedV1::fromData(PdxReaderPtr pr) {
   m_float = pr->readFloat("m_float");
   m_double = pr->readDouble("m_double");
   m_string = pr->readString("m_string");
-  m_boolArray = pr->readBooleanArray("m_boolArray", boolArrayLen);
+  m_boolArray = pr->readBooleanArray("m_boolArray");
   // m_charArray = pr->readCharArray("m_charArray");
   m_dateTime = pr->readDate("m_dateTime");
   m_int16Array = pr->readShortArray("m_int16Array", shortArrayLen);

@@ -214,10 +214,13 @@ void PdxInstanceImpl::writeField(PdxWriterPtr writer, const char* fieldName,
       break;
     }
     case PdxFieldTypes::BOOLEAN_ARRAY: {
-      BooleanArray* val = dynamic_cast<BooleanArray*>(value.get());
-      if (val != nullptr) {
-        writer->writeBooleanArray(fieldName, const_cast<bool*>(val->value()),
-                                  val->length());
+      if (auto val = std::dynamic_pointer_cast<BooleanArray>(value)) {
+        std::vector<bool> tmp;
+        tmp.reserve(val->length());
+        for (int i = 0; i < val->length(); i++) {
+          tmp.push_back(val->operator[](i));
+        }
+        writer->writeBooleanArray(fieldName, &tmp);
       }
       break;
     }
@@ -283,8 +286,7 @@ void PdxInstanceImpl::writeField(PdxWriterPtr writer, const char* fieldName,
       break;
     }
     case PdxFieldTypes::OBJECT_ARRAY: {
-      auto objArray =
-          std::dynamic_pointer_cast<CacheableObjectArray>(value);
+      auto objArray = std::dynamic_pointer_cast<CacheableObjectArray>(value);
       if (objArray != nullptr) {
         writer->writeObjectArray(fieldName, objArray);
       }
@@ -801,7 +803,7 @@ bool PdxInstanceImpl::hasField(const char* fieldname) {
   return (pft != nullptr);
 }
 
-bool PdxInstanceImpl::getBooleanField(const char *fieldname) const {
+bool PdxInstanceImpl::getBooleanField(const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
   return dataInput->readBoolean();
 }
@@ -811,7 +813,7 @@ int8_t PdxInstanceImpl::getByteField(const char* fieldname) const {
   return dataInput->read();
 }
 
-int16_t PdxInstanceImpl::getShortField(const char *fieldname) const {
+int16_t PdxInstanceImpl::getShortField(const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
   return dataInput->readInt16();
 }
@@ -841,10 +843,10 @@ char16_t PdxInstanceImpl::getCharField(const char* fieldname) const {
   return dataInput->readInt16();
 }
 
-void PdxInstanceImpl::getField(const char* fieldname, bool** value,
-                               int32_t& length) const {
+std::unique_ptr<std::vector<bool>> PdxInstanceImpl::getBooleanArrayField(
+    const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
-  dataInput->readBooleanArray(value, length);
+  return dataInput->readBooleanArray();
 }
 
 void PdxInstanceImpl::getField(const char* fieldname, signed char** value,
@@ -932,14 +934,14 @@ void PdxInstanceImpl::getField(const char* fieldname, char*** value,
 }
 
 CacheableDatePtr PdxInstanceImpl::getCacheableDateField(
-                                                const char* fieldname) const {
+    const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
   auto value = CacheableDate::create();
   value->fromData(*dataInput);
   return value;
 }
 
-CacheablePtr PdxInstanceImpl::getCacheableField(const char *fieldname) const {
+CacheablePtr PdxInstanceImpl::getCacheableField(const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
   CacheablePtr value;
   dataInput->readObject(value);
@@ -947,7 +949,7 @@ CacheablePtr PdxInstanceImpl::getCacheableField(const char *fieldname) const {
 }
 
 CacheableObjectArrayPtr PdxInstanceImpl::getCacheableObjectArrayField(
-                                                const char* fieldname) const {
+    const char* fieldname) const {
   auto dataInput = getDataInputForField(fieldname);
   auto value = CacheableObjectArray::create();
   value->fromData(*dataInput);
@@ -1030,7 +1032,7 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::DOUBLE: {
-        double value =  getDoubleField(identityFields.at(i)->getFieldName());
+        double value = getDoubleField(identityFields.at(i)->getFieldName());
         ACE_OS::snprintf(buf, 2048, "%f", value);
         toString += buf;
         break;
@@ -1150,24 +1152,17 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::DATE: {
-        CacheableDatePtr value = getCacheableDateField(
-                                        identityFields.at(i)->getFieldName());
+        CacheableDatePtr value =
+            getCacheableDateField(identityFields.at(i)->getFieldName());
         if (value != nullptr) {
-          ACE_OS::snprintf(buf, 2048, "%s", value->toString()->asChar());
-          toString += buf;
+          toString += value->toString()->asChar();
         }
         break;
       }
       case PdxFieldTypes::BOOLEAN_ARRAY: {
-        bool* value = 0;
-        int32_t length;
-        getField(identityFields.at(i)->getFieldName(), &value, length);
-        if (length > 0) {
-          for (int i = 0; i < length; i++) {
-            ACE_OS::snprintf(buf, 2048, "%s\t", value[i] ? "true" : "false");
-            toString += buf;
-          }
-          GF_SAFE_DELETE_ARRAY(value);
+        auto value = getBooleanArrayField(identityFields.at(i)->getFieldName());
+        for (const auto& b : *value) {
+          toString += b ? "true\t" : "false\t";
         }
         break;
       }
@@ -1188,8 +1183,8 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       case PdxFieldTypes::OBJECT_ARRAY: {
-        CacheableObjectArrayPtr value = getCacheableObjectArrayField(
-                                        identityFields.at(i)->getFieldName());
+        CacheableObjectArrayPtr value =
+            getCacheableObjectArrayField(identityFields.at(i)->getFieldName());
         if (value != nullptr) {
           ACE_OS::snprintf(buf, 2048, "%s\t", value->toString()->asChar());
           toString += buf;
@@ -1197,7 +1192,8 @@ CacheableStringPtr PdxInstanceImpl::toString() const {
         break;
       }
       default: {
-        CacheablePtr value = getCacheableField(identityFields.at(i)->getFieldName());
+        CacheablePtr value =
+            getCacheableField(identityFields.at(i)->getFieldName());
         if (value != nullptr) {
           ACE_OS::snprintf(buf, 2048, "%s\t", value->toString()->asChar());
           toString += buf;
@@ -1291,7 +1287,8 @@ bool PdxInstanceImpl::operator==(const CacheableKey& other) const {
   equatePdxFields(otherPdxIdentityFieldList, myPdxIdentityFieldList);
 
   auto myDataInput = m_cache->createDataInput(m_buffer, m_bufferLength);
-  auto otherDataInput = m_cache->createDataInput(otherPdx->m_buffer, otherPdx->m_bufferLength);
+  auto otherDataInput =
+      m_cache->createDataInput(otherPdx->m_buffer, otherPdx->m_bufferLength);
 
   int fieldTypeId = -1;
   for (size_t i = 0; i < myPdxIdentityFieldList.size(); i++) {
@@ -1510,7 +1507,8 @@ void PdxInstanceImpl::toData(PdxWriterPtr writer) /*const*/ {
       }
       if (value != nullptr) {
         writeField(writer, currPf->getFieldName(), currPf->getTypeId(), value);
-        position = getNextFieldPosition(*dataInput, static_cast<int>(i) + 1, pt);
+        position =
+            getNextFieldPosition(*dataInput, static_cast<int>(i) + 1, pt);
       } else {
         if (currPf->IsVariableLengthType()) {
           // need to add offset
@@ -1710,16 +1708,19 @@ bool PdxInstanceImpl::hasDefaultBytes(PdxFieldTypePtr pField,
       return compareDefaultBytes(dataInput, start, end, m_IntDefaultBytes, 4);
     }
     case PdxFieldTypes::STRING: {
-      return compareDefaultBytes(dataInput, start, end, m_StringDefaultBytes, 1);
+      return compareDefaultBytes(dataInput, start, end, m_StringDefaultBytes,
+                                 1);
     }
     case PdxFieldTypes::BOOLEAN: {
-      return compareDefaultBytes(dataInput, start, end, m_BooleanDefaultBytes, 1);
+      return compareDefaultBytes(dataInput, start, end, m_BooleanDefaultBytes,
+                                 1);
     }
     case PdxFieldTypes::FLOAT: {
       return compareDefaultBytes(dataInput, start, end, m_FloatDefaultBytes, 4);
     }
     case PdxFieldTypes::DOUBLE: {
-      return compareDefaultBytes(dataInput, start, end, m_DoubleDefaultBytes, 8);
+      return compareDefaultBytes(dataInput, start, end, m_DoubleDefaultBytes,
+                                 8);
     }
     case PdxFieldTypes::CHAR: {
       return compareDefaultBytes(dataInput, start, end, m_CharDefaultBytes, 2);
@@ -1744,13 +1745,15 @@ bool PdxInstanceImpl::hasDefaultBytes(PdxFieldTypePtr pField,
     case PdxFieldTypes::STRING_ARRAY:
     case PdxFieldTypes::ARRAY_OF_BYTE_ARRAYS:
     case PdxFieldTypes::OBJECT_ARRAY: {
-      return compareDefaultBytes(dataInput, start, end, m_NULLARRAYDefaultBytes, 1);
+      return compareDefaultBytes(dataInput, start, end, m_NULLARRAYDefaultBytes,
+                                 1);
     }
     case PdxFieldTypes::DATE: {
       return compareDefaultBytes(dataInput, start, end, m_DateDefaultBytes, 8);
     }
     case PdxFieldTypes::OBJECT: {
-      return compareDefaultBytes(dataInput, start, end, m_ObjectDefaultBytes, 1);
+      return compareDefaultBytes(dataInput, start, end, m_ObjectDefaultBytes,
+                                 1);
     }
     default: {
       throw IllegalStateException("hasDefaultBytes unable to find typeID ");
@@ -2498,7 +2501,8 @@ PdxTypeRegistryPtr PdxInstanceImpl::getPdxTypeRegistry() const {
   return m_pdxTypeRegistry;
 }
 
-std::unique_ptr<DataInput> PdxInstanceImpl::getDataInputForField(const char* fieldname) const {
+std::unique_ptr<DataInput> PdxInstanceImpl::getDataInputForField(
+    const char* fieldname) const {
   auto pt = getPdxType();
   auto pft = pt->getPdxField(fieldname);
 

@@ -229,9 +229,9 @@ PdxWriterPtr PdxRemoteWriter::writeObject(const char* fieldName,
 }
 
 PdxWriterPtr PdxRemoteWriter::writeBooleanArray(const char* fieldName,
-                                                bool* array, int length) {
+                                                const std::vector<bool>* array) {
   writePreserveData();
-  PdxLocalWriter::writeBooleanArray(fieldName, array, length);
+  PdxLocalWriter::writeBooleanArray(fieldName, array);
   return shared_from_this();
 }
 

@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef GEODE_PDXLOCALREADER_H_
-#define GEODE_PDXLOCALREADER_H_
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -20,12 +15,21 @@
  * limitations under the License.
  */
 
+#pragma once
+
+#ifndef GEODE_PDXLOCALREADER_H_
+#define GEODE_PDXLOCALREADER_H_
+
+#include <vector>
+
 #include <geode/PdxReader.hpp>
-#include "PdxType.hpp"
 #include <geode/DataInput.hpp>
 #include <geode/CacheableObjectArray.hpp>
 #include <geode/CacheableDate.hpp>
+
+#include "PdxType.hpp"
 #include "PdxRemotePreservedData.hpp"
+
 namespace apache {
 namespace geode {
 namespace client {
@@ -145,7 +149,8 @@ class PdxLocalReader : public PdxReader {
 
   virtual wchar_t* readWideCharArray(const char* fieldName, int32_t& length);
 
-  virtual bool* readBooleanArray(const char* fieldName, int32_t& length);
+  virtual std::unique_ptr<std::vector<bool>> readBooleanArray(
+      const char* fieldName);
 
   /**
    * Read a 8bit-Integer Array from the <code>PdxReader</code>.
@@ -216,7 +221,6 @@ class PdxLocalReader : public PdxReader {
   virtual PdxUnreadFieldsPtr readUnreadFields();
 
  protected:
-
   PdxTypeRegistryPtr m_pdxTypeRegistry;
 };
 typedef std::shared_ptr<PdxLocalReader> PdxLocalReaderPtr;

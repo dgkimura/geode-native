@@ -75,8 +75,8 @@ class TESTOBJECT_EXPORT PdxTypes1V2 : public PdxSerializable {
 
   CacheableStringPtr toString() const;
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   virtual void fromData(PdxReaderPtr pr);
 
@@ -118,8 +118,8 @@ class TESTOBJECT_EXPORT PdxTypes2V2 : public PdxSerializable {
 
   CacheableStringPtr toString() const;
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   virtual void fromData(PdxReaderPtr pr);
 
@@ -162,8 +162,8 @@ class TESTOBJECT_EXPORT PdxTypes3V2 : public PdxSerializable {
 
   bool equals(PdxSerializablePtr obj);
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   virtual void fromData(PdxReaderPtr pr);
 
@@ -207,8 +207,8 @@ class TESTOBJECT_EXPORT PdxTypesR1V2 : public PdxSerializable {
 
   bool equals(PdxSerializablePtr obj);
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   virtual void fromData(PdxReaderPtr pr);
 
@@ -252,8 +252,8 @@ class TESTOBJECT_EXPORT PdxTypesR2V2 : public PdxSerializable {
 
   CacheableStringPtr toString() const;
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   virtual void fromData(PdxReaderPtr pr);
 
@@ -297,8 +297,8 @@ class TESTOBJECT_EXPORT PdxTypesIgnoreUnreadFieldsV2 : public PdxSerializable {
 
   bool equals(PdxSerializablePtr obj);
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   virtual void fromData(PdxReaderPtr pr);
 
@@ -330,7 +330,7 @@ class TESTOBJECT_EXPORT PdxVersionedV2 : public PdxSerializable {
   float m_float;
   double m_double;
   char* m_string;
-  bool* m_boolArray;
+  std::unique_ptr<std::vector<bool>> m_boolArray;
   char* m_charArray;
   CacheableDatePtr m_dateTime;
   int16_t* m_int16Array;
@@ -342,7 +342,6 @@ class TESTOBJECT_EXPORT PdxVersionedV2 : public PdxSerializable {
   // IDictionary<object, object> m_map;
   // List<object> m_list;
 
-  int32_t boolArrayLen;
   int32_t byteArrayLen;
   int32_t shortArrayLen;
   int32_t intArrayLen;
@@ -362,8 +361,8 @@ class TESTOBJECT_EXPORT PdxVersionedV2 : public PdxSerializable {
 
   CacheableStringPtr toString() const;
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   virtual void fromData(PdxReaderPtr pr);
 

@@ -63,7 +63,7 @@ class TESTOBJECT_EXPORT PdxVersioned1 : public PdxSerializable {
 
   char* m_string;
 
-  bool* m_boolArray;
+  std::unique_ptr<std::vector<bool>> m_boolArray;
   int8_t* m_byteArray;
   int8_t* m_sbyteArray;  ///
 
@@ -187,7 +187,7 @@ class TESTOBJECT_EXPORT PdxVersioned1 : public PdxSerializable {
 
   const char* getString() { return m_string; }
 
-  bool* getBoolArray() { return m_boolArray; }
+  std::vector<bool> getBoolArray() { return *m_boolArray; }
 
   int8_t* getByteArray() { return m_byteArray; }
 
@@ -229,8 +229,8 @@ class TESTOBJECT_EXPORT PdxVersioned1 : public PdxSerializable {
 
   int32_t getCharArrayLength() { return charArrayLen; }
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   virtual void toData(PdxWriterPtr pw) /*const*/;
 

@@ -229,7 +229,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, putPdxWithIdentityField)
     LOG("putPdxWithIdentityField started ");
 
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
       serializationRegistry->addPdxType(SerializePdx::createDeserializable);
       LOG("SerializePdx Registered Successfully....");
     } catch (apache::geode::client::IllegalStateException& /* ex*/) {
@@ -253,7 +255,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, putCacheableObjectArrayWithPdxFields)
     LOG("putCacheableObjectArrayWithPdxFields started ");
 
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
       serializationRegistry->addPdxType(Address::createDeserializable);
       LOG("Address Registered Successfully....");
     } catch (apache::geode::client::IllegalStateException& /* ex*/) {
@@ -288,7 +292,9 @@ DUNIT_TASK_DEFINITION(CLIENT2, verifyPdxIdentityField)
     LOG("verifyPdxIdentityField started ");
 
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
       serializationRegistry->addPdxType(SerializePdx::createDeserializable);
       LOG("SerializePdx Registered Successfully....");
     } catch (apache::geode::client::IllegalStateException& /* ex*/) {
@@ -407,7 +413,9 @@ DUNIT_TASK_DEFINITION(CLIENT2, verifyCacheableObjectArrayWithPdxField)
     LOG("verifyCacheableObjectArrayWithPdxField started ");
 
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
       serializationRegistry->addPdxType(Address::createDeserializable);
       LOG("Address Registered Successfully....");
     } catch (apache::geode::client::IllegalStateException& /* ex*/) {
@@ -521,9 +529,12 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT1, pdxPut)
   {
     LOG("pdxPut started ");
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     try {
-      serializationRegistry->addPdxType(PdxTests::PdxType::createDeserializable);
+      serializationRegistry->addPdxType(
+          PdxTests::PdxType::createDeserializable);
       LOG("PdxObject Registered Successfully....");
     } catch (apache::geode::client::IllegalStateException& /* ex*/) {
       LOG("PdxObject IllegalStateException");
@@ -604,9 +615,12 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT2, getObject)
   {
     LOG("getObject started ");
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     try {
-      serializationRegistry->addPdxType(PdxTests::PdxType::createDeserializable);
+      serializationRegistry->addPdxType(
+          PdxTests::PdxType::createDeserializable);
       LOG("PdxObject Registered Successfully....");
     } catch (apache::geode::client::IllegalStateException& /* ex*/) {
       LOG("PdxObject IllegalStateException");
@@ -736,8 +750,11 @@ DUNIT_TASK_DEFINITION(CLIENT2, verifyPdxInstanceEquals)
     LOG("Task verifyPdxInstanceEquals started.");
 
     try {
-      SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
-      serializationRegistry->addPdxType(PdxTests::PdxType::createDeserializable);
+      SerializationRegistryPtr serializationRegistry =
+          CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+              ->getSerializationRegistry();
+      serializationRegistry->addPdxType(
+          PdxTests::PdxType::createDeserializable);
       LOG("PdxObject Registered Successfully....");
     } catch (apache::geode::client::IllegalStateException& /* ex*/) {
       LOG("PdxObject IllegalStateException");
@@ -799,9 +816,12 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
   {
     LOG("accessPdxInstance started ");
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     try {
-      serializationRegistry->addPdxType(PdxTests::PdxType::createDeserializable);
+      serializationRegistry->addPdxType(
+          PdxTests::PdxType::createDeserializable);
       LOG("PdxObject Registered Successfully....");
     } catch (apache::geode::client::IllegalStateException& /* ex*/) {
       LOG("PdxObject IllegalStateException");
@@ -933,14 +953,11 @@ DUNIT_TASK_DEFINITION(CLIENT2, accessPdxInstance)
     ASSERT(pIPtr->getFieldType("m_sbyteArray") == PdxFieldTypes::BYTE_ARRAY,
            "Type Value BYTE_ARRAY Mismatch");
 
-    bool* boolArray = nullptr;
-    int32_t boolArrayLength = 0;
-    pIPtr->getField("m_boolArray", &boolArray, boolArrayLength);
-    ASSERT(genericValCompare(pdxobjPtr->getBoolArrayLength(),
-                             boolArrayLength) == true,
+    auto boolArray = pIPtr->getBooleanArrayField("m_boolArray");
+    ASSERT(genericValCompare(pdxobjPtr->getBoolArray().size(),
+                             boolArray->size()) == true,
            "boolArrayLength should be equal");
-    ASSERT(genericCompare(pdxobjPtr->getBoolArray(), boolArray,
-                          boolArrayLength) == true,
+    ASSERT(pdxobjPtr->getBoolArray() == *boolArray,
            "boolArray should be equal");
     ASSERT(pIPtr->getFieldType("m_boolArray") == PdxFieldTypes::BOOLEAN_ARRAY,
            "Type Value BOOLEAN_ARRAY Mismatch");
@@ -1381,15 +1398,15 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstance)
     int arrayLen = 0;
 
     bool setBoolArray[] = {true, false, true, false, true, true, false, true};
-    bool* getBoolArray = nullptr;
     wpiPtr->setField("m_boolArray", setBoolArray, 8);
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(newPiPtr->hasField("m_boolArray") == true,
            "m_boolArray = true expected");
-    newPiPtr->getField("m_boolArray", &getBoolArray, arrayLen);
-    ASSERT(arrayLen == 8, "Arraylength == 8 expected");
-    ASSERT(genericCompare(setBoolArray, getBoolArray, arrayLen) == true,
+    auto getBoolArray = newPiPtr->getBooleanArrayField("m_boolArray");
+    ASSERT(getBoolArray->size() == 8, "Arraylength == 8 expected");
+    ASSERT(std::vector<bool>(std::begin(setBoolArray),
+                             std::end(setBoolArray)) == *getBoolArray,
            "boolArray should be equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -2039,15 +2056,15 @@ DUNIT_TASK_DEFINITION(CLIENT2, modifyPdxInstanceAndCheckLocally)
     int arrayLen = 0;
 
     bool setBoolArray[] = {true, false, true, false, true, true, false, true};
-    bool* getBoolArray = nullptr;
     wpiPtr->setField("m_boolArray", setBoolArray, 8);
     rptr->put(keyport, wpiPtr);
     newPiPtr = std::dynamic_pointer_cast<PdxInstance>(rptr->get(keyport));
     ASSERT(pIPtr->hasField("m_boolArray") == true,
            "m_boolArray = true expected");
-    newPiPtr->getField("m_boolArray", &getBoolArray, arrayLen);
-    ASSERT(arrayLen == 8, "Arraylength == 8 expected");
-    ASSERT(genericCompare(setBoolArray, getBoolArray, arrayLen) == true,
+    auto getBoolArray = newPiPtr->getBooleanArrayField("m_boolArray");
+    ASSERT(getBoolArray->size() == 8, "Arraylength == 8 expected");
+    ASSERT(std::vector<bool>(std::begin(setBoolArray),
+                             std::end(setBoolArray)) == *getBoolArray,
            "boolArray should be equal");
     ASSERT((*pIPtr.get() == *newPiPtr.get()) == false,
            "PdxInstance should not be equal");
@@ -2326,7 +2343,9 @@ END_TASK_DEFINITION
 DUNIT_TASK_DEFINITION(CLIENT1, pdxIFPutGetTest)
   {
     LOG("pdxIFPutGetTest started ");
-    SerializationRegistryPtr serializationRegistry = CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())->getSerializationRegistry();
+    SerializationRegistryPtr serializationRegistry =
+        CacheRegionHelper::getCacheImpl(cacheHelper->getCache().get())
+            ->getSerializationRegistry();
     try {
       serializationRegistry->addPdxType(Address::createDeserializable);
       LOG("Address Registered Successfully....");
@@ -2335,7 +2354,8 @@ DUNIT_TASK_DEFINITION(CLIENT1, pdxIFPutGetTest)
     }
 
     try {
-      serializationRegistry->addPdxType(PdxTests::PdxType::createDeserializable);
+      serializationRegistry->addPdxType(
+          PdxTests::PdxType::createDeserializable);
       LOG("PdxObject Registered Successfully....");
     } catch (apache::geode::client::IllegalStateException& /* ex*/) {
       LOG("PdxObject IllegalStateException");

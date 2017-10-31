@@ -84,10 +84,10 @@ class TestPdxSerializer : public PdxSerializer {
       return fromDataForAddress(pr);
     }
 
-    PdxTests::NonPdxType *npt =
-        new PdxTests::NonPdxType(CacheRegionHelper::getCacheImpl(getHelper()->getCache().get())
-                                     ->getSerializationRegistry()
-                                     ->getPdxSerializer());
+    PdxTests::NonPdxType *npt = new PdxTests::NonPdxType(
+        CacheRegionHelper::getCacheImpl(getHelper()->getCache().get())
+            ->getSerializationRegistry()
+            ->getPdxSerializer());
 
     try {
       int32_t *Lengtharr;
@@ -103,7 +103,7 @@ class TestPdxSerializer : public PdxSerializer {
 
       npt->m_bool = pr->readBoolean("m_bool");
       // GenericValCompare
-      npt->m_boolArray = pr->readBooleanArray("m_boolArray", npt->boolArrayLen);
+      npt->m_boolArray = pr->readBooleanArray("m_boolArray");
 
       npt->m_byte = pr->readByte("m_byte");
       npt->m_byteArray = pr->readByteArray("m_byteArray", npt->byteArrayLen);
@@ -216,7 +216,7 @@ class TestPdxSerializer : public PdxSerializer {
       pw->markIdentityField("m_char");
       pw->writeBoolean("m_bool", npt->m_bool);  // 1
       pw->markIdentityField("m_bool");
-      pw->writeBooleanArray("m_boolArray", npt->m_boolArray, 3);
+      pw->writeBooleanArray("m_boolArray", npt->m_boolArray.get());
       pw->markIdentityField("m_boolArray");
       pw->writeByte("m_byte", npt->m_byte);
       pw->markIdentityField("m_byte");

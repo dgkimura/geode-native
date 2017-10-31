@@ -133,13 +133,8 @@ void PdxVersioned1::init(const char* key) {
   m_string = new char[len];
   strcpy(m_string, "PdxVersioned ");
   strcat(m_string, key);
-  m_boolArray = new bool[3];
-  m_boolArray[0] = true;
-  m_boolArray[1] = false;
-  m_boolArray[2] = true;
-  /*for(int i=0; i<3; i++){
-    m_boolArray[i] = true;
-  };*/
+  m_boolArray = std::unique_ptr<std::vector<bool>>(
+      new std::vector<bool>{true, false, true});
 
   m_byteArray = new int8_t[2];
   m_byteArray[0] = 0x34;
@@ -279,7 +274,7 @@ void PdxTests::PdxVersioned1::toData(PdxWriterPtr pw) /*const*/ {
   pw->writeArrayOfByteArrays("m_byteByteArray", m_byteByteArray, 2, lengthArr);
   pw->writeChar("m_char", m_char);
   pw->writeBoolean("m_bool", m_bool);  // 1
-  pw->writeBooleanArray("m_boolArray", m_boolArray, 3);
+  pw->writeBooleanArray("m_boolArray", m_boolArray.get());
   pw->writeByte("m_byte", m_byte);
   pw->writeByteArray("m_byteArray", m_byteArray, 2);
   pw->writeWideCharArray("m_charArray", m_charArray, 2);
@@ -333,7 +328,7 @@ void PdxTests::PdxVersioned1::fromData(PdxReaderPtr pr) {
   // GenericValCompare
   m_bool = pr->readBoolean("m_bool");
   // GenericValCompare
-  m_boolArray = pr->readBooleanArray("m_boolArray", boolArrayLen);
+  m_boolArray = pr->readBooleanArray("m_boolArray");
   m_byte = pr->readByte("m_byte");
   m_byteArray = pr->readByteArray("m_byteArray", byteArrayLen);
   m_charArray = pr->readWideCharArray("m_charArray", charArrayLen);

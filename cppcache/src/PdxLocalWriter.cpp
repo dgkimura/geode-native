@@ -375,9 +375,9 @@ PdxWriterPtr PdxLocalWriter::writeObject(const char* fieldName,
 }
 
 PdxWriterPtr PdxLocalWriter::writeBooleanArray(const char* fieldName,
-                                               bool* array, int length) {
+                                               const std::vector<bool>* array) {
   addOffset();
-  writeObject(array, length);
+  writeObject(array);
   return shared_from_this();
 }
 

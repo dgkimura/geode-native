@@ -1,3 +1,11 @@
+# IN-PROGRESS: How to address arrays with null-ability
+
+This branch evaluates using vector and pointers to vectors.
+
+* Consider using optional (boost, custom, or standard).
+* Consider how to conditionally compile optional in future.
+* Can't break API when making changes to optional, must be able to deprecate existing methods.
+
 [<img src="https://geode.apache.org/img/apache_geode_logo.png" align="center"/>](http://geode.apache.org)
 
 [![Build Status](https://travis-ci.org/apache/geode-native.svg?branch=develop)](https://travis-ci.org/apache/geode-native) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0) 

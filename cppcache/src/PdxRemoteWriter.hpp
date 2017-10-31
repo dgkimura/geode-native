@@ -20,6 +20,8 @@
 #ifndef GEODE_PDXREMOTEWRITER_H_
 #define GEODE_PDXREMOTEWRITER_H_
 
+#include <vector>
+
 #include "PdxLocalWriter.hpp"
 
 namespace apache {
@@ -144,8 +146,7 @@ class PdxRemoteWriter : public PdxLocalWriter {
    *@param fieldName The name of the field associated with the value.
    *@param value The boolean array value to write
    */
-  virtual PdxWriterPtr writeBooleanArray(const char* fieldName, bool* array,
-                                         int length);
+  virtual PdxWriterPtr writeBooleanArray(const char* fieldName, const std::vector<bool>* array);
 
   /**
    *Write a Char array to the PdxWriter.

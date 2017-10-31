@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef GEODE_PDXREADER_H_
-#define GEODE_PDXREADER_H_
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -19,6 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#pragma once
+
+#ifndef GEODE_PDXREADER_H_
+#define GEODE_PDXREADER_H_
+
+#include <vector>
 
 #include "CacheableBuiltins.hpp"
 #include "PdxUnreadFields.hpp"
@@ -226,15 +228,16 @@ class CPPCACHE_EXPORT PdxReader {
                                      int32_t& length) = 0;
 
   /**
-   * Read a bool* value from the <code>PdxReader</code> and sets array length.
-   * <p>C++ bool* is mapped to Java boolean[]</p>
+   * Read a std::vector<bool> value from the <code>PdxReader</code>.
+   * <p>C++ std::vector<bool> is mapped to Java boolean[]</p>
    * @param fieldName name of the field to read
-   * @param length length is set with number of bool elements.
+   * @return std::vector<bool> or nullptr
    * @throws IllegalStateException if PdxReader doesn't has the named field.
    *
    * @see PdxReader#hasField
    */
-  virtual bool* readBooleanArray(const char* fieldName, int32_t& length) = 0;
+  virtual std::unique_ptr<std::vector<bool>> readBooleanArray(
+      const char* fieldName) = 0;
 
   /**
    * Read a int8_t* value from the <code>PdxReader</code> and sets array length.

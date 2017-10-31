@@ -35,7 +35,8 @@ PdxReaderWithTypeCollector::PdxReaderWithTypeCollector(
     DataInput& dataInput, PdxTypePtr pdxType, int32_t pdxlen,
     PdxTypeRegistryPtr pdxTypeRegistry)
     : PdxLocalReader(dataInput, pdxType, pdxlen, pdxTypeRegistry) {
-  m_newPdxType = std::make_shared<PdxType>(m_pdxTypeRegistry ,pdxType->getPdxClassName(), true);
+  m_newPdxType = std::make_shared<PdxType>(m_pdxTypeRegistry,
+                                           pdxType->getPdxClassName(), true);
 }
 
 PdxReaderWithTypeCollector::~PdxReaderWithTypeCollector() {}
@@ -337,8 +338,8 @@ wchar_t* PdxReaderWithTypeCollector::readWideCharArray(const char* fieldName,
   }
 }
 
-bool* PdxReaderWithTypeCollector::readBooleanArray(const char* fieldName,
-                                                   int32_t& length) {
+std::unique_ptr<std::vector<bool>> PdxReaderWithTypeCollector::readBooleanArray(
+    const char* fieldName) {
   checkType(fieldName, PdxFieldTypes::BOOLEAN_ARRAY, "boolean[]");
   m_newPdxType->addVariableLengthTypeField(fieldName, "boolean[]",
                                            PdxFieldTypes::BOOLEAN_ARRAY);
@@ -352,7 +353,7 @@ bool* PdxReaderWithTypeCollector::readBooleanArray(const char* fieldName,
   if (position != -1) {
     m_dataInput->advanceCursor(position);
     const uint8_t* startLoc = m_dataInput->currentBufferPosition();
-    bool* retVal = PdxLocalReader::readBooleanArray(fieldName, length);
+    auto retVal = PdxLocalReader::readBooleanArray(fieldName);
     int32_t strSize =
         static_cast<int32_t>(m_dataInput->currentBufferPosition() - startLoc);
     m_dataInput->rewindCursor(strSize + position);

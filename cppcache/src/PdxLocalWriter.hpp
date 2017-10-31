@@ -129,6 +129,19 @@ class PdxLocalWriter : public PdxWriter,
     }
   }
 
+  template <typename mType>
+  void writeObject(const std::vector<mType>* objArray) {
+    if (objArray != nullptr) {
+      m_dataOutput->writeArrayLen(objArray->size());
+      for (const auto& o : *objArray) {
+        writeObject(o);
+      }
+    }
+    else {
+      m_dataOutput->write(static_cast<uint8_t>(0xff));
+    }
+  }
+
   /**
    *Write a wide char to the PdxWriter.
    *@param fieldName The name of the field associated with the value.
@@ -216,8 +229,7 @@ class PdxLocalWriter : public PdxWriter,
    *@param fieldName The name of the field associated with the value.
    *@param value The boolean array value to write
    */
-  virtual PdxWriterPtr writeBooleanArray(const char* fieldName, bool* array,
-                                         int length);
+  virtual PdxWriterPtr writeBooleanArray(const char* fieldName, const std::vector<bool>* array);
 
   /**
    *Write a Char array to the PdxWriter.

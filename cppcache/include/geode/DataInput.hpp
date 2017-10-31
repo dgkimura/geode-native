@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #pragma once
 
 #ifndef GEODE_DATAINPUT_H_
 #define GEODE_DATAINPUT_H_
 
-#include "geode_globals.hpp"
-#include "ExceptionTypes.hpp"
+#include <vector>
 #include <cstring>
 #include <string>
+
+#include "geode_globals.hpp"
 #include "geode_types.hpp"
+#include "ExceptionTypes.hpp"
 #include "Serializable.hpp"
 #include "CacheableString.hpp"
 
@@ -640,8 +643,8 @@ class CPPCACHE_EXPORT DataInput {
     readObject(value, length);
   }
 
-  inline void readBooleanArray(bool** value, int32_t& length) {
-    readObject(value, length);
+  inline std::unique_ptr<std::vector<bool>> readBooleanArray() {
+    return readObject<bool>();
   }
 
   inline void readByteArray(int8_t** value, int32_t& length) {
@@ -917,6 +920,22 @@ class CPPCACHE_EXPORT DataInput {
       }
       *value = objArray;
     }
+  }
+
+  template <typename mType>
+  std::unique_ptr<std::vector<mType>> readObject() {
+    std::unique_ptr<std::vector<mType>> object = nullptr;
+    int arrayLen = readArrayLen();
+    if (arrayLen > -1) {
+      object.reset(new std::vector<mType>);
+      object->reserve(arrayLen);
+      for (int i = 0; i < arrayLen; i++) {
+        mType tmp = 0;
+        readObject(&tmp);
+        (*object)[i] = tmp;
+      }
+    }
+    return object;
   }
 
   inline char readPdxChar() {

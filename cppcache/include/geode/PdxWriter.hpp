@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef GEODE_PDXWRITER_H_
-#define GEODE_PDXWRITER_H_
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -19,6 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#pragma once
+
+#ifndef GEODE_PDXWRITER_H_
+#define GEODE_PDXWRITER_H_
+
+#include <vector>
 
 #include "geode_globals.hpp"
 #include "geode_types.hpp"
@@ -228,8 +230,7 @@ class CPPCACHE_EXPORT PdxWriter {
    * @throws IllegalStateException if the named field has already been written
    * or fieldName is nullptr or empty.
    */
-  virtual PdxWriterPtr writeBooleanArray(const char* fieldName, bool* array,
-                                         int length) = 0;
+  virtual PdxWriterPtr writeBooleanArray(const char* fieldName, const std::vector<bool>* array) = 0;
 
   /**
    * Writes the named field with the given value to the serialized form.

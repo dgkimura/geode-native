@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 /*
-* PdxObject.cpp
-*
-*  Created on: Sep 29, 2011
-*      Author: npatel
-*/
+ * PdxObject.cpp
+ *
+ *  Created on: Sep 29, 2011
+ *      Author: npatel
+ */
 
 #include "InvalidPdxUsage.hpp"
 //#include "../cppcache/fw_dunit.hpp"
@@ -112,7 +112,7 @@ void InvalidPdxUsage::toData(PdxWriterPtr pw) /*const*/ {
   }
 
   try {
-    pw->writeBooleanArray("", m_boolArray, 3);
+    pw->writeBooleanArray("", m_boolArray.get());
     pw->markIdentityField("m_boolArray");
   } catch (IllegalStateException& excpt) {
     toDataexceptionCounter++;
@@ -492,7 +492,7 @@ void InvalidPdxUsage::fromData(PdxReaderPtr pr) {
   }
 
   try {
-    m_boolArray = pr->readBooleanArray("", boolArrayLen);
+    m_boolArray = pr->readBooleanArray("");
   } catch (IllegalStateException& excpt) {
     exceptionCounter++;
     LOGINFO("readBooleanArray():: Got expected Exception :: %s ",

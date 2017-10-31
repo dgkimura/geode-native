@@ -107,8 +107,8 @@ class TESTOBJECT_EXPORT Child : public Parent, public PdxSerializable {
 
   const char* getClassName() const { return "PdxTests.Child"; }
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   void toData(PdxWriterPtr pw) {
     pw->writeInt("m_a", m_a);
@@ -223,8 +223,8 @@ class TESTOBJECT_EXPORT CharTypes : public PdxSerializable {
 
   const char* getClassName() const { return "PdxTests.CharTypes"; }
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   void toData(PdxWriterPtr pw) {
     pw->writeChar("m_ch", m_ch);
@@ -290,8 +290,8 @@ class TESTOBJECT_EXPORT Address : public PdxSerializable {
 
   const char* getClassName() const { return "PdxTests.Address"; }
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   void toData(PdxWriterPtr pw) /*const*/ {
     pw->writeInt("_aptNumber", _aptNumber);  // 4
@@ -341,7 +341,7 @@ class TESTOBJECT_EXPORT PdxType : public PdxSerializable {
 
   const char* m_string;
 
-  bool* m_boolArray;
+  std::unique_ptr<std::vector<bool>> m_boolArray;
   int8_t* m_byteArray;
   int8_t* m_sbyteArray;  ///
 
@@ -384,7 +384,6 @@ class TESTOBJECT_EXPORT PdxType : public PdxSerializable {
   CacheableObjectArrayPtr m_objectArray;
   CacheableObjectArrayPtr m_objectArrayEmptyPdxFieldName;
 
-  int32_t boolArrayLen;
   int32_t charArrayLen;
   int32_t byteArrayLen;
   int32_t shortArrayLen;
@@ -418,13 +417,9 @@ class TESTOBJECT_EXPORT PdxType : public PdxSerializable {
 
     m_string = "gfestring";
 
-    m_boolArray = new bool[3];
-    m_boolArray[0] = true;
-    m_boolArray[1] = false;
-    m_boolArray[2] = true;
-    /*for(int i=0; i<3; i++){
-      m_boolArray[i] = true;
-    };*/
+    m_boolArray = std::unique_ptr<std::vector<bool>>(
+        new std::vector<bool>{true, false, true});
+    ;
 
     m_byteArray = new int8_t[2];
     m_byteArray[0] = 0x34;
@@ -633,7 +628,6 @@ class TESTOBJECT_EXPORT PdxType : public PdxSerializable {
       }
     }*/
 
-    boolArrayLen = 3;
     byteArrayLen = 2;
     shortArrayLen = 2;
     intArrayLen = 4;
@@ -724,7 +718,7 @@ class TESTOBJECT_EXPORT PdxType : public PdxSerializable {
 
   const char* getString() { return m_string; }
 
-  bool* getBoolArray() { return m_boolArray; }
+  std::vector<bool> getBoolArray() { return *m_boolArray; }
 
   int8_t* getByteArray() { return m_byteArray; }
 
@@ -754,8 +748,6 @@ class TESTOBJECT_EXPORT PdxType : public PdxSerializable {
 
   int32_t getByteArrayLength() { return byteArrayLen; }
 
-  int32_t getBoolArrayLength() { return boolArrayLen; }
-
   int32_t getShortArrayLength() { return shortArrayLen; }
 
   int32_t getStringArrayLength() { return strLenArray; }
@@ -772,8 +764,8 @@ class TESTOBJECT_EXPORT PdxType : public PdxSerializable {
 
   int32_t getCharArrayLength() { return charArrayLen; }
 
-  using PdxSerializable::toData;
   using PdxSerializable::fromData;
+  using PdxSerializable::toData;
 
   virtual void toData(PdxWriterPtr pw) /*const*/;
 

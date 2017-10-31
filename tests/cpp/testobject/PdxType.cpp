@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 /*
-* PdxObject.cpp
-*
-*  Created on: Sep 29, 2011
-*      Author: npatel
-*/
+ * PdxObject.cpp
+ *
+ *  Created on: Sep 29, 2011
+ *      Author: npatel
+ */
 
 #include "PdxType.hpp"
 
@@ -83,7 +83,7 @@ void PdxTests::PdxType::toData(PdxWriterPtr pw) /*const*/ {
   pw->markIdentityField("m_char");
   pw->writeBoolean("m_bool", m_bool);  // 1
   pw->markIdentityField("m_bool");
-  pw->writeBooleanArray("m_boolArray", m_boolArray, 3);
+  pw->writeBooleanArray("m_boolArray", m_boolArray.get());
   pw->markIdentityField("m_boolArray");
   pw->writeByte("m_byte", m_byte);
   pw->markIdentityField("m_byte");
@@ -190,7 +190,7 @@ void PdxTests::PdxType::fromData(PdxReaderPtr pr) {
 
   m_bool = pr->readBoolean("m_bool");
   // GenericValCompare
-  m_boolArray = pr->readBooleanArray("m_boolArray", boolArrayLen);
+  m_boolArray = pr->readBooleanArray("m_boolArray");
 
   m_byte = pr->readByte("m_byte");
   m_byteArray = pr->readByteArray("m_byteArray", byteArrayLen);

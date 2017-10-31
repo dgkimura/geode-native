@@ -137,8 +137,7 @@ class PdxWriterWithTypeCollector : public PdxLocalWriter {
    *@param fieldName The name of the field associated with the value.
    *@param value The boolean array value to write
    */
-  virtual PdxWriterPtr writeBooleanArray(const char* fieldName, bool* array,
-                                         int length);
+  virtual PdxWriterPtr writeBooleanArray(const char* fieldName, const std::vector<bool>* array);
 
   /**
    *Write a Char array to the PdxWriter.

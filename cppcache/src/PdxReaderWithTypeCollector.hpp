@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef GEODE_PDXREADERWITHTYPECOLLECTOR_H_
-#define GEODE_PDXREADERWITHTYPECOLLECTOR_H_
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -19,6 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#pragma once
+
+#ifndef GEODE_PDXREADERWITHTYPECOLLECTOR_H_
+#define GEODE_PDXREADERWITHTYPECOLLECTOR_H_
+
+#include <vector>
 
 #include "PdxLocalReader.hpp"
 #include "PdxTypeRegistry.hpp"
@@ -109,7 +111,8 @@ class PdxReaderWithTypeCollector : public PdxLocalReader {
 
   virtual wchar_t* readWideCharArray(const char* fieldName, int32_t& length);
 
-  virtual bool* readBooleanArray(const char* fieldName, int32_t& length);
+  virtual std::unique_ptr<std::vector<bool>> readBooleanArray(
+      const char* fieldName);
 
   /**
    * Read a 8bit-Integer Array from the <code>PdxReader</code>.

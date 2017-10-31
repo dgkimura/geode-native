@@ -99,7 +99,7 @@ class TESTOBJECT_EXPORT NonPdxType {
 
   const char* m_string;
 
-  bool* m_boolArray;
+  std::unique_ptr<std::vector<bool>> m_boolArray;
   int8_t* m_byteArray;
   int8_t* m_sbyteArray;  ///
 
@@ -179,13 +179,8 @@ class TESTOBJECT_EXPORT NonPdxType {
 
     m_string = "gfestring";
 
-    m_boolArray = new bool[3];
-    m_boolArray[0] = true;
-    m_boolArray[1] = false;
-    m_boolArray[2] = true;
-    /*for(int i=0; i<3; i++){
-      m_boolArray[i] = true;
-    };*/
+    m_boolArray = std::unique_ptr<std::vector<bool>>(
+        new std::vector<bool>{true, false, true});
 
     m_byteArray = new int8_t[2];
     m_byteArray[0] = 0x34;
@@ -435,7 +430,7 @@ class TESTOBJECT_EXPORT NonPdxType {
 
   const char* getString() { return m_string; }
 
-  bool* getBoolArray() { return m_boolArray; }
+  std::vector<bool> getBoolArray() { return *m_boolArray; }
 
   int8_t* getByteArray() { return m_byteArray; }
 

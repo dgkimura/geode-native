@@ -165,8 +165,7 @@ class CPPCACHE_EXPORT PdxInstanceImpl : public WritablePdxInstance {
    *
    * @see PdxInstance#hasField
    */
-  virtual void getField(const char* fieldname, bool** value,
-                        int32_t& length) const;
+  virtual std::unique_ptr<std::vector<bool>> getBooleanArrayField(const char* fieldname) const;
 
   /**
    * Reads the named field and set its value in signed char array type out

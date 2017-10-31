@@ -206,10 +206,10 @@ PdxWriterPtr PdxWriterWithTypeCollector::writeObject(const char* fieldName,
 }
 
 PdxWriterPtr PdxWriterWithTypeCollector::writeBooleanArray(
-    const char* fieldName, bool* array, int length) {
+    const char* fieldName, const std::vector<bool>* array) {
   m_pdxType->addVariableLengthTypeField(fieldName, "bool[]",
                                         PdxFieldTypes::BOOLEAN_ARRAY);
-  PdxLocalWriter::writeBooleanArray(fieldName, array, length);
+  PdxLocalWriter::writeBooleanArray(fieldName, array);
   return shared_from_this();
 }
 

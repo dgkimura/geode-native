@@ -159,7 +159,6 @@ int16_t PdxRemoteReader::readShort(const char* fieldName) {
   }
 }
 
-
 int32_t PdxRemoteReader::readInt(const char* fieldName) {
   int choice = m_localToRemoteMap[m_currentIndex++];
 
@@ -404,14 +403,13 @@ wchar_t* PdxRemoteReader::readWideCharArray(const char* fieldName,
   }
 }
 
-bool* PdxRemoteReader::readBooleanArray(const char* fieldName,
-                                        int32_t& length) {
+std::unique_ptr<std::vector<bool>> PdxRemoteReader::readBooleanArray(
+    const char* fieldName) {
   int choice = m_localToRemoteMap[m_currentIndex++];
 
   switch (choice) {
     case -2:
-      return PdxLocalReader::readBooleanArray(fieldName,
-                                              length);  // in same order
+      return PdxLocalReader::readBooleanArray(fieldName);  // in same order
     case -1: {
       return nullptr;  // null value
     }
@@ -421,7 +419,7 @@ bool* PdxRemoteReader::readBooleanArray(const char* fieldName,
           choice, m_offsetsBuffer, m_offsetSize, m_serializedLength);
       PdxLocalReader::resettoPdxHead();
       m_dataInput->advanceCursor(position);
-      bool* retVal = PdxLocalReader::readBooleanArray(fieldName, length);
+      auto retVal = PdxLocalReader::readBooleanArray(fieldName);
       PdxLocalReader::resettoPdxHead();
       return retVal;
     }

@@ -189,11 +189,11 @@ wchar_t* PdxLocalReader::readWideCharArray(
   m_dataInput->readWideCharArray(&charArray, length);
   return charArray;
 }
-bool* PdxLocalReader::readBooleanArray(const char* fieldName, int32_t& length) {
+
+std::unique_ptr<std::vector<bool>> PdxLocalReader::readBooleanArray(
+    const char* fieldName) {
   checkEmptyFieldName(fieldName);
-  bool* boolArray = nullptr;
-  m_dataInput->readBooleanArray(&boolArray, length);
-  return boolArray;
+  return m_dataInput->readBooleanArray();
 }
 
 int8_t* PdxLocalReader::readByteArray(const char* fieldName, int32_t& length) {
