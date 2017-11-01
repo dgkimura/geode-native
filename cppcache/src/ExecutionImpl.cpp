@@ -69,9 +69,9 @@ std::vector<int8_t>* ExecutionImpl::getFunctionAttributes(const char* func) {
   return nullptr;
 }
 
-ResultCollectorPtr ExecutionImpl::execute(CacheableVectorPtr& routingObj,
-                                          CacheablePtr& args,
-                                          ResultCollectorPtr& rs,
+ResultCollectorPtr ExecutionImpl::execute(const CacheableVectorPtr& routingObj,
+                                          const CacheablePtr& args,
+                                          const ResultCollectorPtr& rs,
                                           const char* func, uint32_t timeout) {
   m_routingObj = routingObj;
   m_args = args;
