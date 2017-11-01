@@ -182,7 +182,7 @@ void Properties::addAll(const PropertiesPtr& other) {
 
    public:
     explicit Copier(Properties& lhs) : m_lhs(lhs) {}
-    void visit(CacheableKeyPtr& key, CacheablePtr& value) {
+    void visit(const CacheableKeyPtr& key, const CacheablePtr& value) {
       m_lhs.insert(key, value);
     }
   } aCopier(*this);
