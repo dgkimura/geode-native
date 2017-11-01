@@ -536,13 +536,13 @@ class CPPCACHE_EXPORT DataInput {
    * @see staticCast
    */
   template <class PTR>
-  inline void readObject(std::shared_ptr<PTR>& ptr,
+  inline std::shared_ptr<PTR> readObject(
                          bool throwOnError = DINP_THROWONERROR_DEFAULT) {
     SerializablePtr sPtr = readObjectInternal();
     if (throwOnError) {
-      ptr = std::dynamic_pointer_cast<PTR>(sPtr);
+      return std::dynamic_pointer_cast<PTR>(sPtr);
     } else {
-      ptr = std::static_pointer_cast<PTR>(sPtr);
+      return std::static_pointer_cast<PTR>(sPtr);
     }
   }
 

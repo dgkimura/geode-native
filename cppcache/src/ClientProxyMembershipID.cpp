@@ -231,16 +231,16 @@ void ClientProxyMembershipID::fromData(DataInput& input) {
 
   input.readBytesOnly(hostAddr, len);  // inetaddress
   hostPort = input.readInt32();            // port
-  input.readObject(hostname);          // hostname
+  hostname = input.readObject<CacheableString>();          // hostname
   splitbrain = input.read();             // splitbrain
   dcport = input.readInt32();              // port
   vPID = input.readInt32();                // pid
   vmKind = input.read();                 // vmkind
   auto aStringArray = CacheableStringArray::create();
   aStringArray->fromData(input);
-  input.readObject(dsName);            // name
-  input.readObject(uniqueTag);         // unique tag
-  input.readObject(durableClientId);   // durable client id
+  dsName = input.readObject<CacheableString>();            // name
+  uniqueTag = input.readObject<CacheableString>();         // unique tag
+  durableClientId = input.readObject<CacheableString>();   // durable client id
   durableClntTimeOut = input.readInt32();  // durable client timeout
   int32_t vmViewId = 0;
   readVersion(splitbrain, input);
@@ -284,13 +284,13 @@ Serializable* ClientProxyMembershipID::readEssentialData(DataInput& input) {
   const auto vmKind = input.read();  // vmkind
 
   if (vmKind == ClientProxyMembershipID::LONER_DM_TYPE) {
-    input.readObject(uniqueTag);  // unique tag
+    uniqueTag = input.readObject<CacheableString>();  // unique tag
   } else {
-    input.readObject(vmViewIdstr);
+    vmViewIdstr = input.readObject<CacheableString>();
     vmViewId = atoi(vmViewIdstr.get()->asChar());
   }
 
-  input.readObject(dsName);  // name
+  dsName = input.readObject<CacheableString>();  // name
 
   if (vmKind != ClientProxyMembershipID::LONER_DM_TYPE) {
     // initialize the object with the values read and some dummy values

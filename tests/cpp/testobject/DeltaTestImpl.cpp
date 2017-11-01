@@ -67,10 +67,10 @@ DeltaTestImpl::DeltaTestImpl(DeltaTestImplPtr rhs) : Delta(nullptr) {
 
 void DeltaTestImpl::fromData(DataInput& input) {
   intVar = input.readInt32();
-  input.readObject(str);
+  str = input.readObject<CacheableString>();
   doubleVar = input.readDouble();
-  input.readObject(byteArr);
-  input.readObject(testObj);
+  byteArr = input.readObject<CacheableBytes>();
+  testObj = input.readObject<TestObject1>();
 }
 
 void DeltaTestImpl::toData(DataOutput& output) const {
@@ -116,13 +116,13 @@ void DeltaTestImpl::fromDelta(DataInput& input) {
     intVar = input.readInt32();
   }
   if ((deltaBits & STR_MASK) == STR_MASK) {
-    input.readObject(str);
+    str = input.readObject<CacheableString>();
   }
   if ((deltaBits & DOUBLE_MASK) == DOUBLE_MASK) {
     doubleVar = input.readDouble();
   }
   if ((deltaBits & BYTE_ARR_MASK) == BYTE_ARR_MASK) {
-    input.readObject(byteArr);
+    byteArr = input.readObject<CacheableBytes>();
     /*
         uint8_t* bytes;
         int32_t len;
@@ -132,7 +132,7 @@ void DeltaTestImpl::fromDelta(DataInput& input) {
     */
   }
   if ((deltaBits & TEST_OBJ_MASK) == TEST_OBJ_MASK) {
-    input.readObject(testObj);
+    testObj = input.readObject<TestObject1>();
   }
 }
 CacheableStringPtr DeltaTestImpl::toString() const {

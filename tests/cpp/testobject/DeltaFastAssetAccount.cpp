@@ -54,9 +54,9 @@ void DeltaFastAssetAccount::toData(
 
 void DeltaFastAssetAccount::fromData(apache::geode::client::DataInput& input) {
   acctId = input.readInt32();
-  input.readObject(customerName);
+  customerName = input.readObject<CacheableString>();
   netWorth = input.readDouble();
-  input.readObject(assets);
+  assets = input.readObject<CacheableHashMap>();
   timestamp = input.readInt64();
 }
 

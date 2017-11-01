@@ -102,7 +102,6 @@ void VersionedCacheableObjectPartList::fromData(DataInput& input) {
   m_regionIsVersioned = (flags & 0x08) == 0x08;
   m_serializeValues = (flags & 0x10) == 0x10;
   bool persistent = (flags & 0x20) == 0x20;
-  CacheableKeyPtr key;
   CacheableStringPtr exMsgPtr;
   int32_t len = 0;
   bool valuesNULL = false;
@@ -125,7 +124,7 @@ void VersionedCacheableObjectPartList::fromData(DataInput& input) {
     len = static_cast<int32_t>(input.readUnsignedVL());
 
     for (int32_t index = 0; index < len; ++index) {
-      input.readObject(key, true);
+      CacheableKeyPtr key = input.readObject<CacheableKey>(true);
       if (m_resultKeys != nullptr) {
         m_resultKeys->push_back(key);
       }

@@ -358,7 +358,7 @@ inline void TcrMessage::readKeyPart(DataInput& input) {
   const auto isObj = input.readBoolean();
   if (lenObj > 0) {
     if (isObj) {
-      input.readObject(m_key);
+      m_key = input.readObject<CacheableKey>();
     } else {
       m_key = std::static_pointer_cast<CacheableKey>(
           readCacheableString(input, lenObj));
@@ -2876,7 +2876,7 @@ void TcrMessage::readEventIdPart(DataInput& input, bool skip, int32_t parts) {
 
   GF_D_ASSERT(isObj != 0);
 
-  input.readObject(m_eventid);
+  m_eventid = input.readObject<EventId>();
 }
 
 DSMemberForVersionStampPtr TcrMessage::readDSMember(
@@ -2953,8 +2953,7 @@ void TcrMessage::readHashSetForGCVersions(
     CacheableKeyPtr key;
     CacheablePtr val;
     for (int32_t index = 0; index < len; index++) {
-      CacheableKeyPtr keyPtr;
-      input.readObject(keyPtr);
+      CacheableKeyPtr keyPtr = input.readObject<CacheableKey>();
       value->insert(keyPtr);
     }
   }

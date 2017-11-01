@@ -28,13 +28,13 @@ namespace geode {
 namespace client {
 
 void RegionCommit::fromData(DataInput& input) {
-  input.readObject(m_regionPath);
-  input.readObject(m_parentRegionPath);
+  m_regionPath = input.readObject<CacheableString>();
+  m_parentRegionPath = input.readObject<CacheableString>();
   int32_t size = input.readInt32();
   if (size > 0) {
     const auto largeModCount = input.readBoolean();
     DSMemberForVersionStampPtr dsMember;
-    input.readObject(dsMember);
+    dsMember = input.readObject<DSMemberForVersionStamp>();
 
     auto memId = m_memberListForVersionStamp.add(dsMember);
     for (int i = 0; i < size; i++) {

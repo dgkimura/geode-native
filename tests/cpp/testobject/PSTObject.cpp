@@ -52,7 +52,7 @@ void PSTObject::fromData(apache::geode::client::DataInput& input) {
   timestamp = input.readInt64();
   field1 = input.readInt32();
   field2 = input.read();
-  input.readObject(valueData);
+  valueData = input.readObject<CacheableBytes>();
 }
 
 CacheableStringPtr PSTObject::toString() const {

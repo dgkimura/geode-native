@@ -43,7 +43,7 @@ void CacheableObjectPartList::fromData(DataInput& input) {
     int32_t keysOffset = (m_keysOffset != nullptr ? *m_keysOffset : 0);
     for (int32_t index = keysOffset; index < keysOffset + len; ++index) {
       if (hasKeys) {
-        input.readObject(key, true);
+        key = input.readObject<CacheableKey>(true);
       } else if (m_keys != nullptr) {
         key = m_keys->operator[](index);
       } else {

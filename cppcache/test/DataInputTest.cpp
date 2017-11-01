@@ -135,7 +135,7 @@ class TestDataInput {
   template <class PTR>
   void readObject(std::shared_ptr<PTR> &ptr,
                   bool throwOnError = DINP_THROWONERROR_DEFAULT) {
-    m_dataInput.readObject(ptr, throwOnError);
+    ptr = m_dataInput.readObject<PTR>(throwOnError);
   }
 
   bool readNativeBool() { return m_dataInput.readNativeBool(); }

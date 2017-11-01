@@ -919,11 +919,11 @@ void PdxInsideIGeodeSerializable::toData(DataOutput &output) const {
 
 void PdxInsideIGeodeSerializable::fromData(DataInput &input) {
   m_i1 = input.readInt32();
-  input.readObject(m_npdx);
+  m_npdx = input.readObject<NestedPdx>();
   m_i2 = input.readInt32();
   input.readUTF(&m_s1);
   input.readUTF(&m_s2);
-  input.readObject(m_pdx3);
+  m_pdx3 = input.readObject<PdxTypes3>();
   m_i3 = input.readInt32();
   m_i4 = input.readInt32();
 }

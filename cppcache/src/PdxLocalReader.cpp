@@ -353,7 +353,7 @@ bool PdxLocalReader::isIdentityField(const char* fieldName) {
 
 void PdxLocalReader::readCollection(const char* fieldName,
                                     CacheableArrayListPtr& collection) {
-  m_dataInput->readObject(collection);
+  collection = m_dataInput->readObject<CacheableArrayList>();
 }
 
 PdxUnreadFieldsPtr PdxLocalReader::readUnreadFields() {

@@ -58,7 +58,7 @@ bool FarSideEntryOp::isInvalidate(int8_t op) {
 
 void FarSideEntryOp::fromData(DataInput& input, bool largeModCount,
                               uint16_t memId) {
-  input.readObject(m_key);
+  m_key = input.readObject<CacheableKey>();
   m_op = input.read();
   if (largeModCount) {
     m_modSerialNum = input.readInt32();

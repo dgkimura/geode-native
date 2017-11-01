@@ -59,7 +59,7 @@ void TestObject1::fromData(DataInput& input) {
   input.readBytes(&bytes, &len);
   arr = CacheableBytes::create(bytes, len);
   delete bytes;
-  input.readObject(name);
+  name = input.readObject<CacheableString>();
   identifier = input.readInt32();
 }
 

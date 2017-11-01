@@ -3485,8 +3485,7 @@ void ChunkedQueryResponse::handleChunk(const uint8_t* chunk, int32_t chunkLen,
     // special case for scalar result
     partLen = input->readInt32();
     input->read();
-    CacheableInt32Ptr intVal;
-    input->readObject(intVal, true);
+    CacheableInt32Ptr intVal = input->readObject<CacheableInt32>(true);
     m_queryResults->push_back(intVal);
 
     // TODO:
@@ -3948,9 +3947,7 @@ void ChunkedDurableCQListResponse::handleChunk(const uint8_t* chunk,
   const auto stringParts = input->read();  // read the number of strings in the message this
                              // is one byte
 
-  CacheableStringPtr strTemp;
   for (int i = 0; i < stringParts; i++) {
-    input->readObject(strTemp);
-    m_resultList->push_back(strTemp);
+    m_resultList->push_back(input->readObject<CacheableString>());
   }
 }

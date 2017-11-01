@@ -70,8 +70,8 @@ void EnumInfo::toData(apache::geode::client::DataOutput &output) const {
 }
 
 void EnumInfo::fromData(apache::geode::client::DataInput &input) {
-  input.readObject(m_enumClassName);
-  input.readObject(m_enumName);
+  m_enumClassName = input.readObject<CacheableString>();
+  m_enumName = input.readObject<CacheableString>();
   m_ordinal = input.readInt32();
 }
 

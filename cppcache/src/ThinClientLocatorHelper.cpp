@@ -142,7 +142,7 @@ GfErrType ThinClientLocatorHelper::getAllServers(
       }
       di->rewindCursor(1);
 
-      di->readObject(response);
+      response = di->readObject<GetAllServersResponse>();
       servers = response->getServers();
       return GF_NOERR;
     } catch (const AuthenticationRequiredException&) {
@@ -237,7 +237,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewCallBackConn(
             "SSL is enabled on locator, enable SSL in client as well");
       }
       di->rewindCursor(1);
-      di->readObject(response);
+      response = di->readObject<QueueConnectionResponse>();
       outEndpoint = response->getServers();
       return GF_NOERR;
     } catch (const AuthenticationRequiredException& excp) {
@@ -341,7 +341,7 @@ GfErrType ThinClientLocatorHelper::getEndpointForNewFwdConn(
       }
       di->rewindCursor(1);
 
-      di->readObject(response);
+      response = di->readObject<ClientConnectionResponse>();
       response->printInfo();
       if (!response->serverFound()) {
         LOGFINE("Server not found");
@@ -432,7 +432,7 @@ GfErrType ThinClientLocatorHelper::updateLocators(
       }
       di->rewindCursor(1);
 
-      di->readObject(response);
+      response = di->readObject<LocatorListResponse>();
       std::vector<ServerLocation> locators = response->getLocators();
       if (locators.size() > 0) {
         RandGen randGen;

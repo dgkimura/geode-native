@@ -318,7 +318,7 @@ void Properties::fromData(DataInput& input) {
     if (!(key = input.readNativeString())) {
       CacheableKeyPtr keyPtr;
       CacheablePtr valPtr;
-      input.readObject(keyPtr, true);
+      keyPtr = input.readObject<CacheableKey>(true);
       input.readObject(valPtr);
       MAP->rebind(keyPtr, valPtr);
     } else {

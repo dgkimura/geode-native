@@ -84,15 +84,15 @@ void Portfolio::toData(DataOutput& output) const {
 
 void Portfolio::fromData(DataInput& input) {
   ID = input.readInt32();
-  input.readObject(pkid);
-  input.readObject(position1);
-  input.readObject(position2);
-  input.readObject(positions);
-  input.readObject(type);
+  pkid = input.readObject<CacheableString>();
+  position1 = input.readObject<Position>();
+  position2 = input.readObject<Position>();
+  positions = input.readObject<CacheableHashMap>();
+  type = input.readObject<CacheableString>();
   input.readUTF(&status);
-  input.readObject(names);
+  names = input.readObject<CacheableStringArray>();
   input.readBytes(&newVal, &newValSize);
-  input.readObject(creationDate);
+  creationDate = input.readObject<CacheableDate>();
   int tmp = 0;
   input.readBytes(&arrayNull, &tmp);
   input.readBytes(&arrayZeroSize, &tmp);

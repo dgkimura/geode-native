@@ -450,7 +450,7 @@ bool TcrConnection::InitTcrConnection(
         auto diForClient = cacheImpl->getCache()->createDataInput(
             recvMessage->value(), recvMessage->length());
         ClientProxyMembershipIDPtr member;
-        diForClient->readObject(member);
+        member = diForClient->readObject<ClientProxyMembershipID>();
         auto memId = cacheImpl->getMemberListForVersionStamp()->add(member);
         getEndpointObject()->setDistributedMemberID(memId);
         LOGDEBUG("Deserialized distributed member Id %d", memId);
