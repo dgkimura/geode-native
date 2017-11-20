@@ -20,6 +20,8 @@
 #ifndef GEODE_CACHEPERFSTATS_H_
 #define GEODE_CACHEPERFSTATS_H_
 
+#include <cassert>
+
 #include <geode/geode_globals.hpp>
 #include <geode/statistics/Statistics.hpp>
 #include <geode/statistics/StatisticsFactory.hpp>
@@ -139,7 +141,7 @@ class CPPCACHE_EXPORT CachePerfStats {
                                       "Statistics about native client cache",
                                       statDescArr, 24);
     }
-    GF_D_ASSERT(statsType != nullptr);
+    assert(statsType != nullptr);
     // Create Statistics object
     m_cachePerfStats =
         factory->createAtomicStatistics(statsType, "CachePerfStats");

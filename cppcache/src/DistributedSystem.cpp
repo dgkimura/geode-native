@@ -14,30 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "config.h"
-#include <geode/geode_globals.hpp>
 
-#include <geode/DistributedSystem.hpp>
-#include "statistics/StatisticsManager.hpp"
-#include <geode/SystemProperties.hpp>
+#include <cassert>
 
-#include <CppCacheLibrary.hpp>
-#include <Utils.hpp>
-#include "util/Log.hpp"
-#include <geode/CacheFactory.hpp>
 #include <ace/OS.h>
-
-#include <ExpiryTaskManager.hpp>
-#include <CacheImpl.hpp>
 #include <ace/Guard_T.h>
 #include <ace/Recursive_Thread_Mutex.h>
+#include <geode/geode_globals.hpp>
+#include <geode/CacheFactory.hpp>
 #include <geode/DataOutput.hpp>
-#include <TcrMessage.hpp>
-#include <DistributedSystemImpl.hpp>
-#include <RegionStats.hpp>
-#include <PoolStatistics.hpp>
+#include <geode/DistributedSystem.hpp>
+#include <geode/SystemProperties.hpp>
 
-#include <DiffieHellman.hpp>
+#include "config.h"
+#include "CppCacheLibrary.hpp"
+#include "CacheImpl.hpp"
+#include "ExpiryTaskManager.hpp"
+#include "TcrMessage.hpp"
+#include "DistributedSystemImpl.hpp"
+#include "RegionStats.hpp"
+#include "PoolStatistics.hpp"
+#include "DiffieHellman.hpp"
+#include "statistics/StatisticsManager.hpp"
+#include "Utils.hpp"
+#include "util/Log.hpp"
 
 #include "version.h"
 
@@ -206,7 +206,7 @@ std::unique_ptr<DistributedSystem> DistributedSystem::create(
     Log::close();
     throw;
   }
-  GF_D_ASSERT(m_statisticsManager != nullptr);
+  assert(statMngr != nullptr);
 
   auto distributedSystem = std::unique_ptr<DistributedSystem>(
       new DistributedSystem(name, std::move(statMngr), std::move(sysProps)));

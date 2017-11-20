@@ -14,13 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cassert>
+#include <mutex>
+
 #include "LRUEntriesMap.hpp"
 #include "LRUList.cpp"
 #include "ExpiryTaskManager.hpp"
 #include "MapSegment.hpp"
 #include "CacheImpl.hpp"
 
-#include <mutex>
 #include "util/concurrent/spinlock_mutex.hpp"
 
 namespace apache {
@@ -257,7 +260,7 @@ GfErrType LRUEntriesMap::put(const std::shared_ptr<CacheableKey>& key,
                              std::shared_ptr<VersionTag> versionTag,
                              bool& isUpdate, DataInput* delta) {
   MapSegment* segmentRPtr = segmentFor(key);
-  GF_D_ASSERT(segmentRPtr != nullptr);
+  assert(segmentRPtr != nullptr);
 
   GfErrType err = GF_NOERR;
   bool segmentLocked = false;
@@ -319,7 +322,7 @@ GfErrType LRUEntriesMap::put(const std::shared_ptr<CacheableKey>& key,
       segmentRPtr->getEntry(key, mePtr, tmpValue);
       // mePtr cannot be null, we just put it...
       // must convert to an std::shared_ptr<LRUMapEntryImpl>...
-      GF_D_ASSERT(mePtr != nullptr);
+      assert(mePtr != nullptr);
       m_lruList.appendEntry(mePtr);
       me = mePtr;
     } else {

@@ -15,11 +15,13 @@
  * limitations under the License.
  */
 
+#include <string>
+#include <cassert>
+#include <cstdlib>
+
 #include <geode/Cache.hpp>
 #include <Utils.hpp>
 #include <geode/DataOutput.hpp>
-#include <string>
-#include <cstdlib>
 #include <geode/GeodeTypeIds.hpp>
 #include <CacheXmlParser.hpp>
 #include <ace/DLL.h>
@@ -461,7 +463,7 @@ void writeCharStar(DataOutput& out, const char* field) {
 
 /** this one allocates the memory and modifies field to point to it. */
 void readCharStar(DataInput& in, char** field) {
-  GF_D_ASSERT(*field == nullptr);
+  assert(*field == nullptr);
   int32_t memlen = in.readArrayLen();
   if (memlen != 0) {
     *field = new char[memlen];
@@ -680,37 +682,37 @@ void RegionAttributes::validateSerializableAttributes() {
 }
 
 void RegionAttributes::setCacheListener(const char* lib, const char* func) {
-  GF_R_ASSERT(lib != nullptr);
-  GF_R_ASSERT(func != nullptr);
+  assert(lib != nullptr);
+  assert(func != nullptr);
   copyStringAttribute(m_cacheListenerLibrary, lib);
   copyStringAttribute(m_cacheListenerFactory, func);
 }
 
 void RegionAttributes::setPartitionResolver(const char* lib, const char* func) {
-  GF_R_ASSERT(lib != nullptr);
-  GF_R_ASSERT(func != nullptr);
+  assert(lib != nullptr);
+  assert(func != nullptr);
   copyStringAttribute(m_partitionResolverLibrary, lib);
   copyStringAttribute(m_partitionResolverFactory, func);
 }
 
 void RegionAttributes::setCacheLoader(const char* lib, const char* func) {
-  GF_R_ASSERT(lib != nullptr);
-  GF_R_ASSERT(func != nullptr);
+  assert(lib != nullptr);
+  assert(func != nullptr);
   copyStringAttribute(m_cacheLoaderLibrary, lib);
   copyStringAttribute(m_cacheLoaderFactory, func);
 }
 
 void RegionAttributes::setCacheWriter(const char* lib, const char* func) {
-  GF_R_ASSERT(lib != nullptr);
-  GF_R_ASSERT(func != nullptr);
+  assert(lib != nullptr);
+  assert(func != nullptr);
   copyStringAttribute(m_cacheWriterLibrary, lib);
   copyStringAttribute(m_cacheWriterFactory, func);
 }
 
 void RegionAttributes::setPersistenceManager(const char* lib, const char* func,
                                              const std::shared_ptr<Properties>& config) {
-  GF_R_ASSERT(lib != nullptr);
-  GF_R_ASSERT(func != nullptr);
+  assert(lib != nullptr);
+  assert(func != nullptr);
   copyStringAttribute(m_persistenceLibrary, lib);
   copyStringAttribute(m_persistenceFactory, func);
   m_persistenceProperties = config;

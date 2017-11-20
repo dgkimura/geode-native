@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "LRUList.hpp"
-#include "util/concurrent/spinlock_mutex.hpp"
 
 #include <mutex>
+#include <cassert>
+
+#include "LRUList.hpp"
+#include "util/concurrent/spinlock_mutex.hpp"
 
 namespace apache {
 namespace geode {
@@ -58,7 +60,7 @@ template <typename TEntry, typename TCreateEntry>
 void LRUList<TEntry, TCreateEntry>::appendNode(LRUListNode* aNode) {
   std::lock_guard<spinlock_mutex> lk(m_tailLock);
 
-  GF_D_ASSERT(aNode != nullptr);
+  assert(aNode != nullptr);
 
   aNode->clearNextLRUListNode();
   m_tailNode->setNextLRUListNode(aNode);

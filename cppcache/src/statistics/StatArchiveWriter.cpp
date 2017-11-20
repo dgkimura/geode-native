@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <cassert>
+
 #include <geode/geode_globals.hpp>
 
 #include <ace/ACE.h>
@@ -201,8 +203,8 @@ void ResourceInst::writeSample() {
   bool wroteInstId = false;
   bool checkForChange = true;
   StatisticDescriptor **stats = this->type->getStats();
-  GF_D_ASSERT(stats != nullptr);
-  GF_D_ASSERT(*stats != nullptr);
+  assert(stats != nullptr);
+  assert(*stats != nullptr);
   if (this->resource->isClosed()) {
     return;
   }

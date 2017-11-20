@@ -21,6 +21,10 @@
  *      Author: abhaware
  */
 
+#include <cassert>
+#include <set>
+#include <algorithm>
+
 #include "ThinClientRedundancyManager.hpp"
 #include "TcrHADistributionManager.hpp"
 #include "RemoteQueryService.hpp"
@@ -35,8 +39,6 @@
 #include "ThinClientLocatorHelper.hpp"
 #include "UserAttributes.hpp"
 #include "ProxyCache.hpp"
-#include <set>
-#include <algorithm>
 
 using namespace apache::geode::client;
 
@@ -395,12 +397,12 @@ GfErrType ThinClientRedundancyManager::maintainRedundancyLevel(
   // checked. To verify, We may have to modify
   //    TcrEndpoint class.)
 
-  GF_DEV_ASSERT(!isRedundancySatisfied || ((m_redundantEndpoints.size() ==
+  assert(!isRedundancySatisfied || ((m_redundantEndpoints.size() ==
                                             (size_t)(m_redundancyLevel + 1)) &&
                                            isPrimaryConnected));
-  GF_DEV_ASSERT(isRedundancySatisfied ||
-                ((int)m_redundantEndpoints.size() <= m_redundancyLevel) ||
-                m_redundancyLevel == -1);
+  assert(isRedundancySatisfied ||
+         ((int)m_redundantEndpoints.size() <= m_redundancyLevel) ||
+         m_redundancyLevel == -1);
 
   std::shared_ptr<RemoteQueryService> queryServicePtr;
   ThinClientPoolDM* poolDM = dynamic_cast<ThinClientPoolDM*>(m_poolHADM);
@@ -440,9 +442,9 @@ GfErrType ThinClientRedundancyManager::maintainRedundancyLevel(
   // result or redundantEndpoints/nonredundantEndpoints cannot have stale or
   // deleted endpoints
   if (!m_poolHADM) {
-    GF_DEV_ASSERT(m_redundantEndpoints.size() +
-                      m_nonredundantEndpoints.size() ==
-                  (unsigned)m_theTcrConnManager->getNumEndPoints());
+    assert(m_redundantEndpoints.size() +
+           m_nonredundantEndpoints.size() ==
+             (unsigned)m_theTcrConnManager->getNumEndPoints());
   }
 
   // Update pool stats
@@ -492,9 +494,6 @@ GfErrType ThinClientRedundancyManager::maintainRedundancyLevel(
 void ThinClientRedundancyManager::removeEndpointsInOrder(
     std::vector<TcrEndpoint*>& destVector,
     const std::vector<TcrEndpoint*>& srcVector) {
-#if GF_DEVEL_ASSERTS == 1
-  size_t destInitSize = destVector.size();
-#endif
 
   std::vector<TcrEndpoint*> tempDestVector;
   std::vector<TcrEndpoint*>::iterator itDest;
@@ -515,22 +514,21 @@ void ThinClientRedundancyManager::removeEndpointsInOrder(
   // Postconditions:
   // 1. size of destVector decreases by the size of srcVector
 
-  GF_DEV_ASSERT(destInitSize == destVector.size() + srcVector.size());
+  size_t destInitSize = destVector.size();
+  assert(destInitSize == destVector.size() + srcVector.size());
 }
 
 void ThinClientRedundancyManager::addEndpointsInOrder(
     std::vector<TcrEndpoint*>& destVector,
     const std::vector<TcrEndpoint*>& srcVector) {
-#if GF_DEVEL_ASSERTS == 1
-  size_t destInitSize = destVector.size();
-#endif
 
   destVector.insert(destVector.end(), srcVector.begin(), srcVector.end());
 
   // Postconditions:
   // 1. Length of destVector increases by the length of srcVector
 
-  GF_DEV_ASSERT(destVector.size() == destInitSize + srcVector.size());
+  size_t destInitSize = destVector.size();
+  assert(destVector.size() == destInitSize + srcVector.size());
 }
 
 GfErrType ThinClientRedundancyManager::createQueueEP(TcrEndpoint* ep,
@@ -768,7 +766,7 @@ bool ThinClientRedundancyManager::readyForEvents(
 void ThinClientRedundancyManager::moveEndpointToLast(
     std::vector<TcrEndpoint*>& epVector, TcrEndpoint* targetEp) {
   // Pre-condition
-  GF_DEV_ASSERT(epVector.size() > 0 && targetEp != nullptr);
+  assert(epVector.size() > 0 && targetEp != nullptr);
 
   // Remove Ep
   for (std::vector<TcrEndpoint*>::iterator it = epVector.begin();
@@ -1040,7 +1038,7 @@ void ThinClientRedundancyManager::getAllEndpoints(
             "endpoints, found redundant endpoint.");
       } else if (status == PRIMARY_SERVER) {
         // Primary should be unique
-        GF_DEV_ASSERT(primaryEp == nullptr);
+        assert(primaryEp == nullptr);
         primaryEp = ep;
         LOGDEBUG(
             "ThinClientRedundancyManager::getAllEndpoints(): sorting "
@@ -1224,7 +1222,7 @@ void ThinClientRedundancyManager::doPeriodicAck() {
       if (!acked) {
         // clear entries' acked flag for next periodic ack
         uint32_t cleared = m_eventidmap.clearAckedFlags(entries);
-        GF_D_ASSERT(cleared <= count);
+        assert(cleared <= count);
         cleared = 0;  // this line to avoid a 'unused var' warning in gcc
       }
     }

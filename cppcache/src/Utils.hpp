@@ -24,6 +24,7 @@
  * @file
  */
 
+#include <cassert>
 #include <typeinfo>
 #include <string>
 #include <unordered_set>
@@ -169,7 +170,7 @@ class CPPCACHE_EXPORT Utils {
       LOGFINE("Type ID is %d for the object returning zero HeapLRU size",
               theObject->typeId());
     }
-    GF_DEV_ASSERT(objectSize != 0 && objectSize != ((uint32_t)-1));
+    assert(objectSize != 0 && objectSize != ((uint32_t)-1));
     return objectSize;
   }
 

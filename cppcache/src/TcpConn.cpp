@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <cassert>
 #include <memory.h>
 
 #include <ace/INET_Addr.h>
@@ -162,7 +163,7 @@ void TcpConn::listen(const char *ipaddr,
 
 void TcpConn::listen(ACE_INET_Addr addr,
                      std::chrono::microseconds waitSeconds) {
-  GF_DEV_ASSERT(m_io != nullptr);
+  assert(m_io != nullptr);
 
   ACE_SOCK_Acceptor listener(addr, 1);
   int32_t retVal = 0;
@@ -203,7 +204,7 @@ void TcpConn::connect(const char *ipaddr,
 }
 
 void TcpConn::connect() {
-  GF_DEV_ASSERT(m_io != nullptr);
+  assert(m_io != nullptr);
 
   ACE_INET_Addr ipaddr = m_addr;
   std::chrono::microseconds waitMicroSeconds = m_waitMilliSeconds;
@@ -283,8 +284,8 @@ int32_t TcpConn::socketOp(TcpConn::SockOp op, char *buff, int32_t len,
       }
     }*/
 
-    GF_DEV_ASSERT(m_io != nullptr);
-    GF_DEV_ASSERT(buff != nullptr);
+    assert(m_io != nullptr);
+    assert(buff != nullptr);
 
 #if GF_DEVEL_ASSERTS == 1
     if (len <= 0) {
@@ -292,7 +293,7 @@ int32_t TcpConn::socketOp(TcpConn::SockOp op, char *buff, int32_t len,
           "TcpConn::socketOp called with a length of %d specified. "
           "No operation performed.",
           len);
-      GF_DEV_ASSERT(false);
+      assert(false);
     }
 #endif
 
@@ -349,14 +350,14 @@ int32_t TcpConn::socketOp(TcpConn::SockOp op, char *buff, int32_t len,
       ACE_OS::last_error(ETIME);
     }
 
-    GF_DEV_ASSERT(len >= 0);
+    assert(len >= 0);
     return totalsend;
   }
 }
 
 //  Return the local port for this TCP connection.
 uint16_t TcpConn::getPort() {
-  GF_DEV_ASSERT(m_io != nullptr);
+  assert(m_io != nullptr);
 
   ACE_INET_Addr localAddr;
   m_io->get_local_addr(*(ACE_Addr *)&localAddr);

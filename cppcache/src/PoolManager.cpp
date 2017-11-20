@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cassert>
 #include <mutex>
 
 #include <geode/PoolManager.hpp>
@@ -77,7 +79,7 @@ void PoolManager::Impl::close(bool keepAlive) {
 
      if (iter != m_connectionPools.end()) {
        poolPtr = iter->second;
-       GF_DEV_ASSERT(poolPtr != nullptr);
+       assert(poolPtr != nullptr);
      }
 
      return poolPtr;

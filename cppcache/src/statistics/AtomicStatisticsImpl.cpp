@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-#include <geode/geode_globals.hpp>
-
 #include <atomic>
+#include <cassert>
+
+#include <geode/geode_globals.hpp>
 
 #include <ace/OS_NS_stdio.h>
 #include "AtomicStatisticsImpl.hpp"
@@ -90,7 +91,7 @@ AtomicStatisticsImpl::AtomicStatisticsImpl(StatisticsType* typeArg,
     this->uniqueId = uniqueIdArg;
     this->closed = false;
     this->statsType = dynamic_cast<StatisticsTypeImpl*>(typeArg);
-    GF_D_ASSERT(this->statsType != nullptr);
+    assert(this->statsType != nullptr);
     int32_t intCount = statsType->getIntStatCount();
     int32_t longCount = statsType->getLongStatCount();
     int32_t doubleCount = statsType->getDoubleStatCount();

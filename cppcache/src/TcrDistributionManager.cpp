@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cassert>
+
 #include <geode/geode_globals.hpp>
 #include "TcrDistributionManager.hpp"
 #include "ThinClientRegion.hpp"
@@ -25,7 +28,7 @@ using namespace apache::geode::client;
 TcrDistributionManager::TcrDistributionManager(
     ThinClientRegion* region, TcrConnectionManager& connManager)
     : ThinClientDistributionManager(connManager, region) {
-  GF_R_ASSERT(region != nullptr);
+  assert(region != nullptr);
   m_clientNotification =
       region->getAttributes()->getClientNotificationEnabled();
 }

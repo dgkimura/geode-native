@@ -17,6 +17,7 @@
 
 #include <geode/geode_globals.hpp>
 
+#include <cassert>
 #include <cctype>
 #include <string>
 #include <utility>
@@ -433,7 +434,7 @@ void Log::writeBanner() {
     fflush(stdout);
     return;
   }  // else
-  GF_D_ASSERT(g_logFile && g_logMutex && g_logFileWithExt);
+  assert(g_logFile && g_logMutex && g_logFileWithExt);
 
   if (fprintf(g_log, "%s", bannertext.c_str()) == 0 || ferror(g_log)) {
     // we should be continue,

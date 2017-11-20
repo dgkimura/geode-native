@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "TcpSslConn.hpp"
 
 #include <geode/SystemProperties.hpp>
 #include <geode/DistributedSystem.hpp>
+
 #include "CacheImpl.hpp"
+#include "TcpSslConn.hpp"
 
 namespace apache {
 namespace geode {
@@ -55,7 +56,7 @@ void TcpSslConn::createSocket(ACE_SOCKET sock) {
 
 void TcpSslConn::listen(ACE_INET_Addr addr,
                         std::chrono::microseconds waitSeconds) {
-  GF_DEV_ASSERT(m_ssl != nullptr);
+  assert(m_ssl != nullptr);
 
   int32_t retVal = m_ssl->listen(addr, waitSeconds);
 
@@ -76,7 +77,7 @@ void TcpSslConn::listen(ACE_INET_Addr addr,
 }
 
 void TcpSslConn::connect() {
-  GF_DEV_ASSERT(m_ssl != nullptr);
+  assert(m_ssl != nullptr);
 
   ACE_OS::signal(SIGPIPE, SIG_IGN);  // Ignore broken pipe
 
@@ -120,8 +121,8 @@ void TcpSslConn::close() {
 int32_t TcpSslConn::socketOp(TcpConn::SockOp op, char* buff, int32_t len,
                              std::chrono::microseconds waitSeconds) {
   {
-    GF_DEV_ASSERT(m_ssl != nullptr);
-    GF_DEV_ASSERT(buff != nullptr);
+    assert(m_ssl != nullptr);
+    assert(buff != nullptr);
 
 #if GF_DEVEL_ASSERTS == 1
     if (len <= 0) {
@@ -129,7 +130,7 @@ int32_t TcpSslConn::socketOp(TcpConn::SockOp op, char* buff, int32_t len,
           "TcpSslConn::socketOp called with a length of %d specified. "
           "No operation performed.",
           len);
-      GF_DEV_ASSERT(false);
+      assert(false);
     }
 #endif
     // passing wait time as micro seconds
@@ -186,13 +187,13 @@ int32_t TcpSslConn::socketOp(TcpConn::SockOp op, char* buff, int32_t len,
       ACE_OS::last_error(ETIME);
     }
 
-    GF_DEV_ASSERT(len >= 0);
+    assert(len >= 0);
     return totalsend;
   }
 }
 
 uint16_t TcpSslConn::getPort() {
-  GF_DEV_ASSERT(m_ssl != nullptr);
+  assert(m_ssl != nullptr);
 
   ACE_INET_Addr localAddr;
   m_ssl->getLocalAddr(*(ACE_Addr*)&localAddr);

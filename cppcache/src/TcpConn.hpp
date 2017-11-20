@@ -20,6 +20,8 @@
 #ifndef GEODE_TCPCONN_H_
 #define GEODE_TCPCONN_H_
 
+#include <cassert>
+
 #include <geode/geode_globals.hpp>
 #include "util/Log.hpp"
 #include "Connector.hpp"
@@ -118,7 +120,7 @@ class CPPCACHE_EXPORT TcpConn : public Connector {
 
   virtual void setOption(int32_t level, int32_t option, void* val,
                          int32_t len) {
-    GF_DEV_ASSERT(m_io != nullptr);
+    assert(m_io != nullptr);
 
     if (m_io->set_option(level, option, val, len) == -1) {
       int32_t lastError = ACE_OS::last_error();

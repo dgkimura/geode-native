@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <algorithm>
+#include <cassert>
+
 #include "ConcurrentEntriesMap.hpp"
 #include "RegionInternal.hpp"
 #include "TableOfPrimes.hpp"
-
-#include <algorithm>
 
 using namespace apache::geode::client;
 
@@ -36,7 +38,7 @@ ConcurrentEntriesMap::ConcurrentEntriesMap(
       m_region(region),
       m_numDestroyTrackers(0),
       m_concurrencyChecksEnabled(concurrencyChecksEnabled) {
-  GF_DEV_ASSERT(entryFactory != nullptr);
+  assert(entryFactory != nullptr);
 
   uint8_t maxConcurrency = TableOfPrimes::getMaxPrimeForConcurrency();
   if (concurrency > maxConcurrency) {

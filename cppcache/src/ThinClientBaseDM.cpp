@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cassert>
+
+#include <geode/ExceptionTypes.hpp>
 #include <geode/geode_globals.hpp>
+#include <geode/SystemProperties.hpp>
+
 #include "ThinClientBaseDM.hpp"
 #include "ThinClientRegion.hpp"
 #include "TcrMessage.hpp"
 #include "TcrEndpoint.hpp"
-#include <geode/ExceptionTypes.hpp>
 #include "Utils.hpp"
 #include "CacheImpl.hpp"
-#include <geode/SystemProperties.hpp>
-//#include "UserAttributes.hpp"
 #include "ProxyCache.hpp"
 
 using namespace apache::geode::client;
@@ -238,7 +241,7 @@ int ThinClientBaseDM::processChunks(volatile bool& isRunning) {
   }
   LOGFINE("Ending chunk process thread for region %s",
           (m_region != nullptr ? m_region->getFullPath() : "(null)"));
-  GF_DEV_ASSERT(m_chunks.size() == 0);
+  assert(m_chunks.size() == 0);
   return 0;
 }
 

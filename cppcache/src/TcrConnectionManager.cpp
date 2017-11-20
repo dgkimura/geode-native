@@ -14,6 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <chrono>
+#include <cassert>
+#include <set>
+#include <thread>
+
+#include <ace/INET_Addr.h>
+#include <geode/SystemProperties.hpp>
+
 #include "TcrConnectionManager.hpp"
 #include "TcrEndpoint.hpp"
 #include "ExpiryHandler_T.hpp"
@@ -27,14 +36,9 @@
 #include "ThinClientRegion.hpp"
 #include "ThinClientHARegion.hpp"
 #include "TcrConnection.hpp"
-#include <geode/SystemProperties.hpp>
 #include "RemoteQueryService.hpp"
 #include "ThinClientLocatorHelper.hpp"
 #include "ServerLocation.hpp"
-#include <ace/INET_Addr.h>
-#include <set>
-#include <thread>
-#include <chrono>
 
 namespace apache {
 namespace geode {
@@ -284,7 +288,7 @@ TcrEndpoint *TcrConnectionManager::addRefToTcrEndpoint(std::string endpointName,
     // this endpoint does not exist
     ep = new TcrEndpoint(endpointName, m_cache, m_failoverSema, m_cleanupSema,
                          m_redundancySema, dm, false);
-    GF_R_ASSERT(0 == m_endpoints.bind(endpointName, ep));
+    assert(0 == m_endpoints.bind(endpointName, ep));
   }
   ep->setNumRegions(ep->numRegions() + 1);
 
@@ -325,7 +329,7 @@ bool TcrConnectionManager::removeRefToEndpoint(TcrEndpoint *ep,
 
   if (0 == ep->numRegions()) {
     // this endpoint no longer used
-    GF_R_ASSERT(0 == m_endpoints.unbind(ep->name(), ep));
+    assert(0 == m_endpoints.unbind(ep->name(), ep));
     LOGFINE("delete endpoint %s", ep->name().c_str());
     GF_SAFE_DELETE(ep);
     hasRemovedEndpoint = true;
@@ -460,7 +464,7 @@ void TcrConnectionManager::initializeHAEndpoints(const char *endpointsStr) {
   }
   // Postconditions:
   // 1. endpointsList.size() > 0
-  GF_DEV_ASSERT(endpointsList.size() > 0);
+  assert(endpointsList.size() > 0);
 }
 
 void TcrConnectionManager::removeHAEndpoints() {
@@ -552,7 +556,7 @@ int TcrConnectionManager::cleanup(volatile bool &isRunning) {
   LOGFINE("TcrConnectionManager: ending cleanup thread");
   //  Postcondition - all notification channels should be cleaned up by the end
   //  of this function.
-  GF_DEV_ASSERT(m_receiverReleaseList.size() == 0);
+  assert(m_receiverReleaseList.size() == 0);
   return 0;
 }
 

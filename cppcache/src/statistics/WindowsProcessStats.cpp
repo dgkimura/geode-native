@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cassert>
+
 #include <geode/geode_globals.hpp>
 #include <ace/Thread_Mutex.h>
 #include <ace/Singleton.h>
@@ -30,7 +33,7 @@ WindowsProcessStats::WindowsProcessStats(
 
   // Create Statistics
   this->stats = statisticsFactory->createOsStatistics(m_statsType, name, pid);
-  GF_D_ASSERT(this->stats != nullptr);
+  assert(this->stats != nullptr);
 
 // Refresh Stats Values
 #if defined(_WIN32)

@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cassert>
+
 #include "config.h"
 #include "ExpiryTaskManager.hpp"
 #include "util/Log.hpp"
 #include <geode/DistributedSystem.hpp>
-#include "Assert.hpp"
 #include "DistributedSystemImpl.hpp"
 
 #if defined(_WIN32)
@@ -95,7 +97,7 @@ void ExpiryTaskManager::stopExpiryTaskManager() {
   if (m_reactorEventLoopRunning) {
     m_reactor->end_reactor_event_loop();
     this->wait();
-    GF_D_ASSERT(m_reactor->reactor_event_loop_done() > 0);
+    assert(m_reactor->reactor_event_loop_done() > 0);
     m_reactorEventLoopRunning = false;
   }
 }

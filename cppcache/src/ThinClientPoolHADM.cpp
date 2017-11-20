@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cassert>
+
 #include "ThinClientPoolHADM.hpp"
 #include "ExpiryHandler_T.hpp"
 #include <geode/SystemProperties.hpp>
@@ -234,7 +237,7 @@ void ThinClientPoolHADM::removeRegion(ThinClientRegion* theTCR) {
       return;
     }
   }
-  GF_DEV_ASSERT("Region not found in ThinClientPoolHADM list" ? false : false);
+  assert("Region not found in ThinClientPoolHADM list" ? false : false);
 }
 
 void ThinClientPoolHADM::readyForEvents() {

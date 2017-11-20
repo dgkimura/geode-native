@@ -20,6 +20,8 @@
 #ifndef GEODE_TCPSSLCONN_H_
 #define GEODE_TCPSSLCONN_H_
 
+#include <cassert>
+
 #include <ace/DLL.h>
 
 #include "TcpConn.hpp"
@@ -87,7 +89,7 @@ class TcpSslConn : public TcpConn {
 
   void setOption(int32_t level, int32_t option, void* val,
                  int32_t len) override {
-    GF_DEV_ASSERT(m_ssl != nullptr);
+    assert(m_ssl != nullptr);
 
     if (m_ssl->setOption(level, option, val, len) == -1) {
       int32_t lastError = ACE_OS::last_error();

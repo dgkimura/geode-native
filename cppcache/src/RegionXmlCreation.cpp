@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <cassert>
+
 #include <geode/Cache.hpp>
 #include <CacheRegionHelper.hpp>
 #include "RegionXmlCreation.hpp"
@@ -41,7 +43,7 @@ void RegionXmlCreation::fillIn(std::shared_ptr<Region> regionPtr) {
 }
 
 void RegionXmlCreation::createRoot(Cache* cache) {
-  GF_D_ASSERT(this->isRoot);
+  assert(this->isRoot);
   std::shared_ptr<Region> rootRegPtr = nullptr;
 
   CacheImpl* cacheImpl = CacheRegionHelper::getCacheImpl(cache);
@@ -50,7 +52,7 @@ void RegionXmlCreation::createRoot(Cache* cache) {
 }
 
 void RegionXmlCreation::create(std::shared_ptr<Region> parent) {
-  GF_D_ASSERT(!(this->isRoot));
+  assert(!(this->isRoot));
   std::shared_ptr<Region> subRegPtr = nullptr;
 
   subRegPtr = parent->createSubregion(regionName.c_str(), regAttrs);

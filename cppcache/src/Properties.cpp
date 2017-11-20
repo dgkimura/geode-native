@@ -15,16 +15,17 @@
  * limitations under the License.
  */
 
-#include <geode/Properties.hpp>
-#include <geode/GeodeTypeIds.hpp>
-
+#include <cassert>
 #include <string>
+
 #include <ace/Hash_Map_Manager.h>
 #include <ace/Recursive_Thread_Mutex.h>
 #include <ace/Guard_T.h>
-#include "ace/config-lite.h"
-#include "ace/Versioned_Namespace.h"
+#include <ace/config-lite.h>
+#include <ace/Versioned_Namespace.h>
 #include <ace/OS_NS_stdio.h>
+#include <geode/Properties.hpp>
+#include <geode/GeodeTypeIds.hpp>
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -192,7 +193,7 @@ void Properties::addAll(const std::shared_ptr<Properties>& other) {
 }
 
 void Properties::load(const char* fileName) {
-  GF_R_ASSERT(fileName != nullptr);
+  assert(fileName != nullptr);
   PropertiesFile pf(*this);
   pf.readFile(fileName);
 }

@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <cassert>
+
 #include <geode/geode_globals.hpp>
 #include "config.h"
 #include <ace/OS_NS_sys_utsname.h>
@@ -106,7 +108,7 @@ void HostStatHelper::newProcessStats(GeodeStatisticsFactory* statisticsFactory,
       throw IllegalArgumentException(
           "HostStatHelper::newProcess:unhandled osCodem");
   }
-  GF_D_ASSERT(processStats != nullptr);
+  assert(processStats != nullptr);
 }
 
 void HostStatHelper::close() {

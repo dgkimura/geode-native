@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <cassert>
 #include <sstream>
 #include <vector>
 
@@ -2387,7 +2388,7 @@ GfErrType LocalRegion::destroyRegionNoThrow(
   if (m_regionAttributes->getCachingEnabled()) {
     GF_SAFE_DELETE(m_entries);
   }
-  GF_D_ASSERT(m_destroyPending);
+  assert(m_destroyPending);
 
   if (removeFromParent) {
     if (m_parentRegion == nullptr) {

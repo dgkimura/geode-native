@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cassert>
+
 #include <geode/geode_globals.hpp>
 #include "TcrHADistributionManager.hpp"
 #include <geode/ExceptionTypes.hpp>
@@ -32,7 +35,7 @@ TcrHADistributionManager::TcrHADistributionManager(
     : ThinClientDistributionManager(connManager, theRegion),
       m_cacheAttributes(cacheAttributes),
       m_theTcrConnManager(connManager) {
-  GF_R_ASSERT(theRegion != nullptr);
+  assert(theRegion != nullptr);
 }
 
 void TcrHADistributionManager::init() {

@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <cassert>
 #include <algorithm>
 #include <ace/INET_Addr.h>
 
@@ -33,7 +34,6 @@
 #include "DistributedSystemImpl.hpp"
 #include "UserAttributes.hpp"
 #include "ThinClientStickyManager.hpp"
-
 #include "NonCopyable.hpp"
 
 using namespace apache::geode::client;
@@ -2089,7 +2089,7 @@ TcrEndpoint* ThinClientPoolDM::addEP(const char* endpointName) {
     if (m_endpoints.bind(fullName, ep)) {
       LOGERROR("Failed to add endpoint %s to pool %s", fullName.c_str(),
                m_poolName.c_str());
-      GF_DEV_ASSERT(
+      assert(
           "ThinClientPoolDM::addEP( ): failed to add endpoint" ? false : false);
     }
   }

@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
+#include <cassert>
+
 #include "TcrMessage.hpp"
 #include <geode/CacheableBuiltins.hpp>
 #include <geode/DistributedSystem.hpp>
 #include <geode/SystemProperties.hpp>
 #include <geode/CacheableObjectArray.hpp>
-#include "Assert.hpp"
 #include "TcrConnection.hpp"
 #include "AutoDelete.hpp"
 #include "TcrChunkedContext.hpp"
@@ -1912,7 +1913,7 @@ TcrMessageRegisterInterestList::TcrMessageRegisterInterestList(
   m_receiveValues = receiveValues;
 
   uint32_t numInItrestList = static_cast<int32_t>(keys.size());
-  GF_R_ASSERT(numInItrestList != 0);
+  assert(numInItrestList != 0);
   uint32_t numOfParts = 2 + numInItrestList;
 
   numOfParts += 2 - numInItrestList;
@@ -1965,7 +1966,7 @@ TcrMessageUnregisterInterestList::TcrMessageUnregisterInterestList(
   m_receiveValues = receiveValues;
 
   auto numInItrestList = keys.size();
-  GF_R_ASSERT(numInItrestList != 0);
+  assert(numInItrestList != 0);
   uint32_t numOfParts = 2 + static_cast<uint32_t>(numInItrestList);
 
   numOfParts += 2;
@@ -2145,7 +2146,7 @@ TcrMessagePeriodicAck::TcrMessagePeriodicAck(
   m_request = std::move(dataOutput);
 
   uint32_t numParts = static_cast<uint32_t>(entries.size());
-  GF_D_ASSERT(numParts > 0);
+  assert(numParts > 0);
   writeHeader(m_msgType, numParts);
   for (EventIdMapEntryList::const_iterator entry = entries.begin();
        entry != entries.end(); ++entry) {
@@ -2927,7 +2928,7 @@ void TcrMessage::readEventIdPart(DataInput& input, bool skip, int32_t parts) {
   int32_t eventIdLen = input.readInt32();
   const auto isObj = input.read();
 
-  GF_D_ASSERT(isObj != 0);
+  assert(isObj != 0);
 
   m_eventid = input.readObject<EventId>();
 }

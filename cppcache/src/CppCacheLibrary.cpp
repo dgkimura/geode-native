@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+#include <cassert>
+#include <string>
+
 #include "CppCacheLibrary.hpp"
 
 #include <ace/OS.h>
@@ -33,8 +36,6 @@
 #include <geode/DataOutput.hpp>
 #include "TcrMessage.hpp"
 #include "Utils.hpp"
-
-#include <string>
 
 // called during DLL initialization
 void initLibDllEntry(void) {
@@ -147,7 +148,7 @@ std::string CppCacheLibrary::getProductDir() {
     }
   }
   // check if bin on windows, and go back one...
-  GF_D_ASSERT(libdirname.length() > 4);
+  assert(libdirname.length() > 4);
 #ifdef WIN32
   std::string libpart = "bin";
 #else

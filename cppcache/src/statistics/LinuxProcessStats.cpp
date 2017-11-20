@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cassert>
+
 #include <geode/geode_globals.hpp>
 #include <ace/Thread_Mutex.h>
 #include <ace/Singleton.h>
@@ -35,7 +38,7 @@ LinuxProcessStats::LinuxProcessStats(GeodeStatisticsFactory* statFactory,
 
   // Create Statistics
   this->stats = statFactory->createOsStatistics(m_statsType, name, pid);
-  GF_D_ASSERT(this->stats != nullptr);
+  assert(this->stats != nullptr);
 
 // Refresh Stats Values
 #if defined(_LINUX)
@@ -92,7 +95,7 @@ void LinuxProcessStats::createType(StatisticsFactory* statFactory) {
     hostCpuUsageINT = m_statsType->nameToId("hostCpuUsage");
     threadsINT = m_statsType->nameToId("threads");
   } catch (IllegalArgumentException&) {
-    GF_D_ASSERT(false);
+    assert(false);
     throw;
   }
 }
