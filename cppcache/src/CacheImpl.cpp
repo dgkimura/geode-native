@@ -57,7 +57,7 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
       m_closed(false),
       m_initialized(false),
       m_distributedSystem(std::move(sys)),
-      m_implementee(c),
+      cache(c),
       m_cond(m_mutex),
       m_attributes(nullptr),
       m_evictionControllerPtr(nullptr),
@@ -95,7 +95,7 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
 
   m_initialized = true;
 
-  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager(*m_implementee));
+  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager(*cache));
 }
 
 void CacheImpl::initServices() {
@@ -796,4 +796,8 @@ CacheImpl::getCacheTransactionManager() {
       new std::shared_ptr<MemberListForVersionStamp>(
           new MemberListForVersionStamp());
   return *versionStampMemIdList;
+}
+
+void CacheImpl::setCache(Cache* cache) {
+  this->cache = cache;
 }

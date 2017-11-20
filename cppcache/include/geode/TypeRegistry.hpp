@@ -30,7 +30,7 @@ class PdxSerializer;
 
 class TypeRegistry {
  public:
-  TypeRegistry(const Cache& cache);
+  TypeRegistry(Cache* cache);
 
   /**
    * @brief register an instance factory method for a given type.
@@ -59,7 +59,11 @@ class TypeRegistry {
 
  protected:
  private:
-  const Cache& m_cache;
+  void setCache(Cache* cache);
+
+  Cache* m_cache;
+
+  friend Cache;
 };
 }  // namespace client
 }  // namespace geode
