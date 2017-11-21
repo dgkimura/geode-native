@@ -57,7 +57,7 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
       m_closed(false),
       m_initialized(false),
       m_distributedSystem(std::move(sys)),
-      cache(c),
+      m_cache(c),
       m_cond(m_mutex),
       m_attributes(nullptr),
       m_evictionControllerPtr(nullptr),
@@ -95,7 +95,7 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
 
   m_initialized = true;
 
-  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager(*cache));
+  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager(*m_cache));
 }
 
 void CacheImpl::initServices() {
@@ -381,7 +381,7 @@ void CacheImpl::createRegion(const char* name,
   }
 
   validateRegionAttributes(name, aRegionAttributes);
-std::shared_ptr<RegionInternal> rpImpl = nullptr;
+  std::shared_ptr<RegionInternal> rpImpl = nullptr;
   {
     // For multi threading and the operations between bind and find seems to be
     // hard to be atomic since a regionImpl needs to be valid before it can be
@@ -546,7 +546,7 @@ std::shared_ptr<RegionInternal> CacheImpl::createRegion_internal(
         "RegionAttributes is null");
   }
 
-std::shared_ptr<RegionInternal> rptr = nullptr;
+  std::shared_ptr<RegionInternal> rptr = nullptr;
   RegionKind regionKind = getRegionKind(attrs);
   const char* poolName = attrs->getPoolName();
   const char* regionEndpoints = attrs->getEndpoints();
@@ -609,8 +609,7 @@ std::shared_ptr<RegionInternal> rptr = nullptr;
     rptr = tmp;
   } else {
     LOGINFO("Creating local region %s", name.c_str());
-    rptr = std::make_shared<LocalRegion>(name, this, rootRegion, attrs, csptr,
-                                         shared);
+    rptr.reset(new LocalRegion(name, this, rootRegion, attrs, csptr, shared));
   }
   return rptr;
 }
@@ -799,5 +798,6 @@ CacheImpl::getCacheTransactionManager() {
 }
 
 void CacheImpl::setCache(Cache* cache) {
-  this->cache = cache;
+  m_cache = cache;
+  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager(*m_cache));
 }

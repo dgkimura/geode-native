@@ -187,7 +187,7 @@ bool Cache::isPoolInMultiuserMode(std::shared_ptr<Region> regionPtr) {
   const char* poolName = regionPtr->getAttributes()->getPoolName();
 
   if (poolName != nullptr) {
-    auto poolPtr = regionPtr->getCache()->getPoolManager().find(poolName);
+    auto poolPtr = regionPtr->getCache().getPoolManager().find(poolName);
     if (poolPtr != nullptr && !poolPtr->isDestroyed()) {
       return poolPtr->getMultiuserAuthentication();
     }
