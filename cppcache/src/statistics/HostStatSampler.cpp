@@ -703,6 +703,10 @@ void HostStatSampler::checkDiskLimit() {
   }
 }
 
+void HostStatSampler::setCache(Cache* cache) {
+  m_cache = cache;
+}
+
 int32_t HostStatSampler::svc(void) {
   DistributedSystemImpl::setThreadName(NC_HSS_Thread);
   try {

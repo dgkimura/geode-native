@@ -232,3 +232,7 @@ void StatisticsManager::deleteStatistics(Statistics*& stat) {
   }
   stat = nullptr;
 }
+
+void StatisticsManager::setCache(Cache* cache) {
+  if (m_sampler) m_sampler->setCache(cache);
+}

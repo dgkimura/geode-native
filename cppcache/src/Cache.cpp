@@ -153,7 +153,10 @@ Cache::Cache(Cache&& other) noexcept :
   m_typeRegistry(other.m_typeRegistry.release()) {
 
   m_cacheImpl->setCache(this);
+  m_cacheImpl->getPdxTypeRegistry()->setCache(this);
   m_typeRegistry->setCache(this);
+  m_cacheImpl->getCacheTransactionManager()->setCache(this);
+  getDistributedSystem().getStatisticsManager()->setCache(this);
 }
 
 Cache::~Cache() = default;

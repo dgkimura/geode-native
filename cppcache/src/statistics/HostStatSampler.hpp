@@ -199,6 +199,8 @@ class CPPCACHE_EXPORT HostStatSampler : public ACE_Task_Base,
    */
   bool isRunning();
 
+  void setCache(Cache* cache);
+
   ~HostStatSampler();
 
  private:

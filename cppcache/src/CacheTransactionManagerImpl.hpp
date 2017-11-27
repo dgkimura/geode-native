@@ -36,7 +36,7 @@ enum commitOp { BEFORE_COMMIT, AFTER_COMMIT };
 class CacheTransactionManagerImpl
     : public virtual apache::geode::client::CacheTransactionManager {
  public:
-  CacheTransactionManagerImpl(Cache* cache);
+  CacheTransactionManagerImpl(Cache*& cache);
   virtual ~CacheTransactionManagerImpl();
 
   virtual void begin() override;
@@ -57,6 +57,8 @@ class CacheTransactionManagerImpl
   virtual std::shared_ptr<TransactionId> getTransactionId() override;
 
   TXState* getSuspendedTx(int32_t txId);
+
+  void setCache(Cache* cache) override { m_cache = cache; };
 
  protected:
   ThinClientPoolDM* getDM();

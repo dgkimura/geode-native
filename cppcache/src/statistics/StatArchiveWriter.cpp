@@ -39,7 +39,7 @@ using std::chrono::nanoseconds;
 
 // Constructor and Member functions of StatDataOutput class
 
-StatDataOutput::StatDataOutput(std::string filename, Cache *cache) {
+StatDataOutput::StatDataOutput(std::string filename, Cache *&cache) {
   if (filename.length() == 0) {
     std::string s("undefined archive file name");
     throw IllegalArgumentException(s.c_str());
@@ -314,7 +314,7 @@ void ResourceInst::writeResourceInst(StatDataOutput *dataOutArg,
 
 // Constructor and Member functions of StatArchiveWriter class
 StatArchiveWriter::StatArchiveWriter(std::string outfile,
-                                     HostStatSampler *samplerArg, Cache *cache)
+                                     HostStatSampler *samplerArg, Cache *&cache)
     : cache(cache) {
   resourceTypeId = 0;
   resourceInstId = 0;

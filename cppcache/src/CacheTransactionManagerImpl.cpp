@@ -39,7 +39,7 @@ namespace apache {
 namespace geode {
 namespace client {
 
-CacheTransactionManagerImpl::CacheTransactionManagerImpl(Cache* cache)
+CacheTransactionManagerImpl::CacheTransactionManagerImpl(Cache*& cache)
     : m_cache(cache), m_txCond(m_suspendedTxLock) {}
 
 CacheTransactionManagerImpl::~CacheTransactionManagerImpl() {}

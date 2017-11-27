@@ -109,6 +109,7 @@ class StatisticsManager {
     return m_statisticsFactory.get();
   }
 
+  void setCache(Cache* cache);
 };  // class
 
 }  // namespace statistics

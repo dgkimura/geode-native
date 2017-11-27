@@ -92,6 +92,7 @@ class CPPCACHE_EXPORT PdxTypeRegistry
   PdxTypeRegistry(Cache* cache);
   PdxTypeRegistry(const PdxTypeRegistry& other) = delete;
 
+  void setCache(Cache* cache) { this->cache = cache; }
   virtual ~PdxTypeRegistry();
 
   // test hook
