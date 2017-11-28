@@ -50,7 +50,6 @@ class DistributedSystemImpl;
 class CacheRegionHelper;
 class DiffieHellman;
 class TcrConnection;
-class Cache;
 
 class CPPCACHE_EXPORT DistributedSystem {
   /**

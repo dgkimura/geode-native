@@ -36,7 +36,6 @@ namespace geode {
 namespace statistics {
 
 class GeodeStatisticsFactory;
-class apache::geode::client::CacheImpl;
 
 /**
  * Head Application Manager for Statistics Module.
