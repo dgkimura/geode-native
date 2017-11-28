@@ -149,8 +149,8 @@ Cache::Cache(const std::string& name, std::shared_ptr<Properties> dsProp,
 }
 
 Cache::Cache(Cache&& other) noexcept :
-  m_cacheImpl(other.m_cacheImpl.release()),
-  m_typeRegistry(other.m_typeRegistry.release()) {
+  m_cacheImpl(std::move(other.m_cacheImpl)),
+  m_typeRegistry(std::move(other.m_typeRegistry)) {
 
   m_cacheImpl->setCache(this);
   m_cacheImpl->getPdxTypeRegistry()->setCache(this);

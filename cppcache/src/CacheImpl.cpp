@@ -95,7 +95,7 @@ CacheImpl::CacheImpl(Cache* c, const std::string& name,
 
   m_initialized = true;
 
-  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager(*m_cache));
+  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager(this));
 }
 
 void CacheImpl::initServices() {
@@ -799,5 +799,4 @@ CacheImpl::getCacheTransactionManager() {
 
 void CacheImpl::setCache(Cache* cache) {
   m_cache = cache;
-  m_poolManager = std::unique_ptr<PoolManager>(new PoolManager(*m_cache));
 }
