@@ -140,11 +140,10 @@ TypeRegistry& Cache::getTypeRegistry() { return *(m_typeRegistry.get()); }
 Cache::Cache(const std::string& name, std::shared_ptr<Properties> dsProp,
              bool ignorePdxUnreadFields, bool readPdxSerialized,
              const std::shared_ptr<AuthInitialize>& authInitialize) {
-  auto dsPtr = DistributedSystem::create(DEFAULT_DS_NAME, this, dsProp);
-  dsPtr->connect();
   m_cacheImpl = std::unique_ptr<CacheImpl>(
-      new CacheImpl(this, name, std::move(dsPtr), ignorePdxUnreadFields,
-                    readPdxSerialized, authInitialize));
+      new CacheImpl(this, name, DistributedSystem::create(DEFAULT_DS_NAME, dsProp),
+                    ignorePdxUnreadFields, readPdxSerialized, authInitialize));
+  m_cacheImpl->getDistributedSystem().connect(this);
   m_typeRegistry = std::unique_ptr<TypeRegistry>(new TypeRegistry(this));
 }
 
@@ -153,10 +152,7 @@ Cache::Cache(Cache&& other) noexcept :
   m_typeRegistry(std::move(other.m_typeRegistry)) {
 
   m_cacheImpl->setCache(this);
-  m_cacheImpl->getPdxTypeRegistry()->setCache(this);
   m_typeRegistry->setCache(this);
-  m_cacheImpl->getCacheTransactionManager()->setCache(this);
-  getDistributedSystem().getStatisticsManager()->setCache(this);
 }
 
 Cache::~Cache() = default;

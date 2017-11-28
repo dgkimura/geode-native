@@ -26,7 +26,6 @@
 #include <geode/geode_globals.hpp>
 #include <geode/statistics/Statistics.hpp>
 #include <geode/ExceptionTypes.hpp>
-
 #include "HostStatSampler.hpp"
 #include "StatisticsTypeImpl.hpp"
 #include "AdminRegion.hpp"
@@ -37,6 +36,7 @@ namespace geode {
 namespace statistics {
 
 class GeodeStatisticsFactory;
+class apache::geode::client::CacheImpl;
 
 /**
  * Head Application Manager for Statistics Module.
@@ -68,7 +68,7 @@ class StatisticsManager {
  public:
   StatisticsManager(const char* filePath,
                     std::chrono::milliseconds sampleIntervalMs, bool enabled,
-                    Cache* cache, const char* durableClientId,
+                    apache::geode::client::CacheImpl* cache, const char* durableClientId,
                     const std::chrono::seconds durableTimeout,
                     int64_t statFileLimit = 0, int64_t statDiskSpaceLimit = 0);
 
@@ -108,8 +108,6 @@ class StatisticsManager {
   GeodeStatisticsFactory* getStatisticsFactory() const {
     return m_statisticsFactory.get();
   }
-
-  void setCache(Cache* cache);
 };  // class
 
 }  // namespace statistics

@@ -130,7 +130,7 @@ const char* HostStatSampler::NC_HSS_Thread = "NC HSS Thread";
 
 HostStatSampler::HostStatSampler(const char* filePath,
                                  std::chrono::milliseconds sampleIntervalMs,
-                                 StatisticsManager* statMngr, Cache* cache,
+                                 StatisticsManager* statMngr, CacheImpl* cache,
                                  const char* durableClientId,
                                  const std::chrono::seconds durableTimeout,
                                  int64_t statFileLimit,
@@ -701,10 +701,6 @@ void HostStatSampler::checkDiskLimit() {
     }
     fileIndex++;
   }
-}
-
-void HostStatSampler::setCache(Cache* cache) {
-  m_cache = cache;
 }
 
 int32_t HostStatSampler::svc(void) {

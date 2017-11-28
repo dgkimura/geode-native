@@ -353,6 +353,7 @@ class CPPCACHE_EXPORT CacheImpl : private NonCopyable, private NonAssignable {
 
   friend class CacheFactory;
   friend class Cache;
+  friend class DistributedSystem;
 };
 }  // namespace client
 }  // namespace geode

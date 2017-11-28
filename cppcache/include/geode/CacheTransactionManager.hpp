@@ -30,7 +30,6 @@ namespace apache {
 namespace geode {
 namespace client {
 class TransactionId;
-class Cache;
 
 class CPPCACHE_EXPORT CacheTransactionManager {
  public:
@@ -191,8 +190,6 @@ class CPPCACHE_EXPORT CacheTransactionManager {
    * @since 3.6
    */
   virtual bool exists() = 0;
-
-  virtual void setCache(Cache* cache) = 0;
 
  protected:
   CacheTransactionManager();
