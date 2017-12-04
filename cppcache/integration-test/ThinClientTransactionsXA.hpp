@@ -24,6 +24,7 @@
 #include <ace/Auto_Event.h>
 #include <ace/OS.h>
 #include <ace/High_Res_Timer.h>
+#include <geode/TransactionId.hpp>
 
 #include <string>
 
@@ -390,13 +391,13 @@ const bool NO_ACK = false;
 
 class SuspendTransactionThread : public ACE_Task_Base {
  private:
-  std::shared_ptr<TransactionId> m_suspendedTransaction;
+  TransactionId m_suspendedTransaction;
   bool m_sleep;
   ACE_Auto_Event* m_txEvent;
 
  public:
   SuspendTransactionThread(bool sleep, ACE_Auto_Event* txEvent)
-      : m_suspendedTransaction(nullptr), m_sleep(sleep), m_txEvent(txEvent) {}
+      : m_suspendedTransaction(NullTransactionId), m_sleep(sleep), m_txEvent(txEvent) {}
 
   int svc(void) {
     char buf[1024];
@@ -433,13 +434,13 @@ class SuspendTransactionThread : public ACE_Task_Base {
   }
   void start() { activate(); }
   void stop() { wait(); }
-  std::shared_ptr<TransactionId> getSuspendedTx() {
+  TransactionId& getSuspendedTx() {
     return m_suspendedTransaction;
   }
 };
 class ResumeTransactionThread : public ACE_Task_Base {
  private:
-  std::shared_ptr<TransactionId> m_suspendedTransaction;
+  TransactionId m_suspendedTransaction;
   bool m_commit;
   bool m_tryResumeWithSleep;
   bool m_isFailed;
@@ -447,7 +448,7 @@ class ResumeTransactionThread : public ACE_Task_Base {
   ACE_Auto_Event* m_txEvent;
 
  public:
-  ResumeTransactionThread(std::shared_ptr<TransactionId> suspendedTransaction,
+  ResumeTransactionThread(TransactionId suspendedTransaction,
                           bool commit, bool tryResumeWithSleep,
                           ACE_Auto_Event* txEvent)
       : m_suspendedTransaction(suspendedTransaction),
@@ -671,7 +672,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, SuspendResumeCommit)
     ASSERT(resumeExc,
            "SuspendResumeCommit: Transaction shouldnt have been resumed");
 
-    ASSERT(txManager->suspend() == nullptr,
+    ASSERT(&txManager->suspend() == &NullTransactionId,
            "SuspendResumeCommit: Transaction shouldnt have been suspended");
   }
 END_TASK_DEFINITION

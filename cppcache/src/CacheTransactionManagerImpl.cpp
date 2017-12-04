@@ -46,7 +46,7 @@ void CacheTransactionManagerImpl::begin() {
   }
   TXState* txState = new TXState(m_cache->getCache());
   TSSTXStateWrapper::s_geodeTSSTXState->setTXState(txState);
-  addTx(txState->getTransactionId()->getId());
+  addTx(txState->getTransactionId().getId());
 }
 
 void CacheTransactionManagerImpl::commit() {
@@ -321,12 +321,13 @@ ThinClientPoolDM* CacheTransactionManagerImpl::getDM() {
 }
 
 Cache* CacheTransactionManagerImpl::getCache() { return m_cache->getCache(); }
-std::shared_ptr<TransactionId> CacheTransactionManagerImpl::suspend() {
+
+const TransactionId& CacheTransactionManagerImpl::suspend() {
   // get the current state of the thread
   TXState* txState = TSSTXStateWrapper::s_geodeTSSTXState->getTXState();
   if (txState == nullptr) {
     LOGFINE("Transaction not in progress. Returning nullptr transaction Id.");
-    return nullptr;
+    return NullTransactionId;
   }
 
   // get the current connection that this transaction is using
@@ -335,7 +336,7 @@ std::shared_ptr<TransactionId> CacheTransactionManagerImpl::suspend() {
   if (conn == nullptr) {
     LOGFINE(
         "Thread local connection is null. Returning nullptr transaction Id.");
-    return nullptr;
+    return NullTransactionId;
   }
 
   // get the endpoint info from the connection
@@ -364,7 +365,7 @@ std::shared_ptr<TransactionId> CacheTransactionManagerImpl::suspend() {
   txState->setSuspendedExpiryTaskId(id);
 
   // add the transaction state to the list of suspended transactions
-  addSuspendedTx(txState->getTransactionId()->getId(), txState);
+  addSuspendedTx(txState->getTransactionId().getId(), txState);
 
   // set the current transaction state as null
   TSSTXStateWrapper::s_geodeTSSTXState->setTXState(nullptr);
@@ -438,7 +439,7 @@ void CacheTransactionManagerImpl::resumeTxUsingTxState(TXState* txState,
   TcrConnection* conn;
 
   LOGDEBUG("Resuming transaction for tid: %d",
-           txState->getTransactionId()->getId());
+           txState->getTransactionId().getId());
 
   if (cancelExpiryTask) {
     // cancel the expiry task for the transaction
@@ -453,7 +454,7 @@ void CacheTransactionManagerImpl::resumeTxUsingTxState(TXState* txState,
   TSSTXStateWrapper::s_geodeTSSTXState->setTXState(txState);
 
   LOGFINE("Get connection for transaction id %d",
-          txState->getTransactionId()->getId());
+          txState->getTransactionId().getId());
   // get connection to the endpoint specified in the transaction state
   GfErrType error = txState->getPoolDM()->getConnectionToAnEndPoint(
       txState->getEPStr(), conn);
@@ -467,7 +468,7 @@ void CacheTransactionManagerImpl::resumeTxUsingTxState(TXState* txState,
   } else {
     txState->getPoolDM()->setThreadLocalConnection(conn);
     LOGFINE("Set the thread local connection for transaction id %d",
-            txState->getTransactionId()->getId());
+            txState->getTransactionId().getId());
   }
 }
 
@@ -560,10 +561,10 @@ bool CacheTransactionManagerImpl::isSuspendedTx(int32_t txId) {
   }
 }
 
-std::shared_ptr<TransactionId> CacheTransactionManagerImpl::getTransactionId() {
+const TransactionId& CacheTransactionManagerImpl::getTransactionId() {
   TXState* txState = TSSTXStateWrapper::s_geodeTSSTXState->getTXState();
   if (txState == nullptr) {
-    return nullptr;
+    return NullTransactionId;
   } else {
     return txState->getTransactionId();
   }

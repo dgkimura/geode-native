@@ -41,10 +41,11 @@ class TXId : public apache::geode::client::TransactionId {
 
   int32_t getId() const;
 
+  TXId& operator=(const TXId& other);
+
  private:
-  const int32_t m_TXId;
+  int32_t m_TXId;
   static std::atomic<int32_t> m_transactionId;
-  TXId& operator=(const TXId&);
   TXId(const TXId&);
 };
 }  // namespace client

@@ -91,7 +91,7 @@ class CPPCACHE_EXPORT CacheTransactionManager {
    *         the thread was not associated with a transaction
    * @since 3.6.2
    */
-  virtual std::shared_ptr<TransactionId> suspend() = 0;
+  virtual const TransactionId& suspend() = 0;
 
   /**
    * On the current thread, resumes a transaction that was previously suspended
@@ -181,7 +181,7 @@ class CPPCACHE_EXPORT CacheTransactionManager {
    *
    * @since 3.6.2
    */
-  virtual std::shared_ptr<TransactionId> getTransactionId() = 0;
+  virtual const TransactionId& getTransactionId() = 0;
 
   /** Reports the existence of a Transaction for this thread
    *

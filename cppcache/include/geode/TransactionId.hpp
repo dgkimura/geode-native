@@ -40,6 +40,8 @@ class CPPCACHE_EXPORT TransactionId {
 
   FRIEND_STD_SHARED_PTR(TransactionId)
 };
+
+static const TransactionId NullTransactionId;
 }  // namespace client
 }  // namespace geode
 }  // namespace apache
