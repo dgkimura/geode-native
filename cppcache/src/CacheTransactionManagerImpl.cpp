@@ -373,7 +373,7 @@ std::shared_ptr<TransactionId> CacheTransactionManagerImpl::suspend() {
   return txState->getTransactionId();
 }
 
-void CacheTransactionManagerImpl::resume(std::shared_ptr<TransactionId> transactionId) {
+void CacheTransactionManagerImpl::resume(const TransactionId& transactionId) {
   // get the current state of the thread
   if (TSSTXStateWrapper::s_geodeTSSTXState->getTXState() != nullptr) {
     GfErrTypeThrowException("A transaction is already in progress",
@@ -381,8 +381,7 @@ void CacheTransactionManagerImpl::resume(std::shared_ptr<TransactionId> transact
   }
 
   // get the transaction state of the suspended transaction
-  TXState* txState = removeSuspendedTx(
-      (std::static_pointer_cast<TXId>(transactionId))->getId());
+  TXState* txState = removeSuspendedTx(dynamic_cast<const TXId&>(transactionId).getId());
   if (txState == nullptr) {
     GfErrTypeThrowException(
         "Could not get transaction state for the transaction id.",
@@ -392,15 +391,14 @@ void CacheTransactionManagerImpl::resume(std::shared_ptr<TransactionId> transact
   resumeTxUsingTxState(txState);
 }
 
-bool CacheTransactionManagerImpl::isSuspended(std::shared_ptr<TransactionId> transactionId) {
-  return isSuspendedTx(
-      (std::static_pointer_cast<TXId>(transactionId))->getId());
+bool CacheTransactionManagerImpl::isSuspended(const TransactionId& transactionId) {
+  return isSuspendedTx(dynamic_cast<const TXId&>(transactionId).getId());
 }
-bool CacheTransactionManagerImpl::tryResume(std::shared_ptr<TransactionId> transactionId) {
+bool CacheTransactionManagerImpl::tryResume(const TransactionId& transactionId) {
   return tryResume(transactionId, true);
 }
 bool CacheTransactionManagerImpl::tryResume(
-    std::shared_ptr<TransactionId> transactionId, bool cancelExpiryTask) {
+    const TransactionId& transactionId, bool cancelExpiryTask) {
   // get the current state of the thread
   if (TSSTXStateWrapper::s_geodeTSSTXState->getTXState() != nullptr) {
     LOGFINE("A transaction is already in progress. Cannot resume transaction.");
@@ -408,8 +406,7 @@ bool CacheTransactionManagerImpl::tryResume(
   }
 
   // get the transaction state of the suspended transaction
-  TXState* txState = removeSuspendedTx(
-      (std::static_pointer_cast<TXId>(transactionId))->getId());
+  TXState* txState = removeSuspendedTx(dynamic_cast<const TXId&>(transactionId).getId());
   if (txState == nullptr) return false;
 
   resumeTxUsingTxState(txState, cancelExpiryTask);
@@ -417,7 +414,7 @@ bool CacheTransactionManagerImpl::tryResume(
 }
 
 bool CacheTransactionManagerImpl::tryResume(
-    std::shared_ptr<TransactionId> transactionId, std::chrono::milliseconds waitTime) {
+    const TransactionId& transactionId, std::chrono::milliseconds waitTime) {
   // get the current state of the thread
   if (TSSTXStateWrapper::s_geodeTSSTXState->getTXState() != nullptr) {
     LOGFINE("A transaction is already in progress. Cannot resume transaction.");
@@ -427,8 +424,7 @@ bool CacheTransactionManagerImpl::tryResume(
   if (!exists(transactionId)) return false;
 
   // get the transaction state of the suspended transaction
-  TXState* txState = removeSuspendedTx(
-      (std::static_pointer_cast<TXId>(transactionId))->getId(), waitTime);
+  TXState* txState = removeSuspendedTx(dynamic_cast<const TXId&>(transactionId).getId(), waitTime);
   if (txState == nullptr) return false;
 
   resumeTxUsingTxState(txState);
@@ -475,8 +471,8 @@ void CacheTransactionManagerImpl::resumeTxUsingTxState(TXState* txState,
   }
 }
 
-bool CacheTransactionManagerImpl::exists(std::shared_ptr<TransactionId> transactionId) {
-  return findTx((std::static_pointer_cast<TXId>(transactionId))->getId());
+bool CacheTransactionManagerImpl::exists(const TransactionId& transactionId) {
+  return findTx(dynamic_cast<const TXId&>(transactionId).getId());
 }
 
 bool CacheTransactionManagerImpl::exists() {
@@ -562,7 +558,9 @@ bool CacheTransactionManagerImpl::isSuspendedTx(int32_t txId) {
   } else {
     return true;
   }
-} std::shared_ptr<TransactionId> CacheTransactionManagerImpl::getTransactionId() {
+}
+
+std::shared_ptr<TransactionId> CacheTransactionManagerImpl::getTransactionId() {
   TXState* txState = TSSTXStateWrapper::s_geodeTSSTXState->getTXState();
   if (txState == nullptr) {
     return nullptr;

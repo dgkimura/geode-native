@@ -33,7 +33,7 @@ TXId::TXId() : m_TXId(m_transactionId++) {}
 
 TXId::~TXId() {}
 
-int32_t TXId::getId() { return m_TXId; }
+int32_t TXId::getId() const { return m_TXId; }
 }  // namespace client
 }  // namespace geode
 }  // namespace apache

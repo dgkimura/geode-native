@@ -39,7 +39,7 @@ class TXId : public apache::geode::client::TransactionId {
   TXId();
   virtual ~TXId();
 
-  int32_t getId();
+  int32_t getId() const;
 
  private:
   const int32_t m_TXId;

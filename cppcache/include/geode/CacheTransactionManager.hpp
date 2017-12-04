@@ -105,7 +105,7 @@ class CPPCACHE_EXPORT CacheTransactionManager {
    *           given transactionId
    * @since 3.6.2
    */
-  virtual void resume(std::shared_ptr<TransactionId> transactionId) = 0;
+  virtual void resume(const TransactionId& transactionId) = 0;
 
   /**
    * This method can be used to determine if a transaction with the given
@@ -117,7 +117,7 @@ class CPPCACHE_EXPORT CacheTransactionManager {
    * @since 3.6.2
    * @see #exists(TransactionId)
    */
-  virtual bool isSuspended(std::shared_ptr<TransactionId> transactionId) = 0;
+  virtual bool isSuspended(const TransactionId& transactionId) = 0;
 
   /**
    * On the current thread, resumes a transaction that was previously suspended
@@ -136,7 +136,7 @@ class CPPCACHE_EXPORT CacheTransactionManager {
    * @return true if the transaction was resumed, false otherwise
    * @since 3.6.2
    */
-  virtual bool tryResume(std::shared_ptr<TransactionId> transactionId) = 0;
+  virtual bool tryResume(const TransactionId& transactionId) = 0;
 
   /**
    * On the current thread, resumes a transaction that was previously suspended
@@ -159,7 +159,7 @@ class CPPCACHE_EXPORT CacheTransactionManager {
    * @since 3.6.2
    * @see #tryResume(TransactionId)
    */
-  virtual bool tryResume(std::shared_ptr<TransactionId> transactionId,
+  virtual bool tryResume(const TransactionId& transactionId,
                          std::chrono::milliseconds waitTime) = 0;
 
   /**
@@ -173,7 +173,7 @@ class CPPCACHE_EXPORT CacheTransactionManager {
    * @since 3.6.2
    * @see #isSuspended(TransactionId)
    */
-  virtual bool exists(std::shared_ptr<TransactionId> transactionId) = 0;
+  virtual bool exists(const TransactionId& transactionId) = 0;
 
   /** Returns the transaction identifier for the current thread
    *

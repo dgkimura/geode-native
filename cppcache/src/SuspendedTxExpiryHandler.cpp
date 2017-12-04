@@ -39,7 +39,7 @@ int SuspendedTxExpiryHandler::handle_timeout(const ACE_Time_Value& current_time,
   LOGDEBUG("Entered SuspendedTxExpiryHandler");
   try {
     // resume the transaction and rollback it
-    if (m_cacheTxMgr->tryResume(m_txid, false)) m_cacheTxMgr->rollback();
+    if (m_cacheTxMgr->tryResume(*m_txid, false)) m_cacheTxMgr->rollback();
   } catch (...) {
     // Ignore whatever exception comes
     LOGFINE(
