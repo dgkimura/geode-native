@@ -113,7 +113,7 @@ namespace Apache
        
           try
           {
-            return Apache::Geode::Client::TransactionId::Create( m_nativeptr->get()->suspend() );
+            return Apache::Geode::Client::TransactionId::Create(const_cast<native::TransactionId*>(&m_nativeptr->get()->suspend()));
           }
           finally
           {
@@ -128,7 +128,7 @@ namespace Apache
 
           try
           {
-            return Apache::Geode::Client::TransactionId::Create( m_nativeptr->get()->getTransactionId() );
+            return Apache::Geode::Client::TransactionId::Create(const_cast<native::TransactionId*>(&m_nativeptr->get()->getTransactionId()));
           }
           finally
           {

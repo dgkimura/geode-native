@@ -47,11 +47,7 @@ namespace Apache
       generic<class TKey, class TValue>
 			Apache::Geode::Client::TransactionId^ TransactionEvent<TKey, TValue>::TransactionId::get( )
       {
-        std::shared_ptr<apache::geode::client::TransactionId> & nativeptr(
-          NativePtr->getTransactionId( ) );
-
-				return Apache::Geode::Client::TransactionId::Create(
-          nativeptr.get() );
+        return Apache::Geode::Client::TransactionId::Create(&NativePtr->getTransactionId());
       }
     
       generic<class TKey, class TValue>
