@@ -61,20 +61,13 @@ void VersionedCacheableObjectPartList::readObjectPart(
   } else if (m_serializeValues) {
     // read length
     int32_t skipLen = input.readArrayLen();
-    int8_t* bytes = nullptr;
+    std::vector<int8_t> bytes;
     if (skipLen > 0) {
       // readObject
-      bytes = new int8_t[skipLen];
-      input.readBytesOnly(bytes, skipLen);
+      bytes.resize(skipLen);
+      input.readBytesOnly(bytes.data(), skipLen);
     }
-    m_values->emplace(keyPtr, CacheableBytes::create(bytes, skipLen));
-
-    /* adongre
-     * CID 29377: Resource leak (RESOURCE_LEAK)Calling allocation function
-     * "apache::geode::client::DataInput::readBytes(unsigned char **, int *)" on
-     * "bytes".
-     */
-    _GEODE_SAFE_DELETE_ARRAY(bytes);
+    m_values->emplace(keyPtr, CacheableBytes::create(bytes));
 
   } else {
     // set nullptr to indicate that there is no exception for the key on this

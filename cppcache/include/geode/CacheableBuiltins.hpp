@@ -485,18 +485,11 @@ _GEODE_CACHEABLE_KEY_TYPE_(char16_t, CacheableCharacter, 3);
 
 // Instantiations for array built-in Cacheables
 
-_GEODE_CACHEABLE_ARRAY_TYPE_DEF_(int8_t, CacheableBytes);
-/**
- * An immutable wrapper for byte arrays that can serve as
- * a distributable object for caching.
- */
-_GEODE_CACHEABLE_ARRAY_TYPE_(int8_t, CacheableBytes);
-
 template <typename T>
 class _GEODE_EXPORT CacheableArray : public Cacheable {
- protected:
+ public:
 
-  inline double operator[](uint32_t index) const {
+  inline T operator[](uint32_t index) const {
     if (static_cast<int32_t>(index) >= m_value.size()) {
       throw OutOfRangeException(
           "CacheableArray::operator[]: Index out of range.");
@@ -504,13 +497,6 @@ class _GEODE_EXPORT CacheableArray : public Cacheable {
     return m_value[index];
   }
 
-  virtual void toData(DataOutput& output) const override {
-    apache::geode::client::serializer::writeArrayObject(output, m_value);
-  }
-
-  virtual void fromData(DataInput& input) override {
-    m_value = apache::geode::client::serializer::readArrayObject<T>(input);
-  }
 
   virtual int32_t classId() const override { return 0; }
 
@@ -529,13 +515,18 @@ class _GEODE_EXPORT CacheableArray : public Cacheable {
       return GeodeTypeIds::CharArray;
     } else if (std::is_same<T, bool>::value) {
       return GeodeTypeIds::BooleanArray;
+    } else if (std::is_same<T, int8_t>::value) {
+      return GeodeTypeIds::CacheableBytes;
     }
 
+    // TODO: Make this template parameter, else you can have fake values for
+    //       undefined types.
     return GeodeTypeIds::NullObj;
   }
 
   virtual size_t objectSize() const override {
     return static_cast<uint32_t>(
+        sizeof(CacheableArray) +
         apache::geode::client::serializer::objectArraySize(m_value));
   }
 
@@ -561,7 +552,19 @@ class _GEODE_EXPORT CacheableArray : public Cacheable {
   inline static std::shared_ptr<CacheableArray<T>> create(const std::vector<T> value) {
     return std::make_shared<CacheableArray<T>>(value);
   }
+  virtual void toData(DataOutput& output) const override {
+    apache::geode::client::serializer::writeArrayObject(output, m_value);
+  }
+  virtual void fromData(DataInput& input) override {
+    m_value = apache::geode::client::serializer::readArrayObject<T>(input);
+  }
 };
+
+/**
+ * An immutable wrapper for byte arrays that can serve as
+ * a distributable object for caching.
+ */
+using CacheableBytes = CacheableArray<int8_t>;
 
 /**
  * An immutable wrapper for array of booleans that can serve as

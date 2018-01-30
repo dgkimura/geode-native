@@ -277,7 +277,9 @@ PdxInstanceFactoryImpl::writeArrayOfByteArrays(const std::string& fieldName,
                                         PdxFieldTypes::ARRAY_OF_BYTE_ARRAYS);
   auto cacheableObject = CacheableVector::create();
   for (int i = 0; i < arrayLength; i++) {
-    auto ptr = CacheableBytes::create(value[i], elementLength[i]);
+	std::vector<int8_t> data;
+	data.assign(value[i], value[i] + elementLength[i]);
+    auto ptr = std::make_shared<CacheableBytes>(data);
     cacheableObject->push_back(ptr);
   }
   m_FieldVsValues.emplace(fieldName, cacheableObject);

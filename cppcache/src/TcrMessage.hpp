@@ -386,12 +386,8 @@ class _GEODE_EXPORT TcrMessage {
   //  that
   // takes ownership of delta bytes.
   std::shared_ptr<CacheableBytes> getDeltaBytes() {
-    if (m_deltaBytes == nullptr) {
-      return nullptr;
-    }
     std::shared_ptr<CacheableBytes> retVal(
-        CacheableBytes::createNoCopy(m_deltaBytes, m_deltaBytesLen));
-    m_deltaBytes = nullptr;
+        CacheableBytes::create(m_deltaBytes));
     return retVal;
   }
 
@@ -511,7 +507,7 @@ class _GEODE_EXPORT TcrMessage {
         m_messageResponseTimeout(-1),
         m_boolValue(0),
         m_delta(nullptr),
-        m_deltaBytes(nullptr),
+        m_deltaBytes(),
         m_deltaBytesLen(0),
         m_isCallBackArguement(false),
         m_bucketServerLocation(nullptr),
@@ -643,7 +639,7 @@ class _GEODE_EXPORT TcrMessage {
   std::chrono::milliseconds m_messageResponseTimeout;
   bool m_boolValue;
   std::unique_ptr<DataInput> m_delta;
-  int8_t* m_deltaBytes;
+  std::vector<int8_t> m_deltaBytes;
   int32_t m_deltaBytesLen;
   bool m_isCallBackArguement;
   std::shared_ptr<BucketServerLocation> m_bucketServerLocation;

@@ -56,8 +56,8 @@ class CqDeltaListener : public CqListener {
     auto deltaValue = aCqEvent.getDeltaValue();
     DeltaTestImpl newValue;
     auto input = getHelper()->getCache()->createDataInput(
-        reinterpret_cast<const uint8_t*>(deltaValue->value()),
-        deltaValue->length());
+        reinterpret_cast<const uint8_t*>(deltaValue->value().data()),
+        deltaValue->value().size());
     newValue.fromDelta(*input);
     if (newValue.getIntVar() == 5) {
       m_deltaCount++;

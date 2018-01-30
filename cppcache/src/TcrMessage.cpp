@@ -297,12 +297,10 @@ void TcrMessage::readSecureObjectPart(DataInput& input, bool defaultString,
         LOGDEBUG("reading connectionid");
         // TODO: this will execute always
         // input.rea.readInt(&connectionId);
-        // m_connectionIDBytes =
-        // CacheableBytes::create(input.currentBufferPosition(), lenObj);
-        // m_connectionIDBytes = readCacheableBytes(input, lenObj);
-        m_connectionIDBytes = CacheableBytes::create(
-            reinterpret_cast<const int8_t*>(input.currentBufferPosition()),
-            lenObj);
+        m_connectionIDBytes = std::make_shared<CacheableBytes>(
+            std::vector<int8_t>(
+                input.currentBufferPosition(),
+                input.currentBufferPosition() + sizeof(int8_t) * lenObj));
         input.advanceCursor(lenObj);
       }
     }
@@ -322,8 +320,10 @@ void TcrMessage::readUniqueIDObjectPart(DataInput& input) {
   LOGDEBUG("TcrMessage::readUniqueIDObjectPart lenObj = %d isObj = %d", lenObj,
            isObj);
   if (lenObj > 0) {
-    m_value = CacheableBytes::create(
-        reinterpret_cast<const int8_t*>(input.currentBufferPosition()), lenObj);
+    std::vector<int8_t> data;
+    data.assign(input.currentBufferPosition(),
+                input.currentBufferPosition() + lenObj);
+    m_value = std::make_shared<CacheableBytes>(data);
     input.advanceCursor(lenObj);
   }
 }
@@ -332,7 +332,7 @@ int64_t TcrMessage::getConnectionId(TcrConnection* conn) {
   if (m_connectionIDBytes != nullptr) {
    auto tmp = conn->decryptBytes(m_connectionIDBytes);
    auto di = m_tcdm->getConnectionManager().getCacheImpl()->createDataInput(
-       reinterpret_cast<const uint8_t*>(tmp->value()), tmp->length());
+       reinterpret_cast<const uint8_t*>(tmp->value().data()), tmp->length());
    return di->readInt64();
   } else {
     LOGWARN("Returning 0 as internal connection ID msgtype = %d ", m_msgType);
@@ -347,7 +347,8 @@ int64_t TcrMessage::getUniqueId(TcrConnection* conn) {
     auto tmp = conn->decryptBytes(encryptBytes);
 
     auto di = m_tcdm->getConnectionManager().getCacheImpl()->createDataInput(
-        reinterpret_cast<const uint8_t*>(tmp->value()), tmp->length());
+        reinterpret_cast<const uint8_t*>(tmp->value().data()),
+        tmp->value().size());
     return di->readInt64();
   }
   return 0;
@@ -1187,11 +1188,11 @@ void TcrMessage::handleByteArrayResponse(
         m_deltaBytesLen = input->readInt32();
 
         input->advanceCursor(1);  // ignore byte
-        m_deltaBytes = new int8_t[m_deltaBytesLen];
-        input->readBytesOnly(m_deltaBytes, m_deltaBytesLen);
+        m_deltaBytes.resize(m_deltaBytesLen);
+        input->readBytesOnly(m_deltaBytes.data(), m_deltaBytes.size());
         m_delta =
             m_tcdm->getConnectionManager().getCacheImpl()->createDataInput(
-                reinterpret_cast<const uint8_t*>(m_deltaBytes),
+                reinterpret_cast<const uint8_t*>(m_deltaBytes.data()),
                 m_deltaBytesLen);
       } else {
         readObjectPart(*input);
@@ -1915,14 +1916,15 @@ TcrMessageRegisterInterestList::TcrMessageRegisterInterestList(
 
   writeObjectPart(cal);
 
-  int8_t bytes[2];
+  std::vector<int8_t> bytes;
   std::shared_ptr<CacheableBytes> byteArr = nullptr;
-  bytes[0] = receiveValues ? 0 : 1;  // reveive values
-  byteArr = CacheableBytes::create(bytes, 1);
+  bytes.push_back(receiveValues ? 0 : 1);  // reveive values
+  byteArr = std::make_shared<CacheableBytes>(bytes);
   writeObjectPart(byteArr);
+  bytes.resize(2);
   bytes[0] = isCachingEnabled ? 1 : 0;  // region policy
   bytes[1] = 0;                         // serialize values
-  byteArr = CacheableBytes::create(bytes, 2);
+  byteArr = std::make_shared<CacheableBytes>(bytes);
   writeObjectPart(byteArr);
   writeMessageLength();
   m_interestPolicy = interestPolicy.ordinal;
@@ -2008,14 +2010,15 @@ TcrMessageRegisterInterest::TcrMessageRegisterInterest(
   writeBytePart(isDurable ? 1 : 0);
   writeRegionPart(str2);  // regexp string
 
-  int8_t bytes[2];
+  std::vector<int8_t> bytes;
   std::shared_ptr<CacheableBytes> byteArr = nullptr;
-  bytes[0] = receiveValues ? 0 : 1;
-  byteArr = CacheableBytes::create(bytes, 1);
+  bytes.push_back(receiveValues ? 0 : 1);
+  byteArr = std::make_shared<CacheableBytes>(bytes);
   writeObjectPart(byteArr);
+  bytes.resize(2);
   bytes[0] = isCachingEnabled ? 1 : 0;  // region data policy
   bytes[1] = 0;                         // serializevalues
-  byteArr = CacheableBytes::create(bytes, 2);
+  byteArr = std::make_shared<CacheableBytes>(bytes);
   writeObjectPart(byteArr);
 
   writeMessageLength();
@@ -2563,9 +2566,8 @@ TcrMessageRemoveUserAuth::TcrMessageRemoveUserAuth(
   LOGDEBUG("Tcrmessage sending REMOVE_USER_AUTH message to server");
   writeHeader(m_msgType, 1);
   // adding dummy part as server has check for numberofparts > 0
-  int8_t dummy = 0;
-  if (keepAlive) dummy = 1;
-  auto cbp = CacheableBytes::create(&dummy, 1);
+  auto cbp = std::make_shared<CacheableBytes>(
+      std::vector<int8_t>{static_cast<int8_t>(keepAlive ? 1 : 0)});
   writeObjectPart(cbp, false);
   writeMessageLength();
   LOGDEBUG("TcrMessage REMOVE_USER_AUTH = %s ",
@@ -2583,9 +2585,9 @@ void TcrMessage::createUserCredentialMessage(TcrConnection* conn) {
 
   if (m_creds != nullptr) m_creds->toData(*dOut);
 
-  auto credBytes =
-      CacheableBytes::create(reinterpret_cast<const int8_t*>(dOut->getBuffer()),
-                             dOut->getBufferLength());
+  std::vector<int8_t> data;
+  data.assign(dOut->getBuffer(), dOut->getBuffer() + dOut->getBufferLength());
+  auto credBytes = std::make_shared<CacheableBytes>(data);
   auto encryptBytes = conn->encryptBytes(credBytes);
   writeObjectPart(encryptBytes);
 
@@ -2614,9 +2616,11 @@ void TcrMessage::addSecurityPart(int64_t connectionId, int64_t unique_id,
   dOutput->writeInt(connectionId);
   dOutput->writeInt(unique_id);
 
-  auto bytes = CacheableBytes::create(
-      reinterpret_cast<const int8_t*>(dOutput->getBuffer()),
-      dOutput->getBufferLength());
+  std::vector<int8_t> data;
+  data.assign(
+    dOutput->getBuffer(),
+    dOutput->getBuffer() + sizeof(int8_t) * dOutput->getBufferLength());
+  auto bytes = std::make_shared<CacheableBytes>(data);
 
   auto encryptBytes = conn->encryptBytes(bytes);
 
@@ -2644,9 +2648,11 @@ void TcrMessage::addSecurityPart(int64_t connectionId, TcrConnection* conn) {
 
   dOutput->writeInt(connectionId);
 
-  auto bytes = CacheableBytes::create(
-      reinterpret_cast<const int8_t*>(dOutput->getBuffer()),
-      dOutput->getBufferLength());
+  std::vector<int8_t> data;
+  data.assign(
+      dOutput->getBuffer(),
+      dOutput->getBuffer() + sizeof(int8_t) * dOutput->getBufferLength());
+  auto bytes = std::make_shared<CacheableBytes>(data);
 
   auto encryptBytes = conn->encryptBytes(bytes);
 
@@ -2823,12 +2829,6 @@ void TcrMessage::setData(const char* bytearray, int32_t len, uint16_t memId,
 
 TcrMessage::~TcrMessage() {
   _GEODE_SAFE_DELETE(m_cqs);
-  /* adongre
-   * CID 29167: Non-array delete for scalars (DELETE_ARRAY)
-   * Coverity - II
-   */
-  // _GEODE_SAFE_DELETE( m_deltaBytes );
-  _GEODE_SAFE_DELETE_ARRAY(m_deltaBytes);
 }
 
 const std::string& TcrMessage::getRegionName() const { return m_regionName; }

@@ -149,7 +149,7 @@ void PdxInstanceImpl::writeField(PdxWriter& writer,
       break;
     }
     case PdxFieldTypes::BYTE_ARRAY: {
-      if (auto&& val = std::dynamic_pointer_cast<CacheableArray<int8_t>>(value)) {
+      if (auto&& val = std::dynamic_pointer_cast<CacheableBytes>(value)) {
         writer.writeByteArray(fieldName, val->value());
       }
       break;
@@ -223,7 +223,7 @@ void PdxInstanceImpl::writeField(PdxWriter& writer,
         for (auto&& entry : *vector) {
           if (auto&& val = std::dynamic_pointer_cast<CacheableBytes>(entry)) {
             values[i] = const_cast<int8_t*>(
-                reinterpret_cast<const int8_t*>(val->value()));
+                reinterpret_cast<const int8_t*>(val->value().data()));
             lengths[i] = val->length();
           }
           i++;
@@ -1952,7 +1952,9 @@ void PdxInstanceImpl::setField(const std::string& fieldName, int8_t** value,
   }
   auto cacheableObject = CacheableVector::create();
   for (int i = 0; i < arrayLength; i++) {
-    auto ptr = CacheableBytes::create(value[i], elementLength[i]);
+	std::vector<int8_t> data;
+	data.assign(value[i], value[i] + sizeof(int8_t) *elementLength[i]);
+    auto ptr = CacheableBytes::create(data);
     cacheableObject->push_back(ptr);
   }
   m_updatedFields[fieldName] = cacheableObject;

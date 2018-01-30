@@ -30,14 +30,12 @@ TestObject1::TestObject1()
 TestObject1::TestObject1(std::string& str, int32_t id) {
   name = CacheableString::create(str.c_str());
   identifier = id;
-  int8_t* bytes;
-  _GEODE_NEW(bytes, int8_t[1024 * 4]);
+  std::vector<int8_t> bytes(1024 * 4);
   bytes[0] = 'A';
   for (int i = 1; i <= 1024 * 2; i = i * 2) {
-    memcpy(bytes + i, bytes, i);
+    memcpy(&bytes[i], &bytes[0], i);
   }
-  arr = CacheableBytes::create(bytes, 1024 * 4);
-  delete bytes;
+  arr = CacheableBytes::create(bytes);
 }
 
 TestObject1::TestObject1(TestObject1& rhs) {
@@ -45,11 +43,11 @@ TestObject1::TestObject1(TestObject1& rhs) {
              ? nullptr
              : CacheableString::create(rhs.name->value().c_str());
   identifier = rhs.identifier;
-  arr = CacheableBytes::create(rhs.arr->value(), rhs.arr->length());
+  arr = CacheableBytes::create(rhs.arr->value());
 }
 
 void TestObject1::toData(DataOutput& output) const {
-  output.writeBytes(arr->value(), arr->length());
+  output.writeBytes(arr->value().data(), arr->length());
   output.writeObject(name);
   output.writeInt(identifier);
 }
@@ -58,7 +56,9 @@ void TestObject1::fromData(DataInput& input) {
   int8_t* bytes;
   int32_t len;
   input.readBytes(&bytes, &len);
-  arr = CacheableBytes::create(bytes, len);
+  std::vector<int8_t> vbytes;
+  vbytes.assign(bytes, bytes + len);
+  arr = CacheableBytes::create(vbytes);
   delete bytes;
   name = std::static_pointer_cast<CacheableString>(input.readObject());
   identifier = input.readInt32();

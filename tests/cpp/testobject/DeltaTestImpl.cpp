@@ -35,8 +35,8 @@ DeltaTestImpl::DeltaTestImpl() : Delta(nullptr) {
   intVar = 1;
   str = CacheableString::create("test");
   doubleVar = 1.1;
-  uint8_t byte = 'A';
-  byteArr = CacheableBytes::create(reinterpret_cast<const int8_t*>(&byte), 1);
+  std::vector<int8_t> byte{'A'};
+  byteArr = CacheableBytes::create(byte);
   testObj = nullptr;
   m_hasDelta = false;
   deltaBits = 0;
@@ -57,8 +57,10 @@ DeltaTestImpl::DeltaTestImpl(const DeltaTestImpl& rhs) : Delta(nullptr) {
   doubleVar = rhs.doubleVar;
   byteArr =
       (rhs.byteArr == nullptr ? nullptr
-                              : CacheableBytes::create(rhs.byteArr->value(),
-                                                       rhs.byteArr->length()));
+                              : CacheableBytes::create(
+       std::vector<int8_t>(
+            rhs.byteArr->value().data(),
+            rhs.byteArr->value().data() + sizeof(int8_t) * rhs.byteArr->length())));
   testObj = (rhs.testObj == nullptr
                  ? nullptr
                  : std::shared_ptr<TestObject1>(new TestObject1(*rhs.testObj)));

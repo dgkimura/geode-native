@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <vector>
+
 #include "DiffieHellman.hpp"
 #include "util/Log.hpp"
 #include <geode/ExceptionTypes.hpp>
@@ -128,14 +130,15 @@ void DiffieHellman::clearDhKeys(void) {
 std::shared_ptr<CacheableBytes> DiffieHellman::getPublicKey(void) {
   int keyLen = 0;
   auto pubKeyPtr = gf_getPublicKey_Ptr(m_dhCtx, &keyLen);
-  return CacheableBytes::createNoCopy(reinterpret_cast<int8_t*>(pubKeyPtr),
-                                      keyLen);
+  return std::make_shared<CacheableBytes>(std::vector<int8_t>(
+    pubKeyPtr,
+    pubKeyPtr + sizeof(int8_t) * keyLen));
 }
 
 void DiffieHellman::setPublicKeyOther(
     const std::shared_ptr<CacheableBytes>& pubkey) {
   return gf_setPublicKeyOther_Ptr(
-      m_dhCtx, reinterpret_cast<const uint8_t*>(pubkey->value()),
+      m_dhCtx, reinterpret_cast<const uint8_t*>(pubkey->value().data()),
       pubkey->length());
 }
 
@@ -144,29 +147,32 @@ void DiffieHellman::computeSharedSecret(void) {
 }
 std::shared_ptr<CacheableBytes> DiffieHellman::encrypt(
     const std::shared_ptr<CacheableBytes>& cleartext) {
-  return encrypt(reinterpret_cast<const uint8_t*>(cleartext->value()),
-                 cleartext->length());
+  return encrypt(reinterpret_cast<const uint8_t*>(cleartext->value().data()),
+                 cleartext->value().size());
 }
-std::shared_ptr<CacheableBytes> DiffieHellman::encrypt(const uint8_t* cleartext,
-                                                       int len) {
+std::shared_ptr<CacheableBytes> DiffieHellman::encrypt(
+    const uint8_t* cleartext,
+    int len) {
   int cipherLen = 0;
   unsigned char* ciphertextPtr =
       gf_encryptDH_Ptr(m_dhCtx, cleartext, len, &cipherLen);
-  return CacheableBytes::createNoCopy(reinterpret_cast<int8_t*>(ciphertextPtr),
-                                      cipherLen);
+  return std::make_shared<CacheableBytes>(std::vector<int8_t>(
+      ciphertextPtr,
+      ciphertextPtr + sizeof(int8_t) * cipherLen));
 }
 std::shared_ptr<CacheableBytes> DiffieHellman::decrypt(
     const std::shared_ptr<CacheableBytes>& cleartext) {
-  return decrypt(reinterpret_cast<const uint8_t*>(cleartext->value()),
-                 cleartext->length());
+  return decrypt(reinterpret_cast<const uint8_t*>(cleartext->value().data()),
+                 cleartext->value().size());
 }
 std::shared_ptr<CacheableBytes> DiffieHellman::decrypt(const uint8_t* cleartext,
-                                                       int len) {
+                                                         int len) {
   int cipherLen = 0;
   unsigned char* ciphertextPtr =
       gf_decryptDH_Ptr(m_dhCtx, cleartext, len, &cipherLen);
-  return CacheableBytes::createNoCopy(reinterpret_cast<int8_t*>(ciphertextPtr),
-                                      cipherLen);
+  std::vector<int8_t> data;
+  data.assign(ciphertextPtr, ciphertextPtr + cipherLen);
+  return CacheableBytes::create(data);
 }
 
 bool DiffieHellman::verify(const std::shared_ptr<CacheableString>& subject,
@@ -176,8 +182,8 @@ bool DiffieHellman::verify(const std::shared_ptr<CacheableString>& subject,
   LOGDEBUG("DiffieHellman::verify");
   bool result = gf_verifyDH_Ptr(
       m_dhCtx, subject->value().c_str(),
-      reinterpret_cast<const uint8_t*>(challenge->value()), challenge->length(),
-      reinterpret_cast<const uint8_t*>(response->value()), response->length(),
+      reinterpret_cast<const uint8_t*>(challenge->value().data()), challenge->length(),
+      reinterpret_cast<const uint8_t*>(response->value().data()), response->length(),
       &errCode);
   LOGDEBUG("DiffieHellman::verify 2");
   if (errCode == DH_ERR_SUBJECT_NOT_FOUND) {

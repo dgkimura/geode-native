@@ -271,7 +271,8 @@ bool TcrConnection::InitTcrConnection(
             serverChallengeBytes[pos] = getrand(255);
           }
           serverChallenge = CacheableBytes::create(
-              reinterpret_cast<int8_t*>(serverChallengeBytes), 64);
+              std::vector<int8_t>(serverChallengeBytes,
+                                  serverChallengeBytes + sizeof(int8_t) * 64));
           serverChallenge->toData(*handShakeMsg);
         }
       } else {                       // if isDhOn
@@ -399,7 +400,7 @@ bool TcrConnection::InitTcrConnection(
     }
     auto queueSizeMsg = readHandshakeData(4, connectTimeout);
     auto dI = cacheImpl->createDataInput(
-        reinterpret_cast<const uint8_t*>(queueSizeMsg->value()),
+        reinterpret_cast<const uint8_t*>(queueSizeMsg->value().data()),
         queueSizeMsg->length());
     int32_t queueSize = 0;
     queueSize = dI->readInt32();
@@ -431,13 +432,13 @@ bool TcrConnection::InitTcrConnection(
       if (static_cast<int8_t>((*arrayLenHeader)[0]) == -2) {
         auto recvMsgLenBytes = readHandshakeData(2, connectTimeout);
         auto dI2 = m_connectionManager->getCacheImpl()->createDataInput(
-            reinterpret_cast<const uint8_t*>(recvMsgLenBytes->value()),
+            reinterpret_cast<const uint8_t*>(recvMsgLenBytes->value().data()),
             recvMsgLenBytes->length());
         recvMsgLen = dI2->readInt16();
       } else if (static_cast<int8_t>((*arrayLenHeader)[0]) == -3) {
         auto recvMsgLenBytes = readHandshakeData(4, connectTimeout);
         auto dI2 = m_connectionManager->getCacheImpl()->createDataInput(
-            reinterpret_cast<const uint8_t*>(recvMsgLenBytes->value()),
+            reinterpret_cast<const uint8_t*>(recvMsgLenBytes->value().data()),
             recvMsgLenBytes->length());
         recvMsgLen = dI2->readInt32();
       }
@@ -446,7 +447,7 @@ bool TcrConnection::InitTcrConnection(
       if (getEndpointObject()->getDistributedMemberID() == 0) {
         LOGDEBUG("Deserializing distributed member Id");
         auto diForClient = cacheImpl->createDataInput(
-            reinterpret_cast<const uint8_t*>(recvMessage->value()),
+            reinterpret_cast<const uint8_t*>(recvMessage->value().data()),
             recvMessage->length());
         auto member = std::static_pointer_cast<ClientProxyMembershipID>(
             diForClient->readObject());
@@ -458,7 +459,7 @@ bool TcrConnection::InitTcrConnection(
 
     auto recvMsgLenBytes = readHandshakeData(2, connectTimeout);
     auto dI3 = m_connectionManager->getCacheImpl()->createDataInput(
-        reinterpret_cast<const uint8_t*>(recvMsgLenBytes->value()),
+        reinterpret_cast<const uint8_t*>(recvMsgLenBytes->value().data()),
         recvMsgLenBytes->length());
     uint16_t recvMsgLen2 = dI3->readInt16();
     auto recvMessage = readHandshakeData(recvMsgLen2, connectTimeout);
@@ -466,11 +467,11 @@ bool TcrConnection::InitTcrConnection(
     if (!isClientNotification) {
       auto deltaEnabledMsg = readHandshakeData(1, connectTimeout);
       auto di = m_connectionManager->getCacheImpl()->createDataInput(
-          reinterpret_cast<const uint8_t*>(deltaEnabledMsg->value()), 1);
+          reinterpret_cast<const uint8_t*>(deltaEnabledMsg->value().data()), 1);
       ThinClientBaseDM::setDeltaEnabledOnServer(di->readBoolean());
     }
 
-    switch ((*acceptanceCode)[0]) {
+    switch (acceptanceCode->value()[0]) {
       case REPLY_OK:
       case SUCCESSFUL_SERVER_TO_CLIENT:
         LOGFINER("Handshake reply: %u,%u,%u", (*acceptanceCode)[0],
@@ -478,21 +479,21 @@ bool TcrConnection::InitTcrConnection(
         if (isClientNotification) readHandshakeInstantiatorMsg(connectTimeout);
         break;
       case REPLY_AUTHENTICATION_FAILED: {
-        AuthenticationFailedException ex((char*)recvMessage->value());
+        AuthenticationFailedException ex((char*)recvMessage->value().data());
         GF_SAFE_DELETE_CON(m_conn);
         throwException(ex);
         // not expected to be reached
         break;
       }
       case REPLY_AUTHENTICATION_REQUIRED: {
-        AuthenticationRequiredException ex((char*)recvMessage->value());
+        AuthenticationRequiredException ex((char*)recvMessage->value().data());
         GF_SAFE_DELETE_CON(m_conn);
         throwException(ex);
         // not expected to be reached
         break;
       }
       case REPLY_DUPLICATE_DURABLE_CLIENT: {
-        DuplicateDurableClientException ex((char*)recvMessage->value());
+        DuplicateDurableClientException ex((char*)recvMessage->value().data());
         GF_SAFE_DELETE_CON(m_conn);
         throwException(ex);
         // not expected to be reached
@@ -502,10 +503,10 @@ bool TcrConnection::InitTcrConnection(
       case REPLY_INVALID:
       case UNSUCCESSFUL_SERVER_TO_CLIENT: {
         LOGERROR("Handshake rejected by server[%s]: %s",
-                 m_endpointObj->name().c_str(), (char*)recvMessage->value());
+                 m_endpointObj->name().c_str(), (char*)recvMessage->value().data());
         auto message =
             std::string("TcrConnection::TcrConnection: ") +
-            "Handshake rejected by server: " + (char*)recvMessage->value();
+            "Handshake rejected by server: " + (char*)recvMessage->value().data();
         CacheServerException ex(message);
         GF_SAFE_DELETE_CON(m_conn);
         throw ex;
@@ -515,11 +516,11 @@ bool TcrConnection::InitTcrConnection(
             "Unknown error[%d] received from server [%s] in handshake: "
             "%s",
             (*acceptanceCode)[0], m_endpointObj->name().c_str(),
-            recvMessage->value());
+            recvMessage->value().data());
         auto message =
             std::string("TcrConnection::TcrConnection: Unknown error") +
             " received from server in handshake: " +
-            (char*)recvMessage->value();
+            (char*)recvMessage->value().data();
         MessageException ex(message);
         GF_SAFE_DELETE_CON(m_conn);
         throw ex;
@@ -1137,8 +1138,9 @@ std::shared_ptr<CacheableBytes> TcrConnection::readHandshakeData(
   _GEODE_NEW(recvMessage, char[msgLength + 1]);
   recvMessage[msgLength] = '\0';
   if (msgLength == 0) {
-    return CacheableBytes::createNoCopy(reinterpret_cast<int8_t*>(recvMessage),
-                                        1);
+    return CacheableBytes::create(std::vector<int8_t>(
+        recvMessage,
+        recvMessage + sizeof(int8_t) * 1));
   }
   if ((error = receiveData(recvMessage, msgLength, connectTimeout, false)) !=
       CONN_NOERR) {
@@ -1156,8 +1158,9 @@ std::shared_ptr<CacheableBytes> TcrConnection::readHandshakeData(
                            "Handshake failure"));
     }
   } else {
-    return CacheableBytes::createNoCopy(reinterpret_cast<int8_t*>(recvMessage),
-                                        msgLength + 1);
+    return CacheableBytes::create(std::vector<int8_t>(
+        recvMessage,
+        recvMessage + sizeof(int8_t) * msgLength + 1));
   }
   return nullptr;
 }
@@ -1191,8 +1194,9 @@ std::shared_ptr<CacheableBytes> TcrConnection::readHandshakeRawData(
     // not expected to be reached
     return nullptr;
   } else {
-    return CacheableBytes::createNoCopy(reinterpret_cast<int8_t*>(recvMessage),
-                                        msgLength);
+    return std::make_shared<CacheableBytes>(std::vector<int8_t>(
+        recvMessage,
+        recvMessage + sizeof(int8_t) * msgLength));
   }
 }
 
@@ -1207,7 +1211,7 @@ uint32_t TcrConnection::readHandshakeArraySize(
     std::chrono::microseconds connectTimeout) {
   auto codeBytes = readHandshakeData(1, connectTimeout);
   auto codeDI = m_connectionManager->getCacheImpl()->createDataInput(
-      reinterpret_cast<const uint8_t*>(codeBytes->value()),
+      reinterpret_cast<const uint8_t*>(codeBytes->value().data()),
       codeBytes->length());
   uint8_t code = codeDI->read();
   uint32_t arraySize = 0;
@@ -1219,14 +1223,14 @@ uint32_t TcrConnection::readHandshakeArraySize(
       if (code == 0xFE) {
         auto lenBytes = readHandshakeData(2, connectTimeout);
         auto lenDI = m_connectionManager->getCacheImpl()->createDataInput(
-            reinterpret_cast<const uint8_t*>(lenBytes->value()),
+            reinterpret_cast<const uint8_t*>(lenBytes->value().data()),
             lenBytes->length());
         uint16_t val = lenDI->readInt16();
         tempLen = val;
       } else if (code == 0xFD) {
         auto lenBytes = readHandshakeData(4, connectTimeout);
         auto lenDI = m_connectionManager->getCacheImpl()->createDataInput(
-            reinterpret_cast<const uint8_t*>(lenBytes->value()),
+            reinterpret_cast<const uint8_t*>(lenBytes->value().data()),
             lenBytes->length());
         uint32_t val = lenDI->readInt32();
         tempLen = val;
@@ -1359,7 +1363,7 @@ std::shared_ptr<CacheableString> TcrConnection::readHandshakeString(
     case GeodeTypeIds::CacheableASCIIString: {
       auto lenBytes = readHandshakeData(2, connectTimeout);
       auto lenDI = m_connectionManager->getCacheImpl()->createDataInput(
-          reinterpret_cast<const uint8_t*>(lenBytes->value()),
+          reinterpret_cast<const uint8_t*>(lenBytes->value().data()),
           lenBytes->length());
       length = lenDI->readInt16();
 

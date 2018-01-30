@@ -112,8 +112,9 @@ DUNIT_TASK_DEFINITION(CLIENT1, PutsTask)
       char* ptrChar = createRandCharArray(keyArr[count]);
 
       auto emptyBytesArr = CacheableBytes::create();
-      auto bytePtrSent = CacheableBytes::createNoCopy(
-          reinterpret_cast<int8_t*>(ptr), keyArr[count]);
+      auto bytePtrSent = std::make_shared<CacheableBytes>(std::vector<int8_t>(
+          ptr,
+          ptr + sizeof(int8_t) * keyArr[count]));
       auto stringPtrSent =
           CacheableString::create(std::string(ptrChar, keyArr[count]));
 
@@ -147,7 +148,7 @@ DUNIT_TASK_DEFINITION(CLIENT1, PutsTask)
              "Empty Bytes Array ptr is nullptr");
 
       bool isSameBytes = (bytePtrReturn->length() == bytePtrSent->length() &&
-                          !memcmp(bytePtrReturn->value(), bytePtrSent->value(),
+                          !memcmp(bytePtrReturn->value().data(), bytePtrSent->value().data(),
                                   bytePtrReturn->length()));
       bool isSameString =
           (stringPtrReturn->length() == stringPtrSent->length() &&
