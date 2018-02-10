@@ -490,29 +490,9 @@ _GEODE_CACHEABLE_KEY_TYPE_(char16_t, CacheableCharacter, 3);
 
 // Instantiations for array built-in Cacheables
 
-_GEODE_CACHEABLE_ARRAY_TYPE_DEF_(int8_t, CacheableBytes);
-/**
- * An immutable wrapper for byte arrays that can serve as
- * a distributable object for caching.
- */
-_GEODE_CACHEABLE_ARRAY_TYPE_(int8_t, CacheableBytes);
-
 template <typename T, GeodeTypeIds::IdValues GeodeTypeId>
 class _GEODE_EXPORT CacheableArray : public Cacheable {
  protected:
-
-  inline T operator[](uint32_t index) const {
-    if (static_cast<int32_t>(index) >= m_value.size()) {
-      throw OutOfRangeException(
-          "CacheableArray::operator[]: Index out of range.");
-    }
-    return m_value[index];
-  }
-
-  virtual void toData(DataOutput& output) const override {
-    apache::geode::client::serializer::writeArrayObject(output, m_value);
-  }
-
   virtual void fromData(DataInput& input) override {
     m_value = apache::geode::client::serializer::readArrayObject<T>(input);
   }
@@ -536,9 +516,10 @@ class _GEODE_EXPORT CacheableArray : public Cacheable {
  public:
   inline CacheableArray() {}
   inline CacheableArray(int32_t length) : m_value(length) {}
-  inline CacheableArray(std::vector<T> value) : m_value(value) {}
+  inline CacheableArray(const std::vector<T>& value) : m_value(value) {}
+  inline CacheableArray(std::vector<T>&& value) : m_value(std::move(value)) {}
 
-  inline const std::vector<T> value() const { return m_value; }
+  inline const std::vector<T>& value() const { return m_value; }
   inline int32_t length() const { return m_value.size(); }
   static std::shared_ptr<Serializable> createDeserializable() {
     return std::make_shared<CacheableArray<T, GeodeTypeId>>();
@@ -547,14 +528,30 @@ class _GEODE_EXPORT CacheableArray : public Cacheable {
     return std::make_shared<CacheableArray<T, GeodeTypeId>>();
   }
   inline static std::shared_ptr<CacheableArray<T, GeodeTypeId>> create(
-      int32_t length) {
-    return std::make_shared<CacheableArray<T, GeodeTypeId>>(length);
-  }
-  inline static std::shared_ptr<CacheableArray<T, GeodeTypeId>> create(
-      const std::vector<T> value) {
+      const std::vector<T>& value) {
     return std::make_shared<CacheableArray<T, GeodeTypeId>>(value);
   }
+  inline static std::shared_ptr<CacheableArray<T, GeodeTypeId>> create(
+	  std::vector<T>&& value) {
+	  return std::make_shared<CacheableArray<T, GeodeTypeId>>(std::move(value));
+  }
+  inline T operator[](uint32_t index) const {
+	  if (static_cast<int32_t>(index) >= m_value.size()) {
+		  throw OutOfRangeException(
+			  "CacheableArray::operator[]: Index out of range.");
+	  }
+	  return m_value[index];
+  }
+  virtual void toData(DataOutput& output) const override {
+	  apache::geode::client::serializer::writeArrayObject(output, m_value);
+  }
 };
+
+/**
+* An immutable wrapper for byte arrays that can serve as
+* a distributable object for caching.
+*/
+using CacheableBytes = CacheableArray<int8_t, GeodeTypeIds::CacheableBytes>;
 
 /**
  * An immutable wrapper for array of booleans that can serve as
