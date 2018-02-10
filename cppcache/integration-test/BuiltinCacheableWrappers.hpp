@@ -1027,7 +1027,8 @@ class CacheableStringArrayWrapper : public CacheableWrapper {
         randArr[arrayIndex] = CacheableString::create(randStr);
       }
     }
-    m_cacheableObject = CacheableStringArray::create(randArr, arraySize);
+    m_cacheableObject = CacheableStringArray::create(
+		std::vector<std::shared_ptr<CacheableString>>(randArr, randArr + arraySize));
   }
 
   virtual uint32_t getCheckSum(const std::shared_ptr<Cacheable> object) const {

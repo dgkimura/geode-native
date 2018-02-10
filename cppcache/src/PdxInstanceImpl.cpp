@@ -1345,7 +1345,8 @@ std::shared_ptr<CacheableStringArray> PdxInstanceImpl::getFieldNames() {
   }
 
   if (size > 0) {
-    return CacheableStringArray::createNoCopy(ptrArr, size);
+    return CacheableStringArray::create(
+		std::vector<std::shared_ptr<CacheableString>>(ptrArr, ptrArr + size));
   }
   return nullptr;
 }
@@ -1980,7 +1981,8 @@ void PdxInstanceImpl::setField(const std::string& fieldName, std::string* value,
     }
   }
   if (length > 0) {
-    auto cacheableObject = CacheableStringArray::create(ptrArr, length);
+    auto cacheableObject = CacheableStringArray::create(
+		std::vector<std::shared_ptr<CacheableString>>(ptrArr, ptrArr + length));
     m_updatedFields[fieldName] = cacheableObject;
   }
 }

@@ -255,7 +255,7 @@ std::shared_ptr<PdxInstanceFactory> PdxInstanceFactoryImpl::writeStringArray(
       ptrArr.push_back(CacheableString::create(v));
     }
     auto cacheableObject =
-        CacheableStringArray::create(ptrArr.data(), ptrArr.size());
+        CacheableStringArray::create(ptrArr);
     m_FieldVsValues.emplace(fieldName, cacheableObject);
   }
   return shared_from_this();
